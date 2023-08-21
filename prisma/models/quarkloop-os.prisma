@@ -1,0 +1,44 @@
+model OperatingSystem {
+    id String @id
+
+    name        String
+    path        String    @unique
+    description String
+    overview    String?
+    imageUrl    String?
+    websiteUrl  String?
+    url1        String?
+    url2        String?
+    url3        String?
+    url4        String?
+    isVerified  Boolean   @default(false)
+    createdAt   DateTime? @default(now())
+
+    userRoleAssignment UserRoleAssignmentMap[]
+
+    workspaces  Workspace[]
+    planMetrics PlanMetrics[]
+}
+
+//@relations
+model Workspace {
+    relId Int @id
+
+    os   OperatingSystem @relation(fields: [osId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    osId String
+}
+
+//@relations
+model UserRoleAssignmentMap {
+    id   String           @id @default(cuid())
+    os   OperatingSystem? @relation(fields: [osId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    osId String?
+}
+
+//@relations
+model PlanMetrics {
+    id String @id
+
+    os   OperatingSystem? @relation(fields: [osId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    osId String?
+}
