@@ -1,0 +1,42 @@
+model Workspace {
+    relId Int @id @default(autoincrement())
+
+    id          String
+    name        String
+    path        String   @unique
+    description String?
+    accessType  Int?
+    imageUrl    String?
+    createdAt   DateTime @default(now())
+
+    userRoleAssignment UserRoleAssignmentMap[]
+    planMetrics        PlanMetrics[]
+
+    os   OperatingSystem @relation(fields: [osId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    osId String
+
+    @@unique(fields: [osId, id])
+}
+
+//@relations
+model OperatingSystem {
+    id String @id
+
+    workspaces Workspace[]
+}
+
+//@relations
+model UserRoleAssignmentMap {
+    id String @id @default(cuid())
+
+    workspace   Workspace? @relation(fields: [workspaceId], references: [relId], onUpdate: Cascade, onDelete: Cascade)
+    workspaceId Int?
+}
+
+//@relations
+model PlanMetrics {
+    id String @id
+
+    workspace   Workspace? @relation(fields: [workspaceId], references: [relId], onUpdate: Cascade, onDelete: Cascade)
+    workspaceId Int?
+}
