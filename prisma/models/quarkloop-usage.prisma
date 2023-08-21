@@ -1,0 +1,211 @@
+model Plan {
+    id String @id
+
+    type               PlanType
+    status             PlanStatus @default(Active)
+    name               String
+    description        String
+    isDefault          Boolean
+    createdAt          DateTime   @default(now())
+    updatedAt          DateTime?
+    briefFeaturesLabel String
+    briefFeatures      Json
+    buttonLabel        String
+    buttonSignupPath   String
+
+    features      PlanFeatures?
+    price         PlanPricing[]
+    subscriptions PlanSubscription[]
+}
+
+model PlanFeatures {
+    id String @id
+
+    maxOs                    Int
+    maxOsLabel               String
+    maxWorkspaces            Int
+    maxWorkspacesLabel       String
+    maxApps                  Int
+    maxAppsLabel             String
+    maxAppConversations      Int
+    maxAppConversationsLabel String
+    maxAppPages              Int
+    maxAppPagesLabel         String
+    maxAppForms              Int
+    maxAppFormsLabel         String
+    maxAppFormFields         Int
+    maxAppFormFieldsLabel    String
+    maxAppFiles              Int
+    maxAppFilesLabel         String
+
+    plan   Plan   @relation(fields: [planId], references: [id], onUpdate: Cascade, onDelete: NoAction)
+    planId String @unique
+}
+
+model PlanPricing {
+    id String @id
+
+    price     String
+    currency  PlanPricingCurreny
+    cycle     PlanPricingCycle
+    createdAt DateTime           @default(now())
+    updatedAt DateTime?
+
+    plan   Plan   @relation(fields: [planId], references: [id], onUpdate: Cascade, onDelete: NoAction)
+    planId String
+}
+
+model PlanBilling {
+    id String @id
+
+    status   Int
+    dueDate  DateTime
+    amount   Float
+    provider String
+
+    Subscription   PlanSubscription @relation(fields: [subscriptionId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    subscriptionId String
+}
+
+model PlanSubscription {
+    id String @id
+
+    status    PlanSubscriptionStatus
+    startDate DateTime
+    endDate   DateTime?
+    endReason String?
+    createdAt DateTime               @default(now())
+    updatedAt DateTime?
+
+    user   User   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    userId String
+    plan   Plan   @relation(fields: [planId], references: [id], onUpdate: Cascade, onDelete: NoAction)
+    planId String
+
+    billing PlanBilling[]
+    metrics PlanMetrics[]
+}
+
+model PlanMetrics {
+    id Int @id @default(autoincrement())
+
+    type  PlanMetricsType
+    value Json?
+
+    // usedOs          Int
+    // usedWorkspaces  Int
+    // usedApps        Int
+    // usedForms       Int
+    // usedPages       Int
+    // usedFileStorage Int
+
+    subscription   PlanSubscription @relation(fields: [subscriptionId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    subscriptionId String
+
+    os          OperatingSystem? @relation(fields: [osId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    osId        String?
+    workspace   Workspace?       @relation(fields: [workspaceId], references: [relId], onUpdate: Cascade, onDelete: Cascade)
+    workspaceId Int?
+
+    app                       App?                     @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId                     String?
+    appConversationSettings   AppConversationSettings? @relation(fields: [appConversationSettingsId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appConversationSettingsId String?
+    appPageSettings           AppPageSettings?         @relation(fields: [appPageSettingsId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appPageSettingsId         String?
+    appFormSettings           AppFormSettings?         @relation(fields: [appFormSettingsId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appFormSettingsId         String?
+    appFileSettings           AppFileSettings?         @relation(fields: [appFileSettingsId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appFileSettingsId         String?
+}
+
+enum PlanType {
+    Free
+    Standard
+    Professional
+    Enterprise
+}
+
+enum PlanStatus {
+    Active
+    Archived
+}
+
+enum PlanPricingCurreny {
+    Dollar
+    Euro
+    TurkishLira
+}
+
+enum PlanPricingCycle {
+    Monthly
+    Yearly
+}
+
+enum PlanSubscriptionStatus {
+    Active
+    Expired
+    Upgraded
+    DownGraded
+    Canceled
+}
+
+enum PlanMetricsType {
+    Os
+    Workspace
+    App
+    AppConversation
+    AppForm
+    AppFormField
+    AppPage
+    AppFile
+}
+
+//@relations
+model User {
+    id String @id
+
+    planSubscriptions PlanSubscription[]
+}
+
+//@relations
+model OperatingSystem {
+    id          String        @id
+    planMetrics PlanMetrics[]
+}
+
+//@relations
+model Workspace {
+    relId       Int           @id
+    planMetrics PlanMetrics[]
+}
+
+//@relations
+model App {
+    id          String        @id
+    planMetrics PlanMetrics[]
+}
+
+//@relations
+model AppConversationSettings {
+    id          String        @id
+    planMetrics PlanMetrics[]
+}
+
+//@relations
+model AppPageSettings {
+    id          String        @id
+    planMetrics PlanMetrics[]
+}
+
+//@relations
+model AppFormSettings {
+    id          String        @id
+    planMetrics PlanMetrics[]
+}
+
+//@relations
+model AppFileSettings {
+    id          String        @id
+    planMetrics PlanMetrics[]
+}
