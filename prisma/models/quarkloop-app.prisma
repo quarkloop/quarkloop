@@ -1,0 +1,196 @@
+model App {
+    id String @id
+
+    name          String
+    type          Int
+    visibility    Visibility
+    status        AppStatus
+    workspacePath String     @unique
+    profilePath   String     @unique
+    createdAt     DateTime?  @default(now())
+    lastUpdate    DateTime?
+    icon          String?
+    metadata      Json?
+
+    userRoleAssignment UserRoleAssignmentMap[]
+    submissions        AppSubmission[]
+
+    conversationSettings AppConversationSettings?
+    pagesSettings        AppPageSettings[]
+    formsSettings        AppFormSettings[]
+    filesSettings        AppFileSettings?
+
+    planMetrics PlanMetrics[]
+}
+
+model AppSubmission {
+    id String @id
+
+    title      String
+    stage      AppSubmissionStage @default(Draft)
+    createdAt  DateTime?          @default(now())
+    lastUpdate DateTime?
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String
+
+    appSubmissionUser   AppSubmissionUserMap[]
+    appConversationData AppConversationData[]
+}
+
+model AppSubmissionUserMap {
+    id Int @id @default(autoincrement())
+
+    role AppSubmissionRole
+
+    user            User          @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    userId          String
+    bot             Bot?          @relation(fields: [botId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    botId           String?
+    appSubmission   AppSubmission @relation(fields: [appSubmissionId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appSubmissionId String
+}
+
+model AppConversationSettings {
+    id String @id
+
+    createdAt  DateTime? @default(now())
+    lastUpdate DateTime?
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String @unique
+
+    planMetrics PlanMetrics[]
+}
+
+model AppPageSettings {
+    id String @id
+
+    name       String
+    entryPoint Boolean
+    content    String
+    createdAt  DateTime? @default(now())
+    lastUpdate DateTime?
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String
+
+    planMetrics PlanMetrics[]
+}
+
+model AppFormSettings {
+    id String @id
+
+    name       String
+    fields     Json[]
+    fieldCount Int?
+    createdAt  DateTime? @default(now())
+    lastUpdate DateTime?
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String
+
+    planMetrics PlanMetrics[]
+}
+
+model AppFileSettings {
+    id String @id
+
+    enable     Boolean
+    createdAt  DateTime? @default(now())
+    lastUpdate DateTime?
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String @unique
+
+    planMetrics PlanMetrics[]
+}
+
+model AppConversationData {
+    id Int @id @default(autoincrement())
+
+    type       AppConversationDataMessageType
+    message    String
+    createdAt  DateTime?                      @default(now())
+    lastUpdate DateTime?
+
+    appSubmission   AppSubmission? @relation(fields: [appSubmissionId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appSubmissionId String?
+}
+
+enum AppInstanceType {
+    SingleInstanceSingleUser
+    SingleInstanceMultiUser
+    MultiInstanceSingleUser
+    MultiInstanceMultiUser
+}
+
+enum Visibility {
+    PrivateNoOne
+    PrivateAnyOneWithLink
+    PrivateOsUsers
+    Public
+}
+
+enum AppStatus {
+    On
+    Off
+    Archived
+}
+
+enum AppSubmissionRole {
+    Owner
+    Reviewer
+    Reader
+}
+
+enum AppSubmissionStage {
+    Draft
+    Ready
+    OnHold
+    Closed
+    Archived
+}
+
+enum AppConversationDataMessageType {
+    Normal
+    Inline
+}
+
+//@relations
+model User {
+    id String @id
+
+    appSubmissionUser AppSubmissionUserMap[]
+}
+
+//@relations
+model UserRoleAssignmentMap {
+    id String @id @default(cuid())
+
+    App   App?    @relation(fields: [appId], references: [id])
+    appId String?
+}
+
+//@relations
+model Bot {
+    id String @id
+
+    appSubmissionUser AppSubmissionUserMap[]
+}
+
+//@relations
+model PlanMetrics {
+    id String @id
+
+    app                       App?                     @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId                     String?
+    appConversationSettings   AppConversationSettings? @relation(fields: [appConversationSettingsId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appConversationSettingsId String?
+    appPageSettings           AppPageSettings?         @relation(fields: [appPageSettingsId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appPageSettingsId         String?
+    appFormSettings           AppFormSettings?         @relation(fields: [appFormSettingsId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appFormSettingsId         String?
+    appFileSettings           AppFileSettings?         @relation(fields: [appFileSettingsId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appFileSettingsId         String?
+}
