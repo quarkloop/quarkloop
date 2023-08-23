@@ -1,0 +1,163 @@
+model User {
+    id String @id @default(cuid())
+
+    name          String?
+    email         String    @unique
+    emailVerified DateTime?
+    password      String?
+    passwordSalt  String?
+    birthday      DateTime?
+    country       String?
+    image         String?
+    createdAt     DateTime  @default(now())
+    status        Int       @default(1)
+
+    accounts Account[]
+    sessions Session[]
+
+    roleAssignments   UserRoleAssignmentMap[]
+    appSubmissionUser AppSubmissionUserMap[]
+
+    planSubscriptions PlanSubscription[]
+}
+
+model Account {
+    id String @id @default(cuid())
+
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? @db.Text
+    session_state     String?
+
+    user   User   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    userId String
+
+    @@unique([provider, providerAccountId])
+}
+
+model Session {
+    id String @id @default(cuid())
+
+    sessionToken String   @unique
+    expires      DateTime
+
+    user   User   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    userId String
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+model Bot {
+    id String @id @default(cuid())
+
+    name      String?
+    email     String   @unique
+    createdAt DateTime @default(now())
+    status    Int      @default(1)
+
+    roleAssignments   UserRoleAssignmentMap[]
+    appSubmissionUser AppSubmissionUserMap[]
+}
+
+model UserRoleAssignmentMap {
+    id String @id @default(cuid())
+
+    role      PermissionRole
+    type      PermissionType
+    createdAt DateTime       @default(now())
+
+    user        User             @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    userId      String
+    bot         Bot?             @relation(fields: [botId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    botId       String?
+    os          OperatingSystem? @relation(fields: [osId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    osId        String?
+    workspace   Workspace?       @relation(fields: [workspaceId], references: [relId], onUpdate: Cascade, onDelete: Cascade)
+    workspaceId Int?
+    app         App?             @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId       String?
+}
+
+enum PermissionRole {
+    Owner
+    Admin
+    Member
+    Viewer
+    Contributer
+    Guest
+}
+
+enum PermissionType {
+    OS
+    Workspace
+    App
+}
+
+// model Role {
+//     id String @id @default(cuid())
+
+//     name String @unique
+
+//     permissions     RolePermission[]
+//     roleAssignments UserRoleAssignmentMap[]
+// }
+
+// model RolePermission {
+//     id String @id @default(cuid())
+
+//     name   String
+//     score  Int
+//     role   Role   @relation(fields: [roleId], references: [id])
+//     roleId String
+// }
+
+//@relations
+model OperatingSystem {
+    id String @id @default(cuid())
+
+    roleAssignments UserRoleAssignmentMap[]
+}
+
+//@relations
+model Workspace {
+    relId Int @id
+
+    roleAssignments UserRoleAssignmentMap[]
+}
+
+//@relations
+model App {
+    id String @id
+
+    roleAssignments UserRoleAssignmentMap[]
+}
+
+//@relations
+model AppSubmissionUserMap {
+    id String @id
+
+    user   User?   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    userId String?
+    bot    Bot?    @relation(fields: [botId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    botId  String?
+}
+
+//@relations
+model PlanSubscription {
+    id String @id
+
+    User   User   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    userId String
+}
