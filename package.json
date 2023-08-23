@@ -1,6 +1,8 @@
 {
   "name": "@quarkloop/quarkloop",
   "version": "0.0.0",
+  "author": "Quarkloop.",
+  "license": "Apache-2.0",
   "private": true,
   "workspaces": [
     "apps/quarkloop",
