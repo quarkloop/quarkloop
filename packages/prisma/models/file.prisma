@@ -1,0 +1,17 @@
+model AppFileSettings {
+    id String @id
+
+    enable     Boolean
+    createdAt  DateTime? @default(now())
+    lastUpdate DateTime?
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String @unique
+}
+
+//@relations
+model App {
+    id String @id
+
+    fileSettings AppFileSettings[]
+}
