@@ -1,0 +1,19 @@
+model AppFormSettings {
+    id String @id
+
+    name       String
+    fields     Json[]
+    fieldCount Int?
+    createdAt  DateTime? @default(now())
+    lastUpdate DateTime?
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String
+}
+
+//@relations
+model App {
+    id String @id
+
+    formSettings AppFormSettings[]
+}
