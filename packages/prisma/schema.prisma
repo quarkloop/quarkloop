@@ -1,0 +1,112 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
+    directUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
+}
+
+model App {
+    id String @id
+
+    name          String
+    type          Int
+    //visibility    Visibility
+    //status        AppStatus
+    workspacePath String    @unique
+    profilePath   String    @unique
+    createdAt     DateTime? @default(now())
+    lastUpdate    DateTime?
+    icon          String?
+    metadata      Json?
+
+    instances AppInstance[]
+
+    threadSettings AppThreadSettings?
+    pagesSettings  AppPageSettings[]
+    formsSettings  AppFormSettings[]
+    filesSettings  AppFileSettings?
+}
+
+model AppInstance {
+    id String @id
+
+    title      String
+    stage      Int
+    createdAt  DateTime? @default(now())
+    lastUpdate DateTime?
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String
+
+    appInstanceUser AppInstanceUserMap[]
+    appThreadData   AppThreadData[]
+}
+
+model AppInstanceUserMap {
+    id Int @id @default(autoincrement())
+
+    appInstance   AppInstance @relation(fields: [appInstanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appInstanceId String
+}
+
+model AppFileSettings {
+    id String @id
+
+    enable     Boolean
+    createdAt  DateTime? @default(now())
+    lastUpdate DateTime?
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String @unique
+}
+
+model AppFormSettings {
+    id String @id
+
+    name       String
+    fields     Json[]
+    fieldCount Int?
+    createdAt  DateTime? @default(now())
+    lastUpdate DateTime?
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String
+}
+
+model AppPageSettings {
+    id String @id
+
+    name       String
+    entryPoint Boolean
+    content    String
+    createdAt  DateTime? @default(now())
+    lastUpdate DateTime?
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String
+}
+
+model AppThreadSettings {
+    id String @id
+
+    createdAt  DateTime? @default(now())
+    lastUpdate DateTime?
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String @unique
+}
+
+model AppThreadData {
+    id Int @id @default(autoincrement())
+
+    type       Int
+    message    String
+    createdAt  DateTime? @default(now())
+    lastUpdate DateTime?
+
+    appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appInstanceId String?
+}
