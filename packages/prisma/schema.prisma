@@ -1,13 +1,14 @@
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
+    previewFeatures = ["multiSchema"]
 }
 
 datasource db {
     provider  = "postgresql"
     url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
     directUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
+    schemas   = ["app"]
 }
-
 model App {
     id String @id
 
@@ -22,12 +23,13 @@ model App {
     icon          String?
     metadata      Json?
 
-    instances AppInstance[]
-
+    instances      AppInstance[]
     threadSettings AppThreadSettings?
+    filesSettings  AppFileSettings?
     pagesSettings  AppPageSettings[]
     formsSettings  AppFormSettings[]
-    filesSettings  AppFileSettings?
+
+    @@schema("app")
 }
 
 model AppInstance {
@@ -41,15 +43,9 @@ model AppInstance {
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String
 
-    appInstanceUser AppInstanceUserMap[]
-    appThreadData   AppThreadData[]
-}
+    appThreadData AppThreadData[]
 
-model AppInstanceUserMap {
-    id Int @id @default(autoincrement())
-
-    appInstance   AppInstance @relation(fields: [appInstanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-    appInstanceId String
+    @@schema("app")
 }
 
 model AppFileSettings {
@@ -61,6 +57,8 @@ model AppFileSettings {
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String @unique
+
+    @@schema("app")
 }
 
 model AppFormSettings {
@@ -74,6 +72,8 @@ model AppFormSettings {
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String
+
+    @@schema("app")
 }
 
 model AppPageSettings {
@@ -87,6 +87,8 @@ model AppPageSettings {
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String
+
+    @@schema("app")
 }
 
 model AppThreadSettings {
@@ -97,6 +99,8 @@ model AppThreadSettings {
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String @unique
+
+    @@schema("app")
 }
 
 model AppThreadData {
@@ -109,4 +113,7 @@ model AppThreadData {
 
     appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appInstanceId String?
+
+    @@schema("app")
 }
+

@@ -17,6 +17,8 @@ model App {
     filesSettings  AppFileSettings?
     pagesSettings  AppPageSettings[]
     formsSettings  AppFormSettings[]
+
+    @@schema("app")
 }
 
 model AppInstance {
@@ -31,6 +33,8 @@ model AppInstance {
     appId String
 
     appThreadData AppThreadData[]
+
+    @@schema("app")
 }
 
 //@relations

@@ -7,6 +7,8 @@ model AppFileSettings {
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String @unique
+
+    @@schema("app")
 }
 
 //@relations
@@ -14,4 +16,11 @@ model App {
     id String @id
 
     fileSettings AppFileSettings[]
+}
+
+//@relations
+model AppInstance {
+    id String @id
+
+    threadData AppFile[]
 }

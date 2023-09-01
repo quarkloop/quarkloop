@@ -9,6 +9,8 @@ model AppFormSettings {
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String
+
+    @@schema("app")
 }
 
 //@relations
