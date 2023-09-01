@@ -1,0 +1,10 @@
+{
+  "extends": "@quarkloop/tsconfig/nextjs.json",
+  "compilerOptions": {
+    "target": "es5",
+    "jsx": "preserve",
+    "resolveJsonModule": true
+  },
+  "include": ["."],
+  "exclude": ["dist", "build", "node_modules"]
+}
