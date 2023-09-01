@@ -1,0 +1,83 @@
+model App {
+    id String @id
+
+    name          String
+    type          Int
+    //visibility    Visibility
+    //status        AppStatus
+    workspacePath String    @unique
+    profilePath   String    @unique
+    createdAt     DateTime? @default(now())
+    lastUpdate    DateTime?
+    icon          String?
+    metadata      Json?
+
+    instances AppInstance[]
+
+    threadSettings AppThreadSettings?
+    pagesSettings  AppPageSettings[]
+    formsSettings  AppFormSettings[]
+    filesSettings  AppFileSettings?
+}
+
+model AppInstance {
+    id String @id
+
+    title      String
+    stage      Int
+    createdAt  DateTime? @default(now())
+    lastUpdate DateTime?
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String
+
+    appInstanceUser AppInstanceUserMap[]
+    appThreadData   AppThreadData[]
+}
+
+model AppInstanceUserMap {
+    id Int @id @default(autoincrement())
+
+    appInstance   AppInstance @relation(fields: [appInstanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appInstanceId String
+}
+
+//@relations
+model AppThreadSettings {
+    id String @id
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String @unique
+}
+
+//@relations
+model AppPageSettings {
+    id String @id
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String
+}
+
+//@relations
+model AppFormSettings {
+    id String @id
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String
+}
+
+//@relations
+model AppFileSettings {
+    id String @id
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String @unique
+}
+
+//@relations
+model AppThreadData {
+    id Int @id @default(autoincrement())
+
+    appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appInstanceId String?
+}
