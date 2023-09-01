@@ -197,7 +197,7 @@ export const CreateAppThreadDataPlugin = createPlugin<
       data: {
         type: createArgs.type!,
         message: createArgs.message!,
-        lastUpdate: new Date(),
+        updatedAt: new Date(),
         appSubmission: {
           connect: {
             id: createArgs.appSubmissionId,
@@ -293,7 +293,7 @@ export const UpdateAppThreadDataPlugin = createPlugin<
     //     ...(updateArgs.pages && { pages: updateArgs.pages }),
     //     ...(updateArgs.forms && { forms: updateArgs.forms }),
 
-    //     lastUpdate: updateArgs.lastUpdate,
+    //     updatedAt: updateArgs.updatedAt,
     //   },
     // });
 

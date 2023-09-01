@@ -5,7 +5,7 @@ model AppPageSettings {
     entryPoint Boolean
     content    String
     createdAt  DateTime? @default(now())
-    lastUpdate DateTime?
+    updatedAt  DateTime?
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String

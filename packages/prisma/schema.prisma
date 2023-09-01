@@ -18,7 +18,7 @@ model App {
     workspacePath String    @unique
     profilePath   String    @unique
     createdAt     DateTime? @default(now())
-    lastUpdate    DateTime?
+    updatedAt     DateTime?
     icon          String?
     metadata      Json?
 
@@ -33,10 +33,10 @@ model App {
 model AppInstance {
     id String @id
 
-    title      String
-    stage      Int
-    createdAt  DateTime? @default(now())
-    lastUpdate DateTime?
+    title     String
+    stage     Int
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String
@@ -55,9 +55,9 @@ model AppInstanceUserMap {
 model AppFileSettings {
     id String @id
 
-    enable     Boolean
-    createdAt  DateTime? @default(now())
-    lastUpdate DateTime?
+    enable    Boolean
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String @unique
@@ -70,7 +70,7 @@ model AppFormSettings {
     fields     Json[]
     fieldCount Int?
     createdAt  DateTime? @default(now())
-    lastUpdate DateTime?
+    updatedAt  DateTime?
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String
@@ -83,7 +83,7 @@ model AppPageSettings {
     entryPoint Boolean
     content    String
     createdAt  DateTime? @default(now())
-    lastUpdate DateTime?
+    updatedAt  DateTime?
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String
@@ -92,8 +92,8 @@ model AppPageSettings {
 model AppThreadSettings {
     id String @id
 
-    createdAt  DateTime? @default(now())
-    lastUpdate DateTime?
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String @unique
@@ -102,10 +102,10 @@ model AppThreadSettings {
 model AppThreadData {
     id Int @id @default(autoincrement())
 
-    type       Int
-    message    String
-    createdAt  DateTime? @default(now())
-    lastUpdate DateTime?
+    type      Int
+    message   String
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
 
     appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appInstanceId String?

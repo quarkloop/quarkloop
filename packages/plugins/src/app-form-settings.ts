@@ -378,7 +378,7 @@ export const UpdateAppFormSettingsPlugin = createPlugin<
         fields: [], // TODO
         //...(updateArgs.fields && { fields: newFields }),
         ...(updateArgs.fieldCount && { fieldCount: newFields.length }),
-        lastUpdate: new Date(),
+        updatedAt: new Date(),
       },
     });
 

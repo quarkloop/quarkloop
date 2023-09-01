@@ -1,8 +1,8 @@
 model AppThreadSettings {
     id String @id
 
-    createdAt  DateTime? @default(now())
-    lastUpdate DateTime?
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String @unique
@@ -11,10 +11,10 @@ model AppThreadSettings {
 model AppThreadData {
     id Int @id @default(autoincrement())
 
-    type       Int
-    message    String
-    createdAt  DateTime? @default(now())
-    lastUpdate DateTime?
+    type      Int
+    message   String
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
 
     appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appInstanceId String?

@@ -352,7 +352,7 @@ export const UpdateAppInstancePlugin = createPlugin<
       data: {
         ...(updateArgs.title && { title: updateArgs.title }),
         ...(updateArgs.stage && { stage: updateArgs.stage }),
-        lastUpdate: new Date(),
+        updatedAt: new Date(),
       },
     });
 

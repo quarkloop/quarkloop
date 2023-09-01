@@ -327,7 +327,7 @@ export const UpdateAppThreadSettingsPlugin = createPlugin<
     //     ...(updateArgs.pages && { pages: updateArgs.pages }),
     //     ...(updateArgs.forms && { forms: updateArgs.forms }),
 
-    //     lastUpdate: updateArgs.lastUpdate,
+    //     updatedAt: updateArgs.updatedAt,
     //   },
     // });
 

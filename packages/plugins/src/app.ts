@@ -321,7 +321,7 @@ export const CreateAppPlugin = createPlugin<PipelineState, PipelineArgs[]>({
         profilePath: profilePath,
         icon: createArgs.icon,
         metadata: createArgs.metadata!,
-        lastUpdate: new Date(),
+        updatedAt: new Date(),
         userRoleAssignment: {
           create: {
             type: "App",
@@ -422,7 +422,7 @@ export const UpdateAppPlugin = createPlugin<PipelineState, PipelineArgs[]>({
         //...(updateArgs.pages && { pages: updateArgs.pages }),
         //...(updateArgs.forms && { forms: updateArgs.forms }),
 
-        lastUpdate: new Date(),
+        updatedAt: new Date(),
       },
     });
 
@@ -584,7 +584,7 @@ export const DeleteAppPlugin = createPlugin<PipelineState, PipelineArgs[]>({
         data: submissions.map((sub) => ({
           message: "The associated app to this submission was archived.",
           type: "Inline",
-          lastUpdate: new Date(),
+          updatedAt: new Date(),
           userId: user?.id!,
           submissionUserId: sub.id,
         })),

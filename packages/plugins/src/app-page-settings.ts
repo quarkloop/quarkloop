@@ -321,7 +321,7 @@ export const UpdateAppPageSettingsPlugin = createPlugin<
         ...(updateArgs.name && { name: updateArgs.name }),
         ...(updateArgs.content != null && { content: updateArgs.content }),
         ...(updateArgs.entryPoint && { entryPoint: updateArgs.entryPoint }),
-        lastUpdate: updateArgs.lastUpdate,
+        updatedAt: updateArgs.updatedAt,
       },
     });
 

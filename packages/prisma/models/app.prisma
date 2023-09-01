@@ -8,45 +8,36 @@ model App {
     workspacePath String    @unique
     profilePath   String    @unique
     createdAt     DateTime? @default(now())
-    lastUpdate    DateTime?
+    updatedAt     DateTime?
     icon          String?
     metadata      Json?
 
-    instances AppInstance[]
-
+    instances      AppInstance[]
     threadSettings AppThreadSettings?
+    filesSettings  AppFileSettings?
     pagesSettings  AppPageSettings[]
     formsSettings  AppFormSettings[]
-    filesSettings  AppFileSettings?
 }
 
 model AppInstance {
     id String @id
 
-    title      String
-    stage      Int
-    createdAt  DateTime? @default(now())
-    lastUpdate DateTime?
+    title     String
+    stage     Int
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String
 
-    appInstanceUser AppInstanceUserMap[]
-    appThreadData   AppThreadData[]
-}
-
-model AppInstanceUserMap {
-    id Int @id @default(autoincrement())
-
-    appInstance   AppInstance @relation(fields: [appInstanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-    appInstanceId String
+    appThreadData AppThreadData[]
 }
 
 //@relations
 model AppThreadSettings {
     id String @id
 
-    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    app   App    @relation(fields: [appId], references: [id])
     appId String @unique
 }
 
@@ -54,7 +45,7 @@ model AppThreadSettings {
 model AppPageSettings {
     id String @id
 
-    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    app   App    @relation(fields: [appId], references: [id])
     appId String
 }
 
@@ -62,7 +53,7 @@ model AppPageSettings {
 model AppFormSettings {
     id String @id
 
-    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    app   App    @relation(fields: [appId], references: [id])
     appId String
 }
 
@@ -70,7 +61,7 @@ model AppFormSettings {
 model AppFileSettings {
     id String @id
 
-    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    app   App    @relation(fields: [appId], references: [id])
     appId String @unique
 }
 
@@ -78,6 +69,6 @@ model AppFileSettings {
 model AppThreadData {
     id Int @id @default(autoincrement())
 
-    appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id])
     appInstanceId String?
 }
