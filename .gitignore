@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+node_modules
 /.pnp
 .pnp.js
 
@@ -36,3 +37,4 @@ yarn-error.log*
 next-env.d.ts
 
 *turbo-build.log
+bin.bash
