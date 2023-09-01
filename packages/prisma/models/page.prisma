@@ -1,0 +1,19 @@
+model AppPageSettings {
+    id String @id
+
+    name       String
+    entryPoint Boolean
+    content    String
+    createdAt  DateTime? @default(now())
+    lastUpdate DateTime?
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String
+}
+
+//@relations
+model App {
+    id String @id
+
+    pageSettings AppPageSettings[]
+}
