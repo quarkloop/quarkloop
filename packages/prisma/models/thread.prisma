@@ -1,0 +1,35 @@
+model AppThreadSettings {
+    id String @id
+
+    createdAt  DateTime? @default(now())
+    lastUpdate DateTime?
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String @unique
+}
+
+model AppThreadData {
+    id Int @id @default(autoincrement())
+
+    type       Int
+    message    String
+    createdAt  DateTime? @default(now())
+    lastUpdate DateTime?
+
+    appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appInstanceId String?
+}
+
+//@relations
+model App {
+    id String @id
+
+    threadSettings AppThreadSettings?
+}
+
+//@relations
+model AppInstance {
+    id String @id
+
+    threadData AppThreadData[]
+}
