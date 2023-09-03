@@ -36,7 +36,7 @@ export const GetAppFormSettingsByIdPlugin = createPlugin<
 
     const getArgs = args[0].appFormSettings as GetAppFormSettingsByIdPluginArgs;
 
-    const record = await prisma.appFormSettings.findFirst({
+    const record = await prisma.appFormSettings.findUnique({
       where: {
         id: getArgs.id,
       },
@@ -130,21 +130,6 @@ export const CreateAppFormSettingsPlugin = createPlugin<
 
     const createArgs = args[0]
       .appFormSettings as CreateAppFormSettingsPluginArgs;
-
-    const app = await prisma.app.findFirst({
-      where: {
-        id: createArgs.appId,
-      },
-    });
-
-    if (app == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.NOT_FOUND(
-          "[CreateAppFormSettingsPlugin] app not found"
-        ),
-      };
-    }
 
     const appFormSettingsId = generateId();
 
@@ -309,7 +294,9 @@ export const DeleteAppFormSettingsPlugin = createPlugin<
     const record = await prisma.appFormSettings.deleteMany({
       where: {
         id: deleteArgs.id,
-        appId: deleteArgs.appId,
+        app: {
+          id: deleteArgs.appId,
+        },
       },
     });
 
