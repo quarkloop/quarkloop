@@ -35,7 +35,7 @@ export const GetAppFileSettingsByIdPlugin = createPlugin<
 
     const getArgs = args[0].appFileSettings as GetAppFileSettingsByIdPluginArgs;
 
-    const record = await prisma.appFileSettings.findFirst({
+    const record = await prisma.appFileSettings.findUnique({
       where: {
         id: getArgs.id,
       },
@@ -139,21 +139,6 @@ export const CreateAppFileSettingsPlugin = createPlugin<
     const createArgs = args[0]
       .appFileSettings as CreateAppFileSettingsPluginArgs;
 
-    const app = await prisma.app.findFirst({
-      where: {
-        id: createArgs.appId,
-      },
-    });
-
-    if (app == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.NOT_FOUND(
-          "[CreateAppFileSettingsPlugin] app not found"
-        ),
-      };
-    }
-
     const appFileSettingsId = generateId();
 
     const record = await prisma.appFileSettings.create({
@@ -205,26 +190,17 @@ export const UpdateAppFileSettingsPlugin = createPlugin<
     const updateArgs = args[0]
       .appFileSettings as UpdateAppFileSettingsPluginArgs;
 
-    const record = await prisma.appFileSettings.updateMany({
+    const record = await prisma.appFileSettings.update({
       where: {
         id: updateArgs.id,
       },
       data: {
-        // once an app created, only name and icon can be updated.
-        // ...(updateArgs.name && { name: updateArgs.name }),
-        // ...(updateArgs.status != null && { status: updateArgs.status }),
-        // ...(updateArgs.icon && { icon: updateArgs.icon }),
-
-        // ...(updateArgs.metadata && { metadata: updateArgs.metadata }),
-        // ...(updateArgs.pages && { pages: updateArgs.pages }),
-        // ...(updateArgs.forms && { forms: updateArgs.forms }),
-
+        ...(updateArgs.enable && { enable: updateArgs.enable }),
         updatedAt: updateArgs.updatedAt,
       },
     });
 
-    // TODO: following check may not work, investigate on alternatives
-    if (record.count == 0) {
+    if (record == null) {
       return {
         ...state,
         status: PluginStatusEntry.NOT_FOUND("[UpdateAppFileSettingsPlugin]"),
@@ -262,7 +238,9 @@ export const DeleteAppFileSettingsPlugin = createPlugin<
     const record = await prisma.appFileSettings.deleteMany({
       where: {
         id: deleteArgs.id,
-        appId: deleteArgs.appId,
+        app: {
+          id: deleteArgs.appId,
+        },
       },
     });
 
