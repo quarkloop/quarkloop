@@ -60,9 +60,15 @@ importers:
       '@next/bundle-analyzer':
         specifier: ^13.4.5
         version: 13.4.5
-      '@prisma/client':
-        specifier: ^4.16.2
-        version: 4.16.2(prisma@4.16.2)
+      '@quarkloop/plugin':
+        specifier: workspace:*
+        version: link:../../packages/plugin
+      '@quarkloop/plugins':
+        specifier: workspace:*
+        version: link:../../packages/plugins
+      '@quarkloop/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       '@types/node':
         specifier: 20.3.1
         version: 20.3.1
@@ -81,9 +87,6 @@ importers:
       next-transpile-modules:
         specifier: ^10.0.1
         version: 10.0.1
-      prisma:
-        specifier: ^4.16.2
-        version: 4.16.2
       react:
         specifier: 18.2.0
         version: 18.2.0
