@@ -24,16 +24,7 @@ export const GetAppThreadSettingsByIdPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAppThreadSettingsByIdPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appThreadSettings == null) {
+    if (args.length === 0 || args[0].appThreadSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -83,16 +74,7 @@ export const GetAppThreadSettingsByAppIdPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAppThreadSettingsByAppIdPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appThreadSettings == null) {
+    if (args.length === 0 || args[0].appThreadSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -146,16 +128,7 @@ export const CreateAppThreadSettingsPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[CreateAppThreadSettingsPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appThreadSettings == null) {
+    if (args.length === 0 || args[0].appThreadSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -218,7 +191,7 @@ export const UpdateAppThreadSettingsPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
+    if (args.length === 0 || args[0].appThreadSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -227,14 +200,6 @@ export const UpdateAppThreadSettingsPlugin = createPlugin<
       };
     }
 
-    if (args[0].appThreadSettings == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[UpdateAppThreadSettingsPlugin]"
-        ),
-      };
-    }
     const updateArgs = args[0]
       .appThreadSettings as UpdateAppThreadSettingsPluginArgs;
 
@@ -271,7 +236,7 @@ export const DeleteAppThreadSettingsPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
+    if (args.length === 0 || args[0].appThreadSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -280,14 +245,6 @@ export const DeleteAppThreadSettingsPlugin = createPlugin<
       };
     }
 
-    if (args[0].appThreadSettings == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[DeleteAppThreadSettingsPlugin]"
-        ),
-      };
-    }
     const deleteArgs = args[0]
       .appThreadSettings as DeleteAppThreadSettingsPluginArgs;
 
