@@ -1,16 +1,12 @@
 model App {
     id String @id
 
-    name          String
-    type          Int
-    //visibility    Visibility
-    //status        AppStatus
-    workspacePath String    @unique
-    profilePath   String    @unique
-    createdAt     DateTime? @default(now())
-    updatedAt     DateTime?
-    icon          String?
-    metadata      Json?
+    type      Int
+    name      String?
+    icon      String?
+    metadata  Json?
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
 
     instances      AppInstance[]
     threadSettings AppThreadSettings?
@@ -24,15 +20,17 @@ model App {
 model AppInstance {
     id String @id
 
-    title     String
-    stage     Int
+    name      String?
     createdAt DateTime? @default(now())
     updatedAt DateTime?
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String
 
-    appThreadData AppThreadData[]
+    appThreadData AppThread[]
+    AppFileData   AppFile[]
+    AppPageData   AppPage[]
+    AppFormData   AppForm[]
 
     @@schema("app")
 }
@@ -70,7 +68,31 @@ model AppFileSettings {
 }
 
 //@relations
-model AppThreadData {
+model AppThread {
+    id Int @id @default(autoincrement())
+
+    appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id])
+    appInstanceId String?
+}
+
+//@relations
+model AppFile {
+    id Int @id @default(autoincrement())
+
+    appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id])
+    appInstanceId String?
+}
+
+//@relations
+model AppForm {
+    id Int @id @default(autoincrement())
+
+    appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id])
+    appInstanceId String?
+}
+
+//@relations
+model AppPage {
     id Int @id @default(autoincrement())
 
     appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id])
