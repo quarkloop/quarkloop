@@ -15,7 +15,7 @@ export type AppFormPluginArgs =
 export interface GetAppFormById {}
 export interface GetAppFormByIdApiResponse extends ApiResponse {}
 export interface GetAppFormByIdApiArgs {
-  id: number;
+  id: string;
   appInstanceId: string;
 }
 export interface GetAppFormByIdPluginArgs extends GetAppFormByIdApiArgs {}
@@ -41,7 +41,7 @@ export interface CreateAppFormPluginArgs extends CreateAppFormApiArgs {}
 export interface UpdateAppForm {}
 export interface UpdateAppFormApiResponse extends ApiResponse {}
 export interface UpdateAppFormApiArgs extends Partial<AppForm> {
-  id: number;
+  id: string;
   appInstanceId: string;
 }
 export interface UpdateAppFormPluginArgs extends UpdateAppFormApiArgs {}
@@ -50,7 +50,7 @@ export interface UpdateAppFormPluginArgs extends UpdateAppFormApiArgs {}
 export interface DeleteAppForm {}
 export interface DeleteAppFormApiResponse extends ApiResponse {}
 export interface DeleteAppFormApiArgs {
-  id: number;
+  id: string;
   appInstanceId: string;
 }
 export interface DeleteAppFormPluginArgs extends DeleteAppFormApiArgs {}
