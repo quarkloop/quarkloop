@@ -30,9 +30,6 @@ export const GetApiResponsePlugin = createPlugin<
       ...state,
       apiResponse: {
         status: PluginStatusEntry.OK(),
-        isOwner: false,
-        user: state.user?.user,
-        planSubscription: state.database?.planSubscription?.records as any,
         data: {
           ...(state.database && { database: state.database }),
         },
@@ -70,8 +67,6 @@ export const CreateApiResponsePlugin = createPlugin<
         status: PluginStatusEntry.CREATED(),
         data: {
           ...(state.database && { database: state.database }),
-          //appDatabase: state.appDatabase,
-          //appIntegration: state.appIntegration,
         },
       },
     };
@@ -107,8 +102,6 @@ export const UpdateApiResponsePlugin = createPlugin<
         status: PluginStatusEntry.OK(),
         data: {
           ...(state.database && { database: state.database }),
-          //appDatabase: state.appDatabase,
-          //appIntegration: state.appIntegration,
         },
       },
     };
