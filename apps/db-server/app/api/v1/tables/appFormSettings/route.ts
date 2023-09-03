@@ -124,7 +124,7 @@ export async function PUT(request: Request, { params }: { params: any }) {
 }
 
 // DeleteAppFormSettings
-export async function PATCH(request: Request, { params }: { params: any }) {
+export async function DELETE(request: Request, { params }: { params: any }) {
   const { osId, workspaceId, appId, formId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
