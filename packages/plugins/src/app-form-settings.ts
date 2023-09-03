@@ -25,16 +25,7 @@ export const GetAppFormSettingsByIdPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAppFormSettingsByIdPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appFormSettings == null) {
+    if (args.length === 0 || args[0].appFormSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -83,16 +74,7 @@ export const GetAppFormsSettingsByAppIdPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAppFormsSettingsByAppIdPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appFormSettings == null) {
+    if (args.length === 0 || args[0].appFormSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -137,16 +119,7 @@ export const CreateAppFormSettingsPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[CreateAppFormSettingsPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appFormSettings == null) {
+    if (args.length === 0 || args[0].appFormSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -212,7 +185,7 @@ export const UpdateAppFormSettingsPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
+    if (args.length === 0 || args[0].appFormSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -221,14 +194,6 @@ export const UpdateAppFormSettingsPlugin = createPlugin<
       };
     }
 
-    if (args[0].appFormSettings == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[UpdateAppFormSettingsPlugin]"
-        ),
-      };
-    }
     const updateArgs = args[0]
       .appFormSettings as UpdateAppFormSettingsPluginArgs;
 
@@ -329,16 +294,7 @@ export const DeleteAppFormSettingsPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[DeleteAppFormSettingsPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appFormSettings == null) {
+    if (args.length === 0 || args[0].appFormSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
