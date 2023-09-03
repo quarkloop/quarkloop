@@ -20,7 +20,7 @@ export const GetAppFileSettingsByIdPlugin = createPlugin<
   name: "GetAppFileSettingsByIdPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -32,6 +32,7 @@ export const GetAppFileSettingsByIdPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appFileSettings == null) {
       return {
         ...state,
@@ -42,26 +43,10 @@ export const GetAppFileSettingsByIdPlugin = createPlugin<
     }
 
     const getArgs = args[0].appFileSettings as GetAppFileSettingsByIdPluginArgs;
-    const { user } = state.user;
 
     const record = await prisma.appFileSettings.findFirst({
       where: {
         id: getArgs.id,
-        app: {
-          userRoleAssignment: {
-            every: {
-              user: {
-                id: user?.id,
-              },
-              workspace: {
-                id: getArgs.workspaceId,
-              },
-              os: {
-                id: getArgs.osId,
-              },
-            },
-          },
-        },
       },
     });
 
@@ -93,7 +78,7 @@ export const GetAppFileSettingsByAppIdPlugin = createPlugin<
   name: "GetAppFileSettingsByAppIdPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -105,6 +90,7 @@ export const GetAppFileSettingsByAppIdPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appFileSettings == null) {
       return {
         ...state,
@@ -116,25 +102,11 @@ export const GetAppFileSettingsByAppIdPlugin = createPlugin<
 
     const getArgs = args[0]
       .appFileSettings as GetAppFileSettingsByAppIdPluginArgs;
-    const { user } = state.user;
 
     const record = await prisma.appFileSettings.findFirst({
       where: {
         app: {
           id: getArgs.appId,
-          userRoleAssignment: {
-            every: {
-              user: {
-                id: user?.id,
-              },
-              workspace: {
-                id: getArgs.workspaceId,
-              },
-              os: {
-                id: getArgs.osId,
-              },
-            },
-          },
         },
       },
     });
@@ -169,12 +141,7 @@ export const CreateAppFileSettingsPlugin = createPlugin<
   name: "CreateAppFileSettingsPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (
-      state.status ||
-      state.session == null ||
-      state.user == null ||
-      state.user.subscription == null
-    ) {
+    if (state.status) {
       return state;
     }
 
@@ -186,6 +153,7 @@ export const CreateAppFileSettingsPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appFileSettings == null) {
       return {
         ...state,
@@ -198,25 +166,9 @@ export const CreateAppFileSettingsPlugin = createPlugin<
     const createArgs = args[0]
       .appFileSettings as CreateAppFileSettingsPluginArgs;
 
-    const { user } = state.user;
-    const { subscription } = state.user;
-
     const app = await prisma.app.findFirst({
       where: {
         id: createArgs.appId,
-        userRoleAssignment: {
-          every: {
-            user: {
-              id: user?.id,
-            },
-            workspace: {
-              id: createArgs.workspaceId,
-            },
-            os: {
-              id: createArgs.osId,
-            },
-          },
-        },
       },
     });
 
@@ -238,22 +190,6 @@ export const CreateAppFileSettingsPlugin = createPlugin<
         app: {
           connect: {
             id: createArgs.appId,
-          },
-        },
-        planMetrics: {
-          create: {
-            type: "AppFile",
-            subscription: { connect: { id: subscription.id } },
-            os: { connect: { id: createArgs.osId } },
-            workspace: {
-              connect: {
-                osId_id: {
-                  id: createArgs.workspaceId!,
-                  osId: createArgs.osId,
-                },
-              },
-            },
-            app: { connect: { id: createArgs.appId } },
           },
         },
       },
@@ -280,7 +216,7 @@ export const UpdateAppFileSettingsPlugin = createPlugin<
   name: "UpdateAppFileSettingsPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -292,6 +228,7 @@ export const UpdateAppFileSettingsPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appFileSettings == null) {
       return {
         ...state,
@@ -302,42 +239,32 @@ export const UpdateAppFileSettingsPlugin = createPlugin<
     }
     const updateArgs = args[0]
       .appFileSettings as UpdateAppFileSettingsPluginArgs;
-    const { user } = state.user;
 
-    // const record = await prisma.appFileSettings.updateMany({
-    //   where: {
-    //     id: updateArgs.id,
-    //     workspace: {
-    //       id: updateArgs.workspaceId,
-    //       os: {
-    //         id: updateArgs.osId,
-    //         user: {
-    //           id: user.id,
-    //         },
-    //       },
-    //     },
-    //   },
-    //   data: {
-    //     // once an app created, only name and icon can be updated.
-    //     ...(updateArgs.name && { name: updateArgs.name }),
-    //     ...(updateArgs.status != null && { status: updateArgs.status }),
-    //     ...(updateArgs.icon && { icon: updateArgs.icon }),
+    const record = await prisma.appFileSettings.updateMany({
+      where: {
+        id: updateArgs.id,
+      },
+      data: {
+        // once an app created, only name and icon can be updated.
+        // ...(updateArgs.name && { name: updateArgs.name }),
+        // ...(updateArgs.status != null && { status: updateArgs.status }),
+        // ...(updateArgs.icon && { icon: updateArgs.icon }),
 
-    //     ...(updateArgs.metadata && { metadata: updateArgs.metadata }),
-    //     ...(updateArgs.pages && { pages: updateArgs.pages }),
-    //     ...(updateArgs.forms && { forms: updateArgs.forms }),
+        // ...(updateArgs.metadata && { metadata: updateArgs.metadata }),
+        // ...(updateArgs.pages && { pages: updateArgs.pages }),
+        // ...(updateArgs.forms && { forms: updateArgs.forms }),
 
-    //     updatedAt: updateArgs.updatedAt,
-    //   },
-    // });
+        updatedAt: updateArgs.updatedAt,
+      },
+    });
 
-    // // TODO: following check may not work, investigate on alternatives
-    // if (record.count == 0) {
-    //   return {
-    //     ...state,
-    //     status: PluginStatusEntry.NOT_FOUND("[UpdateAppFileSettingsPlugin]"),
-    //   };
-    // }
+    // TODO: following check may not work, investigate on alternatives
+    if (record.count == 0) {
+      return {
+        ...state,
+        status: PluginStatusEntry.NOT_FOUND("[UpdateAppFileSettingsPlugin]"),
+      };
+    }
 
     return state;
   },
@@ -351,7 +278,7 @@ export const DeleteAppFileSettingsPlugin = createPlugin<
   name: "DeleteAppFileSettingsPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -363,6 +290,7 @@ export const DeleteAppFileSettingsPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appFileSettings == null) {
       return {
         ...state,
@@ -373,27 +301,11 @@ export const DeleteAppFileSettingsPlugin = createPlugin<
     }
     const deleteArgs = args[0]
       .appFileSettings as DeleteAppFileSettingsPluginArgs;
-    const { user } = state.user;
 
     const record = await prisma.appFileSettings.deleteMany({
       where: {
         id: deleteArgs.id,
         appId: deleteArgs.appId,
-        app: {
-          userRoleAssignment: {
-            every: {
-              user: {
-                id: user?.id,
-              },
-              workspace: {
-                id: deleteArgs.workspaceId,
-              },
-              os: {
-                id: deleteArgs.osId,
-              },
-            },
-          },
-        },
       },
     });
 
