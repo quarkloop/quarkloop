@@ -5,81 +5,11 @@ import { createPlugin } from "@quarkloop/plugin";
 import { PipelineArgs, PipelineState, PluginStatusEntry } from "./pipeline";
 
 import {
-  GetAdminAppInstanceByIdPluginArgs,
   GetAppInstanceByIdPluginArgs,
   CreateAppInstancePluginArgs,
   GetAppInstancesByAppIdPluginArgs,
   UpdateAppInstancePluginArgs,
 } from "@quarkloop/types";
-
-/// GetAdminAppInstanceById Plugin
-export const GetAdminAppInstanceByIdPlugin = createPlugin<
-  PipelineState,
-  PipelineArgs[]
->({
-  name: "GetAdminAppInstanceByIdPlugin",
-  config: {},
-  handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null) {
-      return state;
-    }
-
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAdminAppInstanceByIdPlugin]"
-        ),
-      };
-    }
-    if (args[0].appInstance == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAdminAppInstanceByIdPlugin]"
-        ),
-      };
-    }
-    const getArgs = args[0].appInstance as GetAdminAppInstanceByIdPluginArgs;
-
-    const record = await prisma.appInstance.findFirst({
-      where: {
-        id: getArgs.id,
-        app: {
-          id: getArgs.appId,
-          userRoleAssignment: {
-            every: {
-              workspace: {
-                id: getArgs.workspaceId,
-              },
-              os: {
-                id: getArgs.osId,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (record == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.NOT_FOUND("[GetAdminAppInstanceByIdPlugin]"),
-      };
-    }
-
-    return {
-      ...state,
-      database: {
-        ...state.database,
-        appInstance: {
-          records: record,
-          totalRecords: 1,
-        },
-      },
-    };
-  },
-});
 
 /// GetAppInstanceById Plugin
 export const GetAppInstanceByIdPlugin = createPlugin<
@@ -89,7 +19,7 @@ export const GetAppInstanceByIdPlugin = createPlugin<
   name: "GetAppInstanceByIdPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -101,6 +31,7 @@ export const GetAppInstanceByIdPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appInstance == null) {
       return {
         ...state,
@@ -110,18 +41,10 @@ export const GetAppInstanceByIdPlugin = createPlugin<
       };
     }
     const getArgs = args[0].appInstance as GetAppInstanceByIdPluginArgs;
-    const { user } = state.user;
 
     const record = await prisma.appInstance.findFirst({
       where: {
         id: getArgs.id,
-        appInstanceUser: {
-          every: {
-            user: {
-              id: user?.id,
-            },
-          },
-        },
       },
       include: {
         app: true,
@@ -156,7 +79,7 @@ export const GetAppInstancesByAppIdPlugin = createPlugin<
   name: "GetAppInstancesByAppIdPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -168,6 +91,7 @@ export const GetAppInstancesByAppIdPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appInstance == null) {
       return {
         ...state,
@@ -176,32 +100,14 @@ export const GetAppInstancesByAppIdPlugin = createPlugin<
         ),
       };
     }
+
     const getArgs = args[0].appInstance as GetAppInstancesByAppIdPluginArgs;
-    const { user } = state.user;
 
     const record = await prisma.appInstance.findMany({
       where: {
         app: {
-          ...(getArgs.appId && { id: getArgs.appId }),
-          ...(getArgs.workspaceId &&
-            getArgs.osId && {
-              workspace: {
-                id: getArgs.workspaceId,
-                os: {
-                  id: getArgs.osId,
-                },
-              },
-            }),
+          id: getArgs.appId,
         },
-        ...(getArgs.appId == null && {
-          appInstanceUser: {
-            every: {
-              user: {
-                id: user?.id,
-              },
-            },
-          },
-        }),
       },
       include: {
         app: true,
@@ -236,7 +142,7 @@ export const CreateAppInstancePlugin = createPlugin<
   name: "CreateAppInstancePlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -248,6 +154,7 @@ export const CreateAppInstancePlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appInstance == null) {
       return {
         ...state,
@@ -258,34 +165,16 @@ export const CreateAppInstancePlugin = createPlugin<
     }
 
     const createArgs = args[0].appInstance as CreateAppInstancePluginArgs;
-    const { user } = state.user;
 
-    const submissionId = generateId();
+    const instanceId = generateId();
 
     const record = await prisma.appInstance.create({
       data: {
-        id: submissionId,
-        title: createArgs.title!,
-        stage: createArgs.stage!,
-        // ...(createArgs.conversations && {
-        //   conversations: createArgs.conversations,
-        // }),
-        // ...(createArgs.files && { files: createArgs.files }),
-        // ...(createArgs.forms && { forms: createArgs.forms }),
-        // ...(createArgs.payments && { payments: createArgs.payments }),
+        id: instanceId,
+        name: createArgs.name!,
         app: {
           connect: {
             id: createArgs.appId,
-          },
-        },
-        appInstanceUser: {
-          create: {
-            role: "Owner",
-            user: {
-              connect: {
-                id: user?.id,
-              },
-            },
           },
         },
       },
@@ -312,7 +201,7 @@ export const UpdateAppInstancePlugin = createPlugin<
   name: "UpdateAppInstancePlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -324,6 +213,7 @@ export const UpdateAppInstancePlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appInstance == null) {
       return {
         ...state,
@@ -332,8 +222,8 @@ export const UpdateAppInstancePlugin = createPlugin<
         ),
       };
     }
+
     const updateArgs = args[0].appInstance as UpdateAppInstancePluginArgs;
-    const { user } = state.user;
 
     const record = await prisma.appInstance.updateMany({
       where: {
@@ -341,17 +231,9 @@ export const UpdateAppInstancePlugin = createPlugin<
         app: {
           id: updateArgs.appId,
         },
-        appInstanceUser: {
-          every: {
-            user: {
-              id: user?.id,
-            },
-          },
-        },
       },
       data: {
-        ...(updateArgs.title && { title: updateArgs.title }),
-        ...(updateArgs.stage && { stage: updateArgs.stage }),
+        ...(updateArgs.name && { title: updateArgs.name }),
         updatedAt: new Date(),
       },
     });
