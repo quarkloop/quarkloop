@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 
 import {
-  GetAdminAppInstanceByIdPluginArgs,
   GetAppInstanceByIdPluginArgs,
-  CreateAppInstancePluginArgs,
   GetAppInstancesByAppIdPluginArgs,
+  CreateAppInstancePluginArgs,
   UpdateAppInstancePluginArgs,
+  DeleteAppInstancePluginArgs,
 } from "@quarkloop/types";
 import { createPipeline } from "@quarkloop/plugin";
 import {
@@ -16,14 +16,14 @@ import {
   CreateApiResponsePlugin,
   UpdateApiResponsePlugin,
   DeleteApiResponsePlugin,
-  GetAdminAppInstanceByIdPlugin,
   GetAppInstanceByIdPlugin,
-  CreateAppInstancePlugin,
   GetAppInstancesByAppIdPlugin,
+  CreateAppInstancePlugin,
   UpdateAppInstancePlugin,
+  DeleteAppInstancePlugin,
 } from "@quarkloop/plugins";
 
-// GetAdminAppInstanceById
+// GetAppInstanceById
 export async function GET(request: Request, { params }: { params: any }) {
   const { appId, id } = params;
 
@@ -32,14 +32,14 @@ export async function GET(request: Request, { params }: { params: any }) {
   });
 
   const finalState = await pipeline
-    .use(GetAdminAppInstanceByIdPlugin)
+    .use(GetAppInstanceByIdPlugin)
     .use(GetApiResponsePlugin)
     .onError(DefaultErrorHandler)
     .execute({
       appInstance: {
         appId: appId,
         id: id,
-      } as GetAdminAppInstanceByIdPluginArgs,
+      } as GetAppInstanceByIdPluginArgs,
     });
 
   return NextResponse.json(finalState.apiResponse);
