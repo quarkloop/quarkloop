@@ -15,7 +15,7 @@ export type AppPagePluginArgs =
 export interface GetAppPageById {}
 export interface GetAppPageByIdApiResponse extends ApiResponse {}
 export interface GetAppPageByIdApiArgs {
-  id: number;
+  id: string;
   appInstanceId: string;
 }
 export interface GetAppPageByIdPluginArgs extends GetAppPageByIdApiArgs {}
@@ -41,7 +41,7 @@ export interface CreateAppPagePluginArgs extends CreateAppPageApiArgs {}
 export interface UpdateAppPage {}
 export interface UpdateAppPageApiResponse extends ApiResponse {}
 export interface UpdateAppPageApiArgs extends Partial<AppPage> {
-  id: number;
+  id: string;
   appInstanceId: string;
 }
 export interface UpdateAppPagePluginArgs extends UpdateAppPageApiArgs {}
@@ -50,7 +50,7 @@ export interface UpdateAppPagePluginArgs extends UpdateAppPageApiArgs {}
 export interface DeleteAppPage {}
 export interface DeleteAppPageApiResponse extends ApiResponse {}
 export interface DeleteAppPageApiArgs {
-  id: number;
+  id: string;
   appInstanceId: string;
 }
 export interface DeleteAppPagePluginArgs extends DeleteAppPageApiArgs {}
