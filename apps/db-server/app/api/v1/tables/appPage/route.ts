@@ -23,7 +23,7 @@ import {
 
 // GetAppPageById
 export async function GET(request: Request, { params }: { params: any }) {
-  const { submissionId, pageId } = params;
+  const { appInstanceId, pageId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -35,7 +35,7 @@ export async function GET(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appPage: {
-        appSubmissionId: submissionId,
+        appInstanceId: appInstanceId,
         id: pageId,
       } as GetAppPageByIdPluginArgs,
     });
@@ -45,7 +45,7 @@ export async function GET(request: Request, { params }: { params: any }) {
 
 // CreateAppPage
 export async function POST(request: Request, { params }: { params: any }) {
-  const { submissionId } = params;
+  const { appInstanceId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -59,7 +59,7 @@ export async function POST(request: Request, { params }: { params: any }) {
     .execute({
       appPage: {
         ...body,
-        appSubmissionId: submissionId,
+        appInstanceId: appInstanceId,
       } as CreateAppPagePluginArgs,
     });
 
@@ -68,7 +68,7 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppPage
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { submissionId, pageId } = params;
+  const { appInstanceId, pageId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -82,7 +82,7 @@ export async function PUT(request: Request, { params }: { params: any }) {
     .execute({
       appPage: {
         ...body,
-        appSubmissionId: submissionId,
+        appInstanceId: appInstanceId,
         id: pageId,
       } as UpdateAppPagePluginArgs,
     });
@@ -92,7 +92,7 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
 // DeleteAppPage
 export async function DELETE(request: Request, { params }: { params: any }) {
-  const { submissionId, pageId } = params;
+  const { appInstanceId, pageId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -104,7 +104,7 @@ export async function DELETE(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appPage: {
-        appSubmissionId: submissionId,
+        appInstanceId: appInstanceId,
         id: pageId,
       } as DeleteAppPagePluginArgs,
     });
