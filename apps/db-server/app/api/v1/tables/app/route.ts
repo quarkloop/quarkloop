@@ -25,7 +25,7 @@ import {
 
 // GetAppById
 export async function GET(request: Request, { params }: { params: any }) {
-  const { osId, workspaceId, appId } = params;
+  const { appId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -37,8 +37,6 @@ export async function GET(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       app: {
-        osId: osId,
-        workspaceId: workspaceId,
         id: appId,
       } as GetAppByIdPluginArgs,
     });
@@ -51,11 +49,6 @@ export async function GET(request: Request, { params }: { params: any }) {
 //   request: Request,
 //   { params }: { params: any }
 // ) {
-//   const { osId } = params;
-
-//   const { searchParams } = new URL(request.url);
-//   const workspaceId = searchParams.get("workspaceId");
-
 //   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
 //     initialState: {},
 //   });
@@ -64,19 +57,13 @@ export async function GET(request: Request, { params }: { params: any }) {
 //     .use(GetAppsByOsIdPlugin)
 //     .use(GetApiResponsePlugin)
 //     .onError(DefaultErrorHandler)
-//     .execute({
-//       app: {
-//         osId: osId,
-//         workspaceId: workspaceId,
-//       } as GetAppsByOsIdPluginArgs,
-//     });
+//     .execute();
 
 //   return NextResponse.json(finalState.apiResponse);
 // }
 
 // CreateApp
 export async function POST(request: Request, { params }: { params: any }) {
-  const { osId, workspaceId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -90,8 +77,6 @@ export async function POST(request: Request, { params }: { params: any }) {
     .execute({
       app: {
         ...body,
-        osId: osId,
-        workspaceId: workspaceId,
       } as CreateAppPluginArgs,
     });
 
@@ -100,7 +85,7 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateApp
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { osId, workspaceId, appId } = params;
+  const { appId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -114,8 +99,6 @@ export async function PUT(request: Request, { params }: { params: any }) {
     .execute({
       app: {
         ...body,
-        osId: osId,
-        workspaceId: workspaceId,
       } as UpdateAppPluginArgs,
     });
 
@@ -124,7 +107,7 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
 // DeleteApp
 export async function DELETE(request: Request, { params }: { params: any }) {
-  const { osId, workspaceId, appId } = params;
+  const { appId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -136,8 +119,6 @@ export async function DELETE(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       app: {
-        osId: osId,
-        workspaceId: workspaceId,
         id: appId,
       } as DeleteAppPluginArgs,
     });
