@@ -16,7 +16,6 @@ export interface GetAppThreadById {}
 export interface GetAppThreadByIdApiResponse extends ApiResponse {}
 export interface GetAppThreadByIdApiArgs {
   id: number;
-  appInstanceId: string;
 }
 export interface GetAppThreadByIdPluginArgs extends GetAppThreadByIdApiArgs {}
 
