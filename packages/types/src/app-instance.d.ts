@@ -5,30 +5,19 @@ import { ApiResponse } from "./api-response";
 export interface AppInstance extends Partial<PrismaAppInstance> {}
 
 export type AppInstancePluginArgs =
-  | GetAdminAppInstanceByIdPluginArgs
+  | GetAppInstanceByIdPluginArgs
   | GetAppInstanceByIdPluginArgs
   | GetAppInstancesByAppIdPluginArgs
   | CreateAppInstancePluginArgs
   | UpdateAppInstancePluginArgs
   | DeleteAppInstancePluginArgs;
 
-/// GetAdminAppInstanceById
-export interface GetAdminAppInstanceById {}
-export interface GetAdminAppInstanceByIdApiResponse extends ApiResponse {}
-export interface GetAdminAppInstanceByIdApiArgs {
-  id: string;
-  osId: string;
-  workspaceId: string;
-  appId: string;
-}
-export interface GetAdminAppInstanceByIdPluginArgs
-  extends GetAdminAppInstanceByIdApiArgs {}
-
 /// GetAppInstanceById
 export interface GetAppInstanceById {}
 export interface GetAppInstanceByIdApiResponse extends ApiResponse {}
 export interface GetAppInstanceByIdApiArgs {
   id: string;
+  appId: string;
 }
 export interface GetAppInstanceByIdPluginArgs
   extends GetAppInstanceByIdApiArgs {}
@@ -37,8 +26,6 @@ export interface GetAppInstanceByIdPluginArgs
 export interface GetAppInstancesByAppId {}
 export interface GetAppInstancesByAppIdApiResponse extends ApiResponse {}
 export interface GetAppInstancesByAppIdApiArgs {
-  osId?: string;
-  workspaceId?: string;
   appId?: string;
 }
 export interface GetAppInstancesByAppIdPluginArgs
