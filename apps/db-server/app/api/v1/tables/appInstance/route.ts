@@ -25,7 +25,7 @@ import {
 
 // GetAdminAppInstanceById
 export async function GET(request: Request, { params }: { params: any }) {
-  const { osId, workspaceId, appId, id } = params;
+  const { appId, id } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -37,8 +37,6 @@ export async function GET(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appInstance: {
-        osId: osId,
-        workspaceId: workspaceId,
         appId: appId,
         id: id,
       } as GetAdminAppInstanceByIdPluginArgs,
@@ -120,7 +118,7 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppInstance
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { submissionId } = params;
+  const { appInstanceId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -134,7 +132,7 @@ export async function PUT(request: Request, { params }: { params: any }) {
     .execute({
       appInstance: {
         ...body,
-        id: submissionId,
+        id: appInstanceId,
       } as UpdateAppInstancePluginArgs,
     });
 
