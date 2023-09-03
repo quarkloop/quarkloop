@@ -12,16 +12,12 @@ datasource db {
 model App {
     id String @id
 
-    name          String
-    type          Int
-    //visibility    Visibility
-    //status        AppStatus
-    workspacePath String    @unique
-    profilePath   String    @unique
-    createdAt     DateTime? @default(now())
-    updatedAt     DateTime?
-    icon          String?
-    metadata      Json?
+    type      Int
+    name      String?
+    icon      String?
+    metadata  Json?
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
 
     instances      AppInstance[]
     threadSettings AppThreadSettings?
@@ -35,15 +31,30 @@ model App {
 model AppInstance {
     id String @id
 
-    title     String
-    stage     Int
+    name      String?
     createdAt DateTime? @default(now())
     updatedAt DateTime?
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String
 
-    appThreadData AppThreadData[]
+    appThreadData AppThread[]
+    AppFileData   AppFile[]
+    AppPageData   AppPage[]
+    AppFormData   AppForm[]
+
+    @@schema("app")
+}
+
+model AppFile {
+    id String @id
+
+    enable    Boolean
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
+
+    appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appInstanceId String?
 
     @@schema("app")
 }
@@ -57,6 +68,19 @@ model AppFileSettings {
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String @unique
+
+    @@schema("app")
+}
+
+model AppForm {
+    id String @id
+
+    name      String
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
+
+    appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appInstanceId String?
 
     @@schema("app")
 }
@@ -76,6 +100,19 @@ model AppFormSettings {
     @@schema("app")
 }
 
+model AppPage {
+    id String @id
+
+    name      String
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
+
+    appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appInstanceId String?
+
+    @@schema("app")
+}
+
 model AppPageSettings {
     id String @id
 
@@ -91,19 +128,7 @@ model AppPageSettings {
     @@schema("app")
 }
 
-model AppThreadSettings {
-    id String @id
-
-    createdAt DateTime? @default(now())
-    updatedAt DateTime?
-
-    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-    appId String @unique
-
-    @@schema("app")
-}
-
-model AppThreadData {
+model AppThread {
     id Int @id @default(autoincrement())
 
     type      Int
@@ -113,6 +138,18 @@ model AppThreadData {
 
     appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appInstanceId String?
+
+    @@schema("app")
+}
+
+model AppThreadSettings {
+    id String @id
+
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
+
+    app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    appId String @unique
 
     @@schema("app")
 }
