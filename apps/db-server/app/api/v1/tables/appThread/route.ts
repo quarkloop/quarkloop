@@ -25,7 +25,7 @@ import {
 
 // GetAppThreadDataById
 export async function GET(request: Request, { params }: { params: any }) {
-  const { submissionId, conversationId } = params;
+  const { submissionId, threadId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -38,7 +38,7 @@ export async function GET(request: Request, { params }: { params: any }) {
     .execute({
       appThreadData: {
         appSubmissionId: submissionId,
-        id: conversationId,
+        id: threadId,
       } as GetAppThreadDataByIdPluginArgs,
     });
 
@@ -94,7 +94,7 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppThreadData
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { submissionId, conversationId } = params;
+  const { submissionId, threadId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -109,7 +109,7 @@ export async function PUT(request: Request, { params }: { params: any }) {
       appThreadData: {
         ...body,
         appSubmissionId: submissionId,
-        id: conversationId,
+        id: threadId,
       } as UpdateAppThreadDataPluginArgs,
     });
 
@@ -118,7 +118,7 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
 // DeleteAppThreadData
 export async function PATCH(request: Request, { params }: { params: any }) {
-  const { submissionId, conversationId } = params;
+  const { submissionId, threadId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -131,7 +131,7 @@ export async function PATCH(request: Request, { params }: { params: any }) {
     .execute({
       appThreadData: {
         appSubmissionId: submissionId,
-        id: conversationId,
+        id: threadId,
       } as DeleteAppThreadDataPluginArgs,
     });
 
