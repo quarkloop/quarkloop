@@ -35,7 +35,7 @@ export const GetAppPageSettingsByIdPlugin = createPlugin<
 
     const getArgs = args[0].appPageSettings as GetAppPageSettingsByIdPluginArgs;
 
-    const record = await prisma.appPageSettings.findFirst({
+    const record = await prisma.appPageSettings.findUnique({
       where: {
         id: getArgs.id,
       },
@@ -129,21 +129,6 @@ export const CreateAppPageSettingsPlugin = createPlugin<
 
     const createArgs = args[0]
       .appPageSettings as CreateAppPageSettingsPluginArgs;
-
-    const app = await prisma.app.findFirst({
-      where: {
-        id: createArgs.appId,
-      },
-    });
-
-    if (app == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.NOT_FOUND(
-          "[CreateAppPageSettingsPlugin] app not found"
-        ),
-      };
-    }
 
     const appPageId = generateId();
 
