@@ -25,7 +25,7 @@ import {
 
 // GetAppFormSettingsById
 export async function GET(request: Request, { params }: { params: any }) {
-  const { osId, workspaceId, appId, formId } = params;
+  const { appId, formId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -37,8 +37,6 @@ export async function GET(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appFormSettings: {
-        osId: osId,
-        workspaceId: workspaceId,
         appId: appId,
         id: formId,
       } as GetAppFormSettingsByIdPluginArgs,
@@ -52,7 +50,7 @@ export async function GET(request: Request, { params }: { params: any }) {
 //   request: Request,
 //   { params }: { params: any }
 // ) {
-//   const { osId, workspaceId, appId } = params;
+//   const { appId } = params;
 
 //   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
 //     initialState: {},
@@ -64,8 +62,6 @@ export async function GET(request: Request, { params }: { params: any }) {
 //     .onError(DefaultErrorHandler)
 //     .execute({
 //       appFormSettings: {
-//         osId: osId,
-//         workspaceId: workspaceId,
 //         appId: appId,
 //       } as GetAppFormsSettingsByAppIdPluginArgs,
 //     });
@@ -75,7 +71,7 @@ export async function GET(request: Request, { params }: { params: any }) {
 
 // CreateAppFormSettings
 export async function POST(request: Request, { params }: { params: any }) {
-  const { osId, workspaceId, appId } = params;
+  const { appId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -89,8 +85,6 @@ export async function POST(request: Request, { params }: { params: any }) {
     .execute({
       appFormSettings: {
         ...body,
-        osId: osId,
-        workspaceId: workspaceId,
         appId: appId,
       } as CreateAppFormSettingsPluginArgs,
     });
@@ -100,7 +94,7 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppFormSettings
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { osId, workspaceId, appId } = params;
+  const { appId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -114,8 +108,6 @@ export async function PUT(request: Request, { params }: { params: any }) {
     .execute({
       appFormSettings: {
         ...body,
-        osId: osId,
-        workspaceId: workspaceId,
         appId: appId,
       } as UpdateAppFormSettingsPluginArgs,
     });
@@ -125,7 +117,7 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
 // DeleteAppFormSettings
 export async function DELETE(request: Request, { params }: { params: any }) {
-  const { osId, workspaceId, appId, formId } = params;
+  const { appId, formId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -137,8 +129,6 @@ export async function DELETE(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appFormSettings: {
-        osId: osId,
-        workspaceId: workspaceId,
         appId: appId,
         id: formId,
       } as DeleteAppFormSettingsPluginArgs,
