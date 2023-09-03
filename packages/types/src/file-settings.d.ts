@@ -16,8 +16,6 @@ export interface GetAppFileSettingsById {}
 export interface GetAppFileSettingsByIdApiResponse extends ApiResponse {}
 export interface GetAppFileSettingsByIdApiArgs {
   id: string;
-  osId: string;
-  workspaceId: string;
   appId: string;
 }
 export interface GetAppFileSettingsByIdPluginArgs
@@ -27,8 +25,6 @@ export interface GetAppFileSettingsByIdPluginArgs
 export interface GetAppFileSettingsByAppId {}
 export interface GetAppFileSettingsByAppIdApiResponse extends ApiResponse {}
 export interface GetAppFileSettingsByAppIdApiArgs {
-  osId: string;
-  workspaceId: string;
   appId: string;
 }
 export interface GetAppFileSettingsByAppIdPluginArgs
@@ -38,8 +34,6 @@ export interface GetAppFileSettingsByAppIdPluginArgs
 export interface CreateAppFileSettings {}
 export interface CreateAppFileSettingsApiResponse extends ApiResponse {}
 export interface CreateAppFileSettingsApiArgs extends Partial<AppFileSettings> {
-  osId: string;
-  workspaceId: string;
   appId: string;
 }
 export interface CreateAppFileSettingsPluginArgs
@@ -50,8 +44,6 @@ export interface UpdateAppFileSettings {}
 export interface UpdateAppFileSettingsApiResponse extends ApiResponse {}
 export interface UpdateAppFileSettingsApiArgs extends Partial<AppFileSettings> {
   id: string;
-  osId: string;
-  workspaceId: string;
   appId: string;
 }
 export interface UpdateAppFileSettingsPluginArgs
@@ -62,8 +54,6 @@ export interface DeleteAppFileSettings {}
 export interface DeleteAppFileSettingsApiResponse extends ApiResponse {}
 export interface DeleteAppFileSettingsApiArgs {
   id: string;
-  osId: string;
-  workspaceId: string;
   appId: string;
 }
 export interface DeleteAppFileSettingsPluginArgs
