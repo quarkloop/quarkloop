@@ -15,7 +15,7 @@ export type AppFilePluginArgs =
 export interface GetAppFileById {}
 export interface GetAppFileByIdApiResponse extends ApiResponse {}
 export interface GetAppFileByIdApiArgs {
-  id: number;
+  id: string;
   appInstanceId: string;
 }
 export interface GetAppFileByIdPluginArgs extends GetAppFileByIdApiArgs {}
@@ -41,7 +41,7 @@ export interface CreateAppFilePluginArgs extends CreateAppFileApiArgs {}
 export interface UpdateAppFile {}
 export interface UpdateAppFileApiResponse extends ApiResponse {}
 export interface UpdateAppFileApiArgs extends Partial<AppFile> {
-  id: number;
+  id: string;
   appInstanceId: string;
 }
 export interface UpdateAppFilePluginArgs extends UpdateAppFileApiArgs {}
@@ -50,7 +50,7 @@ export interface UpdateAppFilePluginArgs extends UpdateAppFileApiArgs {}
 export interface DeleteAppFile {}
 export interface DeleteAppFileApiResponse extends ApiResponse {}
 export interface DeleteAppFileApiArgs {
-  id: number;
+  id: string;
   appInstanceId: string;
 }
 export interface DeleteAppFilePluginArgs extends DeleteAppFileApiArgs {}
