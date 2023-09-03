@@ -29,7 +29,7 @@ export const GetAppByIdPlugin = createPlugin<PipelineState, PipelineArgs[]>({
 
     const getArgs = args[0].app as GetAppByIdPluginArgs;
 
-    const record = await prisma.app.findFirst({
+    const record = await prisma.app.findUnique({
       where: {
         id: getArgs.id,
       },
@@ -117,12 +117,12 @@ export const UpdateAppPlugin = createPlugin<PipelineState, PipelineArgs[]>({
 
     const updateArgs = args[0].app as UpdateAppPluginArgs;
 
-    const record = await prisma.app.updateMany({
+    const record = await prisma.app.update({
       where: {
         id: updateArgs.id,
       },
       data: {
-        // once an app created, only name and icon can be updated.
+        // once an app created, only name, metadata and icon can be updated.
         ...(updateArgs.name && { name: updateArgs.name }),
         ...(updateArgs.icon && { icon: updateArgs.icon }),
         ...(updateArgs.metadata && { metadata: updateArgs.metadata }),
@@ -130,7 +130,7 @@ export const UpdateAppPlugin = createPlugin<PipelineState, PipelineArgs[]>({
       },
     });
 
-    if (record.count == 0) {
+    if (record == null) {
       return {
         ...state,
         status: PluginStatusEntry.NOT_FOUND("[UpdateAppPlugin]"),
@@ -159,7 +159,7 @@ export const DeleteAppPlugin = createPlugin<PipelineState, PipelineArgs[]>({
 
     const deleteArgs = args[0].app as DeleteAppPluginArgs;
 
-    const record = await prisma.app.findMany({
+    const record = await prisma.app.delete({
       where: {
         id: deleteArgs.id,
       },
