@@ -176,9 +176,7 @@ export const CreateAppThreadSettingsPlugin = createPlugin<
     if (app == null) {
       return {
         ...state,
-        status: PluginStatusEntry.NOT_FOUND(
-          "[CreateAppThreadSettingsPlugin] app not found"
-        ),
+        status: PluginStatusEntry.NOT_FOUND("[CreateAppThreadSettingsPlugin]"),
       };
     }
 
@@ -250,7 +248,6 @@ export const UpdateAppThreadSettingsPlugin = createPlugin<
       },
     });
 
-    // TODO: following check may not work, investigate on alternatives
     if (record.count == 0) {
       return {
         ...state,
