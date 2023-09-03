@@ -16,8 +16,6 @@ export interface GetAppThreadSettingsById {}
 export interface GetAppThreadSettingsByIdApiResponse extends ApiResponse {}
 export interface GetAppThreadSettingsByIdApiArgs {
   id: string;
-  osId: string;
-  workspaceId: string;
   appId: string;
 }
 export interface GetAppThreadSettingsByIdPluginArgs
@@ -27,8 +25,6 @@ export interface GetAppThreadSettingsByIdPluginArgs
 export interface GetAppThreadSettingsByAppId {}
 export interface GetAppThreadSettingsByAppIdApiResponse extends ApiResponse {}
 export interface GetAppThreadSettingsByAppIdApiArgs {
-  osId: string;
-  workspaceId: string;
   appId: string;
 }
 export interface GetAppThreadSettingsByAppIdPluginArgs
@@ -39,8 +35,6 @@ export interface CreateAppThreadSettings {}
 export interface CreateAppThreadSettingsApiResponse extends ApiResponse {}
 export interface CreateAppThreadSettingsApiArgs
   extends Partial<AppThreadSettings> {
-  osId: string;
-  workspaceId: string;
   appId: string;
 }
 export interface CreateAppThreadSettingsPluginArgs
@@ -52,8 +46,6 @@ export interface UpdateAppThreadSettingsApiResponse extends ApiResponse {}
 export interface UpdateAppThreadSettingsApiArgs
   extends Partial<AppThreadSettings> {
   id: string;
-  osId: string;
-  workspaceId: string;
   appId: string;
 }
 export interface UpdateAppThreadSettingsPluginArgs
@@ -64,8 +56,6 @@ export interface DeleteAppThreadSettings {}
 export interface DeleteAppThreadSettingsApiResponse extends ApiResponse {}
 export interface DeleteAppThreadSettingsApiArgs {
   id: string;
-  osId: string;
-  workspaceId: string;
   appId: string;
 }
 export interface DeleteAppThreadSettingsPluginArgs
