@@ -140,3 +140,25 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
   return NextResponse.json(finalState.apiResponse);
 }
+
+// DeleteAppInstance
+export async function DELETE(request: Request, { params }: { params: any }) {
+  const { appId, appInstanceId } = params;
+
+  const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
+    initialState: {},
+  });
+
+  const finalState = await pipeline
+    .use(DeleteAppInstancePlugin)
+    .use(DeleteApiResponsePlugin)
+    .onError(DefaultErrorHandler)
+    .execute({
+      app: {
+        appId: appId,
+        id: appInstanceId,
+      } as DeleteAppInstancePluginArgs,
+    });
+
+  return NextResponse.json(finalState.apiResponse);
+}
