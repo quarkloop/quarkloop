@@ -23,16 +23,7 @@ export const GetAppThreadByIdPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAppThreadByIdPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appThread == null) {
+    if (args.length === 0 || args[0].appThread == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -84,16 +75,7 @@ export const GetAppThreadByAppInstanceIdPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAppThreadByAppInstanceIdPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appThread == null) {
+    if (args.length === 0 || args[0].appThread == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -137,16 +119,7 @@ export const CreateAppThreadPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[CreateAppThreadPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appThread == null) {
+    if (args.length === 0 || args[0].appThread == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -195,7 +168,7 @@ export const UpdateAppThreadPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
+    if (args.length === 0 || args[0].appThread == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -204,14 +177,6 @@ export const UpdateAppThreadPlugin = createPlugin<
       };
     }
 
-    if (args[0].appThread == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[UpdateAppThreadPlugin]"
-        ),
-      };
-    }
     const updateArgs = args[0].appThread as UpdateAppThreadPluginArgs;
 
     const record = await prisma.appThread.updateMany({
@@ -249,7 +214,7 @@ export const DeleteAppThreadPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
+    if (args.length === 0 || args[0].appThread == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -258,14 +223,6 @@ export const DeleteAppThreadPlugin = createPlugin<
       };
     }
 
-    if (args[0].appThread == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[DeleteAppThreadPlugin]"
-        ),
-      };
-    }
     const deleteArgs = args[0].appThread as DeleteAppThreadPluginArgs;
 
     const record = await prisma.appThread.deleteMany({
