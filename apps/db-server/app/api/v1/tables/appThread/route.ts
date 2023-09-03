@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 
 import {
-  CreateAppThreadDataPluginArgs,
-  DeleteAppThreadDataPluginArgs,
-  GetAppThreadDataByIdPluginArgs,
-  GetAppThreadDataByAppSubmissionIdPluginArgs,
-  UpdateAppThreadDataPluginArgs,
+  CreateAppThreadPluginArgs,
+  DeleteAppThreadPluginArgs,
+  GetAppThreadByIdPluginArgs,
+  GetAppThreadByAppInstanceIdPluginArgs,
+  UpdateAppThreadPluginArgs,
 } from "@quarkloop/types";
 import { createPipeline } from "@quarkloop/plugin";
 import {
@@ -16,62 +16,62 @@ import {
   CreateApiResponsePlugin,
   UpdateApiResponsePlugin,
   DeleteApiResponsePlugin,
-  GetAppThreadDataByIdPlugin,
-  GetAppThreadDataByAppSubmissionIdPlugin,
-  CreateAppThreadDataPlugin,
-  UpdateAppThreadDataPlugin,
-  DeleteAppThreadDataPlugin,
+  GetAppThreadByIdPlugin,
+  GetAppThreadByAppInstanceIdPlugin,
+  CreateAppThreadPlugin,
+  UpdateAppThreadPlugin,
+  DeleteAppThreadPlugin,
 } from "@quarkloop/plugins";
 
-// GetAppThreadDataById
+// GetAppThreadById
 export async function GET(request: Request, { params }: { params: any }) {
-  const { submissionId, threadId } = params;
+  const { appInstanceId, threadId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
   });
 
   const finalState = await pipeline
-    .use(GetAppThreadDataByIdPlugin)
+    .use(GetAppThreadByIdPlugin)
     .use(GetApiResponsePlugin)
     .onError(DefaultErrorHandler)
     .execute({
-      appThreadData: {
-        appSubmissionId: submissionId,
+      appThread: {
+        appInstanceId: appInstanceId,
         id: threadId,
-      } as GetAppThreadDataByIdPluginArgs,
+      } as GetAppThreadByIdPluginArgs,
     });
 
   return NextResponse.json(finalState.apiResponse);
 }
 
-// // GetAppThreadDataByAppSubmissionId
+// // GetAppThreadByAppInstanceId
 // export async function GET(
 //   request: Request,
 //   { params }: { params: any }
 // ) {
-//   const { submissionId } = params;
+//   const { appInstanceId } = params;
 
 //   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
 //     initialState: {},
 //   });
 
 //   const finalState = await pipeline
-//     .use(GetAppThreadDataByAppSubmissionIdPlugin)
+//     .use(GetAppThreadByAppInstanceIdPlugin)
 //     .use(GetApiResponsePlugin)
 //     .onError(DefaultErrorHandler)
 //     .execute({
-//       appThreadData: {
-//         appSubmissionId: submissionId,
-//       } as GetAppThreadDataByAppSubmissionIdPluginArgs,
+//       appThread: {
+//         appInstanceId: appInstanceId,
+//       } as GetAppThreadByAppInstanceIdPluginArgs,
 //     });
 
 //   return NextResponse.json(finalState.apiResponse);
 // }
 
-// CreateAppThreadData
+// CreateAppThread
 export async function POST(request: Request, { params }: { params: any }) {
-  const { submissionId } = params;
+  const { appInstanceId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -79,22 +79,22 @@ export async function POST(request: Request, { params }: { params: any }) {
   });
 
   const finalState = await pipeline
-    .use(CreateAppThreadDataPlugin)
+    .use(CreateAppThreadPlugin)
     .use(CreateApiResponsePlugin)
     .onError(DefaultErrorHandler)
     .execute({
-      appThreadData: {
+      appThread: {
         ...body,
-        appSubmissionId: submissionId,
-      } as CreateAppThreadDataPluginArgs,
+        appInstanceId: appInstanceId,
+      } as CreateAppThreadPluginArgs,
     });
 
   return NextResponse.json(finalState.apiResponse);
 }
 
-// UpdateAppThreadData
+// UpdateAppThread
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { submissionId, threadId } = params;
+  const { appInstanceId, threadId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -102,37 +102,37 @@ export async function PUT(request: Request, { params }: { params: any }) {
   });
 
   const finalState = await pipeline
-    .use(UpdateAppThreadDataPlugin)
+    .use(UpdateAppThreadPlugin)
     .use(UpdateApiResponsePlugin)
     .onError(DefaultErrorHandler)
     .execute({
-      appThreadData: {
+      appThread: {
         ...body,
-        appSubmissionId: submissionId,
+        appInstanceId: appInstanceId,
         id: threadId,
-      } as UpdateAppThreadDataPluginArgs,
+      } as UpdateAppThreadPluginArgs,
     });
 
   return NextResponse.json(finalState.apiResponse);
 }
 
-// DeleteAppThreadData
+// DeleteAppThread
 export async function DELETE(request: Request, { params }: { params: any }) {
-  const { submissionId, threadId } = params;
+  const { appInstanceId, threadId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
   });
 
   const finalState = await pipeline
-    .use(DeleteAppThreadDataPlugin)
+    .use(DeleteAppThreadPlugin)
     .use(DeleteApiResponsePlugin)
     .onError(DefaultErrorHandler)
     .execute({
-      appThreadData: {
-        appSubmissionId: submissionId,
+      appThread: {
+        appInstanceId: appInstanceId,
         id: threadId,
-      } as DeleteAppThreadDataPluginArgs,
+      } as DeleteAppThreadPluginArgs,
     });
 
   return NextResponse.json(finalState.apiResponse);
