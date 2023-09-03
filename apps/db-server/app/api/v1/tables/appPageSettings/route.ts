@@ -23,10 +23,8 @@ import {
   DeleteAppPageSettingsPlugin,
 } from "@quarkloop/plugins";
 
-export async function GET_GetAppPageSettingsById(
-  request: Request,
-  { params }: { params: any }
-) {
+// GetAppPageSettingsById
+export async function GET(request: Request, { params }: { params: any }) {
   const { osId, workspaceId, appId, pageId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -49,10 +47,8 @@ export async function GET_GetAppPageSettingsById(
   return NextResponse.json(finalState.apiResponse);
 }
 
-export async function GET_GetAppPagesSettingsByAppId(
-  request: Request,
-  { params }: { params: any }
-) {
+// GetAppPagesSettingsByAppId
+export async function GET(request: Request, { params }: { params: any }) {
   const { osId, workspaceId, appId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -74,10 +70,8 @@ export async function GET_GetAppPagesSettingsByAppId(
   return NextResponse.json(finalState.apiResponse);
 }
 
-export async function POST_CreateAppPageSettings(
-  request: Request,
-  { params }: { params: any }
-) {
+// CreateAppPageSettings
+export async function POST(request: Request, { params }: { params: any }) {
   const { osId, workspaceId, appId } = params;
   const body = await request.json();
 
@@ -101,10 +95,8 @@ export async function POST_CreateAppPageSettings(
   return NextResponse.json(finalState.apiResponse);
 }
 
-export async function PUT_UpdateAppPageSettings(
-  request: Request,
-  { params }: { params: any }
-) {
+// UpdateAppPageSettings
+export async function PUT(request: Request, { params }: { params: any }) {
   const { osId, workspaceId, appId } = params;
   const body = await request.json();
 
@@ -128,10 +120,8 @@ export async function PUT_UpdateAppPageSettings(
   return NextResponse.json(finalState.apiResponse);
 }
 
-export async function PATCH_DeleteAppPageSettings(
-  request: Request,
-  { params }: { params: any }
-) {
+// DeleteAppPageSettings
+export async function PATCH(request: Request, { params }: { params: any }) {
   const { osId, workspaceId, appId, pageId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
