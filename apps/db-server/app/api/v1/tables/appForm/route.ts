@@ -23,7 +23,7 @@ import {
 
 // GetAppFormById
 export async function GET(request: Request, { params }: { params: any }) {
-  const { submissionId, formId } = params;
+  const { appInstanceId, formId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -35,7 +35,7 @@ export async function GET(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appForm: {
-        appSubmissionId: submissionId,
+        appInstanceId: appInstanceId,
         id: formId,
       } as GetAppFormByIdPluginArgs,
     });
@@ -45,7 +45,7 @@ export async function GET(request: Request, { params }: { params: any }) {
 
 // CreateAppForm
 export async function POST(request: Request, { params }: { params: any }) {
-  const { submissionId } = params;
+  const { appInstanceId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -59,7 +59,7 @@ export async function POST(request: Request, { params }: { params: any }) {
     .execute({
       appForm: {
         ...body,
-        appSubmissionId: submissionId,
+        appInstanceId: appInstanceId,
       } as CreateAppFormPluginArgs,
     });
 
@@ -68,7 +68,7 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppForm
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { submissionId, formId } = params;
+  const { appInstanceId, formId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -82,7 +82,7 @@ export async function PUT(request: Request, { params }: { params: any }) {
     .execute({
       appForm: {
         ...body,
-        appSubmissionId: submissionId,
+        appInstanceId: appInstanceId,
         id: formId,
       } as UpdateAppFormPluginArgs,
     });
@@ -92,7 +92,7 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
 // DeleteAppForm
 export async function DELETE(request: Request, { params }: { params: any }) {
-  const { submissionId, formId } = params;
+  const { appInstanceId, formId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -104,7 +104,7 @@ export async function DELETE(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appForm: {
-        appSubmissionId: submissionId,
+        appInstanceId: appInstanceId,
         id: formId,
       } as DeleteAppFormPluginArgs,
     });
