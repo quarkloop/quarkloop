@@ -23,10 +23,8 @@ import {
   DeleteAppThreadDataPlugin,
 } from "@quarkloop/plugins";
 
-export async function GET_GetAppThreadDataById(
-  request: Request,
-  { params }: { params: any }
-) {
+// GetAppThreadDataById
+export async function GET(request: Request, { params }: { params: any }) {
   const { submissionId, conversationId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -47,33 +45,32 @@ export async function GET_GetAppThreadDataById(
   return NextResponse.json(finalState.apiResponse);
 }
 
-export async function GET_GetAppThreadDataByAppSubmissionId(
-  request: Request,
-  { params }: { params: any }
-) {
-  const { submissionId } = params;
+// // GetAppThreadDataByAppSubmissionId
+// export async function GET(
+//   request: Request,
+//   { params }: { params: any }
+// ) {
+//   const { submissionId } = params;
 
-  const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
-    initialState: {},
-  });
+//   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
+//     initialState: {},
+//   });
 
-  const finalState = await pipeline
-    .use(GetAppThreadDataByAppSubmissionIdPlugin)
-    .use(GetApiResponsePlugin)
-    .onError(DefaultErrorHandler)
-    .execute({
-      appThreadData: {
-        appSubmissionId: submissionId,
-      } as GetAppThreadDataByAppSubmissionIdPluginArgs,
-    });
+//   const finalState = await pipeline
+//     .use(GetAppThreadDataByAppSubmissionIdPlugin)
+//     .use(GetApiResponsePlugin)
+//     .onError(DefaultErrorHandler)
+//     .execute({
+//       appThreadData: {
+//         appSubmissionId: submissionId,
+//       } as GetAppThreadDataByAppSubmissionIdPluginArgs,
+//     });
 
-  return NextResponse.json(finalState.apiResponse);
-}
+//   return NextResponse.json(finalState.apiResponse);
+// }
 
-export async function POST_CreateAppThreadData(
-  request: Request,
-  { params }: { params: any }
-) {
+// CreateAppThreadData
+export async function POST(request: Request, { params }: { params: any }) {
   const { submissionId } = params;
   const body = await request.json();
 
@@ -95,10 +92,8 @@ export async function POST_CreateAppThreadData(
   return NextResponse.json(finalState.apiResponse);
 }
 
-export async function PUT_UpdateAppThreadData(
-  request: Request,
-  { params }: { params: any }
-) {
+// UpdateAppThreadData
+export async function PUT(request: Request, { params }: { params: any }) {
   const { submissionId, conversationId } = params;
   const body = await request.json();
 
@@ -121,10 +116,8 @@ export async function PUT_UpdateAppThreadData(
   return NextResponse.json(finalState.apiResponse);
 }
 
-export async function PATCH_DeleteAppThreadData(
-  request: Request,
-  { params }: { params: any }
-) {
+// DeleteAppThreadData
+export async function PATCH(request: Request, { params }: { params: any }) {
   const { submissionId, conversationId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
