@@ -20,14 +20,7 @@ export const GetAppByIdPlugin = createPlugin<PipelineState, PipelineArgs[]>({
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR("[GetAppByIdPlugin]"),
-      };
-    }
-
-    if (args[0].app == null) {
+    if (args.length === 0 || args[0].app == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR("[GetAppByIdPlugin]"),
@@ -71,14 +64,7 @@ export const CreateAppPlugin = createPlugin<PipelineState, PipelineArgs[]>({
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR("[CreateAppPlugin]"),
-      };
-    }
-
-    if (args[0].app == null) {
+    if (args.length === 0 || args[0].app == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR("[CreateAppPlugin]"),
@@ -122,19 +108,13 @@ export const UpdateAppPlugin = createPlugin<PipelineState, PipelineArgs[]>({
       return state;
     }
 
-    if (args.length === 0) {
+    if (args.length === 0 || args[0].app == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR("[UpdateAppPlugin]"),
       };
     }
 
-    if (args[0].app == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR("[UpdateAppPlugin]"),
-      };
-    }
     const updateArgs = args[0].app as UpdateAppPluginArgs;
 
     const record = await prisma.app.updateMany({
@@ -170,13 +150,7 @@ export const DeleteAppPlugin = createPlugin<PipelineState, PipelineArgs[]>({
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR("[DeleteAppPlugin]"),
-      };
-    }
-    if (args[0].app == null) {
+    if (args.length === 0 || args[0].app == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR("[DeleteAppPlugin]"),
