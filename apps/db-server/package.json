@@ -6,13 +6,24 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "prisma generate",
+    "studio:dev": "dotenv -e .env.local -- prisma studio",
+    "studio:prod": "dotenv -e .env.production -- prisma studio",
+    "db:reset": "dotenv -e .env.development -- npx prisma migrate reset --preview-feature",
+    "db:migrate": "dotenv -e .env.development -- npx prisma migrate dev",
+    "db:seed": "dotenv -e .env.development -- bash prisma/seed/seed.bash",
+    "db:test": "dotenv -e .env.development -- bash prisma/tests/test.bash",
+    "db:deploy": "dotenv -e .env.production -- npx prisma migrate deploy --preview-feature"
   },
   "devDependencies": {
     "@quarkloop/tsconfig": "workspace:*",
     "typescript": "5.1.6"
   },
   "dependencies": {
+    "@quarkloop/plugin": "workspace:*",
+    "@quarkloop/plugins": "workspace:*",
+    "@quarkloop/types": "workspace:*",
     "@next/bundle-analyzer": "^13.4.5",
     "@types/node": "20.3.1",
     "@types/react": "18.2.13",
@@ -20,8 +31,6 @@
     "eslint-config-next": "13.4.12",
     "next": "13.4.12",
     "next-transpile-modules": "^10.0.1",
-    "@prisma/client": "^4.16.2",
-    "prisma": "^4.16.2",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   }
