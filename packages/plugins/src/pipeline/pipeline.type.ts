@@ -14,8 +14,14 @@ import {
   AppFileSettingsPluginArgs,
   AppThreadSettings,
   AppThreadSettingsPluginArgs,
-  AppThreadData,
-  AppThreadDataPluginArgs,
+  AppThread,
+  AppThreadPluginArgs,
+  AppPagePluginArgs,
+  AppFormPluginArgs,
+  AppFilePluginArgs,
+  AppPage,
+  AppForm,
+  AppFile,
 } from "@quarkloop/types";
 
 type ApiResponseState = ApiResponse;
@@ -31,22 +37,36 @@ export type TableState<T extends any> = {
 // Database specific properties
 export type DatabaseState = {
   app?: TableState<App>;
-  appThreadSettings?: TableState<AppThreadSettings>;
-  appPageSettings?: TableState<AppPageSettings>;
-  appFormSettings?: TableState<AppFormSettings>;
-  appFileSettings?: TableState<AppFileSettings>;
-  appThreadData?: TableState<AppThreadData>;
   appInstance?: TableState<AppInstance>;
+
+  appThread?: TableState<AppThread>;
+  appThreadSettings?: TableState<AppThreadSettings>;
+
+  appPage?: TableState<AppPage>;
+  appPageSettings?: TableState<AppPageSettings>;
+
+  appForm?: TableState<AppForm>;
+  appFormSettings?: TableState<AppFormSettings>;
+
+  appFile?: TableState<AppFile>;
+  appFileSettings?: TableState<AppFileSettings>;
 };
 
 export interface PipelineArgs {
   app?: AppPluginArgs;
-  appThreadSettings?: AppThreadSettingsPluginArgs;
-  appPageSettings?: AppPageSettingsPluginArgs;
-  appFormSettings?: AppFormSettingsPluginArgs;
-  appFileSettings?: AppFileSettingsPluginArgs;
-  appThreadData?: AppThreadDataPluginArgs;
   appInstance?: AppInstancePluginArgs;
+
+  appThread?: AppThreadPluginArgs;
+  appThreadSettings?: AppThreadSettingsPluginArgs;
+
+  appPage?: AppPagePluginArgs;
+  appPageSettings?: AppPageSettingsPluginArgs;
+
+  appForm?: AppFormPluginArgs;
+  appFormSettings?: AppFormSettingsPluginArgs;
+
+  appFile?: AppFilePluginArgs;
+  appFileSettings?: AppFileSettingsPluginArgs;
 }
 
 export interface PipelineState {
