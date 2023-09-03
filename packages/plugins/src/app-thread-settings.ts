@@ -208,7 +208,6 @@ export const UpdateAppThreadSettingsPlugin = createPlugin<
         id: updateArgs.id,
       },
       data: {
-        ...(updateArgs.name && { name: updateArgs.name }),
         updatedAt: updateArgs.updatedAt,
       },
     });
