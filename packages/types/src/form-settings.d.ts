@@ -21,8 +21,6 @@ export interface GetAppFormSettingsById {}
 export interface GetAppFormSettingsByIdApiResponse extends ApiResponse {}
 export interface GetAppFormSettingsByIdApiArgs {
   id: string;
-  osId: string;
-  workspaceId: string;
   appId: string;
 }
 export interface GetAppFormSettingsByIdPluginArgs
@@ -32,8 +30,6 @@ export interface GetAppFormSettingsByIdPluginArgs
 export interface GetAppFormsSettingsByAppId {}
 export interface GetAppFormsSettingsByAppIdApiResponse extends ApiResponse {}
 export interface GetAppFormsSettingsByAppIdApiArgs {
-  osId: string;
-  workspaceId: string;
   appId: string;
 }
 export interface GetAppFormsSettingsByAppIdPluginArgs
@@ -43,8 +39,6 @@ export interface GetAppFormsSettingsByAppIdPluginArgs
 export interface CreateAppFormSettings {}
 export interface CreateAppFormSettingsApiResponse extends ApiResponse {}
 export interface CreateAppFormSettingsApiArgs extends Partial<AppFormSettings> {
-  osId: string;
-  workspaceId: string;
   appId: string;
 }
 export interface CreateAppFormSettingsPluginArgs
@@ -55,8 +49,6 @@ export interface UpdateAppFormSettings {}
 export interface UpdateAppFormSettingsApiResponse extends ApiResponse {}
 export interface UpdateAppFormSettingsApiArgs extends Partial<AppFormSettings> {
   id: string;
-  osId: string;
-  workspaceId: string;
   appId: string;
   formFieldCreate?: boolean;
   formFieldUpdate?: boolean;
@@ -70,8 +62,6 @@ export interface DeleteAppFormSettings {}
 export interface DeleteAppFormSettingsApiResponse extends ApiResponse {}
 export interface DeleteAppFormSettingsApiArgs {
   id: string;
-  osId: string;
-  workspaceId: string;
   appId: string;
 }
 export interface DeleteAppFormSettingsPluginArgs
