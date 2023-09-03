@@ -5,7 +5,6 @@ import {
   CreateAppPluginArgs,
   UpdateAppPluginArgs,
   DeleteAppPluginArgs,
-  GetAppsByOsIdPluginArgs,
 } from "@quarkloop/types";
 import { createPipeline } from "@quarkloop/plugin";
 import {
@@ -17,7 +16,6 @@ import {
   UpdateApiResponsePlugin,
   DeleteApiResponsePlugin,
   GetAppByIdPlugin,
-  GetAppsByOsIdPlugin,
   CreateAppPlugin,
   UpdateAppPlugin,
   DeleteAppPlugin,
