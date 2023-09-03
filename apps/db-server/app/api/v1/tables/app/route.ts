@@ -44,24 +44,6 @@ export async function GET(request: Request, { params }: { params: any }) {
   return NextResponse.json(finalState.apiResponse);
 }
 
-// // GetAppsByOsId
-// export async function GET(
-//   request: Request,
-//   { params }: { params: any }
-// ) {
-//   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
-//     initialState: {},
-//   });
-
-//   const finalState = await pipeline
-//     .use(GetAppsByOsIdPlugin)
-//     .use(GetApiResponsePlugin)
-//     .onError(DefaultErrorHandler)
-//     .execute();
-
-//   return NextResponse.json(finalState.apiResponse);
-// }
-
 // CreateApp
 export async function POST(request: Request, { params }: { params: any }) {
   const body = await request.json();
