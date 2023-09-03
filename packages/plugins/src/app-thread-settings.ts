@@ -20,7 +20,7 @@ export const GetAppThreadSettingsByIdPlugin = createPlugin<
   name: "GetAppThreadSettingsByIdPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -32,6 +32,7 @@ export const GetAppThreadSettingsByIdPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appThreadSettings == null) {
       return {
         ...state,
@@ -43,26 +44,10 @@ export const GetAppThreadSettingsByIdPlugin = createPlugin<
 
     const getArgs = args[0]
       .appThreadSettings as GetAppThreadSettingsByIdPluginArgs;
-    const { user } = state.user;
 
     const record = await prisma.appThreadSettings.findFirst({
       where: {
         id: getArgs.id,
-        app: {
-          userRoleAssignment: {
-            every: {
-              user: {
-                id: user?.id,
-              },
-              workspace: {
-                id: getArgs.workspaceId,
-              },
-              os: {
-                id: getArgs.osId,
-              },
-            },
-          },
-        },
       },
     });
 
@@ -94,7 +79,7 @@ export const GetAppThreadSettingsByAppIdPlugin = createPlugin<
   name: "GetAppThreadSettingsByAppIdPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -106,6 +91,7 @@ export const GetAppThreadSettingsByAppIdPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appThreadSettings == null) {
       return {
         ...state,
@@ -117,25 +103,11 @@ export const GetAppThreadSettingsByAppIdPlugin = createPlugin<
 
     const getArgs = args[0]
       .appThreadSettings as GetAppThreadSettingsByAppIdPluginArgs;
-    const { user } = state.user;
 
     const record = await prisma.appThreadSettings.findFirst({
       where: {
         app: {
           id: getArgs.appId,
-          userRoleAssignment: {
-            every: {
-              user: {
-                id: user?.id,
-              },
-              workspace: {
-                id: getArgs.workspaceId,
-              },
-              os: {
-                id: getArgs.osId,
-              },
-            },
-          },
         },
       },
     });
@@ -170,12 +142,7 @@ export const CreateAppThreadSettingsPlugin = createPlugin<
   name: "CreateAppThreadSettingsPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (
-      state.status ||
-      state.session == null ||
-      state.user == null ||
-      state.user.subscription == null
-    ) {
+    if (state.status) {
       return state;
     }
 
@@ -187,6 +154,7 @@ export const CreateAppThreadSettingsPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appThreadSettings == null) {
       return {
         ...state,
@@ -199,25 +167,9 @@ export const CreateAppThreadSettingsPlugin = createPlugin<
     const createArgs = args[0]
       .appThreadSettings as CreateAppThreadSettingsPluginArgs;
 
-    const { user } = state.user;
-    const { subscription } = state.user;
-
     const app = await prisma.app.findFirst({
       where: {
         id: createArgs.appId,
-        userRoleAssignment: {
-          every: {
-            user: {
-              id: user?.id,
-            },
-            workspace: {
-              id: createArgs.workspaceId,
-            },
-            os: {
-              id: createArgs.osId,
-            },
-          },
-        },
       },
     });
 
@@ -238,22 +190,6 @@ export const CreateAppThreadSettingsPlugin = createPlugin<
         app: {
           connect: {
             id: createArgs.appId,
-          },
-        },
-        planMetrics: {
-          create: {
-            type: "AppThread",
-            subscription: { connect: { id: subscription.id } },
-            os: { connect: { id: createArgs.osId } },
-            workspace: {
-              connect: {
-                osId_id: {
-                  id: createArgs.workspaceId!,
-                  osId: createArgs.osId,
-                },
-              },
-            },
-            app: { connect: { id: createArgs.appId } },
           },
         },
       },
@@ -280,7 +216,7 @@ export const UpdateAppThreadSettingsPlugin = createPlugin<
   name: "UpdateAppThreadSettingsPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -292,6 +228,7 @@ export const UpdateAppThreadSettingsPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appThreadSettings == null) {
       return {
         ...state,
@@ -302,42 +239,24 @@ export const UpdateAppThreadSettingsPlugin = createPlugin<
     }
     const updateArgs = args[0]
       .appThreadSettings as UpdateAppThreadSettingsPluginArgs;
-    const { user } = state.user;
 
-    // const record = await prisma.appThreadSettings.updateMany({
-    //   where: {
-    //     id: updateArgs.id,
-    //     workspace: {
-    //       id: updateArgs.workspaceId,
-    //       os: {
-    //         id: updateArgs.osId,
-    //         user: {
-    //           id: user.id,
-    //         },
-    //       },
-    //     },
-    //   },
-    //   data: {
-    //     // once an app created, only name and icon can be updated.
-    //     ...(updateArgs.name && { name: updateArgs.name }),
-    //     ...(updateArgs.status != null && { status: updateArgs.status }),
-    //     ...(updateArgs.icon && { icon: updateArgs.icon }),
+    const record = await prisma.appThreadSettings.updateMany({
+      where: {
+        id: updateArgs.id,
+      },
+      data: {
+        ...(updateArgs.name && { name: updateArgs.name }),
+        updatedAt: updateArgs.updatedAt,
+      },
+    });
 
-    //     ...(updateArgs.metadata && { metadata: updateArgs.metadata }),
-    //     ...(updateArgs.pages && { pages: updateArgs.pages }),
-    //     ...(updateArgs.forms && { forms: updateArgs.forms }),
-
-    //     updatedAt: updateArgs.updatedAt,
-    //   },
-    // });
-
-    // // TODO: following check may not work, investigate on alternatives
-    // if (record.count == 0) {
-    //   return {
-    //     ...state,
-    //     status: PluginStatusEntry.NOT_FOUND("[UpdateAppThreadSettingsPlugin]"),
-    //   };
-    // }
+    // TODO: following check may not work, investigate on alternatives
+    if (record.count == 0) {
+      return {
+        ...state,
+        status: PluginStatusEntry.NOT_FOUND("[UpdateAppThreadSettingsPlugin]"),
+      };
+    }
 
     return state;
   },
@@ -351,7 +270,7 @@ export const DeleteAppThreadSettingsPlugin = createPlugin<
   name: "DeleteAppThreadSettingsPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -363,6 +282,7 @@ export const DeleteAppThreadSettingsPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appThreadSettings == null) {
       return {
         ...state,
@@ -373,27 +293,11 @@ export const DeleteAppThreadSettingsPlugin = createPlugin<
     }
     const deleteArgs = args[0]
       .appThreadSettings as DeleteAppThreadSettingsPluginArgs;
-    const { user } = state.user;
 
     const record = await prisma.appThreadSettings.deleteMany({
       where: {
         id: deleteArgs.id,
         appId: deleteArgs.appId,
-        app: {
-          userRoleAssignment: {
-            every: {
-              user: {
-                id: user?.id,
-              },
-              workspace: {
-                id: deleteArgs.workspaceId,
-              },
-              os: {
-                id: deleteArgs.osId,
-              },
-            },
-          },
-        },
       },
     });
 
