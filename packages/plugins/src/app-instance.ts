@@ -23,7 +23,7 @@ export const GetAppInstanceByIdPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
+    if (args.length === 0 || args[0].appInstance == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -32,14 +32,6 @@ export const GetAppInstanceByIdPlugin = createPlugin<
       };
     }
 
-    if (args[0].appInstance == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAppInstanceByIdPlugin]"
-        ),
-      };
-    }
     const getArgs = args[0].appInstance as GetAppInstanceByIdPluginArgs;
 
     const record = await prisma.appInstance.findFirst({
@@ -83,16 +75,7 @@ export const GetAppInstancesByAppIdPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAppInstancesByAppIdPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appInstance == null) {
+    if (args.length === 0 || args[0].appInstance == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -146,16 +129,7 @@ export const CreateAppInstancePlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[CreateAppInstancePlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appInstance == null) {
+    if (args.length === 0 || args[0].appInstance == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -205,16 +179,7 @@ export const UpdateAppInstancePlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[UpdateAppInstancePlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appInstance == null) {
+    if (args.length === 0 || args[0].appInstance == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
