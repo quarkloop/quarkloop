@@ -16,7 +16,6 @@ export interface GetAppFileSettingsById {}
 export interface GetAppFileSettingsByIdApiResponse extends ApiResponse {}
 export interface GetAppFileSettingsByIdApiArgs {
   id: string;
-  appId: string;
 }
 export interface GetAppFileSettingsByIdPluginArgs
   extends GetAppFileSettingsByIdApiArgs {}
