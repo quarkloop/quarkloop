@@ -4,22 +4,22 @@ import { createPlugin } from "@quarkloop/plugin";
 import { PipelineArgs, PipelineState, PluginStatusEntry } from "./pipeline";
 
 import {
-  GetAppThreadDataByIdPluginArgs,
-  GetAppThreadDataByAppSubmissionIdPluginArgs,
-  CreateAppThreadDataPluginArgs,
-  UpdateAppThreadDataPluginArgs,
-  DeleteAppThreadDataPluginArgs,
+  GetAppThreadByIdPluginArgs,
+  GetAppThreadByAppInstanceIdPluginArgs,
+  CreateAppThreadPluginArgs,
+  UpdateAppThreadPluginArgs,
+  DeleteAppThreadPluginArgs,
 } from "@quarkloop/types";
 
-/// GetAppThreadDataById Plugin
-export const GetAppThreadDataByIdPlugin = createPlugin<
+/// GetAppThreadById Plugin
+export const GetAppThreadByIdPlugin = createPlugin<
   PipelineState,
   PipelineArgs[]
 >({
-  name: "GetAppThreadDataByIdPlugin",
+  name: "GetAppThreadByIdPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -27,45 +27,27 @@ export const GetAppThreadDataByIdPlugin = createPlugin<
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAppThreadDataByIdPlugin]"
+          "[GetAppThreadByIdPlugin]"
         ),
       };
     }
-    if (args[0].appThreadData == null) {
+
+    if (args[0].appThread == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAppThreadDataByIdPlugin]"
+          "[GetAppThreadByIdPlugin]"
         ),
       };
     }
 
-    const getArgs = args[0].appThreadData as GetAppThreadDataByIdPluginArgs;
-    const { user } = state.user;
+    const getArgs = args[0].appThread as GetAppThreadByIdPluginArgs;
 
-    const record = await prisma.appThreadData.findFirst({
+    const record = await prisma.appThread.findFirst({
       where: {
         id: getArgs.id,
-        appSubmission: {
-          id: getArgs.appSubmissionId,
-          appSubmissionUser: {
-            every: {
-              user: {
-                id: user?.id,
-              },
-            },
-          },
-        },
-      },
-      include: {
-        appSubmission: {
-          include: {
-            appSubmissionUser: {
-              include: {
-                user: true,
-              },
-            },
-          },
+        appInstance: {
+          id: getArgs.appInstanceId,
         },
       },
     });
@@ -73,7 +55,7 @@ export const GetAppThreadDataByIdPlugin = createPlugin<
     if (record == null) {
       return {
         ...state,
-        status: PluginStatusEntry.NOT_FOUND("[GetAppThreadDataByIdPlugin]"),
+        status: PluginStatusEntry.NOT_FOUND("[GetAppThreadByIdPlugin]"),
       };
     }
 
@@ -81,7 +63,7 @@ export const GetAppThreadDataByIdPlugin = createPlugin<
       ...state,
       database: {
         ...state.database,
-        appThreadData: {
+        appThread: {
           records: record,
           totalRecords: 1,
         },
@@ -90,15 +72,15 @@ export const GetAppThreadDataByIdPlugin = createPlugin<
   },
 });
 
-/// GetAppThreadDataByAppSubmissionId Plugin
-export const GetAppThreadDataByAppSubmissionIdPlugin = createPlugin<
+/// GetAppThreadByAppInstanceId Plugin
+export const GetAppThreadByAppInstanceIdPlugin = createPlugin<
   PipelineState,
   PipelineArgs[]
 >({
-  name: "GetAppThreadDataByAppSubmissionIdPlugin",
+  name: "GetAppThreadByAppInstanceIdPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -106,37 +88,26 @@ export const GetAppThreadDataByAppSubmissionIdPlugin = createPlugin<
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAppThreadDataByAppSubmissionIdPlugin]"
+          "[GetAppThreadByAppInstanceIdPlugin]"
         ),
       };
     }
-    if (args[0].appThreadData == null) {
+
+    if (args[0].appThread == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAppThreadDataByAppSubmissionIdPlugin]"
+          "[GetAppThreadByAppInstanceIdPlugin]"
         ),
       };
     }
 
-    const getArgs = args[0]
-      .appThreadData as GetAppThreadDataByAppSubmissionIdPluginArgs;
+    const getArgs = args[0].appThread as GetAppThreadByAppInstanceIdPluginArgs;
 
-    const records = await prisma.appThreadData.findMany({
+    const records = await prisma.appThread.findMany({
       where: {
-        appSubmission: {
-          id: getArgs.appSubmissionId,
-        },
-      },
-      include: {
-        appSubmission: {
-          include: {
-            appSubmissionUser: {
-              include: {
-                user: true,
-              },
-            },
-          },
+        appInstance: {
+          id: getArgs.appInstanceId,
         },
       },
     });
@@ -145,7 +116,7 @@ export const GetAppThreadDataByAppSubmissionIdPlugin = createPlugin<
       ...state,
       database: {
         ...state.database,
-        appThreadData: {
+        appThread: {
           records: records,
           totalRecords: records.length,
         },
@@ -154,20 +125,15 @@ export const GetAppThreadDataByAppSubmissionIdPlugin = createPlugin<
   },
 });
 
-/// CreateAppThreadData Plugin
-export const CreateAppThreadDataPlugin = createPlugin<
+/// CreateAppThread Plugin
+export const CreateAppThreadPlugin = createPlugin<
   PipelineState,
   PipelineArgs[]
 >({
-  name: "CreateAppThreadDataPlugin",
+  name: "CreateAppThreadPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (
-      state.status ||
-      state.session == null ||
-      state.user == null ||
-      state.user.subscription == null
-    ) {
+    if (state.status) {
       return state;
     }
 
@@ -175,52 +141,30 @@ export const CreateAppThreadDataPlugin = createPlugin<
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[CreateAppThreadDataPlugin]"
+          "[CreateAppThreadPlugin]"
         ),
       };
     }
-    if (args[0].appThreadData == null) {
+
+    if (args[0].appThread == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[CreateAppThreadDataPlugin]"
+          "[CreateAppThreadPlugin]"
         ),
       };
     }
 
-    const createArgs = args[0].appThreadData as CreateAppThreadDataPluginArgs;
+    const createArgs = args[0].appThread as CreateAppThreadPluginArgs;
 
-    const { user } = state.user;
-    const { subscription } = state.user;
-
-    const record = await prisma.appThreadData.create({
+    const record = await prisma.appThread.create({
       data: {
         type: createArgs.type!,
         message: createArgs.message!,
         updatedAt: new Date(),
-        appSubmission: {
+        appInstance: {
           connect: {
-            id: createArgs.appSubmissionId,
-          },
-        },
-        // planMetrics: {
-        //   create: {
-        //     type: "AppThreadData",
-        //     subscription: { connect: { id: subscription.id } },
-        //     os: { connect: { id: createArgs.osId } },
-        //     workspace: { connect: { id: createArgs.workspaceId } },
-        //     app: { connect: { id: createArgs.appId } },
-        //   },
-        // },
-      },
-      include: {
-        appSubmission: {
-          include: {
-            appSubmissionUser: {
-              include: {
-                user: true,
-              },
-            },
+            id: createArgs.appInstanceId,
           },
         },
       },
@@ -230,7 +174,7 @@ export const CreateAppThreadDataPlugin = createPlugin<
       ...state,
       database: {
         ...state.database,
-        appThreadData: {
+        appThread: {
           records: record,
           totalRecords: 1,
         },
@@ -239,15 +183,15 @@ export const CreateAppThreadDataPlugin = createPlugin<
   },
 });
 
-/// UpdateAppThreadData Plugin
-export const UpdateAppThreadDataPlugin = createPlugin<
+/// UpdateAppThread Plugin
+export const UpdateAppThreadPlugin = createPlugin<
   PipelineState,
   PipelineArgs[]
 >({
-  name: "UpdateAppThreadDataPlugin",
+  name: "UpdateAppThreadPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -255,69 +199,53 @@ export const UpdateAppThreadDataPlugin = createPlugin<
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[UpdateAppThreadDataPlugin]"
+          "[UpdateAppThreadPlugin]"
         ),
       };
     }
-    if (args[0].appThreadData == null) {
+
+    if (args[0].appThread == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[UpdateAppThreadDataPlugin]"
+          "[UpdateAppThreadPlugin]"
         ),
       };
     }
-    const updateArgs = args[0].appThreadData as UpdateAppThreadDataPluginArgs;
-    const { user } = state.user;
+    const updateArgs = args[0].appThread as UpdateAppThreadPluginArgs;
 
-    // const record = await prisma.appThreadData.updateMany({
-    //   where: {
-    //     id: updateArgs.id,
-    //     workspace: {
-    //       id: updateArgs.workspaceId,
-    //       os: {
-    //         id: updateArgs.osId,
-    //         user: {
-    //           id: user.id,
-    //         },
-    //       },
-    //     },
-    //   },
-    //   data: {
-    //     // once an app created, only name and icon can be updated.
-    //     ...(updateArgs.name && { name: updateArgs.name }),
-    //     ...(updateArgs.status != null && { status: updateArgs.status }),
-    //     ...(updateArgs.icon && { icon: updateArgs.icon }),
+    const record = await prisma.appThread.updateMany({
+      where: {
+        id: updateArgs.id,
+      },
+      data: {
+        // once an app created, only name and icon can be updated.
+        name: updateArgs.name,
+        updatedAt: updateArgs.updatedAt,
+      },
+    });
 
-    //     ...(updateArgs.metadata && { metadata: updateArgs.metadata }),
-    //     ...(updateArgs.pages && { pages: updateArgs.pages }),
-    //     ...(updateArgs.forms && { forms: updateArgs.forms }),
-
-    //     updatedAt: updateArgs.updatedAt,
-    //   },
-    // });
-
-    // // TODO: following check may not work, investigate on alternatives
-    // if (record.count == 0) {
-    //   return {
-    //     ...state,
-    //     status: PluginStatusEntry.NOT_FOUND("[UpdateAppThreadDataPlugin]"),
-    //   };
-    // }
+    // TODO: following check may not work, investigate on alternatives
+    if (record.count == 0) {
+      return {
+        ...state,
+        status: PluginStatusEntry.NOT_FOUND("[UpdateAppThreadPlugin]"),
+      };
+    }
 
     return state;
   },
 });
 
-/// DeleteAppThreadData Plugin
-export const DeleteAppThreadDataPlugin = createPlugin<
+/// DeleteAppThread Plugin
+export const DeleteAppThreadPlugin = createPlugin<
   PipelineState,
   PipelineArgs[]
 >({
-  name: "DeleteAppThreadDataPlugin",
+  name: "DeleteAppThreadPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -325,26 +253,26 @@ export const DeleteAppThreadDataPlugin = createPlugin<
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[DeleteAppThreadDataPlugin]"
+          "[DeleteAppThreadPlugin]"
         ),
       };
     }
-    if (args[0].appThreadData == null) {
+
+    if (args[0].appThread == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[DeleteAppThreadDataPlugin]"
+          "[DeleteAppThreadPlugin]"
         ),
       };
     }
-    const deleteArgs = args[0].appThreadData as DeleteAppThreadDataPluginArgs;
-    const { user } = state.user;
+    const deleteArgs = args[0].appThread as DeleteAppThreadPluginArgs;
 
-    const record = await prisma.appThreadData.deleteMany({
+    const record = await prisma.appThread.deleteMany({
       where: {
         id: deleteArgs.id,
-        appSubmission: {
-          id: deleteArgs.appSubmissionId,
+        appInstance: {
+          id: deleteArgs.appInstanceId,
         },
       },
     });
@@ -352,7 +280,7 @@ export const DeleteAppThreadDataPlugin = createPlugin<
     if (record.count === 0) {
       return {
         ...state,
-        status: PluginStatusEntry.NOT_FOUND("[DeleteAppThreadDataPlugin]"),
+        status: PluginStatusEntry.NOT_FOUND("[DeleteAppThreadPlugin]"),
       };
     }
 
