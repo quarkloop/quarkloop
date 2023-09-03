@@ -21,7 +21,7 @@ export const GetAppFormSettingsByIdPlugin = createPlugin<
   name: "GetAppFormSettingsByIdPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -33,6 +33,7 @@ export const GetAppFormSettingsByIdPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appFormSettings == null) {
       return {
         ...state,
@@ -43,26 +44,10 @@ export const GetAppFormSettingsByIdPlugin = createPlugin<
     }
 
     const getArgs = args[0].appFormSettings as GetAppFormSettingsByIdPluginArgs;
-    const { user } = state.user;
 
     const record = await prisma.appFormSettings.findFirst({
       where: {
         id: getArgs.id,
-        app: {
-          userRoleAssignment: {
-            every: {
-              user: {
-                id: user?.id,
-              },
-              workspace: {
-                id: getArgs.workspaceId,
-              },
-              os: {
-                id: getArgs.osId,
-              },
-            },
-          },
-        },
       },
     });
 
@@ -94,7 +79,7 @@ export const GetAppFormsSettingsByAppIdPlugin = createPlugin<
   name: "GetAppFormsSettingsByAppIdPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -106,6 +91,7 @@ export const GetAppFormsSettingsByAppIdPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appFormSettings == null) {
       return {
         ...state,
@@ -117,25 +103,11 @@ export const GetAppFormsSettingsByAppIdPlugin = createPlugin<
 
     const getArgs = args[0]
       .appFormSettings as GetAppFormsSettingsByAppIdPluginArgs;
-    const { user } = state.user;
 
     const records = await prisma.appFormSettings.findMany({
       where: {
         app: {
           id: getArgs.appId,
-          userRoleAssignment: {
-            every: {
-              user: {
-                id: user?.id,
-              },
-              workspace: {
-                id: getArgs.workspaceId,
-              },
-              os: {
-                id: getArgs.osId,
-              },
-            },
-          },
         },
       },
     });
@@ -161,12 +133,7 @@ export const CreateAppFormSettingsPlugin = createPlugin<
   name: "CreateAppFormSettingsPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (
-      state.status ||
-      state.session == null ||
-      state.user == null ||
-      state.user.subscription == null
-    ) {
+    if (state.status) {
       return state;
     }
 
@@ -178,6 +145,7 @@ export const CreateAppFormSettingsPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appFormSettings == null) {
       return {
         ...state,
@@ -190,25 +158,9 @@ export const CreateAppFormSettingsPlugin = createPlugin<
     const createArgs = args[0]
       .appFormSettings as CreateAppFormSettingsPluginArgs;
 
-    const { user } = state.user;
-    const { subscription } = state.user;
-
     const app = await prisma.app.findFirst({
       where: {
         id: createArgs.appId,
-        userRoleAssignment: {
-          every: {
-            user: {
-              id: user?.id,
-            },
-            workspace: {
-              id: createArgs.workspaceId,
-            },
-            os: {
-              id: createArgs.osId,
-            },
-          },
-        },
       },
     });
 
@@ -230,22 +182,6 @@ export const CreateAppFormSettingsPlugin = createPlugin<
         app: {
           connect: {
             id: createArgs.appId,
-          },
-        },
-        planMetrics: {
-          create: {
-            type: "AppForm",
-            subscription: { connect: { id: subscription.id } },
-            os: { connect: { id: createArgs.osId } },
-            workspace: {
-              connect: {
-                osId_id: {
-                  id: createArgs.workspaceId!,
-                  osId: createArgs.osId,
-                },
-              },
-            },
-            app: { connect: { id: createArgs.appId } },
           },
         },
       },
@@ -272,7 +208,7 @@ export const UpdateAppFormSettingsPlugin = createPlugin<
   name: "UpdateAppFormSettingsPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -284,6 +220,7 @@ export const UpdateAppFormSettingsPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appFormSettings == null) {
       return {
         ...state,
@@ -294,7 +231,6 @@ export const UpdateAppFormSettingsPlugin = createPlugin<
     }
     const updateArgs = args[0]
       .appFormSettings as UpdateAppFormSettingsPluginArgs;
-    const { user } = state.user;
 
     let newFields: Prisma.JsonValue[] = [];
 
@@ -358,19 +294,6 @@ export const UpdateAppFormSettingsPlugin = createPlugin<
         id: updateArgs.id,
         app: {
           id: updateArgs.appId,
-          userRoleAssignment: {
-            every: {
-              user: {
-                id: user?.id,
-              },
-              workspace: {
-                id: updateArgs.workspaceId,
-              },
-              os: {
-                id: updateArgs.osId,
-              },
-            },
-          },
         },
       },
       data: {
@@ -390,28 +313,6 @@ export const UpdateAppFormSettingsPlugin = createPlugin<
       };
     }
 
-    if (updateArgs.formFieldCreate || updateArgs.formFieldDelete) {
-      const metrics = await prisma.planMetrics.updateMany({
-        where: {
-          appFormSettingsId: updateArgs.id,
-        },
-        data: {
-          value: {
-            fieldCount: newFields.length,
-          },
-        },
-      });
-
-      if (metrics == null) {
-        return {
-          ...state,
-          status: PluginStatusEntry.NOT_FOUND(
-            "[UpdateAppFormSettingsPlugin] Failed to update plan metrics."
-          ),
-        };
-      }
-    }
-
     return state;
   },
 });
@@ -424,7 +325,7 @@ export const DeleteAppFormSettingsPlugin = createPlugin<
   name: "DeleteAppFormSettingsPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -436,6 +337,7 @@ export const DeleteAppFormSettingsPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appFormSettings == null) {
       return {
         ...state,
@@ -444,29 +346,14 @@ export const DeleteAppFormSettingsPlugin = createPlugin<
         ),
       };
     }
+
     const deleteArgs = args[0]
       .appFormSettings as DeleteAppFormSettingsPluginArgs;
-    const { user } = state.user;
 
     const record = await prisma.appFormSettings.deleteMany({
       where: {
         id: deleteArgs.id,
         appId: deleteArgs.appId,
-        app: {
-          userRoleAssignment: {
-            every: {
-              user: {
-                id: user?.id,
-              },
-              workspace: {
-                id: deleteArgs.workspaceId,
-              },
-              os: {
-                id: deleteArgs.osId,
-              },
-            },
-          },
-        },
       },
     });
 
