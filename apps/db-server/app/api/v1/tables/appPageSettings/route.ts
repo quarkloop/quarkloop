@@ -121,7 +121,7 @@ export async function PUT(request: Request, { params }: { params: any }) {
 }
 
 // DeleteAppPageSettings
-export async function PATCH(request: Request, { params }: { params: any }) {
+export async function DELETE(request: Request, { params }: { params: any }) {
   const { osId, workspaceId, appId, pageId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
