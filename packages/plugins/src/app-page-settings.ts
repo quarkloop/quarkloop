@@ -24,16 +24,7 @@ export const GetAppPageSettingsByIdPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAppPageSettingsByIdPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appPageSettings == null) {
+    if (args.length === 0 || args[0].appPageSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -82,16 +73,7 @@ export const GetAppPagesSettingsByAppIdPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAppPagesSettingsByAppIdPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appPageSettings == null) {
+    if (args.length === 0 || args[0].appPageSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -136,16 +118,7 @@ export const CreateAppPageSettingsPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[CreateAppPageSettingsPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appPageSettings == null) {
+    if (args.length === 0 || args[0].appPageSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -213,7 +186,7 @@ export const UpdateAppPageSettingsPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
+    if (args.length === 0 || args[0].appPageSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -222,14 +195,6 @@ export const UpdateAppPageSettingsPlugin = createPlugin<
       };
     }
 
-    if (args[0].appPageSettings == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[UpdateAppPageSettingsPlugin]"
-        ),
-      };
-    }
     const updateArgs = args[0]
       .appPageSettings as UpdateAppPageSettingsPluginArgs;
 
@@ -272,7 +237,7 @@ export const DeleteAppPageSettingsPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
+    if (args.length === 0 || args[0].appPageSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -281,14 +246,6 @@ export const DeleteAppPageSettingsPlugin = createPlugin<
       };
     }
 
-    if (args[0].appPageSettings == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[DeleteAppPageSettingsPlugin]"
-        ),
-      };
-    }
     const deleteArgs = args[0]
       .appPageSettings as DeleteAppPageSettingsPluginArgs;
 
