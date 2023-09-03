@@ -24,16 +24,7 @@ export const GetAppFileSettingsByIdPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAppFileSettingsByIdPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appFileSettings == null) {
+    if (args.length === 0 || args[0].appFileSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -82,16 +73,7 @@ export const GetAppFileSettingsByAppIdPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[GetAppFileSettingsByAppIdPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appFileSettings == null) {
+    if (args.length === 0 || args[0].appFileSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -145,16 +127,7 @@ export const CreateAppFileSettingsPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[CreateAppFileSettingsPlugin]"
-        ),
-      };
-    }
-
-    if (args[0].appFileSettings == null) {
+    if (args.length === 0 || args[0].appFileSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -220,7 +193,7 @@ export const UpdateAppFileSettingsPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
+    if (args.length === 0 || args[0].appFileSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -229,14 +202,6 @@ export const UpdateAppFileSettingsPlugin = createPlugin<
       };
     }
 
-    if (args[0].appFileSettings == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[UpdateAppFileSettingsPlugin]"
-        ),
-      };
-    }
     const updateArgs = args[0]
       .appFileSettings as UpdateAppFileSettingsPluginArgs;
 
@@ -282,7 +247,7 @@ export const DeleteAppFileSettingsPlugin = createPlugin<
       return state;
     }
 
-    if (args.length === 0) {
+    if (args.length === 0 || args[0].appFileSettings == null) {
       return {
         ...state,
         status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
@@ -291,14 +256,6 @@ export const DeleteAppFileSettingsPlugin = createPlugin<
       };
     }
 
-    if (args[0].appFileSettings == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-          "[DeleteAppFileSettingsPlugin]"
-        ),
-      };
-    }
     const deleteArgs = args[0]
       .appFileSettings as DeleteAppFileSettingsPluginArgs;
 
