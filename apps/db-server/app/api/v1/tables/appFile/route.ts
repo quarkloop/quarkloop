@@ -23,7 +23,7 @@ import {
 
 // GetAppFileById
 export async function GET(request: Request, { params }: { params: any }) {
-  const { submissionId, fileId } = params;
+  const { appInstanceId, fileId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -35,7 +35,7 @@ export async function GET(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appFile: {
-        appSubmissionId: submissionId,
+        appInstanceId: appInstanceId,
         id: fileId,
       } as GetAppFileByIdPluginArgs,
     });
@@ -45,7 +45,7 @@ export async function GET(request: Request, { params }: { params: any }) {
 
 // CreateAppFile
 export async function POST(request: Request, { params }: { params: any }) {
-  const { submissionId } = params;
+  const { appInstanceId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -59,7 +59,7 @@ export async function POST(request: Request, { params }: { params: any }) {
     .execute({
       appFile: {
         ...body,
-        appSubmissionId: submissionId,
+        appInstanceId: appInstanceId,
       } as CreateAppFilePluginArgs,
     });
 
@@ -68,7 +68,7 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppFile
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { submissionId, fileId } = params;
+  const { appInstanceId, fileId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -82,7 +82,7 @@ export async function PUT(request: Request, { params }: { params: any }) {
     .execute({
       appFile: {
         ...body,
-        appSubmissionId: submissionId,
+        appInstanceId: appInstanceId,
         id: fileId,
       } as UpdateAppFilePluginArgs,
     });
@@ -92,7 +92,7 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
 // DeleteAppFile
 export async function DELETE(request: Request, { params }: { params: any }) {
-  const { submissionId, fileId } = params;
+  const { appInstanceId, fileId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -104,7 +104,7 @@ export async function DELETE(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appFile: {
-        appSubmissionId: submissionId,
+        appInstanceId: appInstanceId,
         id: fileId,
       } as DeleteAppFilePluginArgs,
     });
