@@ -23,10 +23,8 @@ import {
   DeleteAppThreadSettingsPlugin,
 } from "@quarkloop/plugins";
 
-export async function GET_GetAppThreadSettingsById(
-  request: Request,
-  { params }: { params: any }
-) {
+// GetAppThreadSettingsById
+export async function GET(request: Request, { params }: { params: any }) {
   const { osId, workspaceId, appId, fileId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -49,35 +47,34 @@ export async function GET_GetAppThreadSettingsById(
   return NextResponse.json(finalState.apiResponse);
 }
 
-export async function GET_GetAppThreadSettingsByAppId(
-  request: Request,
-  { params }: { params: any }
-) {
-  const { osId, workspaceId, appId } = params;
+// // GetAppThreadSettingsByAppId
+// export async function GET(
+//   request: Request,
+//   { params }: { params: any }
+// ) {
+//   const { osId, workspaceId, appId } = params;
 
-  const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
-    initialState: {},
-  });
+//   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
+//     initialState: {},
+//   });
 
-  const finalState = await pipeline
-    .use(GetAppThreadSettingsByAppIdPlugin)
-    .use(GetApiResponsePlugin)
-    .onError(DefaultErrorHandler)
-    .execute({
-      appThreadSettings: {
-        osId: osId,
-        workspaceId: workspaceId,
-        appId: appId,
-      } as GetAppThreadSettingsByAppIdPluginArgs,
-    });
+//   const finalState = await pipeline
+//     .use(GetAppThreadSettingsByAppIdPlugin)
+//     .use(GetApiResponsePlugin)
+//     .onError(DefaultErrorHandler)
+//     .execute({
+//       appThreadSettings: {
+//         osId: osId,
+//         workspaceId: workspaceId,
+//         appId: appId,
+//       } as GetAppThreadSettingsByAppIdPluginArgs,
+//     });
 
-  return NextResponse.json(finalState.apiResponse);
-}
+//   return NextResponse.json(finalState.apiResponse);
+// }
 
-export async function POST_CreateAppThreadSettings(
-  request: Request,
-  { params }: { params: any }
-) {
+// CreateAppThreadSettings
+export async function POST(request: Request, { params }: { params: any }) {
   const { osId, workspaceId, appId } = params;
   const body = await request.json();
 
@@ -101,10 +98,8 @@ export async function POST_CreateAppThreadSettings(
   return NextResponse.json(finalState.apiResponse);
 }
 
-export async function PUT_UpdateAppThreadSettings(
-  request: Request,
-  { params }: { params: any }
-) {
+// UpdateAppThreadSettings
+export async function PUT(request: Request, { params }: { params: any }) {
   const { osId, workspaceId, appId } = params;
   const body = await request.json();
 
@@ -128,10 +123,8 @@ export async function PUT_UpdateAppThreadSettings(
   return NextResponse.json(finalState.apiResponse);
 }
 
-export async function PATCH_DeleteAppThreadSettings(
-  request: Request,
-  { params }: { params: any }
-) {
+// DeleteAppThreadSettings
+export async function PATCH(request: Request, { params }: { params: any }) {
   const { osId, workspaceId, appId, fileId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
