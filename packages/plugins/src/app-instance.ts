@@ -9,6 +9,7 @@ import {
   CreateAppInstancePluginArgs,
   GetAppInstancesByAppIdPluginArgs,
   UpdateAppInstancePluginArgs,
+  DeleteAppInstancePluginArgs,
 } from "@quarkloop/types";
 
 /// GetAppInstanceById Plugin
@@ -37,9 +38,6 @@ export const GetAppInstanceByIdPlugin = createPlugin<
     const record = await prisma.appInstance.findFirst({
       where: {
         id: getArgs.id,
-      },
-      include: {
-        app: true,
       },
     });
 
@@ -86,7 +84,7 @@ export const GetAppInstancesByAppIdPlugin = createPlugin<
 
     const getArgs = args[0].appInstance as GetAppInstancesByAppIdPluginArgs;
 
-    const record = await prisma.appInstance.findMany({
+    const records = await prisma.appInstance.findMany({
       where: {
         app: {
           id: getArgs.appId,
@@ -97,20 +95,13 @@ export const GetAppInstancesByAppIdPlugin = createPlugin<
       },
     });
 
-    if (record == null) {
-      return {
-        ...state,
-        status: PluginStatusEntry.NOT_FOUND("[GetAppInstanceByIdPlugin]"),
-      };
-    }
-
     return {
       ...state,
       database: {
         ...state.database,
         appInstance: {
-          records: record,
-          totalRecords: 1,
+          records: records,
+          totalRecords: records.length,
         },
       },
     };
@@ -190,7 +181,7 @@ export const UpdateAppInstancePlugin = createPlugin<
 
     const updateArgs = args[0].appInstance as UpdateAppInstancePluginArgs;
 
-    const record = await prisma.appInstance.updateMany({
+    const record = await prisma.appInstance.update({
       where: {
         id: updateArgs.id,
         app: {
@@ -203,11 +194,53 @@ export const UpdateAppInstancePlugin = createPlugin<
       },
     });
 
-    // TODO: following check may not work, investigate on alternatives
-    if (record.count == 0) {
+    if (record == null) {
       return {
         ...state,
         status: PluginStatusEntry.NOT_FOUND("[UpdateAppInstancePlugin]"),
+      };
+    }
+
+    return state;
+  },
+});
+
+/// DeleteAppInstance Plugin
+export const DeleteAppInstancePlugin = createPlugin<
+  PipelineState,
+  PipelineArgs[]
+>({
+  name: "DeleteAppInstancePlugin",
+  config: {},
+  handler: async (state, config, ...args): Promise<PipelineState> => {
+    if (state.status) {
+      return state;
+    }
+
+    if (args.length === 0 || args[0].appInstance == null) {
+      return {
+        ...state,
+        status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
+          "[DeleteAppInstancePlugin]"
+        ),
+      };
+    }
+
+    const deleteArgs = args[0].appInstance as DeleteAppInstancePluginArgs;
+
+    const record = await prisma.appInstance.delete({
+      where: {
+        id: deleteArgs.id,
+        app: {
+          id: deleteArgs.appId,
+        },
+      },
+    });
+
+    if (record == null) {
+      return {
+        ...state,
+        status: PluginStatusEntry.NOT_FOUND("[DeleteAppInstancePlugin]"),
       };
     }
 
