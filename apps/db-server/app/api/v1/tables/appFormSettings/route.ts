@@ -23,10 +23,8 @@ import {
   DeleteAppFormSettingsPlugin,
 } from "@quarkloop/plugins";
 
-export async function GET_GetAppFormSettingsById(
-  request: Request,
-  { params }: { params: any }
-) {
+// GetAppFormSettingsById
+export async function GET(request: Request, { params }: { params: any }) {
   const { osId, workspaceId, appId, formId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -49,35 +47,34 @@ export async function GET_GetAppFormSettingsById(
   return NextResponse.json(finalState.apiResponse);
 }
 
-export async function GET_GetAppFormsSettingsByAppId(
-  request: Request,
-  { params }: { params: any }
-) {
-  const { osId, workspaceId, appId } = params;
+// // GetAppFormsSettingsByAppId
+// export async function GET(
+//   request: Request,
+//   { params }: { params: any }
+// ) {
+//   const { osId, workspaceId, appId } = params;
 
-  const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
-    initialState: {},
-  });
+//   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
+//     initialState: {},
+//   });
 
-  const finalState = await pipeline
-    .use(GetAppFormsSettingsByAppIdPlugin)
-    .use(GetApiResponsePlugin)
-    .onError(DefaultErrorHandler)
-    .execute({
-      appFormSettings: {
-        osId: osId,
-        workspaceId: workspaceId,
-        appId: appId,
-      } as GetAppFormsSettingsByAppIdPluginArgs,
-    });
+//   const finalState = await pipeline
+//     .use(GetAppFormsSettingsByAppIdPlugin)
+//     .use(GetApiResponsePlugin)
+//     .onError(DefaultErrorHandler)
+//     .execute({
+//       appFormSettings: {
+//         osId: osId,
+//         workspaceId: workspaceId,
+//         appId: appId,
+//       } as GetAppFormsSettingsByAppIdPluginArgs,
+//     });
 
-  return NextResponse.json(finalState.apiResponse);
-}
+//   return NextResponse.json(finalState.apiResponse);
+// }
 
-export async function POST_CreateAppFormSettings(
-  request: Request,
-  { params }: { params: any }
-) {
+// CreateAppFormSettings
+export async function POST(request: Request, { params }: { params: any }) {
   const { osId, workspaceId, appId } = params;
   const body = await request.json();
 
@@ -101,10 +98,8 @@ export async function POST_CreateAppFormSettings(
   return NextResponse.json(finalState.apiResponse);
 }
 
-export async function PUT_UpdateAppFormSettings(
-  request: Request,
-  { params }: { params: any }
-) {
+// UpdateAppFormSettings
+export async function PUT(request: Request, { params }: { params: any }) {
   const { osId, workspaceId, appId } = params;
   const body = await request.json();
 
@@ -128,10 +123,8 @@ export async function PUT_UpdateAppFormSettings(
   return NextResponse.json(finalState.apiResponse);
 }
 
-export async function PATCH_DeleteAppFormSettings(
-  request: Request,
-  { params }: { params: any }
-) {
+// DeleteAppFormSettings
+export async function PATCH(request: Request, { params }: { params: any }) {
   const { osId, workspaceId, appId, formId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
