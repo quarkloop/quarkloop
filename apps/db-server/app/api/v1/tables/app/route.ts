@@ -123,7 +123,7 @@ export async function PUT(request: Request, { params }: { params: any }) {
 }
 
 // DeleteApp
-export async function PATCH(request: Request, { params }: { params: any }) {
+export async function DELETE(request: Request, { params }: { params: any }) {
   const { osId, workspaceId, appId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
