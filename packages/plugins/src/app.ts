@@ -40,9 +40,6 @@ export const GetAppByIdPlugin = createPlugin<PipelineState, PipelineArgs[]>({
       where: {
         id: getArgs.id,
       },
-      include: {
-        pagesSettings: true,
-      },
     });
 
     if (record == null) {
@@ -153,7 +150,6 @@ export const UpdateAppPlugin = createPlugin<PipelineState, PipelineArgs[]>({
       },
     });
 
-    // TODO: following check may not work, investigate on alternatives
     if (record.count == 0) {
       return {
         ...state,
