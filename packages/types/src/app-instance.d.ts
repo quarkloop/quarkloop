@@ -48,5 +48,6 @@ export interface DeleteAppInstance {}
 export interface DeleteAppInstanceApiResponse extends ApiResponse {}
 export interface DeleteAppInstanceApiArgs {
   id: string;
+  appId: string;
 }
 export interface DeleteAppInstancePluginArgs extends DeleteAppInstanceApiArgs {}
