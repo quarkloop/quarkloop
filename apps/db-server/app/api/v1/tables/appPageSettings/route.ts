@@ -25,7 +25,7 @@ import {
 
 // GetAppPageSettingsById
 export async function GET(request: Request, { params }: { params: any }) {
-  const { osId, workspaceId, appId, pageId } = params;
+  const { appId, pageId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -37,8 +37,6 @@ export async function GET(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appPageSettings: {
-        osId: osId,
-        workspaceId: workspaceId,
         appId: appId,
         id: pageId,
       } as GetAppPageSettingsByIdPluginArgs,
@@ -47,32 +45,30 @@ export async function GET(request: Request, { params }: { params: any }) {
   return NextResponse.json(finalState.apiResponse);
 }
 
-// GetAppPagesSettingsByAppId
-export async function GET(request: Request, { params }: { params: any }) {
-  const { osId, workspaceId, appId } = params;
+// // GetAppPagesSettingsByAppId
+// export async function GET(request: Request, { params }: { params: any }) {
+//   const { appId } = params;
 
-  const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
-    initialState: {},
-  });
+//   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
+//     initialState: {},
+//   });
 
-  const finalState = await pipeline
-    .use(GetAppPagesSettingsByAppIdPlugin)
-    .use(GetApiResponsePlugin)
-    .onError(DefaultErrorHandler)
-    .execute({
-      appPageSettings: {
-        osId: osId,
-        workspaceId: workspaceId,
-        appId: appId,
-      } as GetAppPagesSettingsByAppIdPluginArgs,
-    });
+//   const finalState = await pipeline
+//     .use(GetAppPagesSettingsByAppIdPlugin)
+//     .use(GetApiResponsePlugin)
+//     .onError(DefaultErrorHandler)
+//     .execute({
+//       appPageSettings: {
+//         appId: appId,
+//       } as GetAppPagesSettingsByAppIdPluginArgs,
+//     });
 
-  return NextResponse.json(finalState.apiResponse);
-}
+//   return NextResponse.json(finalState.apiResponse);
+// }
 
 // CreateAppPageSettings
 export async function POST(request: Request, { params }: { params: any }) {
-  const { osId, workspaceId, appId } = params;
+  const { appId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -86,8 +82,6 @@ export async function POST(request: Request, { params }: { params: any }) {
     .execute({
       appPageSettings: {
         ...body,
-        osId: osId,
-        workspaceId: workspaceId,
         appId: appId,
       } as CreateAppPageSettingsPluginArgs,
     });
@@ -97,7 +91,7 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppPageSettings
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { osId, workspaceId, appId } = params;
+  const { appId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -111,8 +105,6 @@ export async function PUT(request: Request, { params }: { params: any }) {
     .execute({
       appPageSettings: {
         ...body,
-        osId: osId,
-        workspaceId: workspaceId,
         appId: appId,
       } as UpdateAppPageSettingsPluginArgs,
     });
@@ -122,7 +114,7 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
 // DeleteAppPageSettings
 export async function DELETE(request: Request, { params }: { params: any }) {
-  const { osId, workspaceId, appId, pageId } = params;
+  const { appId, pageId } = params;
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -134,8 +126,6 @@ export async function DELETE(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appPageSettings: {
-        osId: osId,
-        workspaceId: workspaceId,
         appId: appId,
         id: pageId,
       } as DeleteAppPageSettingsPluginArgs,
