@@ -20,7 +20,7 @@ export const GetAppPageSettingsByIdPlugin = createPlugin<
   name: "GetAppPageSettingsByIdPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -32,6 +32,7 @@ export const GetAppPageSettingsByIdPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appPageSettings == null) {
       return {
         ...state,
@@ -42,26 +43,10 @@ export const GetAppPageSettingsByIdPlugin = createPlugin<
     }
 
     const getArgs = args[0].appPageSettings as GetAppPageSettingsByIdPluginArgs;
-    const { user } = state.user;
 
     const record = await prisma.appPageSettings.findFirst({
       where: {
         id: getArgs.id,
-        app: {
-          userRoleAssignment: {
-            every: {
-              user: {
-                id: user?.id,
-              },
-              workspace: {
-                id: getArgs.workspaceId,
-              },
-              os: {
-                id: getArgs.osId,
-              },
-            },
-          },
-        },
       },
     });
 
@@ -93,7 +78,7 @@ export const GetAppPagesSettingsByAppIdPlugin = createPlugin<
   name: "GetAppPagesSettingsByAppIdPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -105,6 +90,7 @@ export const GetAppPagesSettingsByAppIdPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appPageSettings == null) {
       return {
         ...state,
@@ -116,25 +102,11 @@ export const GetAppPagesSettingsByAppIdPlugin = createPlugin<
 
     const getArgs = args[0]
       .appPageSettings as GetAppPagesSettingsByAppIdPluginArgs;
-    const { user } = state.user;
 
     const records = await prisma.appPageSettings.findMany({
       where: {
         app: {
           id: getArgs.appId,
-          userRoleAssignment: {
-            every: {
-              user: {
-                id: user?.id,
-              },
-              workspace: {
-                id: getArgs.workspaceId,
-              },
-              os: {
-                id: getArgs.osId,
-              },
-            },
-          },
         },
       },
     });
@@ -160,12 +132,7 @@ export const CreateAppPageSettingsPlugin = createPlugin<
   name: "CreateAppPageSettingsPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (
-      state.status ||
-      state.session == null ||
-      state.user == null ||
-      state.user.subscription == null
-    ) {
+    if (state.status) {
       return state;
     }
 
@@ -177,6 +144,7 @@ export const CreateAppPageSettingsPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appPageSettings == null) {
       return {
         ...state,
@@ -189,25 +157,9 @@ export const CreateAppPageSettingsPlugin = createPlugin<
     const createArgs = args[0]
       .appPageSettings as CreateAppPageSettingsPluginArgs;
 
-    const { user } = state.user;
-    const { subscription } = state.user;
-
     const app = await prisma.app.findFirst({
       where: {
         id: createArgs.appId,
-        userRoleAssignment: {
-          every: {
-            user: {
-              id: user?.id,
-            },
-            workspace: {
-              id: createArgs.workspaceId,
-            },
-            os: {
-              id: createArgs.osId,
-            },
-          },
-        },
       },
     });
 
@@ -231,22 +183,6 @@ export const CreateAppPageSettingsPlugin = createPlugin<
         app: {
           connect: {
             id: createArgs.appId,
-          },
-        },
-        planMetrics: {
-          create: {
-            type: "AppPage",
-            subscription: { connect: { id: subscription.id } },
-            os: { connect: { id: createArgs.osId } },
-            workspace: {
-              connect: {
-                osId_id: {
-                  id: createArgs.workspaceId!,
-                  osId: createArgs.osId,
-                },
-              },
-            },
-            app: { connect: { id: createArgs.appId } },
           },
         },
       },
@@ -273,7 +209,7 @@ export const UpdateAppPageSettingsPlugin = createPlugin<
   name: "UpdateAppPageSettingsPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -285,6 +221,7 @@ export const UpdateAppPageSettingsPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appPageSettings == null) {
       return {
         ...state,
@@ -295,26 +232,12 @@ export const UpdateAppPageSettingsPlugin = createPlugin<
     }
     const updateArgs = args[0]
       .appPageSettings as UpdateAppPageSettingsPluginArgs;
-    const { user } = state.user;
 
     const record = await prisma.appPageSettings.updateMany({
       where: {
         id: updateArgs.id,
         app: {
           id: updateArgs.appId,
-          userRoleAssignment: {
-            every: {
-              user: {
-                id: user?.id,
-              },
-              workspace: {
-                id: updateArgs.workspaceId,
-              },
-              os: {
-                id: updateArgs.osId,
-              },
-            },
-          },
         },
       },
       data: {
@@ -345,7 +268,7 @@ export const DeleteAppPageSettingsPlugin = createPlugin<
   name: "DeleteAppPageSettingsPlugin",
   config: {},
   handler: async (state, config, ...args): Promise<PipelineState> => {
-    if (state.status || state.session == null || state.user == null) {
+    if (state.status) {
       return state;
     }
 
@@ -357,6 +280,7 @@ export const DeleteAppPageSettingsPlugin = createPlugin<
         ),
       };
     }
+
     if (args[0].appPageSettings == null) {
       return {
         ...state,
@@ -367,26 +291,12 @@ export const DeleteAppPageSettingsPlugin = createPlugin<
     }
     const deleteArgs = args[0]
       .appPageSettings as DeleteAppPageSettingsPluginArgs;
-    const { user } = state.user;
 
     const record = await prisma.appPageSettings.deleteMany({
       where: {
         id: deleteArgs.id,
         app: {
           id: deleteArgs.appId,
-          userRoleAssignment: {
-            every: {
-              user: {
-                id: user?.id,
-              },
-              workspace: {
-                id: deleteArgs.workspaceId,
-              },
-              os: {
-                id: deleteArgs.osId,
-              },
-            },
-          },
         },
       },
     });
