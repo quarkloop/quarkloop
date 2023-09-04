@@ -10,6 +10,10 @@ func (s *Server) HandleGetInstance(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK"})
 }
 
+func (s *Server) HandleGetInstances(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
 func (s *Server) HandleCreateInstance(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"status": "Created"})
 }
