@@ -10,6 +10,10 @@ func (s *Server) HandleGetPage(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK"})
 }
 
+func (s *Server) HandleGetPages(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
 func (s *Server) HandleCreatePage(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"status": "Created"})
 }
