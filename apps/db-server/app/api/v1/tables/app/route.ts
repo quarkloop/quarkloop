@@ -23,23 +23,26 @@ import {
 
 // GetAppById
 export async function GET(request: Request, { params }: { params: any }) {
-  const { appId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
   });
 
-  const finalState = await pipeline
-    .use(GetAppByIdPlugin)
-    .use(GetApiResponsePlugin)
-    .onError(DefaultErrorHandler)
-    .execute({
-      app: {
-        id: appId,
-      } as GetAppByIdPluginArgs,
-    });
+  if (id) {
+    const finalState = await pipeline
+      .use(GetAppByIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        app: {
+          id: id,
+        } as GetAppByIdPluginArgs,
+      });
 
-  return NextResponse.json(finalState.apiResponse);
+    return NextResponse.json(finalState.apiResponse);
+  }
 }
 
 // CreateApp
@@ -65,7 +68,6 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateApp
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { appId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -87,7 +89,8 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
 // DeleteApp
 export async function DELETE(request: Request, { params }: { params: any }) {
-  const { appId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -99,7 +102,7 @@ export async function DELETE(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       app: {
-        id: appId,
+        id: id,
       } as DeleteAppPluginArgs,
     });
 
