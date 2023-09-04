@@ -10,6 +10,10 @@ func (s *Server) HandleGetThread(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK"})
 }
 
+func (s *Server) HandleGetThreads(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
 func (s *Server) HandleCreateThread(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"status": "Created"})
 }
