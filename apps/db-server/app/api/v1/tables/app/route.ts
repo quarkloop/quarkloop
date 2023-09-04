@@ -43,6 +43,8 @@ export async function GET(request: Request, { params }: { params: any }) {
 
     return NextResponse.json(finalState.apiResponse);
   }
+
+  return NextResponse.json({ status: "Bad request" }, { status: 400 });
 }
 
 // CreateApp
