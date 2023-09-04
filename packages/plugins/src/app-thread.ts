@@ -10,6 +10,7 @@ import {
   UpdateAppThreadPluginArgs,
   DeleteAppThreadPluginArgs,
 } from "@quarkloop/types";
+import { generateId } from "@quarkloop/lib";
 
 /// GetAppThreadById Plugin
 export const GetAppThreadByIdPlugin = createPlugin<
@@ -135,9 +136,11 @@ export const CreateAppThreadPlugin = createPlugin<
     }
 
     const createArgs = args[0].appThread as CreateAppThreadPluginArgs;
+    const threadId = generateId();
 
     const record = await prisma.appThread.create({
       data: {
+        id: threadId,
         type: createArgs.type!,
         message: createArgs.message!,
         updatedAt: new Date(),
