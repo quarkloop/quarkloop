@@ -5,6 +5,7 @@ import {
   CreateAppFilePluginArgs,
   DeleteAppFilePluginArgs,
   UpdateAppFilePluginArgs,
+  GetAppFileByAppInstanceIdPluginArgs,
 } from "@quarkloop/types";
 import { createPipeline } from "@quarkloop/plugin";
 import {
@@ -19,33 +20,51 @@ import {
   CreateAppFilePlugin,
   UpdateAppFilePlugin,
   DeleteAppFilePlugin,
+  GetAppFileByAppInstanceIdPlugin,
 } from "@quarkloop/plugins";
 
 // GetAppFileById
+// GetAppFileByAppInstanceId
 export async function GET(request: Request, { params }: { params: any }) {
-  const { appInstanceId, fileId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const appInstanceId = searchParams.get("appInstanceId");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
   });
 
-  const finalState = await pipeline
-    .use(GetAppFileByIdPlugin)
-    .use(GetApiResponsePlugin)
-    .onError(DefaultErrorHandler)
-    .execute({
-      appFile: {
-        appInstanceId: appInstanceId,
-        id: fileId,
-      } as GetAppFileByIdPluginArgs,
-    });
+  if (id) {
+    const finalState = await pipeline
+      .use(GetAppFileByIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        appFile: {
+          id: id,
+        } as GetAppFileByIdPluginArgs,
+      });
 
-  return NextResponse.json(finalState.apiResponse);
+    return NextResponse.json(finalState.apiResponse);
+  }
+
+  if (appInstanceId) {
+    const finalState = await pipeline
+      .use(GetAppFileByAppInstanceIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        appFile: {
+          appInstanceId: appInstanceId,
+        } as GetAppFileByAppInstanceIdPluginArgs,
+      });
+
+    return NextResponse.json(finalState.apiResponse);
+  }
 }
 
 // CreateAppFile
 export async function POST(request: Request, { params }: { params: any }) {
-  const { appInstanceId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -59,7 +78,6 @@ export async function POST(request: Request, { params }: { params: any }) {
     .execute({
       appFile: {
         ...body,
-        appInstanceId: appInstanceId,
       } as CreateAppFilePluginArgs,
     });
 
@@ -68,7 +86,6 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppFile
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { appInstanceId, fileId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -82,8 +99,6 @@ export async function PUT(request: Request, { params }: { params: any }) {
     .execute({
       appFile: {
         ...body,
-        appInstanceId: appInstanceId,
-        id: fileId,
       } as UpdateAppFilePluginArgs,
     });
 
@@ -92,7 +107,9 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
 // DeleteAppFile
 export async function DELETE(request: Request, { params }: { params: any }) {
-  const { appInstanceId, fileId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const appInstanceId = searchParams.get("appInstanceId");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -104,8 +121,8 @@ export async function DELETE(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appFile: {
+        id: id,
         appInstanceId: appInstanceId,
-        id: fileId,
       } as DeleteAppFilePluginArgs,
     });
 
