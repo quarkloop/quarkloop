@@ -24,54 +24,47 @@ import {
 } from "@quarkloop/plugins";
 
 // GetAppThreadSettingsById
+// GetAppThreadSettingsByAppId
 export async function GET(request: Request, { params }: { params: any }) {
-  const { appId, fileId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const appId = searchParams.get("appId");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
   });
 
-  const finalState = await pipeline
-    .use(GetAppThreadSettingsByIdPlugin)
-    .use(GetApiResponsePlugin)
-    .onError(DefaultErrorHandler)
-    .execute({
-      appThreadSettings: {
-        appId: appId,
-        id: fileId,
-      } as GetAppThreadSettingsByIdPluginArgs,
-    });
+  if (id) {
+    const finalState = await pipeline
+      .use(GetAppThreadSettingsByIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        appThreadSettings: {
+          id: id,
+        } as GetAppThreadSettingsByIdPluginArgs,
+      });
 
-  return NextResponse.json(finalState.apiResponse);
+    return NextResponse.json(finalState.apiResponse);
+  }
+
+  if (appId) {
+    const finalState = await pipeline
+      .use(GetAppThreadSettingsByAppIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        appThreadSettings: {
+          appId: appId,
+        } as GetAppThreadSettingsByAppIdPluginArgs,
+      });
+
+    return NextResponse.json(finalState.apiResponse);
+  }
 }
-
-// // GetAppThreadSettingsByAppId
-// export async function GET(
-//   request: Request,
-//   { params }: { params: any }
-// ) {
-//   const { appId } = params;
-
-//   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
-//     initialState: {},
-//   });
-
-//   const finalState = await pipeline
-//     .use(GetAppThreadSettingsByAppIdPlugin)
-//     .use(GetApiResponsePlugin)
-//     .onError(DefaultErrorHandler)
-//     .execute({
-//       appThreadSettings: {
-//         appId: appId,
-//       } as GetAppThreadSettingsByAppIdPluginArgs,
-//     });
-
-//   return NextResponse.json(finalState.apiResponse);
-// }
 
 // CreateAppThreadSettings
 export async function POST(request: Request, { params }: { params: any }) {
-  const { appId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -85,7 +78,6 @@ export async function POST(request: Request, { params }: { params: any }) {
     .execute({
       appThreadSettings: {
         ...body,
-        appId: appId,
       } as CreateAppThreadSettingsPluginArgs,
     });
 
@@ -94,7 +86,6 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppThreadSettings
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { appId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -108,7 +99,6 @@ export async function PUT(request: Request, { params }: { params: any }) {
     .execute({
       appThreadSettings: {
         ...body,
-        appId: appId,
       } as UpdateAppThreadSettingsPluginArgs,
     });
 
@@ -117,7 +107,9 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
 // DeleteAppThreadSettings
 export async function DELETE(request: Request, { params }: { params: any }) {
-  const { appId, fileId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const appId = searchParams.get("appId");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -129,8 +121,8 @@ export async function DELETE(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appThreadSettings: {
+        id: id,
         appId: appId,
-        id: fileId,
       } as DeleteAppThreadSettingsPluginArgs,
     });
 
