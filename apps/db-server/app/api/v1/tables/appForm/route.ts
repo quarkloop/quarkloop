@@ -5,6 +5,7 @@ import {
   CreateAppFormPluginArgs,
   DeleteAppFormPluginArgs,
   UpdateAppFormPluginArgs,
+  GetAppFormByAppInstanceIdPluginArgs,
 } from "@quarkloop/types";
 import { createPipeline } from "@quarkloop/plugin";
 import {
@@ -19,33 +20,51 @@ import {
   CreateAppFormPlugin,
   UpdateAppFormPlugin,
   DeleteAppFormPlugin,
+  GetAppFormByAppInstanceIdPlugin,
 } from "@quarkloop/plugins";
 
 // GetAppFormById
+// GetAppFormByAppInstanceId
 export async function GET(request: Request, { params }: { params: any }) {
-  const { appInstanceId, formId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const appInstanceId = searchParams.get("appInstanceId");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
   });
 
-  const finalState = await pipeline
-    .use(GetAppFormByIdPlugin)
-    .use(GetApiResponsePlugin)
-    .onError(DefaultErrorHandler)
-    .execute({
-      appForm: {
-        appInstanceId: appInstanceId,
-        id: formId,
-      } as GetAppFormByIdPluginArgs,
-    });
+  if (id) {
+    const finalState = await pipeline
+      .use(GetAppFormByIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        appForm: {
+          id: id,
+        } as GetAppFormByIdPluginArgs,
+      });
 
-  return NextResponse.json(finalState.apiResponse);
+    return NextResponse.json(finalState.apiResponse);
+  }
+
+  if (appInstanceId) {
+    const finalState = await pipeline
+      .use(GetAppFormByAppInstanceIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        appForm: {
+          appInstanceId: appInstanceId,
+        } as GetAppFormByAppInstanceIdPluginArgs,
+      });
+
+    return NextResponse.json(finalState.apiResponse);
+  }
 }
 
 // CreateAppForm
 export async function POST(request: Request, { params }: { params: any }) {
-  const { appInstanceId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -59,7 +78,6 @@ export async function POST(request: Request, { params }: { params: any }) {
     .execute({
       appForm: {
         ...body,
-        appInstanceId: appInstanceId,
       } as CreateAppFormPluginArgs,
     });
 
@@ -68,7 +86,6 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppForm
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { appInstanceId, formId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -82,8 +99,6 @@ export async function PUT(request: Request, { params }: { params: any }) {
     .execute({
       appForm: {
         ...body,
-        appInstanceId: appInstanceId,
-        id: formId,
       } as UpdateAppFormPluginArgs,
     });
 
@@ -92,7 +107,9 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
 // DeleteAppForm
 export async function DELETE(request: Request, { params }: { params: any }) {
-  const { appInstanceId, formId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const appInstanceId = searchParams.get("appInstanceId");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -104,8 +121,8 @@ export async function DELETE(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appForm: {
+        id: id,
         appInstanceId: appInstanceId,
-        id: formId,
       } as DeleteAppFormPluginArgs,
     });
 
