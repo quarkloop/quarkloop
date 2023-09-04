@@ -113,6 +113,10 @@ export async function DELETE(request: Request, { params }: { params: any }) {
   const id = searchParams.get("id");
   const appInstanceId = searchParams.get("appInstanceId");
 
+  if (id == null && appInstanceId == null) {
+    return NextResponse.json({ status: "Bad request" }, { status: 400 });
+  }
+
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
   });
