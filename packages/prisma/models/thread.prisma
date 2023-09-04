@@ -1,5 +1,5 @@
 model AppThread {
-    id Int @id @default(autoincrement())
+    id String @id
 
     type      Int
     message   String
