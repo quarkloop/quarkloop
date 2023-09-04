@@ -24,54 +24,46 @@ import {
 } from "@quarkloop/plugins";
 
 // GetAppFormSettingsById
+// GetAppFormsSettingsByAppId
 export async function GET(request: Request, { params }: { params: any }) {
-  const { appId, formId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const appId = searchParams.get("appId");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
   });
 
-  const finalState = await pipeline
-    .use(GetAppFormSettingsByIdPlugin)
-    .use(GetApiResponsePlugin)
-    .onError(DefaultErrorHandler)
-    .execute({
-      appFormSettings: {
-        appId: appId,
-        id: formId,
-      } as GetAppFormSettingsByIdPluginArgs,
-    });
+  if (id) {
+    const finalState = await pipeline
+      .use(GetAppFormSettingsByIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        appFormSettings: {
+          id: id,
+        } as GetAppFormSettingsByIdPluginArgs,
+      });
 
-  return NextResponse.json(finalState.apiResponse);
+    return NextResponse.json(finalState.apiResponse);
+  }
+
+  if (appId) {
+    const finalState = await pipeline
+      .use(GetAppFormsSettingsByAppIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        appFormSettings: {
+          appId: appId,
+        } as GetAppFormsSettingsByAppIdPluginArgs,
+      });
+    return NextResponse.json(finalState.apiResponse);
+  }
 }
-
-// // GetAppFormsSettingsByAppId
-// export async function GET(
-//   request: Request,
-//   { params }: { params: any }
-// ) {
-//   const { appId } = params;
-
-//   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
-//     initialState: {},
-//   });
-
-//   const finalState = await pipeline
-//     .use(GetAppFormsSettingsByAppIdPlugin)
-//     .use(GetApiResponsePlugin)
-//     .onError(DefaultErrorHandler)
-//     .execute({
-//       appFormSettings: {
-//         appId: appId,
-//       } as GetAppFormsSettingsByAppIdPluginArgs,
-//     });
-
-//   return NextResponse.json(finalState.apiResponse);
-// }
 
 // CreateAppFormSettings
 export async function POST(request: Request, { params }: { params: any }) {
-  const { appId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -85,7 +77,6 @@ export async function POST(request: Request, { params }: { params: any }) {
     .execute({
       appFormSettings: {
         ...body,
-        appId: appId,
       } as CreateAppFormSettingsPluginArgs,
     });
 
@@ -94,7 +85,6 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppFormSettings
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { appId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -108,7 +98,6 @@ export async function PUT(request: Request, { params }: { params: any }) {
     .execute({
       appFormSettings: {
         ...body,
-        appId: appId,
       } as UpdateAppFormSettingsPluginArgs,
     });
 
@@ -117,7 +106,9 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
 // DeleteAppFormSettings
 export async function DELETE(request: Request, { params }: { params: any }) {
-  const { appId, formId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const appId = searchParams.get("appId");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -129,8 +120,8 @@ export async function DELETE(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appFormSettings: {
+        id: id,
         appId: appId,
-        id: formId,
       } as DeleteAppFormSettingsPluginArgs,
     });
 
