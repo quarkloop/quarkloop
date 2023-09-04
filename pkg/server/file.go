@@ -10,6 +10,10 @@ func (s *Server) HandleGetFile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK"})
 }
 
+func (s *Server) HandleGetFiles(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
 func (s *Server) HandleCreateFile(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"status": "Created"})
 }
