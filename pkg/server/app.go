@@ -15,6 +15,10 @@ func (s *Server) HandleGetApp(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK"})
 }
 
+func (s *Server) HandleGetApps(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
 func (s *Server) HandleCreateApp(c *gin.Context) {
 	app := &types.App{}
 
