@@ -24,51 +24,47 @@ import {
 } from "@quarkloop/plugins";
 
 // GetAppPageSettingsById
+// GetAppPagesSettingsByAppId
 export async function GET(request: Request, { params }: { params: any }) {
-  const { appId, pageId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const appId = searchParams.get("appId");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
   });
 
-  const finalState = await pipeline
-    .use(GetAppPageSettingsByIdPlugin)
-    .use(GetApiResponsePlugin)
-    .onError(DefaultErrorHandler)
-    .execute({
-      appPageSettings: {
-        appId: appId,
-        id: pageId,
-      } as GetAppPageSettingsByIdPluginArgs,
-    });
+  if (id) {
+    const finalState = await pipeline
+      .use(GetAppPageSettingsByIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        appPageSettings: {
+          id: id,
+        } as GetAppPageSettingsByIdPluginArgs,
+      });
 
-  return NextResponse.json(finalState.apiResponse);
+    return NextResponse.json(finalState.apiResponse);
+  }
+
+  if (appId) {
+    const finalState = await pipeline
+      .use(GetAppPagesSettingsByAppIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        appPageSettings: {
+          appId: appId,
+        } as GetAppPagesSettingsByAppIdPluginArgs,
+      });
+
+    return NextResponse.json(finalState.apiResponse);
+  }
 }
-
-// // GetAppPagesSettingsByAppId
-// export async function GET(request: Request, { params }: { params: any }) {
-//   const { appId } = params;
-
-//   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
-//     initialState: {},
-//   });
-
-//   const finalState = await pipeline
-//     .use(GetAppPagesSettingsByAppIdPlugin)
-//     .use(GetApiResponsePlugin)
-//     .onError(DefaultErrorHandler)
-//     .execute({
-//       appPageSettings: {
-//         appId: appId,
-//       } as GetAppPagesSettingsByAppIdPluginArgs,
-//     });
-
-//   return NextResponse.json(finalState.apiResponse);
-// }
 
 // CreateAppPageSettings
 export async function POST(request: Request, { params }: { params: any }) {
-  const { appId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -82,7 +78,6 @@ export async function POST(request: Request, { params }: { params: any }) {
     .execute({
       appPageSettings: {
         ...body,
-        appId: appId,
       } as CreateAppPageSettingsPluginArgs,
     });
 
@@ -91,7 +86,6 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppPageSettings
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { appId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -105,7 +99,6 @@ export async function PUT(request: Request, { params }: { params: any }) {
     .execute({
       appPageSettings: {
         ...body,
-        appId: appId,
       } as UpdateAppPageSettingsPluginArgs,
     });
 
@@ -114,7 +107,9 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
 // DeleteAppPageSettings
 export async function DELETE(request: Request, { params }: { params: any }) {
-  const { appId, pageId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const appId = searchParams.get("appId");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -126,8 +121,8 @@ export async function DELETE(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appPageSettings: {
+        id: id,
         appId: appId,
-        id: pageId,
       } as DeleteAppPageSettingsPluginArgs,
     });
 
