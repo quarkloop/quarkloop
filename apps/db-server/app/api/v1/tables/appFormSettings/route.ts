@@ -112,6 +112,10 @@ export async function DELETE(request: Request, { params }: { params: any }) {
   const id = searchParams.get("id");
   const appId = searchParams.get("appId");
 
+  if (id == null && appId == null) {
+    return NextResponse.json({ status: "Bad request" }, { status: 400 });
+  }
+
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
   });
