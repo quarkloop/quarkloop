@@ -10,6 +10,10 @@ func (s *Server) HandleGetForm(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK"})
 }
 
+func (s *Server) HandleGetForms(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
 func (s *Server) HandleCreateForm(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"status": "Created"})
 }
