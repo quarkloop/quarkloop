@@ -24,54 +24,47 @@ import {
 } from "@quarkloop/plugins";
 
 // GetAppFileSettingsById
+// GetAppFileSettingsByAppId
 export async function GET(request: Request, { params }: { params: any }) {
-  const { appId, fileId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const appId = searchParams.get("appId");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
   });
 
-  const finalState = await pipeline
-    .use(GetAppFileSettingsByIdPlugin)
-    .use(GetApiResponsePlugin)
-    .onError(DefaultErrorHandler)
-    .execute({
-      appFileSettings: {
-        appId: appId,
-        id: fileId,
-      } as GetAppFileSettingsByIdPluginArgs,
-    });
+  if (id) {
+    const finalState = await pipeline
+      .use(GetAppFileSettingsByIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        appFileSettings: {
+          id: id,
+        } as GetAppFileSettingsByIdPluginArgs,
+      });
 
-  return NextResponse.json(finalState.apiResponse);
+    return NextResponse.json(finalState.apiResponse);
+  }
+
+  if (appId) {
+    const finalState = await pipeline
+      .use(GetAppFileSettingsByAppIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        appFileSettings: {
+          appId: appId,
+        } as GetAppFileSettingsByAppIdPluginArgs,
+      });
+
+    return NextResponse.json(finalState.apiResponse);
+  }
 }
-
-// // GetAppFileSettingsByAppId
-// export async function GET(
-//   request: Request,
-//   { params }: { params: any }
-// ) {
-//   const { appId } = params;
-
-//   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
-//     initialState: {},
-//   });
-
-//   const finalState = await pipeline
-//     .use(GetAppFileSettingsByAppIdPlugin)
-//     .use(GetApiResponsePlugin)
-//     .onError(DefaultErrorHandler)
-//     .execute({
-//       appFileSettings: {
-//         appId: appId,
-//       } as GetAppFileSettingsByAppIdPluginArgs,
-//     });
-
-//   return NextResponse.json(finalState.apiResponse);
-// }
 
 // CreateAppFileSettings
 export async function POST(request: Request, { params }: { params: any }) {
-  const { appId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -85,7 +78,6 @@ export async function POST(request: Request, { params }: { params: any }) {
     .execute({
       appFileSettings: {
         ...body,
-        appId: appId,
       } as CreateAppFileSettingsPluginArgs,
     });
 
@@ -94,7 +86,6 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppFileSettings
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { appId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -108,7 +99,6 @@ export async function PUT(request: Request, { params }: { params: any }) {
     .execute({
       appFileSettings: {
         ...body,
-        appId: appId,
       } as UpdateAppFileSettingsPluginArgs,
     });
 
@@ -117,7 +107,9 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
 // DeleteAppFileSettings
 export async function DELETE(request: Request, { params }: { params: any }) {
-  const { appId, fileId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const appId = searchParams.get("appId");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -129,8 +121,8 @@ export async function DELETE(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appFileSettings: {
+        id: id,
         appId: appId,
-        id: fileId,
       } as DeleteAppFileSettingsPluginArgs,
     });
 
