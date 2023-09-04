@@ -24,78 +24,45 @@ import {
 } from "@quarkloop/plugins";
 
 // GetAppInstanceById
+// GetAppInstancesByAppId
 export async function GET(request: Request, { params }: { params: any }) {
-  const { appId, id } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const appId = searchParams.get("appId");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
   });
 
-  const finalState = await pipeline
-    .use(GetAppInstanceByIdPlugin)
-    .use(GetApiResponsePlugin)
-    .onError(DefaultErrorHandler)
-    .execute({
-      appInstance: {
-        appId: appId,
-        id: id,
-      } as GetAppInstanceByIdPluginArgs,
-    });
+  if (id) {
+    const finalState = await pipeline
+      .use(GetAppInstanceByIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        appInstance: {
+          appId: appId,
+          id: id,
+        } as GetAppInstanceByIdPluginArgs,
+      });
 
-  return NextResponse.json(finalState.apiResponse);
+    return NextResponse.json(finalState.apiResponse);
+  }
+
+  if (appId) {
+    const finalState = await pipeline
+      .use(GetAppInstancesByAppIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        appInstance: {
+          appId: appId,
+        } as GetAppInstancesByAppIdPluginArgs,
+      });
+
+    return NextResponse.json(finalState.apiResponse);
+  }
 }
-
-// // GetAppInstanceById
-// export async function GET(
-//   request: Request,
-//   { params }: { params: any }
-// ) {
-//   const { userId, appId, id } = params;
-
-//   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
-//     initialState: {},
-//   });
-
-//   const finalState = await pipeline
-//     .use(GetAppInstanceByIdPlugin)
-//     .use(GetApiResponsePlugin)
-//     .onError(DefaultErrorHandler)
-//     .execute({
-//       appInstance: {
-//         userId: userId,
-//         appId: appId,
-//         id: id,
-//       } as GetAppInstanceByIdPluginArgs,
-//     });
-
-//   return NextResponse.json(finalState.apiResponse);
-// }
-
-// // GetAppInstancesByAppId
-// export async function GET(
-//   request: Request,
-//   { params }: { params: any }
-// ) {
-//   const { searchParams } = new URL(request.url);
-
-//   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
-//     initialState: {},
-//   });
-
-//   const finalState = await pipeline
-//     .use(GetAppInstancesByAppIdPlugin)
-//     .use(GetApiResponsePlugin)
-//     .onError(DefaultErrorHandler)
-//     .execute({
-//       appInstance: {
-//         osId: searchParams.get("osId"),
-//         workspaceId: searchParams.get("workspaceId"),
-//         appId: searchParams.get("appId"),
-//       } as GetAppInstancesByAppIdPluginArgs,
-//     });
-
-//   return NextResponse.json(finalState.apiResponse);
-// }
 
 // CreateAppInstance
 export async function POST(request: Request, { params }: { params: any }) {
@@ -118,7 +85,6 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppInstance
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { appInstanceId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -132,7 +98,6 @@ export async function PUT(request: Request, { params }: { params: any }) {
     .execute({
       appInstance: {
         ...body,
-        id: appInstanceId,
       } as UpdateAppInstancePluginArgs,
     });
 
@@ -141,7 +106,9 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
 // DeleteAppInstance
 export async function DELETE(request: Request, { params }: { params: any }) {
-  const { appId, appInstanceId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const appId = searchParams.get("appId");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -153,8 +120,8 @@ export async function DELETE(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       app: {
+        id: id,
         appId: appId,
-        id: appInstanceId,
       } as DeleteAppInstancePluginArgs,
     });
 
