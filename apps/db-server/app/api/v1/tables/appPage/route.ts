@@ -5,6 +5,7 @@ import {
   CreateAppPagePluginArgs,
   DeleteAppPagePluginArgs,
   UpdateAppPagePluginArgs,
+  GetAppPageByAppInstanceIdPluginArgs,
 } from "@quarkloop/types";
 import { createPipeline } from "@quarkloop/plugin";
 import {
@@ -19,33 +20,51 @@ import {
   CreateAppPagePlugin,
   UpdateAppPagePlugin,
   DeleteAppPagePlugin,
+  GetAppPageByAppInstanceIdPlugin,
 } from "@quarkloop/plugins";
 
 // GetAppPageById
+// GetAppPageByAppInstanceId
 export async function GET(request: Request, { params }: { params: any }) {
-  const { appInstanceId, pageId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const appInstanceId = searchParams.get("appInstanceId");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
   });
 
-  const finalState = await pipeline
-    .use(GetAppPageByIdPlugin)
-    .use(GetApiResponsePlugin)
-    .onError(DefaultErrorHandler)
-    .execute({
-      appPage: {
-        appInstanceId: appInstanceId,
-        id: pageId,
-      } as GetAppPageByIdPluginArgs,
-    });
+  if (id) {
+    const finalState = await pipeline
+      .use(GetAppPageByIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        appPage: {
+          id: id,
+        } as GetAppPageByIdPluginArgs,
+      });
 
-  return NextResponse.json(finalState.apiResponse);
+    return NextResponse.json(finalState.apiResponse);
+  }
+
+  if (appInstanceId) {
+    const finalState = await pipeline
+      .use(GetAppPageByAppInstanceIdPlugin)
+      .use(GetApiResponsePlugin)
+      .onError(DefaultErrorHandler)
+      .execute({
+        appPage: {
+          appInstanceId: appInstanceId,
+        } as GetAppPageByAppInstanceIdPluginArgs,
+      });
+
+    return NextResponse.json(finalState.apiResponse);
+  }
 }
 
 // CreateAppPage
 export async function POST(request: Request, { params }: { params: any }) {
-  const { appInstanceId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -59,7 +78,6 @@ export async function POST(request: Request, { params }: { params: any }) {
     .execute({
       appPage: {
         ...body,
-        appInstanceId: appInstanceId,
       } as CreateAppPagePluginArgs,
     });
 
@@ -68,7 +86,6 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppPage
 export async function PUT(request: Request, { params }: { params: any }) {
-  const { appInstanceId, pageId } = params;
   const body = await request.json();
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -82,8 +99,6 @@ export async function PUT(request: Request, { params }: { params: any }) {
     .execute({
       appPage: {
         ...body,
-        appInstanceId: appInstanceId,
-        id: pageId,
       } as UpdateAppPagePluginArgs,
     });
 
@@ -92,7 +107,9 @@ export async function PUT(request: Request, { params }: { params: any }) {
 
 // DeleteAppPage
 export async function DELETE(request: Request, { params }: { params: any }) {
-  const { appInstanceId, pageId } = params;
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  const appInstanceId = searchParams.get("appInstanceId");
 
   const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
     initialState: {},
@@ -104,8 +121,8 @@ export async function DELETE(request: Request, { params }: { params: any }) {
     .onError(DefaultErrorHandler)
     .execute({
       appPage: {
+        id: id,
         appInstanceId: appInstanceId,
-        id: pageId,
       } as DeleteAppPagePluginArgs,
     });
 
