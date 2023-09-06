@@ -6,6 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (s *Server) HandleGetFormOps(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
+func (s *Server) HandleCallFormOp(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
 func (s *Server) HandleGetForm(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK"})
 }
