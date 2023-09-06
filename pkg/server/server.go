@@ -1,10 +1,13 @@
 package server
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -154,4 +157,40 @@ func (s *Server) BindHandlers() {
 		// app.PUT("/:appId/instances/:instanceId/pages/:pageId", s.HandleUpdatePage)
 		// app.DELETE("/:appId/instances/:instanceId/pages/:pageId", s.HandleDeletePage)
 	}
+}
+
+func (s *Server) Database(
+	c *gin.Context,
+	method, path string,
+	buf []byte,
+	queryParams *url.Values,
+) (*http.Response, error) {
+	req, err := http.NewRequest(method, path, bytes.NewBuffer(buf))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, AppResponsePayload{
+			Status:       http.StatusInternalServerError,
+			StatusString: "InternalServerError",
+			Error:        err,
+			ErrorString:  fmt.Sprintf("[NewRequest] %s", err.Error()),
+		})
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	if queryParams != nil {
+		req.URL.RawQuery = queryParams.Encode()
+	}
+
+	client := http.Client{Timeout: 10 * time.Second}
+	res, err := client.Do(req)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, AppResponsePayload{
+			Status:       http.StatusBadRequest,
+			StatusString: "BadRequest",
+			Error:        err,
+			ErrorString:  fmt.Sprintf("[Client] %s", err.Error()),
+		})
+		return nil, err
+	}
+
+	return res, nil
 }
