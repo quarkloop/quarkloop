@@ -9,7 +9,6 @@
     "build": "pnpm --filter ./apps/db-server run build",
     "start": "pnpm --filter ./apps/db-server run start",
     "lint": "pnpm --filter ./apps/db-server run lint",
-    "postinstall": "prisma generate",
     "studio:dev": "dotenv -e .env.development -- prisma studio",
     "studio:prod": "dotenv -e .env.production -- prisma studio",
     "db:reset": "dotenv -e .env.development -- npx prisma migrate reset --preview-feature",
@@ -31,8 +30,6 @@
     "@types/react-dom": "18.2.6",
     "next": "13.4.12",
     "next-transpile-modules": "^10.0.1",
-    "@prisma/client": "^4.16.2",
-    "prisma": "^4.16.2",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
