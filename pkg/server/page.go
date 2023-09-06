@@ -6,6 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (s *Server) HandleGetPageOps(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
+func (s *Server) HandleCallPageOp(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
 func (s *Server) HandleGetPage(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK"})
 }
