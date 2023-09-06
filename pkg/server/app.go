@@ -1,12 +1,11 @@
 package server
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"time"
+	"net/url"
 
 	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/db"
@@ -69,27 +68,8 @@ func (s *Server) HandleCreateApp(c *gin.Context) {
 		return
 	}
 
-	req, err := http.NewRequest("POST", "http://localhost:3000/api/v1/tables/app", bytes.NewBuffer(marshalled))
+	res, err := s.Database(c, "POST", "http://localhost:3000/api/v1/tables/app", marshalled, nil)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, AppResponsePayload{
-			Status:       http.StatusInternalServerError,
-			StatusString: "InternalServerError",
-			Error:        err,
-			ErrorString:  fmt.Sprintf("[NewRequest] %s", err.Error()),
-		})
-		return
-	}
-	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
-
-	client := http.Client{Timeout: 10 * time.Second}
-	res, err := client.Do(req)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, AppResponsePayload{
-			Status:       http.StatusBadRequest,
-			StatusString: "BadRequest",
-			Error:        err,
-			ErrorString:  fmt.Sprintf("[Client] %s", err.Error()),
-		})
 		return
 	}
 	defer res.Body.Close()
@@ -152,27 +132,8 @@ func (s *Server) HandleUpdateApp(c *gin.Context) {
 		return
 	}
 
-	req, err := http.NewRequest("PUT", "http://localhost:3000/api/v1/tables/app", bytes.NewBuffer(marshalled))
+	res, err := s.Database(c, "PUT", "http://localhost:3000/api/v1/tables/app", marshalled, nil)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, AppResponsePayload{
-			Status:       http.StatusInternalServerError,
-			StatusString: "InternalServerError",
-			Error:        err,
-			ErrorString:  fmt.Sprintf("[NewRequest] %s", err.Error()),
-		})
-		return
-	}
-	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
-
-	client := http.Client{Timeout: 10 * time.Second}
-	res, err := client.Do(req)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, AppResponsePayload{
-			Status:       http.StatusBadRequest,
-			StatusString: "BadRequest",
-			Error:        err,
-			ErrorString:  fmt.Sprintf("[Client] %s", err.Error()),
-		})
 		return
 	}
 	defer res.Body.Close()
@@ -211,30 +172,11 @@ func (s *Server) HandleUpdateApp(c *gin.Context) {
 func (s *Server) HandleDeleteApp(c *gin.Context) {
 	appId := c.Param("appId")
 
-	req, err := http.NewRequest("DELETE", "http://localhost:3000/api/v1/tables/app", nil)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, AppResponsePayload{
-			Status:       http.StatusInternalServerError,
-			StatusString: "InternalServerError",
-			Error:        err,
-			ErrorString:  fmt.Sprintf("[NewRequest] %s", err.Error()),
-		})
-		return
-	}
-	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
-	q := req.URL.Query()
+	q := url.Values{}
 	q.Add("id", appId)
-	req.URL.RawQuery = q.Encode()
 
-	client := http.Client{Timeout: 10 * time.Second}
-	res, err := client.Do(req)
+	res, err := s.Database(c, "DELETE", "http://localhost:3000/api/v1/tables/app", nil, &q)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, AppResponsePayload{
-			Status:       http.StatusBadRequest,
-			StatusString: "BadRequest",
-			Error:        err,
-			ErrorString:  fmt.Sprintf("[Client] %s", err.Error()),
-		})
 		return
 	}
 	defer res.Body.Close()
