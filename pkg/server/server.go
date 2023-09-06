@@ -72,12 +72,12 @@ func (s *Server) BindHandlers() {
 	}
 	// App Instance
 	{
-		app.GET("/:appId/instances", s.HandleGetInstances)
-		app.POST("/:appId/instances", s.HandleCreateInstance)
+		app.GET("/:appId/instances", s.HandleGetAppInstances)
+		app.POST("/:appId/instances", s.HandleCreateAppInstance)
 
-		app.GET("/:appId/instances/:instanceId", s.HandleGetInstance)
-		app.PUT("/:appId/instances/:instanceId", s.HandleUpdateInstance)
-		app.DELETE("/:appId/instances/:instanceId", s.HandleDeleteInstance)
+		app.GET("/:appId/instances/:instanceId", s.HandleGetAppInstance)
+		app.PUT("/:appId/instances/:instanceId", s.HandleUpdateAppInstance)
+		app.DELETE("/:appId/instances/:instanceId", s.HandleDeleteAppInstance)
 	}
 	// AppFileSettings
 	{
