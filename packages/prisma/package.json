@@ -7,7 +7,7 @@
   "type": "module",
   "main": "index.ts",
   "scripts": {
-    "postinstall": "prisma generate",
+    "postinstall": "npx prisma generate",
     "studio:dev": "dotenv -e .env.local -- prisma studio",
     "studio:prod": "dotenv -e .env.production -- prisma studio",
     "db:reset": "dotenv -e .env.development -- npx prisma migrate reset --preview-feature",
