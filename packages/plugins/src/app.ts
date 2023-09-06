@@ -76,7 +76,6 @@ export const CreateAppPlugin = createPlugin<PipelineState, PipelineArgs[]>({
         }
 
         const createArgs = args[0].app as CreateAppPluginArgs;
-
         const appId = generateId();
 
         const record = await prisma.app.create({
