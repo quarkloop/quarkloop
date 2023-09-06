@@ -6,6 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (s *Server) HandleGetFileOps(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
+func (s *Server) HandleCallFileOp(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
 func (s *Server) HandleGetFile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK"})
 }
