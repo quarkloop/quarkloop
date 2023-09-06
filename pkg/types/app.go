@@ -3,6 +3,7 @@ package types
 import "time"
 
 type App struct {
+	Id        string    `json:"id"`
 	Name      string    `json:"name"`
 	Type      int       `json:"type"`
 	Status    AppStatus `json:"status"`
