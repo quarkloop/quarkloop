@@ -6,6 +6,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (s *Server) HandleGetThreadOps(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"status": "OK",
+		"ops":    []string{"CreateThread", "DeleteThread"},
+	})
+}
+
+func (s *Server) HandleCallThreadOp(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
 func (s *Server) HandleGetThread(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK"})
 }
