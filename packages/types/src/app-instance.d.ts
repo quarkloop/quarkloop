@@ -5,31 +5,31 @@ import { ApiResponse } from "./api-response";
 export interface AppInstance extends Partial<PrismaAppInstance> {}
 
 export type AppInstancePluginArgs =
-  | GetAppInstanceByIdPluginArgs
-  | GetAppInstanceByIdPluginArgs
-  | GetAppInstancesByAppIdPluginArgs
-  | CreateAppInstancePluginArgs
-  | UpdateAppInstancePluginArgs
-  | DeleteAppInstancePluginArgs;
+    | GetAppInstanceByIdPluginArgs
+    | GetAppInstanceByIdPluginArgs
+    | GetAppInstancesByAppIdPluginArgs
+    | CreateAppInstancePluginArgs
+    | UpdateAppInstancePluginArgs
+    | DeleteAppInstancePluginArgs;
 
 /// GetAppInstanceById
 export interface GetAppInstanceById {}
 export interface GetAppInstanceByIdApiResponse extends ApiResponse {}
 export interface GetAppInstanceByIdApiArgs {
-  id: string;
-  appId: string;
+    id: string;
+    appId: string;
 }
 export interface GetAppInstanceByIdPluginArgs
-  extends GetAppInstanceByIdApiArgs {}
+    extends GetAppInstanceByIdApiArgs {}
 
 /// GetAppInstancesByAppId
 export interface GetAppInstancesByAppId {}
 export interface GetAppInstancesByAppIdApiResponse extends ApiResponse {}
 export interface GetAppInstancesByAppIdApiArgs {
-  appId?: string;
+    appId?: string;
 }
 export interface GetAppInstancesByAppIdPluginArgs
-  extends GetAppInstancesByAppIdApiArgs {}
+    extends GetAppInstancesByAppIdApiArgs {}
 
 /// CreateAppInstance
 export interface CreateAppInstance {}
@@ -47,7 +47,7 @@ export interface UpdateAppInstancePluginArgs extends UpdateAppInstanceApiArgs {}
 export interface DeleteAppInstance {}
 export interface DeleteAppInstanceApiResponse extends ApiResponse {}
 export interface DeleteAppInstanceApiArgs {
-  id: string;
-  appId: string;
+    id: string;
+    appId: string;
 }
 export interface DeleteAppInstancePluginArgs extends DeleteAppInstanceApiArgs {}
