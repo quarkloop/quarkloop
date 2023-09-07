@@ -97,17 +97,17 @@ func (s *Server) HandleCreateAppInstance(c *gin.Context) {
 	}
 
 	resPayload := AppInstanceResponsePayload{
-		Status:       http.StatusCreated,
-		StatusString: "Created",
+		Status:       res.StatusCode,
+		StatusString: res.Status,
 		AppInstance:  databasePayload.Database.AppInstance.Records,
 	}
 
-	c.JSON(http.StatusCreated, resPayload)
+	c.JSON(res.StatusCode, resPayload)
 }
 
 func (s *Server) HandleUpdateAppInstance(c *gin.Context) {
 	appId := c.Param("appId")
-	appInstanceId := c.Param("appInstanceId")
+	appInstanceId := c.Param("instanceId")
 
 	payload := &AppInstanceRequestPayload{}
 	payload.AppInstance.Id = appInstanceId
@@ -163,17 +163,17 @@ func (s *Server) HandleUpdateAppInstance(c *gin.Context) {
 	}
 
 	resPayload := AppInstanceResponsePayload{
-		Status:       http.StatusOK,
-		StatusString: "OK",
+		Status:       res.StatusCode,
+		StatusString: res.Status,
 		AppInstance:  databasePayload.Database.AppInstance.Records,
 	}
 
-	c.JSON(http.StatusOK, resPayload)
+	c.JSON(res.StatusCode, resPayload)
 }
 
 func (s *Server) HandleDeleteAppInstance(c *gin.Context) {
 	appId := c.Param("appId")
-	appInstanceId := c.Param("appInstanceId")
+	appInstanceId := c.Param("instanceId")
 
 	q := url.Values{}
 	q.Add("id", appInstanceId)
