@@ -10,8 +10,9 @@
     "postinstall": "npx prisma generate",
     "studio:dev": "dotenv -e .env.local -- prisma studio",
     "studio:prod": "dotenv -e .env.production -- prisma studio",
-    "db:reset": "dotenv -e .env.development -- npx prisma migrate reset --preview-feature",
+    "db:reset": "dotenv -e .env.development -- npx prisma migrate reset",
     "db:migrate": "dotenv -e .env.development -- npx prisma migrate dev",
+    "db:resolve": "dotenv -e .env.development -- npx prisma migrate resolve",
     "db:seed": "dotenv -e .env.development -- bash prisma/seed/seed.bash",
     "db:test": "dotenv -e .env.development -- bash prisma/tests/test.bash",
     "db:deploy": "dotenv -e .env.production -- npx prisma migrate deploy --preview-feature"
