@@ -8,8 +8,6 @@ model AppThread {
 
     appInstance   AppInstance? @relation(fields: [appInstanceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appInstanceId String?
-
-    @@schema("app")
 }
 
 model AppThreadSettings {
@@ -20,8 +18,6 @@ model AppThreadSettings {
 
     app   App    @relation(fields: [appId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     appId String @unique
-
-    @@schema("app")
 }
 
 //@relations
