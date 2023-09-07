@@ -1,4 +1,4 @@
-import { prisma } from "@quarkloop/prisma/client";
+import { Prisma, prisma } from "@quarkloop/prisma/client";
 
 import { generateId } from "@quarkloop/lib";
 import { createPlugin } from "@quarkloop/plugin";
@@ -183,24 +183,30 @@ export const UpdateAppInstancePlugin = createPlugin<
 
         const updateArgs = args[0].appInstance as UpdateAppInstancePluginArgs;
 
-        const record = await prisma.appInstance.update({
-            where: {
-                id: updateArgs.id,
-                app: {
-                    id: updateArgs.appId,
+        try {
+            const record = await prisma.appInstance.update({
+                where: {
+                    id: updateArgs.id,
+                    app: {
+                        id: updateArgs.appId,
+                    },
                 },
-            },
-            data: {
-                ...(updateArgs.name && { title: updateArgs.name }),
-                updatedAt: new Date(),
-            },
-        });
+                data: {
+                    ...(updateArgs.name && { name: updateArgs.name }),
+                    updatedAt: new Date(),
+                },
+            });
+        } catch (e) {
+            // https://github.com/prisma/prisma/issues/12128
+            if (e instanceof Prisma.PrismaClientKnownRequestError) {
+                if (e.code === "P2025") {
+                }
+            }
 
-        if (record == null) {
             return {
                 ...state,
                 status: PluginStatusEntry.NOT_FOUND(
-                    "[UpdateAppInstancePlugin]"
+                    "[UpdateAppInstancePlugin] Record to delete does not exist."
                 ),
             };
         }
@@ -232,20 +238,26 @@ export const DeleteAppInstancePlugin = createPlugin<
 
         const deleteArgs = args[0].appInstance as DeleteAppInstancePluginArgs;
 
-        const record = await prisma.appInstance.delete({
-            where: {
-                id: deleteArgs.id,
-                app: {
-                    id: deleteArgs.appId,
+        try {
+            const record = await prisma.appInstance.delete({
+                where: {
+                    id: deleteArgs.id,
+                    app: {
+                        id: deleteArgs.appId,
+                    },
                 },
-            },
-        });
+            });
+        } catch (e) {
+            // https://github.com/prisma/prisma/issues/12128
+            if (e instanceof Prisma.PrismaClientKnownRequestError) {
+                if (e.code === "P2025") {
+                }
+            }
 
-        if (record == null) {
             return {
                 ...state,
                 status: PluginStatusEntry.NOT_FOUND(
-                    "[DeleteAppInstancePlugin]"
+                    "[DeleteAppInstancePlugin] Record to delete does not exist."
                 ),
             };
         }
