@@ -13,8 +13,6 @@ model App {
     filesSettings  AppFileSettings?
     pagesSettings  AppPageSettings[]
     formsSettings  AppFormSettings[]
-
-    @@schema("app")
 }
 
 model AppInstance {
@@ -31,8 +29,6 @@ model AppInstance {
     AppFileData   AppFile[]
     AppPageData   AppPage[]
     AppFormData   AppForm[]
-
-    @@schema("app")
 }
 
 //@relations
