@@ -46,7 +46,10 @@ export async function GET(request: Request, { params }: { params: any }) {
                 } as GetAppInstanceByIdPluginArgs,
             });
 
-        return NextResponse.json(finalState.apiResponse);
+        return NextResponse.json(finalState.apiResponse, {
+            status:
+                (finalState.apiResponse?.status.statusCode as number) ?? 500,
+        });
     }
 
     if (appId) {
@@ -60,7 +63,10 @@ export async function GET(request: Request, { params }: { params: any }) {
                 } as GetAppInstancesByAppIdPluginArgs,
             });
 
-        return NextResponse.json(finalState.apiResponse);
+        return NextResponse.json(finalState.apiResponse, {
+            status:
+                (finalState.apiResponse?.status.statusCode as number) ?? 500,
+        });
     }
 
     return NextResponse.json({ status: "Bad request" }, { status: 400 });
@@ -82,7 +88,9 @@ export async function POST(request: Request, { params }: { params: any }) {
             appInstance: body as CreateAppInstancePluginArgs,
         });
 
-    return NextResponse.json(finalState.apiResponse);
+    return NextResponse.json(finalState.apiResponse, {
+        status: (finalState.apiResponse?.status.statusCode as number) ?? 500,
+    });
 }
 
 // UpdateAppInstance
@@ -103,7 +111,9 @@ export async function PUT(request: Request, { params }: { params: any }) {
             } as UpdateAppInstancePluginArgs,
         });
 
-    return NextResponse.json(finalState.apiResponse);
+    return NextResponse.json(finalState.apiResponse, {
+        status: (finalState.apiResponse?.status.statusCode as number) ?? 500,
+    });
 }
 
 // DeleteAppInstance
@@ -125,7 +135,7 @@ export async function DELETE(request: Request, { params }: { params: any }) {
         .use(DeleteApiResponsePlugin)
         .onError(DefaultErrorHandler)
         .execute({
-            app: {
+            appInstance: {
                 id: id,
                 appId: appId,
             } as DeleteAppInstancePluginArgs,
