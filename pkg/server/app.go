@@ -97,12 +97,12 @@ func (s *Server) HandleCreateApp(c *gin.Context) {
 	}
 
 	resPayload := AppResponsePayload{
-		Status:       http.StatusCreated,
-		StatusString: "Created",
+		Status:       res.StatusCode,
+		StatusString: res.Status,
 		App:          databasePayload.Database.App.Records,
 	}
 
-	c.JSON(http.StatusCreated, resPayload)
+	c.JSON(res.StatusCode, resPayload)
 }
 
 func (s *Server) HandleUpdateApp(c *gin.Context) {
@@ -161,12 +161,12 @@ func (s *Server) HandleUpdateApp(c *gin.Context) {
 	}
 
 	resPayload := AppResponsePayload{
-		Status:       http.StatusOK,
-		StatusString: "OK",
+		Status:       res.StatusCode,
+		StatusString: res.Status,
 		App:          databasePayload.Database.App.Records,
 	}
 
-	c.JSON(http.StatusOK, resPayload)
+	c.JSON(res.StatusCode, resPayload)
 }
 
 func (s *Server) HandleDeleteApp(c *gin.Context) {
