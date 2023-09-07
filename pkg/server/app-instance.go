@@ -13,7 +13,6 @@ import (
 )
 
 type AppInstanceRequestPayload struct {
-	AppId       string            `json:"appId"`
 	AppInstance types.AppInstance `json:"appInstance"`
 }
 
@@ -22,7 +21,7 @@ type AppInstanceResponsePayload struct {
 	StatusString string      `json:"statusText,omitempty"`
 	Error        error       `json:"error,omitempty"`
 	ErrorString  string      `json:"errorString,omitempty"`
-	AppInstance  interface{} `json:"app,omitempty"`
+	AppInstance  interface{} `json:"appInstance,omitempty"`
 }
 
 func (s *Server) HandleGetAppInstance(c *gin.Context) {
@@ -69,7 +68,7 @@ func (s *Server) HandleCreateAppInstance(c *gin.Context) {
 		return
 	}
 
-	res, err := s.Database(c, "POST", "http://localhost:3000/api/v1/tables/app", marshalled, nil)
+	res, err := s.Database(c, "POST", "http://localhost:3000/api/v1/tables/appInstance", marshalled, nil)
 	if err != nil {
 		return
 	}
@@ -111,8 +110,8 @@ func (s *Server) HandleUpdateAppInstance(c *gin.Context) {
 	appInstanceId := c.Param("appInstanceId")
 
 	payload := &AppInstanceRequestPayload{}
-	payload.AppId = appId
 	payload.AppInstance.Id = appInstanceId
+	payload.AppInstance.AppId = appId
 
 	if err := c.BindJSON(payload); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, AppInstanceResponsePayload{
@@ -135,7 +134,7 @@ func (s *Server) HandleUpdateAppInstance(c *gin.Context) {
 		return
 	}
 
-	res, err := s.Database(c, "PUT", "http://localhost:3000/api/v1/tables/app", marshalled, nil)
+	res, err := s.Database(c, "PUT", "http://localhost:3000/api/v1/tables/appInstance", marshalled, nil)
 	if err != nil {
 		return
 	}
@@ -180,7 +179,7 @@ func (s *Server) HandleDeleteAppInstance(c *gin.Context) {
 	q.Add("id", appInstanceId)
 	q.Add("appId", appId)
 
-	res, err := s.Database(c, "DELETE", "http://localhost:3000/api/v1/tables/app", nil, &q)
+	res, err := s.Database(c, "DELETE", "http://localhost:3000/api/v1/tables/appInstance", nil, &q)
 	if err != nil {
 		return
 	}
