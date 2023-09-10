@@ -1,7 +1,8 @@
 package model
 
 type File struct {
-	InstanceId string `json:"appInstanceId"`
+	AppId      string `json:"appId"`
+	InstanceId string `json:"instanceId"`
 	ID         string `json:"id,omitempty"`
 	Enable     bool   `json:"enable"`
 }
