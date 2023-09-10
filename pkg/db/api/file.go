@@ -7,9 +7,10 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/db/model"
 )
 
-func GetFileById() (interface{}, error) {
+func GetFileById(appId, instanceId string) (interface{}, error) {
 	payload := model.File{
-		InstanceId: "",
+		AppId:      appId,
+		InstanceId: instanceId,
 		Enable:     false,
 	}
 
