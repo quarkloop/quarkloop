@@ -8,14 +8,14 @@ import (
 )
 
 type OpCall interface {
-	Call(appId, instanceId string, args interface{}) (interface{}, error)
+	Call(appId, instanceId string, args json.RawMessage) (interface{}, error)
 }
 
 type OpCallCatalog struct {
 	AppId      string
 	InstanceId string
 	Name       string
-	Args       interface{}
+	Args       json.RawMessage
 	CallSite   OpCall
 }
 
@@ -59,7 +59,7 @@ func FindOp(appId, instanceId, opName string, args json.RawMessage) (*OpCallCata
 }
 
 func (opc *OpCallCatalog) Exec() (interface{}, error) {
-	res, err := opc.CallSite.Call(opc.AppId, opc.InstanceId, 5)
+	res, err := opc.CallSite.Call(opc.AppId, opc.InstanceId, opc.Args)
 	if err != nil {
 		return nil, err
 	}
