@@ -34,8 +34,6 @@ export async function GET(request: Request, { params }: { params: any }) {
         initialState: {},
     });
 
-    console.log("*********", searchParams);
-
     if (id) {
         const finalState = await pipeline
             .use(GetAppFileByIdPlugin)
@@ -47,7 +45,12 @@ export async function GET(request: Request, { params }: { params: any }) {
                 } as GetAppFileByIdPluginArgs,
             });
 
-        return NextResponse.json(finalState.apiResponse);
+        console.log("*********", finalState.apiResponse);
+
+        return NextResponse.json(finalState.apiResponse, {
+            status:
+                (finalState.apiResponse?.status.statusCode as number) ?? 500,
+        });
     }
 
     if (appInstanceId) {
@@ -61,7 +64,10 @@ export async function GET(request: Request, { params }: { params: any }) {
                 } as GetAppFileByAppInstanceIdPluginArgs,
             });
 
-        return NextResponse.json(finalState.apiResponse);
+        return NextResponse.json(finalState.apiResponse, {
+            status:
+                (finalState.apiResponse?.status.statusCode as number) ?? 500,
+        });
     }
 
     return NextResponse.json({ status: "Bad request" }, { status: 400 });
