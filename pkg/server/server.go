@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/quarkloop/quarkloop/pkg/db"
+	"github.com/quarkloop/quarkloop/pkg/db/client"
 )
 
 type Server struct {
@@ -169,7 +169,7 @@ func (s *Server) Database(
 	buf []byte,
 	queryParams *url.Values,
 ) (*http.Response, error) {
-	res, err := db.HttpClientInstance.Get(path, queryParams)
+	res, err := client.DatabaseClient.Get(path, queryParams)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, AppResponsePayload{
 			Status:       http.StatusInternalServerError,
