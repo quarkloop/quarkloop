@@ -58,12 +58,10 @@ func (s *Server) HandleCallOp(c *gin.Context) {
 			Status:       http.StatusExpectationFailed,
 			StatusString: "ExpectationFailed",
 			Error:        err,
-			ErrorString:  fmt.Sprintf("[Call] %s", err.Error()),
+			ErrorString:  fmt.Sprintf("[Exec] %s", err.Error()),
 		})
 		return
 	}
 
-	fmt.Printf("******** %+v\n", res)
-
-	c.JSON(http.StatusOK, gin.H{"status": res})
+	c.JSON(http.StatusOK, res)
 }
