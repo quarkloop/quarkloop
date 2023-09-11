@@ -1,7 +1,6 @@
 package db
 
 import (
-	"bytes"
 	"net/http"
 	"net/url"
 	"time"
@@ -12,8 +11,8 @@ type HttpClient struct {
 
 var HttpClientInstance = HttpClient{}
 
-func (c *HttpClient) Get(path string, buf []byte, queryParams *url.Values) (*http.Response, error) {
-	req, err := http.NewRequest("GET", path, bytes.NewBuffer(buf))
+func (c *HttpClient) Get(path string, queryParams *url.Values) (*http.Response, error) {
+	req, err := http.NewRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
 	}
