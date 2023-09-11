@@ -22,17 +22,14 @@ func GetFileById(appId, instanceId, fileId string) (*model.File, error) {
 	defer res.Body.Close()
 
 	if res.StatusCode == http.StatusOK {
-		var file model.File
-
 		var payload db.DatabaseResponsePayload
 		decodeErr := json.NewDecoder(res.Body).Decode(&payload)
 		if decodeErr != nil {
 			return nil, decodeErr
 		}
 
-		val, ok := payload.Database.File.Records.(model.File)
+		file, ok := payload.Database.File.Records.(model.File)
 		if ok {
-			file = val
 			return &file, nil
 		}
 	}
