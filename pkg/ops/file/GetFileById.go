@@ -20,10 +20,10 @@ func (op *GetFileById) Call(appId, instanceId string, args json.RawMessage) (int
 		return nil, err
 	}
 
-	res, err := api.GetFileById(appId, instanceId, fileArgs.FileId)
+	file, err := api.GetFileById(appId, instanceId, fileArgs.FileId)
 	if err != nil {
 		return nil, err
 	}
 
-	return res, nil
+	return file, nil
 }
