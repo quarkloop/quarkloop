@@ -1,25 +1,16 @@
 package api
 
 import (
-	"encoding/json"
+	"net/url"
 
 	"github.com/quarkloop/quarkloop/pkg/db"
-	"github.com/quarkloop/quarkloop/pkg/db/model"
 )
 
-func GetFileById(appId, instanceId string) (interface{}, error) {
-	payload := model.File{
-		AppId:      appId,
-		InstanceId: instanceId,
-		Enable:     false,
-	}
+func GetFileById(appId, instanceId, fileId string) (interface{}, error) {
+	params := url.Values{}
+	params.Add("id", fileId)
 
-	marshalled, err := json.Marshal(&payload)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := db.HttpClientInstance.Get("http://localhost:3000/api/v1/tables/appFile", marshalled, nil)
+	res, err := db.HttpClientInstance.Get("http://localhost:3000/api/v1/tables/appFile", &params)
 	if err != nil {
 		return nil, err
 	}
