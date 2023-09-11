@@ -169,7 +169,7 @@ func (s *Server) Database(
 	buf []byte,
 	queryParams *url.Values,
 ) (*http.Response, error) {
-	res, err := db.HttpClientInstance.Get(path, buf, queryParams)
+	res, err := db.HttpClientInstance.Get(path, queryParams)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, AppResponsePayload{
 			Status:       http.StatusInternalServerError,
