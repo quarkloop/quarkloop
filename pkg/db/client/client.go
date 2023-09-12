@@ -48,7 +48,7 @@ func (c *DatabaseHttpClient) Post(path string, body []byte) (*http.Response, err
 	return res, nil
 }
 
-func (c *DatabaseHttpClient) Update(path string, queryParams *url.Values) (interface{}, error) {
+func (c *DatabaseHttpClient) Update(path string, queryParams *url.Values, body []byte) (interface{}, error) {
 	req, err := http.NewRequest("PUT", path, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
