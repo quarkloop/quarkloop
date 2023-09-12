@@ -62,6 +62,7 @@ func (s *Server) HandleCallOp(c *gin.Context) {
 		})
 		return
 	}
+	fmt.Printf("\n--------- %+v\n", res)
 
 	c.JSON(http.StatusOK, res)
 }
