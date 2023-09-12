@@ -8,7 +8,7 @@ import (
 	"net/url"
 
 	"github.com/gin-gonic/gin"
-	"github.com/quarkloop/quarkloop/pkg/db"
+	"github.com/quarkloop/quarkloop/pkg/db/api"
 	"github.com/quarkloop/quarkloop/pkg/types"
 )
 
@@ -85,7 +85,9 @@ func (s *Server) HandleCreateApp(c *gin.Context) {
 		return
 	}
 
-	databasePayload := db.DatabaseResponsePayload{}
+	fmt.Printf("\n*********** %s", string(resBody))
+
+	databasePayload := api.DatabaseResponsePayload{}
 	if err := json.Unmarshal(resBody, &databasePayload); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, AppResponsePayload{
 			Status:       http.StatusBadRequest,
@@ -149,7 +151,7 @@ func (s *Server) HandleUpdateApp(c *gin.Context) {
 		return
 	}
 
-	databasePayload := db.DatabaseResponsePayload{}
+	databasePayload := api.DatabaseResponsePayload{}
 	if err := json.Unmarshal(resBody, &databasePayload); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, AppResponsePayload{
 			Status:       http.StatusBadRequest,
