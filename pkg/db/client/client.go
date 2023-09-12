@@ -48,13 +48,16 @@ func (c *DatabaseHttpClient) Post(path string, body []byte) (*http.Response, err
 	return res, nil
 }
 
-func (c *DatabaseHttpClient) Update() (interface{}, error) {
+func (c *DatabaseHttpClient) Update(path string, queryParams *url.Values) (interface{}, error) {
 	req, err := http.NewRequest("PUT", path, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	if queryParams != nil {
+		req.URL.RawQuery = queryParams.Encode()
+	}	
 
 	client := http.Client{Timeout: 10 * time.Second}
 	res, err := client.Do(req)
