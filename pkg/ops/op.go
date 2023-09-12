@@ -34,21 +34,28 @@ var Opss = Ops{
 		"GetFileById": ops.GetFileById{
 			Name: "GetFileById",
 		},
+		"CreateFile": ops.CreateFile{
+			Name: "CreateFile",
+		},
 	},
 }
 
 func FindOp(appId, instanceId, opName string, args json.RawMessage) (*OpCallCatalog, error) {
 	val, ok := Opss.Ops[opName]
 	if ok {
+		catalog := OpCallCatalog{
+			AppId:      appId,
+			InstanceId: instanceId,
+			Name:       opName,
+			Args:       args,
+		}
+
 		switch val := val.(type) {
 		case ops.GetFileById:
-			catalog := OpCallCatalog{
-				AppId:      appId,
-				InstanceId: instanceId,
-				Name:       opName,
-				Args:       args,
-				CallSite:   &val,
-			}
+			catalog.CallSite = &val
+			return &catalog, nil
+		case ops.CreateFile:
+			catalog.CallSite = &val
 			return &catalog, nil
 		}
 
