@@ -45,8 +45,6 @@ export async function GET(request: Request, { params }: { params: any }) {
                 } as GetAppFileByIdPluginArgs,
             });
 
-        console.log("*********", finalState.apiResponse);
-
         return NextResponse.json(finalState.apiResponse, {
             status:
                 (finalState.apiResponse?.status.statusCode as number) ?? 500,
@@ -91,7 +89,9 @@ export async function POST(request: Request, { params }: { params: any }) {
             } as CreateAppFilePluginArgs,
         });
 
-    return NextResponse.json(finalState.apiResponse);
+    return NextResponse.json(finalState.apiResponse, {
+        status: (finalState.apiResponse?.status.statusCode as number) ?? 500,
+    });
 }
 
 // UpdateAppFile
@@ -112,7 +112,9 @@ export async function PUT(request: Request, { params }: { params: any }) {
             } as UpdateAppFilePluginArgs,
         });
 
-    return NextResponse.json(finalState.apiResponse);
+    return NextResponse.json(finalState.apiResponse, {
+        status: (finalState.apiResponse?.status.statusCode as number) ?? 500,
+    });
 }
 
 // DeleteAppFile
@@ -140,5 +142,7 @@ export async function DELETE(request: Request, { params }: { params: any }) {
             } as DeleteAppFilePluginArgs,
         });
 
-    return NextResponse.json(finalState.apiResponse);
+    return NextResponse.json(finalState.apiResponse, {
+        status: (finalState.apiResponse?.status.statusCode as number) ?? 500,
+    });
 }
