@@ -1,6 +1,7 @@
 package client
 
 import (
+	"bytes"
 	"net/http"
 	"net/url"
 	"time"
@@ -30,8 +31,21 @@ func (c *DatabaseHttpClient) Get(path string, queryParams *url.Values) (*http.Re
 	return res, nil
 }
 
-func (c *DatabaseHttpClient) Post() (interface{}, error) {
-	return nil, nil
+func (c *DatabaseHttpClient) Post(path string, body []byte) (*http.Response, error) {
+	req, err := http.NewRequest("POST", path, bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+
+	client := http.Client{Timeout: 10 * time.Second}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 func (c *DatabaseHttpClient) Update() (interface{}, error) {
