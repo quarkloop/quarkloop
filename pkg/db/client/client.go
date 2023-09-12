@@ -49,7 +49,20 @@ func (c *DatabaseHttpClient) Post(path string, body []byte) (*http.Response, err
 }
 
 func (c *DatabaseHttpClient) Update() (interface{}, error) {
-	return nil, nil
+	req, err := http.NewRequest("PUT", path, bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+
+	client := http.Client{Timeout: 10 * time.Second}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 func (c *DatabaseHttpClient) Delete() (interface{}, error) {
