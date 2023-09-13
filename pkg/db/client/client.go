@@ -68,6 +68,22 @@ func (c *DatabaseHttpClient) Update(path string, queryParams *url.Values, body [
 	return res, nil
 }
 
-func (c *DatabaseHttpClient) Delete() (interface{}, error) {
-	return nil, nil
+func (c *DatabaseHttpClient) Delete(path string, queryParams *url.Values) (*http.Response, error) {
+	req, err := http.NewRequest("DELETE", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	if queryParams != nil {
+		req.URL.RawQuery = queryParams.Encode()
+	}
+
+	client := http.Client{Timeout: 10 * time.Second}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
