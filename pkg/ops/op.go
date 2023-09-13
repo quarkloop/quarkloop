@@ -40,6 +40,9 @@ var operations = Ops{
 		"UpdateFile": ops.UpdateFile{
 			Name: "UpdateFile",
 		},
+		"DeleteFile": ops.DeleteFile{
+			Name: "DeleteFile",
+		},
 	},
 }
 
@@ -61,6 +64,9 @@ func FindOp(appId, instanceId, opName string, args json.RawMessage) (*OpCallCata
 			catalog.CallSite = &val
 			return &catalog, nil
 		case ops.UpdateFile:
+			catalog.CallSite = &val
+			return &catalog, nil
+		case ops.DeleteFile:
 			catalog.CallSite = &val
 			return &catalog, nil
 		}
