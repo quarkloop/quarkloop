@@ -29,7 +29,7 @@ type Ops struct {
 // 	Instances map[string]interface{}
 // }
 
-var Opss = Ops{
+var operations = Ops{
 	Ops: map[string]interface{}{
 		"GetFileById": ops.GetFileById{
 			Name: "GetFileById",
@@ -37,11 +37,14 @@ var Opss = Ops{
 		"CreateFile": ops.CreateFile{
 			Name: "CreateFile",
 		},
+		"UpdateFile": ops.UpdateFile{
+			Name: "UpdateFile",
+		},
 	},
 }
 
 func FindOp(appId, instanceId, opName string, args json.RawMessage) (*OpCallCatalog, error) {
-	val, ok := Opss.Ops[opName]
+	val, ok := operations.Ops[opName]
 	if ok {
 		catalog := OpCallCatalog{
 			AppId:      appId,
@@ -55,6 +58,9 @@ func FindOp(appId, instanceId, opName string, args json.RawMessage) (*OpCallCata
 			catalog.CallSite = &val
 			return &catalog, nil
 		case ops.CreateFile:
+			catalog.CallSite = &val
+			return &catalog, nil
+		case ops.UpdateFile:
 			catalog.CallSite = &val
 			return &catalog, nil
 		}
