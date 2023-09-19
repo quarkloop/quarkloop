@@ -20,10 +20,10 @@ func (op *DeleteFile) Call(appId, instanceId string, args json.RawMessage) (inte
 		return nil, err
 	}
 
-	file, err := api.DeleteFile(appId, instanceId, fileArgs.FileId)
+	err := api.DeleteFile(appId, instanceId, fileArgs.FileId)
 	if err != nil {
 		return nil, err
 	}
 
-	return file, nil
+	return nil, nil
 }
