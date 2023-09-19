@@ -95,29 +95,24 @@ func UpdateFile(appId, instanceId string, file *model.File) (*model.File, error)
 	return nil, errors.New("failed to update file")
 }
 
-func DeleteFile(appId, instanceId, fileId string) (*model.File, error) {
+func DeleteFile(appId, instanceId, fileId string) error {
 	params := url.Values{}
 	params.Add("id", fileId)
 
 	res, err := client.DatabaseClient.Delete("http://localhost:3000/api/v1/tables/appFile", &params)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode == http.StatusNoContent {
 		var payload DatabaseResponsePayload
 		if err := json.NewDecoder(res.Body).Decode(&payload); err != nil {
-			return nil, err
+			return err
 		}
 
-		var file model.File
-		if err := json.Unmarshal(payload.Database.File.Records, &file); err != nil {
-			return nil, err
-		}
-
-		return &file, nil
+		return nil
 	}
 
-	return nil, errors.New("delete file failed")
+	return errors.New("delete file failed")
 }
