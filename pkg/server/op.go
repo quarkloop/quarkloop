@@ -10,8 +10,8 @@ import (
 )
 
 type OpCallRequestPayload struct {
-	AppID      string `json:"appId,omitempty"`
-	InstanceID string `json:"instanceId,omitempty"`
+	AppID      string `json:"appId"`
+	InstanceID string `json:"instanceId"`
 	Call       struct {
 		Name string          `json:"name"`
 		Args json.RawMessage `json:"args"`
@@ -28,8 +28,6 @@ type OpCallResponsePayload struct {
 
 func (s *Server) HandleCallOp(c *gin.Context) {
 	payload := &OpCallRequestPayload{}
-	payload.AppID = c.Param("appId")
-	payload.InstanceID = c.Param("instanceId")
 
 	if err := c.BindJSON(payload); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, AppResponsePayload{
