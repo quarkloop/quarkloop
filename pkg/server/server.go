@@ -82,7 +82,7 @@ func (s *Server) BindHandlers() {
 	// Op call
 	{
 		//app.GET("/:appId/instances/:instanceId/call", s.HandleGetOps)
-		app.POST("/:appId/instances/:instanceId/call", s.HandleCallOp)
+		app.POST("/call", s.HandleCallOp)
 	}
 	// AppFileSettings
 	{
