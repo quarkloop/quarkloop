@@ -13,9 +13,9 @@ type OpCallRequestPayload struct {
 	AppID      string `json:"appId" binding:"required"`
 	InstanceID string `json:"instanceId" binding:"required"`
 	Call       struct {
-		Name string          `json:"name"`
-		Args json.RawMessage `json:"args"`
-	} `json:"call"`
+		Name string          `json:"name" binding:"required"`
+		Args json.RawMessage `json:"args" binding:"required"`
+	} `json:"call" binding:"required"`
 }
 
 type OpCallResponsePayload struct {
