@@ -10,8 +10,8 @@ import (
 )
 
 type OpCallRequestPayload struct {
-	AppID      string `json:"appId"`
-	InstanceID string `json:"instanceId"`
+	AppID      string `json:"appId" binding:"required"`
+	InstanceID string `json:"instanceId" binding:"required"`
 	Call       struct {
 		Name string          `json:"name"`
 		Args json.RawMessage `json:"args"`
