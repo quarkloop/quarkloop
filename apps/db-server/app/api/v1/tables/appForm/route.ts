@@ -27,21 +27,24 @@ import {
 // GetAppFormByAppInstanceId
 export async function GET(request: Request, { params }: { params: any }) {
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-    const appInstanceId = searchParams.get("appInstanceId");
+    const appId = searchParams.get("appId");
+    const instanceId = searchParams.get("instanceId");
+    const formId = searchParams.get("formId");
 
     const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
         initialState: {},
     });
 
-    if (id) {
+    if (appId && instanceId && formId) {
         const finalState = await pipeline
             .use(GetAppFormByIdPlugin)
             .use(GetApiResponsePlugin)
             .onError(DefaultErrorHandler)
             .execute({
                 appForm: {
-                    id: id,
+                    appId,
+                    instanceId,
+                    formId,
                 } as GetAppFormByIdPluginArgs,
             });
 
@@ -51,14 +54,15 @@ export async function GET(request: Request, { params }: { params: any }) {
         });
     }
 
-    if (appInstanceId) {
+    if (appId && instanceId) {
         const finalState = await pipeline
             .use(GetAppFormByAppInstanceIdPlugin)
             .use(GetApiResponsePlugin)
             .onError(DefaultErrorHandler)
             .execute({
                 appForm: {
-                    appInstanceId: appInstanceId,
+                    appId,
+                    instanceId,
                 } as GetAppFormByAppInstanceIdPluginArgs,
             });
 
@@ -73,6 +77,10 @@ export async function GET(request: Request, { params }: { params: any }) {
 
 // CreateAppForm
 export async function POST(request: Request, { params }: { params: any }) {
+    const { searchParams } = new URL(request.url);
+    const appId = searchParams.get("appId");
+    const instanceId = searchParams.get("instanceId");
+
     const body = await request.json();
 
     const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -85,7 +93,9 @@ export async function POST(request: Request, { params }: { params: any }) {
         .onError(DefaultErrorHandler)
         .execute({
             appForm: {
-                ...body,
+                appId,
+                instanceId,
+                form: body,
             } as CreateAppFormPluginArgs,
         });
 
@@ -96,6 +106,10 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppForm
 export async function PUT(request: Request, { params }: { params: any }) {
+    const { searchParams } = new URL(request.url);
+    const appId = searchParams.get("appId");
+    const instanceId = searchParams.get("instanceId");
+
     const body = await request.json();
 
     const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -108,7 +122,9 @@ export async function PUT(request: Request, { params }: { params: any }) {
         .onError(DefaultErrorHandler)
         .execute({
             appForm: {
-                ...body,
+                appId,
+                instanceId,
+                form: body,
             } as UpdateAppFormPluginArgs,
         });
 
@@ -120,10 +136,11 @@ export async function PUT(request: Request, { params }: { params: any }) {
 // DeleteAppForm
 export async function DELETE(request: Request, { params }: { params: any }) {
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-    const appInstanceId = searchParams.get("appInstanceId");
+    const appId = searchParams.get("appId");
+    const instanceId = searchParams.get("instanceId");
+    const formId = searchParams.get("formId");
 
-    if (id == null && appInstanceId == null) {
+    if (appId == null || instanceId == null || formId == null) {
         return NextResponse.json({ status: "Bad request" }, { status: 400 });
     }
 
@@ -137,8 +154,9 @@ export async function DELETE(request: Request, { params }: { params: any }) {
         .onError(DefaultErrorHandler)
         .execute({
             appForm: {
-                id: id,
-                appInstanceId: appInstanceId,
+                appId,
+                instanceId,
+                formId,
             } as DeleteAppFormPluginArgs,
         });
 
