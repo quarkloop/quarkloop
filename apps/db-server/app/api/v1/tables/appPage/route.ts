@@ -27,21 +27,24 @@ import {
 // GetAppPageByAppInstanceId
 export async function GET(request: Request, { params }: { params: any }) {
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-    const appInstanceId = searchParams.get("appInstanceId");
+    const appId = searchParams.get("appId");
+    const instanceId = searchParams.get("instanceId");
+    const pageId = searchParams.get("pageId");
 
     const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
         initialState: {},
     });
 
-    if (id) {
+    if (appId && instanceId && pageId) {
         const finalState = await pipeline
             .use(GetAppPageByIdPlugin)
             .use(GetApiResponsePlugin)
             .onError(DefaultErrorHandler)
             .execute({
                 appPage: {
-                    id: id,
+                    appId,
+                    instanceId,
+                    pageId,
                 } as GetAppPageByIdPluginArgs,
             });
 
@@ -51,14 +54,15 @@ export async function GET(request: Request, { params }: { params: any }) {
         });
     }
 
-    if (appInstanceId) {
+    if (appId && instanceId) {
         const finalState = await pipeline
             .use(GetAppPageByAppInstanceIdPlugin)
             .use(GetApiResponsePlugin)
             .onError(DefaultErrorHandler)
             .execute({
                 appPage: {
-                    appInstanceId: appInstanceId,
+                    appId,
+                    instanceId,
                 } as GetAppPageByAppInstanceIdPluginArgs,
             });
 
@@ -73,6 +77,10 @@ export async function GET(request: Request, { params }: { params: any }) {
 
 // CreateAppPage
 export async function POST(request: Request, { params }: { params: any }) {
+    const { searchParams } = new URL(request.url);
+    const appId = searchParams.get("appId");
+    const instanceId = searchParams.get("instanceId");
+
     const body = await request.json();
 
     const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -85,7 +93,9 @@ export async function POST(request: Request, { params }: { params: any }) {
         .onError(DefaultErrorHandler)
         .execute({
             appPage: {
-                ...body,
+                appId,
+                instanceId,
+                page: body,
             } as CreateAppPagePluginArgs,
         });
 
@@ -96,6 +106,10 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppPage
 export async function PUT(request: Request, { params }: { params: any }) {
+    const { searchParams } = new URL(request.url);
+    const appId = searchParams.get("appId");
+    const instanceId = searchParams.get("instanceId");
+
     const body = await request.json();
 
     const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -108,7 +122,9 @@ export async function PUT(request: Request, { params }: { params: any }) {
         .onError(DefaultErrorHandler)
         .execute({
             appPage: {
-                ...body,
+                appId,
+                instanceId,
+                page: body,
             } as UpdateAppPagePluginArgs,
         });
 
@@ -120,10 +136,11 @@ export async function PUT(request: Request, { params }: { params: any }) {
 // DeleteAppPage
 export async function DELETE(request: Request, { params }: { params: any }) {
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-    const appInstanceId = searchParams.get("appInstanceId");
+    const appId = searchParams.get("appId");
+    const instanceId = searchParams.get("instanceId");
+    const pageId = searchParams.get("pageId");
 
-    if (id == null && appInstanceId == null) {
+    if (appId == null || instanceId == null || pageId == null) {
         return NextResponse.json({ status: "Bad request" }, { status: 400 });
     }
 
@@ -137,8 +154,9 @@ export async function DELETE(request: Request, { params }: { params: any }) {
         .onError(DefaultErrorHandler)
         .execute({
             appPage: {
-                id: id,
-                appInstanceId: appInstanceId,
+                appId,
+                instanceId,
+                pageId,
             } as DeleteAppPagePluginArgs,
         });
 
