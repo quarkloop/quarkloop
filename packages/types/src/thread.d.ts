@@ -5,43 +5,49 @@ import { ApiResponse } from "./api-response";
 export interface AppThread extends Partial<PrismaAppThread> {}
 
 export type AppThreadPluginArgs =
-  | GetAppThreadByIdPluginArgs
-  | GetAppThreadByAppInstanceIdPluginArgs
-  | CreateAppThreadPluginArgs
-  | UpdateAppThreadPluginArgs
-  | DeleteAppThreadPluginArgs;
-
-/// GetAppThreadById
-export interface GetAppThreadById {}
-export interface GetAppThreadByIdApiResponse extends ApiResponse {}
-export interface GetAppThreadByIdApiArgs {
-  id: string;
-}
-export interface GetAppThreadByIdPluginArgs extends GetAppThreadByIdApiArgs {}
+    | GetAppThreadByAppInstanceIdPluginArgs
+    | GetAppThreadByIdPluginArgs
+    | CreateAppThreadPluginArgs
+    | UpdateAppThreadPluginArgs
+    | DeleteAppThreadPluginArgs;
 
 /// GetAppThreadByAppInstanceId
 export interface GetAppThreadByAppInstanceId {}
 export interface GetAppThreadByAppInstanceIdApiResponse extends ApiResponse {}
 export interface GetAppThreadByAppInstanceIdApiArgs {
-  appInstanceId: string;
+    appId: string;
+    instanceId: string;
 }
 export interface GetAppThreadByAppInstanceIdPluginArgs
-  extends GetAppThreadByAppInstanceIdApiArgs {}
+    extends GetAppThreadByAppInstanceIdApiArgs {}
+
+/// GetAppThreadById
+export interface GetAppThreadById {}
+export interface GetAppThreadByIdApiResponse extends ApiResponse {}
+export interface GetAppThreadByIdApiArgs {
+    appId: string;
+    instanceId: string;
+    threadId: string;
+}
+export interface GetAppThreadByIdPluginArgs extends GetAppThreadByIdApiArgs {}
 
 /// CreateAppThread
 export interface CreateAppThread {}
 export interface CreateAppThreadApiResponse extends ApiResponse {}
-export interface CreateAppThreadApiArgs extends Partial<AppThread> {
-  appInstanceId: string;
+export interface CreateAppThreadApiArgs {
+    appId: string;
+    instanceId: string;
+    thread: Partial<AppThread>;
 }
 export interface CreateAppThreadPluginArgs extends CreateAppThreadApiArgs {}
 
 /// UpdateAppThread
 export interface UpdateAppThread {}
 export interface UpdateAppThreadApiResponse extends ApiResponse {}
-export interface UpdateAppThreadApiArgs extends Partial<AppThread> {
-  id: string;
-  appInstanceId: string;
+export interface UpdateAppThreadApiArgs {
+    appId: string;
+    instanceId: string;
+    thread: Partial<AppThread>;
 }
 export interface UpdateAppThreadPluginArgs extends UpdateAppThreadApiArgs {}
 
@@ -49,7 +55,8 @@ export interface UpdateAppThreadPluginArgs extends UpdateAppThreadApiArgs {}
 export interface DeleteAppThread {}
 export interface DeleteAppThreadApiResponse extends ApiResponse {}
 export interface DeleteAppThreadApiArgs {
-  id: string;
-  appInstanceId: string;
+    appId: string;
+    instanceId: string;
+    threadId: string;
 }
 export interface DeleteAppThreadPluginArgs extends DeleteAppThreadApiArgs {}
