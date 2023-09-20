@@ -5,44 +5,49 @@ import { ApiResponse } from "./api-response";
 export interface AppPage extends Partial<PrismaAppPage> {}
 
 export type AppPagePluginArgs =
-  | GetAppPageByIdPluginArgs
-  | GetAppPageByAppInstanceIdPluginArgs
-  | CreateAppPagePluginArgs
-  | UpdateAppPagePluginArgs
-  | DeleteAppPagePluginArgs;
-
-/// GetAppPageById
-export interface GetAppPageById {}
-export interface GetAppPageByIdApiResponse extends ApiResponse {}
-export interface GetAppPageByIdApiArgs {
-  id: string;
-  appInstanceId: string;
-}
-export interface GetAppPageByIdPluginArgs extends GetAppPageByIdApiArgs {}
+    | GetAppPageByAppInstanceIdPluginArgs
+    | GetAppPageByIdPluginArgs
+    | CreateAppPagePluginArgs
+    | UpdateAppPagePluginArgs
+    | DeleteAppPagePluginArgs;
 
 /// GetAppPageByAppInstanceId
 export interface GetAppPageByAppInstanceId {}
 export interface GetAppPageByAppInstanceIdApiResponse extends ApiResponse {}
 export interface GetAppPageByAppInstanceIdApiArgs {
-  appInstanceId: string;
+    appId: string;
+    instanceId: string;
 }
 export interface GetAppPageByAppInstanceIdPluginArgs
-  extends GetAppPageByAppInstanceIdApiArgs {}
+    extends GetAppPageByAppInstanceIdApiArgs {}
+
+/// GetAppPageById
+export interface GetAppPageById {}
+export interface GetAppPageByIdApiResponse extends ApiResponse {}
+export interface GetAppPageByIdApiArgs {
+    appId: string;
+    instanceId: string;
+    pageId: string;
+}
+export interface GetAppPageByIdPluginArgs extends GetAppPageByIdApiArgs {}
 
 /// CreateAppPage
 export interface CreateAppPage {}
 export interface CreateAppPageApiResponse extends ApiResponse {}
-export interface CreateAppPageApiArgs extends Partial<AppPage> {
-  appInstanceId: string;
+export interface CreateAppPageApiArgs {
+    appId: string;
+    instanceId: string;
+    page: Partial<AppPage>;
 }
 export interface CreateAppPagePluginArgs extends CreateAppPageApiArgs {}
 
 /// UpdateAppPage
 export interface UpdateAppPage {}
 export interface UpdateAppPageApiResponse extends ApiResponse {}
-export interface UpdateAppPageApiArgs extends Partial<AppPage> {
-  id: string;
-  appInstanceId: string;
+export interface UpdateAppPageApiArgs {
+    appId: string;
+    instanceId: string;
+    page: Partial<AppPage>;
 }
 export interface UpdateAppPagePluginArgs extends UpdateAppPageApiArgs {}
 
@@ -50,7 +55,8 @@ export interface UpdateAppPagePluginArgs extends UpdateAppPageApiArgs {}
 export interface DeleteAppPage {}
 export interface DeleteAppPageApiResponse extends ApiResponse {}
 export interface DeleteAppPageApiArgs {
-  id: string;
-  appInstanceId: string;
+    appId: string;
+    instanceId: string;
+    pageId: string;
 }
 export interface DeleteAppPagePluginArgs extends DeleteAppPageApiArgs {}
