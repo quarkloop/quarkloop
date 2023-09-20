@@ -5,62 +5,12 @@ import { createPlugin } from "@quarkloop/plugin";
 import { PipelineArgs, PipelineState, PluginStatusEntry } from "./pipeline";
 
 import {
-    GetAppFileByIdPluginArgs,
     GetAppFileByAppInstanceIdPluginArgs,
+    GetAppFileByIdPluginArgs,
     CreateAppFilePluginArgs,
     UpdateAppFilePluginArgs,
     DeleteAppFilePluginArgs,
 } from "@quarkloop/types";
-
-/// GetAppFileById Plugin
-export const GetAppFileByIdPlugin = createPlugin<PipelineState, PipelineArgs[]>(
-    {
-        name: "GetAppFileByIdPlugin",
-        config: {},
-        handler: async (state, config, ...args): Promise<PipelineState> => {
-            if (state.status) {
-                return state;
-            }
-
-            if (args.length === 0 || args[0].appFile == null) {
-                return {
-                    ...state,
-                    status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
-                        "[GetAppFileByIdPlugin]"
-                    ),
-                };
-            }
-
-            const getArgs = args[0].appFile as GetAppFileByIdPluginArgs;
-
-            const record = await prisma.appFile.findUnique({
-                where: {
-                    id: getArgs.id,
-                },
-            });
-
-            if (record == null) {
-                return {
-                    ...state,
-                    status: PluginStatusEntry.NOT_FOUND(
-                        "[GetAppFileByIdPlugin]"
-                    ),
-                };
-            }
-
-            return {
-                ...state,
-                database: {
-                    ...state.database,
-                    appFile: {
-                        records: record,
-                        totalRecords: 1,
-                    },
-                },
-            };
-        },
-    }
-);
 
 /// GetAppFileByAppInstanceId Plugin
 export const GetAppFileByAppInstanceIdPlugin = createPlugin<
@@ -88,7 +38,7 @@ export const GetAppFileByAppInstanceIdPlugin = createPlugin<
         const record = await prisma.appFile.findFirst({
             where: {
                 appInstance: {
-                    id: getArgs.appInstanceId,
+                    id: getArgs.instanceId,
                 },
             },
         });
@@ -115,6 +65,56 @@ export const GetAppFileByAppInstanceIdPlugin = createPlugin<
     },
 });
 
+/// GetAppFileById Plugin
+export const GetAppFileByIdPlugin = createPlugin<PipelineState, PipelineArgs[]>(
+    {
+        name: "GetAppFileByIdPlugin",
+        config: {},
+        handler: async (state, config, ...args): Promise<PipelineState> => {
+            if (state.status) {
+                return state;
+            }
+
+            if (args.length === 0 || args[0].appFile == null) {
+                return {
+                    ...state,
+                    status: PluginStatusEntry.INTERNAL_SERVER_ERROR(
+                        "[GetAppFileByIdPlugin]"
+                    ),
+                };
+            }
+
+            const getArgs = args[0].appFile as GetAppFileByIdPluginArgs;
+
+            const record = await prisma.appFile.findUnique({
+                where: {
+                    id: getArgs.fileId,
+                },
+            });
+
+            if (record == null) {
+                return {
+                    ...state,
+                    status: PluginStatusEntry.NOT_FOUND(
+                        "[GetAppFileByIdPlugin]"
+                    ),
+                };
+            }
+
+            return {
+                ...state,
+                database: {
+                    ...state.database,
+                    appFile: {
+                        records: record,
+                        totalRecords: 1,
+                    },
+                },
+            };
+        },
+    }
+);
+
 /// CreateAppFile Plugin
 export const CreateAppFilePlugin = createPlugin<PipelineState, PipelineArgs[]>({
     name: "CreateAppFilePlugin",
@@ -140,11 +140,11 @@ export const CreateAppFilePlugin = createPlugin<PipelineState, PipelineArgs[]>({
         const record = await prisma.appFile.create({
             data: {
                 id: fileId,
-                enable: createArgs.enable!,
+                enable: createArgs.file.enable!,
                 updatedAt: new Date(),
                 appInstance: {
                     connect: {
-                        id: createArgs.appInstanceId,
+                        id: createArgs.instanceId,
                     },
                 },
             },
@@ -185,10 +185,10 @@ export const UpdateAppFilePlugin = createPlugin<PipelineState, PipelineArgs[]>({
 
         const record = await prisma.appFile.update({
             where: {
-                id: updateArgs.id,
+                id: updateArgs.file.id,
             },
             data: {
-                enable: updateArgs.enable,
+                enable: updateArgs.file.enable,
                 updatedAt: new Date(),
             },
         });
@@ -226,9 +226,9 @@ export const DeleteAppFilePlugin = createPlugin<PipelineState, PipelineArgs[]>({
 
         const record = await prisma.appFile.deleteMany({
             where: {
-                id: deleteArgs.id,
+                id: deleteArgs.fileId,
                 appInstance: {
-                    id: deleteArgs.appInstanceId,
+                    id: deleteArgs.instanceId,
                 },
             },
         });
