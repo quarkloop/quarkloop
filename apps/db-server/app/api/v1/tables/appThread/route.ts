@@ -16,8 +16,8 @@ import {
     CreateApiResponsePlugin,
     UpdateApiResponsePlugin,
     DeleteApiResponsePlugin,
-    GetAppThreadByIdPlugin,
     GetAppThreadByAppInstanceIdPlugin,
+    GetAppThreadByIdPlugin,
     CreateAppThreadPlugin,
     UpdateAppThreadPlugin,
     DeleteAppThreadPlugin,
@@ -27,21 +27,24 @@ import {
 // GetAppThreadByAppInstanceId
 export async function GET(request: Request, { params }: { params: any }) {
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-    const appInstanceId = searchParams.get("appInstanceId");
+    const appId = searchParams.get("appId");
+    const instanceId = searchParams.get("instanceId");
+    const threadId = searchParams.get("threadId");
 
     const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
         initialState: {},
     });
 
-    if (id) {
+    if (appId && instanceId && threadId) {
         const finalState = await pipeline
             .use(GetAppThreadByIdPlugin)
             .use(GetApiResponsePlugin)
             .onError(DefaultErrorHandler)
             .execute({
                 appThread: {
-                    id: id,
+                    appId,
+                    instanceId,
+                    threadId,
                 } as GetAppThreadByIdPluginArgs,
             });
 
@@ -51,14 +54,15 @@ export async function GET(request: Request, { params }: { params: any }) {
         });
     }
 
-    if (appInstanceId) {
+    if (appId && instanceId) {
         const finalState = await pipeline
             .use(GetAppThreadByAppInstanceIdPlugin)
             .use(GetApiResponsePlugin)
             .onError(DefaultErrorHandler)
             .execute({
                 appThread: {
-                    appInstanceId: appInstanceId,
+                    appId,
+                    instanceId,
                 } as GetAppThreadByAppInstanceIdPluginArgs,
             });
 
@@ -73,6 +77,10 @@ export async function GET(request: Request, { params }: { params: any }) {
 
 // CreateAppThread
 export async function POST(request: Request, { params }: { params: any }) {
+    const { searchParams } = new URL(request.url);
+    const appId = searchParams.get("appId");
+    const instanceId = searchParams.get("instanceId");
+
     const body = await request.json();
 
     const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -85,7 +93,9 @@ export async function POST(request: Request, { params }: { params: any }) {
         .onError(DefaultErrorHandler)
         .execute({
             appThread: {
-                ...body,
+                appId,
+                instanceId,
+                thread: body,
             } as CreateAppThreadPluginArgs,
         });
 
@@ -96,6 +106,10 @@ export async function POST(request: Request, { params }: { params: any }) {
 
 // UpdateAppThread
 export async function PUT(request: Request, { params }: { params: any }) {
+    const { searchParams } = new URL(request.url);
+    const appId = searchParams.get("appId");
+    const instanceId = searchParams.get("instanceId");
+
     const body = await request.json();
 
     const pipeline = createPipeline<PipelineState, PipelineArgs[]>({
@@ -108,7 +122,9 @@ export async function PUT(request: Request, { params }: { params: any }) {
         .onError(DefaultErrorHandler)
         .execute({
             appThread: {
-                ...body,
+                appId,
+                instanceId,
+                thread: body,
             } as UpdateAppThreadPluginArgs,
         });
 
@@ -120,10 +136,11 @@ export async function PUT(request: Request, { params }: { params: any }) {
 // DeleteAppThread
 export async function DELETE(request: Request, { params }: { params: any }) {
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-    const appInstanceId = searchParams.get("appInstanceId");
+    const appId = searchParams.get("appId");
+    const instanceId = searchParams.get("instanceId");
+    const threadId = searchParams.get("threadId");
 
-    if (id == null && appInstanceId == null) {
+    if (appId == null || instanceId == null || threadId == null) {
         return NextResponse.json({ status: "Bad request" }, { status: 400 });
     }
 
@@ -137,8 +154,9 @@ export async function DELETE(request: Request, { params }: { params: any }) {
         .onError(DefaultErrorHandler)
         .execute({
             appThread: {
-                id: id,
-                appInstanceId: appInstanceId,
+                appId,
+                instanceId,
+                threadId,
             } as DeleteAppThreadPluginArgs,
         });
 
