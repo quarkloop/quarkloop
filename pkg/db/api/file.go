@@ -12,7 +12,9 @@ import (
 
 func GetFileById(appId, instanceId, fileId string) (*model.File, error) {
 	params := url.Values{}
-	params.Add("id", fileId)
+	params.Add("appId", appId)
+	params.Add("instanceId", instanceId)
+	params.Add("fileId", fileId)
 
 	res, err := client.DatabaseClient.Get("http://localhost:3000/api/v1/tables/appFile", &params)
 	if err != nil {
@@ -38,12 +40,16 @@ func GetFileById(appId, instanceId, fileId string) (*model.File, error) {
 }
 
 func CreateFile(appId, instanceId string, file *model.File) (*model.File, error) {
+	params := url.Values{}
+	params.Add("appId", appId)
+	params.Add("instanceId", instanceId)
+
 	payload, err := json.Marshal(file)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := client.DatabaseClient.Post("http://localhost:3000/api/v1/tables/appFile", payload)
+	res, err := client.DatabaseClient.Post("http://localhost:3000/api/v1/tables/appFile", &params, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -67,12 +73,16 @@ func CreateFile(appId, instanceId string, file *model.File) (*model.File, error)
 }
 
 func UpdateFile(appId, instanceId string, file *model.File) (*model.File, error) {
+	params := url.Values{}
+	params.Add("appId", appId)
+	params.Add("instanceId", instanceId)
+
 	payload, err := json.Marshal(file)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := client.DatabaseClient.Update("http://localhost:3000/api/v1/tables/appFile", payload)
+	res, err := client.DatabaseClient.Update("http://localhost:3000/api/v1/tables/appFile", &params, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +107,9 @@ func UpdateFile(appId, instanceId string, file *model.File) (*model.File, error)
 
 func DeleteFile(appId, instanceId, fileId string) error {
 	params := url.Values{}
-	params.Add("id", fileId)
+	params.Add("appId", appId)
+	params.Add("instanceId", instanceId)
+	params.Add("fileId", fileId)
 
 	res, err := client.DatabaseClient.Delete("http://localhost:3000/api/v1/tables/appFile", &params)
 	if err != nil {
