@@ -5,44 +5,49 @@ import { ApiResponse } from "./api-response";
 export interface AppForm extends Partial<PrismaAppForm> {}
 
 export type AppFormPluginArgs =
-  | GetAppFormByIdPluginArgs
-  | GetAppFormByAppInstanceIdPluginArgs
-  | CreateAppFormPluginArgs
-  | UpdateAppFormPluginArgs
-  | DeleteAppFormPluginArgs;
-
-/// GetAppFormById
-export interface GetAppFormById {}
-export interface GetAppFormByIdApiResponse extends ApiResponse {}
-export interface GetAppFormByIdApiArgs {
-  id: string;
-  appInstanceId: string;
-}
-export interface GetAppFormByIdPluginArgs extends GetAppFormByIdApiArgs {}
+    | GetAppFormByAppInstanceIdPluginArgs
+    | GetAppFormByIdPluginArgs
+    | CreateAppFormPluginArgs
+    | UpdateAppFormPluginArgs
+    | DeleteAppFormPluginArgs;
 
 /// GetAppFormByAppInstanceId
 export interface GetAppFormByAppInstanceId {}
 export interface GetAppFormByAppInstanceIdApiResponse extends ApiResponse {}
 export interface GetAppFormByAppInstanceIdApiArgs {
-  appInstanceId: string;
+    appId: string;
+    instanceId: string;
 }
 export interface GetAppFormByAppInstanceIdPluginArgs
-  extends GetAppFormByAppInstanceIdApiArgs {}
+    extends GetAppFormByAppInstanceIdApiArgs {}
+
+/// GetAppFormById
+export interface GetAppFormById {}
+export interface GetAppFormByIdApiResponse extends ApiResponse {}
+export interface GetAppFormByIdApiArgs {
+    appId: string;
+    instanceId: string;
+    formId: string;
+}
+export interface GetAppFormByIdPluginArgs extends GetAppFormByIdApiArgs {}
 
 /// CreateAppForm
 export interface CreateAppForm {}
 export interface CreateAppFormApiResponse extends ApiResponse {}
-export interface CreateAppFormApiArgs extends Partial<AppForm> {
-  appInstanceId: string;
+export interface CreateAppFormApiArgs {
+    appId: string;
+    instanceId: string;
+    form: Partial<AppForm>;
 }
 export interface CreateAppFormPluginArgs extends CreateAppFormApiArgs {}
 
 /// UpdateAppForm
 export interface UpdateAppForm {}
 export interface UpdateAppFormApiResponse extends ApiResponse {}
-export interface UpdateAppFormApiArgs extends Partial<AppForm> {
-  id: string;
-  appInstanceId: string;
+export interface UpdateAppFormApiArgs {
+    appId: string;
+    instanceId: string;
+    form: Partial<AppForm>;
 }
 export interface UpdateAppFormPluginArgs extends UpdateAppFormApiArgs {}
 
@@ -50,7 +55,8 @@ export interface UpdateAppFormPluginArgs extends UpdateAppFormApiArgs {}
 export interface DeleteAppForm {}
 export interface DeleteAppFormApiResponse extends ApiResponse {}
 export interface DeleteAppFormApiArgs {
-  id: string;
-  appInstanceId: string;
+    appId: string;
+    instanceId: string;
+    formId: string;
 }
 export interface DeleteAppFormPluginArgs extends DeleteAppFormApiArgs {}
