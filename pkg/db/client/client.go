@@ -31,13 +31,16 @@ func (c *DatabaseHttpClient) Get(path string, queryParams *url.Values) (*http.Re
 	return res, nil
 }
 
-func (c *DatabaseHttpClient) Post(path string, body []byte) (*http.Response, error) {
+func (c *DatabaseHttpClient) Post(path string, queryParams *url.Values, body []byte) (*http.Response, error) {
 	req, err := http.NewRequest("POST", path, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	if queryParams != nil {
+		req.URL.RawQuery = queryParams.Encode()
+	}
 
 	client := http.Client{Timeout: 10 * time.Second}
 	res, err := client.Do(req)
@@ -48,13 +51,16 @@ func (c *DatabaseHttpClient) Post(path string, body []byte) (*http.Response, err
 	return res, nil
 }
 
-func (c *DatabaseHttpClient) Update(path string, body []byte) (*http.Response, error) {
+func (c *DatabaseHttpClient) Update(path string, queryParams *url.Values, body []byte) (*http.Response, error) {
 	req, err := http.NewRequest("PUT", path, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	if queryParams != nil {
+		req.URL.RawQuery = queryParams.Encode()
+	}
 
 	client := http.Client{Timeout: 10 * time.Second}
 	res, err := client.Do(req)
