@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/url"
 
 	"github.com/quarkloop/quarkloop/pkg/db/client"
 	"github.com/quarkloop/quarkloop/pkg/db/model"
@@ -65,4 +66,26 @@ func UpdateApp(app *model.App) (*model.App, error) {
 	}
 
 	return nil, errors.New("failed to update app")
+}
+
+func DeleteApp(appId string) error {
+	q := url.Values{}
+	q.Add("id", appId)
+
+	res, err := client.DatabaseClient.Delete("http://localhost:3000/api/v1/tables/app", &q)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode == http.StatusNoContent {
+		var payload DatabaseResponsePayload
+		if err := json.NewDecoder(res.Body).Decode(&payload); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	return errors.New("delete app failed")
 }
