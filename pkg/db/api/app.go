@@ -109,7 +109,7 @@ func CreateAppInstance(instance *model.AppInstance) (*model.AppInstance, error) 
 		}
 
 		var instance model.AppInstance
-		if err := json.Unmarshal(payload.Database.App.Records, &instance); err != nil {
+		if err := json.Unmarshal(payload.Database.AppInstance.Records, &instance); err != nil {
 			return nil, err
 		}
 
@@ -117,4 +117,33 @@ func CreateAppInstance(instance *model.AppInstance) (*model.AppInstance, error) 
 	}
 
 	return nil, errors.New("failed to create app instance")
+}
+
+func UpdateAppInstance(instance *model.AppInstance) (*model.AppInstance, error) {
+	payload, err := json.Marshal(instance)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := client.DatabaseClient.Update("http://localhost:3000/api/v1/tables/appInstance", nil, payload)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode == http.StatusCreated {
+		var payload DatabaseResponsePayload
+		if err := json.NewDecoder(res.Body).Decode(&payload); err != nil {
+			return nil, err
+		}
+
+		var instance model.AppInstance
+		if err := json.Unmarshal(payload.Database.AppInstance.Records, &instance); err != nil {
+			return nil, err
+		}
+
+		return &instance, nil
+	}
+
+	return nil, errors.New("failed to update app instance")
 }
