@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 
-	ops "github.com/quarkloop/quarkloop/pkg/ops/file"
+	app "github.com/quarkloop/quarkloop/pkg/ops/app"
+	file "github.com/quarkloop/quarkloop/pkg/ops/file"
 )
 
 type OpCall interface {
@@ -31,16 +32,25 @@ type Ops struct {
 
 var operations = Ops{
 	Ops: map[string]interface{}{
-		"GetFileById": ops.GetFileById{
+		"CreateApp": app.CreateApp{
+			Name: "CreateApp",
+		},
+		"UpdateApp": app.UpdateApp{
+			Name: "UpdateApp",
+		},
+		"DeleteApp": app.DeleteApp{
+			Name: "DeleteApp",
+		},
+		"GetFileById": file.GetFileById{
 			Name: "GetFileById",
 		},
-		"CreateFile": ops.CreateFile{
+		"CreateFile": file.CreateFile{
 			Name: "CreateFile",
 		},
-		"UpdateFile": ops.UpdateFile{
+		"UpdateFile": file.UpdateFile{
 			Name: "UpdateFile",
 		},
-		"DeleteFile": ops.DeleteFile{
+		"DeleteFile": file.DeleteFile{
 			Name: "DeleteFile",
 		},
 	},
@@ -57,16 +67,25 @@ func FindOp(appId, instanceId, opName string, args json.RawMessage) (*OpCallCata
 		}
 
 		switch val := val.(type) {
-		case ops.GetFileById:
+		case app.CreateApp:
 			catalog.CallSite = &val
 			return &catalog, nil
-		case ops.CreateFile:
+		case app.UpdateApp:
 			catalog.CallSite = &val
 			return &catalog, nil
-		case ops.UpdateFile:
+		case app.DeleteApp:
 			catalog.CallSite = &val
 			return &catalog, nil
-		case ops.DeleteFile:
+		case file.GetFileById:
+			catalog.CallSite = &val
+			return &catalog, nil
+		case file.CreateFile:
+			catalog.CallSite = &val
+			return &catalog, nil
+		case file.UpdateFile:
+			catalog.CallSite = &val
+			return &catalog, nil
+		case file.DeleteFile:
 			catalog.CallSite = &val
 			return &catalog, nil
 		}
