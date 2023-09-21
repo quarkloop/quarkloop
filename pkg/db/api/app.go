@@ -147,3 +147,25 @@ func UpdateAppInstance(instance *model.AppInstance) (*model.AppInstance, error) 
 
 	return nil, errors.New("failed to update app instance")
 }
+
+func DeleteAppInstance(appId string) error {
+	q := url.Values{}
+	q.Add("id", appId)
+
+	res, err := client.DatabaseClient.Delete("http://localhost:3000/api/v1/tables/appInstance", &q)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode == http.StatusNoContent {
+		var payload DatabaseResponsePayload
+		if err := json.NewDecoder(res.Body).Decode(&payload); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	return errors.New("delete app instance failed")
+}
