@@ -3,8 +3,8 @@ package ops
 import (
 	"encoding/json"
 
-	"github.com/quarkloop/quarkloop/pkg/db/api"
-	"github.com/quarkloop/quarkloop/pkg/db/model"
+	"github.com/quarkloop/quarkloop/pkg/ops/app/db"
+	"github.com/quarkloop/quarkloop/pkg/ops/app/model"
 )
 
 type DeleteApp struct {
@@ -15,13 +15,13 @@ type DeleteAppArgs struct {
 	App model.App `json:"app"`
 }
 
-func (op *DeleteApp) Call(appId, instanceId string, args json.RawMessage) (interface{}, error) {
+func (op *DeleteApp) Call(args json.RawMessage) (interface{}, error) {
 	var appArgs DeleteAppArgs
 	if err := json.Unmarshal(args, &appArgs); err != nil {
 		return nil, err
 	}
 
-	err := api.DeleteApp(appArgs.App.AppId)
+	err := db.DeleteApp(appArgs.App.AppId)
 	if err != nil {
 		return nil, err
 	}
