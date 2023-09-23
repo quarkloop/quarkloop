@@ -3,8 +3,8 @@ package ops
 import (
 	"encoding/json"
 
-	"github.com/quarkloop/quarkloop/pkg/db/api"
-	"github.com/quarkloop/quarkloop/pkg/db/model"
+	"github.com/quarkloop/quarkloop/pkg/ops/file/db"
+	"github.com/quarkloop/quarkloop/pkg/ops/file/model"
 )
 
 type CreateFile struct {
@@ -12,16 +12,18 @@ type CreateFile struct {
 }
 
 type CreateFileArgs struct {
-	File model.File `json:"file"`
+	AppID      string     `json:"appId" binding:"required"`
+	InstanceID string     `json:"instanceId" binding:"required"`
+	File       model.File `json:"file" binding:"required"`
 }
 
-func (op *CreateFile) Call(appId, instanceId string, args json.RawMessage) (interface{}, error) {
+func (op *CreateFile) Call(args json.RawMessage) (interface{}, error) {
 	var fileArgs CreateFileArgs
 	if err := json.Unmarshal(args, &fileArgs); err != nil {
 		return nil, err
 	}
 
-	file, err := api.CreateFile(appId, instanceId, &fileArgs.File)
+	file, err := db.CreateFile(fileArgs.AppID, fileArgs.InstanceID, &fileArgs.File)
 	if err != nil {
 		return nil, err
 	}
