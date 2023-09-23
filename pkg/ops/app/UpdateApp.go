@@ -3,8 +3,8 @@ package ops
 import (
 	"encoding/json"
 
-	"github.com/quarkloop/quarkloop/pkg/db/api"
-	"github.com/quarkloop/quarkloop/pkg/db/model"
+	"github.com/quarkloop/quarkloop/pkg/ops/app/db"
+	"github.com/quarkloop/quarkloop/pkg/ops/app/model"
 )
 
 type UpdateApp struct {
@@ -12,16 +12,17 @@ type UpdateApp struct {
 }
 
 type UpdateAppArgs struct {
-	App model.App `json:"app"`
+	AppID string    `json:"appId" binding:"required"`
+	App   model.App `json:"app"`
 }
 
-func (op *UpdateApp) Call(appId, instanceId string, args json.RawMessage) (interface{}, error) {
+func (op *UpdateApp) Call(args json.RawMessage) (interface{}, error) {
 	var appArgs UpdateAppArgs
 	if err := json.Unmarshal(args, &appArgs); err != nil {
 		return nil, err
 	}
 
-	app, err := api.UpdateApp(&appArgs.App)
+	app, err := db.UpdateApp(&appArgs.App)
 	if err != nil {
 		return nil, err
 	}
