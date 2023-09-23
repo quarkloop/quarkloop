@@ -9,7 +9,7 @@ import (
 )
 
 type OpCall interface {
-	Call(appId, instanceId string, args json.RawMessage) (interface{}, error)
+	Call(args json.RawMessage) (interface{}, error)
 }
 
 type OpCallCatalog struct {
@@ -32,6 +32,7 @@ type Ops struct {
 
 var operations = Ops{
 	Ops: map[string]interface{}{
+		// App
 		"CreateApp": app.CreateApp{
 			Name: "CreateApp",
 		},
@@ -41,6 +42,17 @@ var operations = Ops{
 		"DeleteApp": app.DeleteApp{
 			Name: "DeleteApp",
 		},
+		// AppInstance
+		"CreateAppInstance": app.CreateAppInstance{
+			Name: "CreateAppInstance",
+		},
+		"UpdateAppInstance": app.UpdateAppInstance{
+			Name: "UpdateAppInstance",
+		},
+		"DeleteAppInstance": app.DeleteAppInstance{
+			Name: "DeleteAppInstance",
+		},
+		// File
 		"GetFileById": file.GetFileById{
 			Name: "GetFileById",
 		},
@@ -56,17 +68,16 @@ var operations = Ops{
 	},
 }
 
-func FindOp(appId, instanceId, opName string, args json.RawMessage) (*OpCallCatalog, error) {
+func FindOp(opName string, args json.RawMessage) (*OpCallCatalog, error) {
 	val, ok := operations.Ops[opName]
 	if ok {
 		catalog := OpCallCatalog{
-			AppId:      appId,
-			InstanceId: instanceId,
-			Name:       opName,
-			Args:       args,
+			Name: opName,
+			Args: args,
 		}
 
 		switch val := val.(type) {
+		// App
 		case app.CreateApp:
 			catalog.CallSite = &val
 			return &catalog, nil
@@ -76,6 +87,17 @@ func FindOp(appId, instanceId, opName string, args json.RawMessage) (*OpCallCata
 		case app.DeleteApp:
 			catalog.CallSite = &val
 			return &catalog, nil
+		// AppInstance
+		case app.CreateAppInstance:
+			catalog.CallSite = &val
+			return &catalog, nil
+		case app.UpdateAppInstance:
+			catalog.CallSite = &val
+			return &catalog, nil
+		case app.DeleteAppInstance:
+			catalog.CallSite = &val
+			return &catalog, nil
+		// File
 		case file.GetFileById:
 			catalog.CallSite = &val
 			return &catalog, nil
@@ -97,7 +119,7 @@ func FindOp(appId, instanceId, opName string, args json.RawMessage) (*OpCallCata
 }
 
 func (opc *OpCallCatalog) Exec() (interface{}, error) {
-	res, err := opc.CallSite.Call(opc.AppId, opc.InstanceId, opc.Args)
+	res, err := opc.CallSite.Call(opc.Args)
 	if err != nil {
 		return nil, err
 	}
