@@ -3,7 +3,7 @@ package ops
 import (
 	"encoding/json"
 
-	"github.com/quarkloop/quarkloop/pkg/db/api"
+	"github.com/quarkloop/quarkloop/pkg/ops/file/db"
 )
 
 type GetFileById struct {
@@ -11,7 +11,9 @@ type GetFileById struct {
 }
 
 type GetFileByIdArgs struct {
-	FileId string `json:"fileId"`
+	AppID      string `json:"appId" binding:"required"`
+	InstanceID string `json:"instanceId" binding:"required"`
+	FileId     string `json:"fileId" binding:"required"`
 }
 
 func (op *GetFileById) Call(appId, instanceId string, args json.RawMessage) (interface{}, error) {
@@ -20,7 +22,7 @@ func (op *GetFileById) Call(appId, instanceId string, args json.RawMessage) (int
 		return nil, err
 	}
 
-	file, err := api.GetFileById(appId, instanceId, fileArgs.FileId)
+	file, err := db.GetFileById(fileArgs.AppID, fileArgs.InstanceID, fileArgs.FileId)
 	if err != nil {
 		return nil, err
 	}
