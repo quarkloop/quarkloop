@@ -34,36 +34,46 @@ var operations = Ops{
 	Ops: map[string]interface{}{
 		// App
 		"CreateApp": app.CreateApp{
-			Name: "CreateApp",
+			Name:    "CreateApp",
+			Version: "latest",
 		},
 		"UpdateApp": app.UpdateApp{
-			Name: "UpdateApp",
+			Name:    "UpdateApp",
+			Version: "latest",
 		},
 		"DeleteApp": app.DeleteApp{
-			Name: "DeleteApp",
+			Name:    "DeleteApp",
+			Version: "latest",
 		},
 		// AppInstance
 		"CreateAppInstance": app.CreateAppInstance{
-			Name: "CreateAppInstance",
+			Name:    "CreateAppInstance",
+			Version: "latest",
 		},
 		"UpdateAppInstance": app.UpdateAppInstance{
-			Name: "UpdateAppInstance",
+			Name:    "UpdateAppInstance",
+			Version: "latest",
 		},
 		"DeleteAppInstance": app.DeleteAppInstance{
-			Name: "DeleteAppInstance",
+			Name:    "DeleteAppInstance",
+			Version: "latest",
 		},
 		// File
 		"GetFileById": file.GetFileById{
-			Name: "GetFileById",
+			Name:    "GetFileById",
+			Version: "latest",
 		},
 		"CreateFile": file.CreateFile{
-			Name: "CreateFile",
+			Name:    "CreateFile",
+			Version: "latest",
 		},
 		"UpdateFile": file.UpdateFile{
-			Name: "UpdateFile",
+			Name:    "UpdateFile",
+			Version: "latest",
 		},
 		"DeleteFile": file.DeleteFile{
-			Name: "DeleteFile",
+			Name:    "DeleteFile",
+			Version: "latest",
 		},
 	},
 }
