@@ -2,31 +2,24 @@ package ops
 
 import (
 	"encoding/json"
+	"errors"
 
-	"github.com/quarkloop/quarkloop/pkg/ops/file/db"
-	"github.com/quarkloop/quarkloop/pkg/ops/file/model"
+	"github.com/quarkloop/quarkloop/pkg/ops/file/impl"
 )
 
 type UpdateFile struct {
-	Name string `json:"name"`
+	Name    string `json:"name"`
+	Version string `json:"version"`
 }
 
-type UpdateFileArgs struct {
-	AppID      string     `json:"appId" binding:"required"`
-	InstanceID string     `json:"instanceId" binding:"required"`
-	File       model.File `json:"file" binding:"required"`
-}
-
-func (op *UpdateFile) Call(appId, instanceId string, args json.RawMessage) (interface{}, error) {
-	var fileArgs UpdateFileArgs
-	if err := json.Unmarshal(args, &fileArgs); err != nil {
-		return nil, err
+func (op *UpdateFile) Call(args json.RawMessage) (interface{}, error) {
+	if op.Version == "latest" {
+		val, err := impl.UpdateFile(args)
+		if err != nil {
+			return nil, err
+		}
+		return val, nil
 	}
 
-	file, err := db.UpdateFile(fileArgs.AppID, fileArgs.InstanceID, &fileArgs.File)
-	if err != nil {
-		return nil, err
-	}
-
-	return file, nil
+	return nil, errors.New("failed to call op")
 }
