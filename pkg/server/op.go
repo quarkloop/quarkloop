@@ -9,22 +9,26 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/ops"
 )
 
+// type OpArg struct {
+// 	AppID      string          `json:"appId" binding:"required"`
+// 	InstanceID string          `json:"instanceId" binding:"required"`
+// 	Args       json.RawMessage `json:"args" binding:"required"`
+// }
+
 type OpCallRequestPayload struct {
-	AppID      string `json:"appId" binding:"required"`
-	InstanceID string `json:"instanceId" binding:"required"`
-	Call       struct {
-		Name string          `json:"name" binding:"required"`
-		Args json.RawMessage `json:"args" binding:"required"`
-	} `json:"call" binding:"required"`
+	Op   string          `json:"op" binding:"required"`
+	Args json.RawMessage `json:"args" binding:"required"`
 }
 
-type OpCallResponsePayload struct {
-	Status       int         `json:"status,omitempty"`
-	StatusString string      `json:"statusText,omitempty"`
-	Error        error       `json:"error,omitempty"`
-	ErrorString  string      `json:"errorString,omitempty"`
-	AppInstance  interface{} `json:"appInstance,omitempty"`
-}
+type BatchOpCallRequestPayload = []OpCallRequestPayload
+
+// type OpCallResponsePayload struct {
+// 	Status       int         `json:"status,omitempty"`
+// 	StatusString string      `json:"statusText,omitempty"`
+// 	Error        error       `json:"error,omitempty"`
+// 	ErrorString  string      `json:"errorString,omitempty"`
+// 	AppInstance  interface{} `json:"appInstance,omitempty"`
+// }
 
 func (s *Server) HandleCallOp(c *gin.Context) {
 	payload := &OpCallRequestPayload{}
@@ -39,7 +43,7 @@ func (s *Server) HandleCallOp(c *gin.Context) {
 		return
 	}
 
-	catalog, err := ops.FindOp(payload.AppID, payload.InstanceID, payload.Call.Name, payload.Call.Args)
+	catalog, err := ops.FindOp(payload.Op, payload.Args)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, AppResponsePayload{
 			Status:       http.StatusNotFound,
