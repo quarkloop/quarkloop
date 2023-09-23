@@ -3,8 +3,8 @@ package ops
 import (
 	"encoding/json"
 
-	"github.com/quarkloop/quarkloop/pkg/db/api"
-	"github.com/quarkloop/quarkloop/pkg/db/model"
+	"github.com/quarkloop/quarkloop/pkg/ops/app/db"
+	"github.com/quarkloop/quarkloop/pkg/ops/app/model"
 )
 
 type CreateApp struct {
@@ -15,13 +15,13 @@ type CreateAppArgs struct {
 	App model.App `json:"app"`
 }
 
-func (op *CreateApp) Call(appId, instanceId string, args json.RawMessage) (interface{}, error) {
+func (op *CreateApp) Call(args json.RawMessage) (interface{}, error) {
 	var appArgs CreateAppArgs
 	if err := json.Unmarshal(args, &appArgs); err != nil {
 		return nil, err
 	}
 
-	app, err := api.CreateApp(&appArgs.App)
+	app, err := db.CreateApp(&appArgs.App)
 	if err != nil {
 		return nil, err
 	}
