@@ -3,7 +3,7 @@ package ops
 import (
 	"encoding/json"
 
-	"github.com/quarkloop/quarkloop/pkg/db/api"
+	"github.com/quarkloop/quarkloop/pkg/ops/file/db"
 )
 
 type DeleteFile struct {
@@ -11,16 +11,18 @@ type DeleteFile struct {
 }
 
 type DeleteFileArgs struct {
-	FileId string `json:"fileId"`
+	AppID      string `json:"appId" binding:"required"`
+	InstanceID string `json:"instanceId" binding:"required"`
+	FileId     string `json:"fileId" binding:"required"`
 }
 
-func (op *DeleteFile) Call(appId, instanceId string, args json.RawMessage) (interface{}, error) {
+func (op *DeleteFile) Call(args json.RawMessage) (interface{}, error) {
 	var fileArgs DeleteFileArgs
 	if err := json.Unmarshal(args, &fileArgs); err != nil {
 		return nil, err
 	}
 
-	err := api.DeleteFile(appId, instanceId, fileArgs.FileId)
+	err := db.DeleteFile(fileArgs.AppID, fileArgs.InstanceID, fileArgs.FileId)
 	if err != nil {
 		return nil, err
 	}
