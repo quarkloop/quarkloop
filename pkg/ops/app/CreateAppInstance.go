@@ -2,29 +2,24 @@ package ops
 
 import (
 	"encoding/json"
+	"errors"
 
-	"github.com/quarkloop/quarkloop/pkg/ops/app/db"
-	"github.com/quarkloop/quarkloop/pkg/ops/app/model"
+	"github.com/quarkloop/quarkloop/pkg/ops/app/impl"
 )
 
 type CreateAppInstance struct {
-	Name string `json:"name"`
-}
-
-type CreateAppInstanceArgs struct {
-	AppInstance model.AppInstance `json:"appInstance"`
+	Name    string `json:"name"`
+	Version string `json:"version"`
 }
 
 func (op *CreateAppInstance) Call(args json.RawMessage) (interface{}, error) {
-	var appInstanceArgs CreateAppInstanceArgs
-	if err := json.Unmarshal(args, &appInstanceArgs); err != nil {
-		return nil, err
+	if op.Version == "latest" {
+		val, err := impl.CreateAppInstance(args)
+		if err != nil {
+			return nil, err
+		}
+		return val, nil
 	}
 
-	appInstance, err := db.CreateAppInstance(&appInstanceArgs.AppInstance)
-	if err != nil {
-		return nil, err
-	}
-
-	return appInstance, nil
+	return nil, errors.New("failed to call op")
 }
