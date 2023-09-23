@@ -2,30 +2,24 @@ package ops
 
 import (
 	"encoding/json"
+	"errors"
 
-	"github.com/quarkloop/quarkloop/pkg/ops/file/db"
+	"github.com/quarkloop/quarkloop/pkg/ops/file/impl"
 )
 
 type GetFileById struct {
-	Name string `json:"name"`
+	Name    string `json:"name"`
+	Version string `json:"version"`
 }
 
-type GetFileByIdArgs struct {
-	AppID      string `json:"appId" binding:"required"`
-	InstanceID string `json:"instanceId" binding:"required"`
-	FileId     string `json:"fileId" binding:"required"`
-}
-
-func (op *GetFileById) Call(appId, instanceId string, args json.RawMessage) (interface{}, error) {
-	var fileArgs GetFileByIdArgs
-	if err := json.Unmarshal(args, &fileArgs); err != nil {
-		return nil, err
+func (op *GetFileById) Call(args json.RawMessage) (interface{}, error) {
+	if op.Version == "latest" {
+		val, err := impl.GetFileById(args)
+		if err != nil {
+			return nil, err
+		}
+		return val, nil
 	}
 
-	file, err := db.GetFileById(fileArgs.AppID, fileArgs.InstanceID, fileArgs.FileId)
-	if err != nil {
-		return nil, err
-	}
-
-	return file, nil
+	return nil, errors.New("failed to call op")
 }
