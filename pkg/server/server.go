@@ -1,16 +1,38 @@
 package server
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"os"
-	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/quarkloop/quarkloop/pkg/types"
 )
+
+type AppRequestPayload struct {
+	App types.App `json:"app"`
+}
+
+type AppResponsePayload struct {
+	Status       int         `json:"status,omitempty"`
+	StatusString string      `json:"statusText,omitempty"`
+	Error        error       `json:"error,omitempty"`
+	ErrorString  string      `json:"errorString,omitempty"`
+	App          interface{} `json:"app,omitempty"`
+}
+
+type AppInstanceRequestPayload struct {
+	AppInstance types.AppInstance `json:"appInstance"`
+}
+
+type AppInstanceResponsePayload struct {
+	Status       int         `json:"status,omitempty"`
+	StatusString string      `json:"statusText,omitempty"`
+	Error        error       `json:"error,omitempty"`
+	ErrorString  string      `json:"errorString,omitempty"`
+	AppInstance  interface{} `json:"appInstance,omitempty"`
+}
 
 type Server struct {
 	Status int
@@ -61,152 +83,5 @@ func (s *Server) BindHandlers() {
 	router := s.Router
 
 	app := router.Group("/api/v1/apps")
-	// App
-	{
-		app.GET("", s.HandleGetApps)
-		app.POST("", s.HandleCreateApp)
-
-		app.GET("/:appId", s.HandleGetApp)
-		app.PUT("/:appId", s.HandleUpdateApp)
-		app.DELETE("/:appId", s.HandleDeleteApp)
-	}
-	// App Instance
-	{
-		app.GET("/:appId/instances", s.HandleGetAppInstances)
-		app.POST("/:appId/instances", s.HandleCreateAppInstance)
-
-		app.GET("/:appId/instances/:instanceId", s.HandleGetAppInstance)
-		app.PUT("/:appId/instances/:instanceId", s.HandleUpdateAppInstance)
-		app.DELETE("/:appId/instances/:instanceId", s.HandleDeleteAppInstance)
-	}
-	// Op call
-	{
-		//app.GET("/:appId/instances/:instanceId/call", s.HandleGetOps)
-		app.POST("/call", s.HandleCallOp)
-	}
-	// AppFileSettings
-	{
-		app.GET("/:appId/settings/files", s.HandleGetFileSettings)
-		app.POST("/:appId/settings/files", s.HandleCreateFileSettings)
-		app.PUT("/:appId/settings/files", s.HandleUpdateFileSettings)
-		app.DELETE("/:appId/settings/files", s.HandleDeleteFileSettings)
-	}
-
-	// AppThreadSettings
-	{
-		app.GET("/:appId/settings/threads", s.HandleGetThreadSettings)
-		app.POST("/:appId/settings/threads", s.HandleCreateThreadSettings)
-		app.PUT("/:appId/settings/threads", s.HandleUpdateThreadSettings)
-		app.DELETE("/:appId/settings/threads", s.HandleDeleteThreadSettings)
-	}
-
-	// AppFormSettings
-	{
-		app.GET("/:appId/settings/forms", s.HandleGetFormSettings)
-		app.POST("/:appId/settings/forms", s.HandleCreateFormSettings)
-		app.PUT("/:appId/settings/forms", s.HandleUpdateFormSettings)
-		app.DELETE("/:appId/settings/forms", s.HandleDeleteFormSettings)
-	}
-	// AppPageSettings
-	{
-		app.GET("/:appId/settings/pages", s.HandleGetPageSettings)
-		app.POST("/:appId/settings/pages", s.HandleCreatePageSettings)
-		app.PUT("/:appId/settings/pages", s.HandleUpdatePageSettings)
-		app.DELETE("/:appId/settings/pages", s.HandleDeletePageSettings)
-	}
-	// AppThread
-	{
-		app.GET("/:appId/instances/:instanceId/thread", s.HandleGetThreadOps)
-		app.POST("/:appId/instances/:instanceId/thread", s.HandleCallThreadOp)
-
-		// app.GET("/:appId/instances/:instanceId/threads", s.HandleGetThreads)
-		// app.POST("/:appId/instances/:instanceId/threads", s.HandleCreateThread)
-
-		// app.GET("/:appId/instances/:instanceId/threads/:threadId", s.HandleGetThread)
-		// app.PUT("/:appId/instances/:instanceId/threads/:threadId", s.HandleUpdateThread)
-		// app.DELETE("/:appId/instances/:instanceId/threads/:threadId", s.HandleDeleteThread)
-	}
-	// AppFile
-	{
-		app.GET("/:appId/instances/:instanceId/file", s.HandleGetFileOps)
-		app.POST("/:appId/instances/:instanceId/file", s.HandleCallFileOp)
-
-		// app.GET("/:appId/instances/:instanceId/files", s.HandleGetFiles)
-		// app.POST("/:appId/instances/:instanceId/files", s.HandleCreateFile)
-
-		// app.GET("/:appId/instances/:instanceId/files/:fileId", s.HandleGetFile)
-		// app.PUT("/:appId/instances/:instanceId/files/:fileId", s.HandleUpdateFile)
-		// app.DELETE("/:appId/instances/:instanceId/files/:fileId", s.HandleDeleteFile)
-	}
-	// AppForm
-	{
-		app.GET("/:appId/instances/:instanceId/form", s.HandleGetFormOps)
-		app.POST("/:appId/instances/:instanceId/form", s.HandleCallFormOp)
-
-		// app.GET("/:appId/instances/:instanceId/forms", s.HandleGetForms)
-		// app.POST("/:appId/instances/:instanceId/forms", s.HandleCreateForm)
-
-		// app.GET("/:appId/instances/:instanceId/forms/:formId", s.HandleGetForm)
-		// app.PUT("/:appId/instances/:instanceId/forms/:formId", s.HandleUpdateForm)
-		// app.DELETE("/:appId/instances/:instanceId/forms/:formId", s.HandleDeleteForm)
-	}
-	// AppPage
-	{
-		app.GET("/:appId/instances/:instanceId/page", s.HandleGetPageOps)
-		app.POST("/:appId/instances/:instanceId/page", s.HandleCallPageOp)
-
-		// app.GET("/:appId/instances/:instanceId/pages", s.HandleGetPages)
-		// app.POST("/:appId/instances/:instanceId/pages", s.HandleCreatePage)
-
-		// app.GET("/:appId/instances/:instanceId/pages/:pageId", s.HandleGetPage)
-		// app.PUT("/:appId/instances/:instanceId/pages/:pageId", s.HandleUpdatePage)
-		// app.DELETE("/:appId/instances/:instanceId/pages/:pageId", s.HandleDeletePage)
-	}
-}
-
-func (s *Server) Database(
-	c *gin.Context,
-	method, path string,
-	buf []byte,
-	queryParams *url.Values,
-) (*http.Response, error) {
-	// res, err := client.DatabaseClient.Get(path, queryParams)
-	// if err != nil {
-	// 	c.AbortWithStatusJSON(http.StatusBadRequest, AppResponsePayload{
-	// 		Status:       http.StatusInternalServerError,
-	// 		StatusString: "InternalServerError",
-	// 		Error:        err,
-	// 		ErrorString:  fmt.Sprintf("[Get] %s", err.Error()),
-	// 	})
-	// 	return nil, err
-	// }
-
-	req, err := http.NewRequest(method, path, bytes.NewBuffer(buf))
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, AppResponsePayload{
-			Status:       http.StatusInternalServerError,
-			StatusString: "InternalServerError",
-			Error:        err,
-			ErrorString:  fmt.Sprintf("[NewRequest] %s", err.Error()),
-		})
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
-	if queryParams != nil {
-		req.URL.RawQuery = queryParams.Encode()
-	}
-
-	client := http.Client{Timeout: 10 * time.Second}
-	res, err := client.Do(req)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, AppResponsePayload{
-			Status:       http.StatusBadRequest,
-			StatusString: "BadRequest",
-			Error:        err,
-			ErrorString:  fmt.Sprintf("[Client] %s", err.Error()),
-		})
-		return nil, err
-	}
-
-	return res, nil
+	app.POST("/call", s.HandleCallOp)
 }
