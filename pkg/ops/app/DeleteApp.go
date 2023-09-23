@@ -2,29 +2,24 @@ package ops
 
 import (
 	"encoding/json"
+	"errors"
 
-	"github.com/quarkloop/quarkloop/pkg/ops/app/db"
-	"github.com/quarkloop/quarkloop/pkg/ops/app/model"
+	"github.com/quarkloop/quarkloop/pkg/ops/app/impl"
 )
 
 type DeleteApp struct {
-	Name string `json:"name"`
-}
-
-type DeleteAppArgs struct {
-	App model.App `json:"app"`
+	Name    string `json:"name"`
+	Version string `json:"version"`
 }
 
 func (op *DeleteApp) Call(args json.RawMessage) (interface{}, error) {
-	var appArgs DeleteAppArgs
-	if err := json.Unmarshal(args, &appArgs); err != nil {
-		return nil, err
+	if op.Version == "latest" {
+		val, err := impl.DeleteApp(args)
+		if err != nil {
+			return nil, err
+		}
+		return val, nil
 	}
 
-	err := db.DeleteApp(appArgs.App.AppId)
-	if err != nil {
-		return nil, err
-	}
-
-	return nil, nil
+	return nil, errors.New("failed to call op")
 }
