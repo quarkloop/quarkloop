@@ -8,7 +8,13 @@ import (
 )
 
 type CreateAppInstanceArgs struct {
-	AppInstance model.AppInstance `json:"appInstance"`
+	Data struct {
+		AppInstance model.AppInstance `json:"appInstance" binding:"required"`
+	} `json:"data" binding:"required"`
+	Select *struct {
+		Id   *bool `json:"id"`
+		Name *bool `json:"name"`
+	} `json:"select"`
 }
 
 func CreateAppInstance(args json.RawMessage) (interface{}, error) {
@@ -17,7 +23,7 @@ func CreateAppInstance(args json.RawMessage) (interface{}, error) {
 		return nil, err
 	}
 
-	appInstance, err := db.CreateAppInstance(&appInstanceArgs.AppInstance)
+	appInstance, err := db.CreateAppInstance(&appInstanceArgs.Data.AppInstance)
 	if err != nil {
 		return nil, err
 	}
