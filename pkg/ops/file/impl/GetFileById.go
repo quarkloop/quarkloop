@@ -7,9 +7,15 @@ import (
 )
 
 type GetFileByIdArgs struct {
-	AppID      string `json:"appId" binding:"required"`
-	InstanceID string `json:"instanceId" binding:"required"`
-	FileId     string `json:"fileId" binding:"required"`
+	Where struct {
+		AppId      string `json:"appId" binding:"required"`
+		InstanceId string `json:"instanceId" binding:"required"`
+		FileId     string `json:"fileId" binding:"required"`
+	} `json:"where" binding:"required"`
+	Select *struct {
+		Id   *bool `json:"id"`
+		Name *bool `json:"name"`
+	} `json:"select"`
 }
 
 func GetFileById(args json.RawMessage) (interface{}, error) {
@@ -18,7 +24,7 @@ func GetFileById(args json.RawMessage) (interface{}, error) {
 		return nil, err
 	}
 
-	file, err := db.GetFileById(fileArgs.AppID, fileArgs.InstanceID, fileArgs.FileId)
+	file, err := db.GetFileById(fileArgs.Where.AppId, fileArgs.Where.InstanceId, fileArgs.Where.FileId)
 	if err != nil {
 		return nil, err
 	}
