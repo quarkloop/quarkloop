@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 
 	"github.com/quarkloop/quarkloop/pkg/ops/app/db"
-	"github.com/quarkloop/quarkloop/pkg/ops/app/model"
 )
 
 type DeleteAppInstanceArgs struct {
-	AppID       string            `json:"appId" binding:"required"`
-	AppInstance model.AppInstance `json:"appInstance"`
+	Where struct {
+		AppId      string `json:"appId" binding:"required"`
+		InstanceId string `json:"instanceId" binding:"required"`
+	} `json:"where" binding:"required"`
 }
 
 func DeleteAppInstance(args json.RawMessage) (interface{}, error) {
@@ -18,7 +19,7 @@ func DeleteAppInstance(args json.RawMessage) (interface{}, error) {
 		return nil, err
 	}
 
-	err := db.DeleteAppInstance(appInstanceArgs.AppInstance.AppId)
+	err := db.DeleteAppInstance(appInstanceArgs.Where.InstanceId)
 	if err != nil {
 		return nil, err
 	}
