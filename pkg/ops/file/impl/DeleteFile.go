@@ -7,9 +7,11 @@ import (
 )
 
 type DeleteFileArgs struct {
-	AppID      string `json:"appId" binding:"required"`
-	InstanceID string `json:"instanceId" binding:"required"`
-	FileId     string `json:"fileId" binding:"required"`
+	Where struct {
+		AppId      string `json:"appId" binding:"required"`
+		InstanceId string `json:"instanceId" binding:"required"`
+		FileId     string `json:"fileId" binding:"required"`
+	} `json:"where" binding:"required"`
 }
 
 func DeleteFile(args json.RawMessage) (interface{}, error) {
@@ -18,7 +20,7 @@ func DeleteFile(args json.RawMessage) (interface{}, error) {
 		return nil, err
 	}
 
-	err := db.DeleteFile(fileArgs.AppID, fileArgs.InstanceID, fileArgs.FileId)
+	err := db.DeleteFile(fileArgs.Where.AppId, fileArgs.Where.InstanceId, fileArgs.Where.FileId)
 	if err != nil {
 		return nil, err
 	}
