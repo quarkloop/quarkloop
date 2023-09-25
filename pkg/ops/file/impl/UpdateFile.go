@@ -8,9 +8,17 @@ import (
 )
 
 type UpdateFileArgs struct {
-	AppID      string     `json:"appId" binding:"required"`
-	InstanceID string     `json:"instanceId" binding:"required"`
-	File       model.File `json:"file" binding:"required"`
+	Where struct {
+		AppId      string `json:"appId" binding:"required"`
+		InstanceId string `json:"instanceId" binding:"required"`
+	} `json:"where" binding:"required"`
+	Data struct {
+		File model.File `json:"file" binding:"required"`
+	} `json:"data" binding:"required"`
+	Select *struct {
+		Id   *bool `json:"id"`
+		Name *bool `json:"name"`
+	} `json:"select"`
 }
 
 func UpdateFile(args json.RawMessage) (interface{}, error) {
@@ -19,7 +27,7 @@ func UpdateFile(args json.RawMessage) (interface{}, error) {
 		return nil, err
 	}
 
-	file, err := db.UpdateFile(fileArgs.AppID, fileArgs.InstanceID, &fileArgs.File)
+	file, err := db.UpdateFile(fileArgs.Where.AppId, fileArgs.Where.InstanceId, &fileArgs.Data.File)
 	if err != nil {
 		return nil, err
 	}
