@@ -8,8 +8,16 @@ import (
 )
 
 type UpdateAppArgs struct {
-	AppID string    `json:"appId" binding:"required"`
-	App   model.App `json:"app"`
+	Where struct {
+		AppId string `json:"appId" binding:"required"`
+	} `json:"where" binding:"required"`
+	Data struct {
+		App model.App `json:"app" binding:"required"`
+	} `json:"data" binding:"required"`
+	Select *struct {
+		Id   *bool `json:"id"`
+		Name *bool `json:"name"`
+	} `json:"select"`
 }
 
 func UpdateApp(args json.RawMessage) (interface{}, error) {
@@ -18,7 +26,7 @@ func UpdateApp(args json.RawMessage) (interface{}, error) {
 		return nil, err
 	}
 
-	app, err := db.UpdateApp(&appArgs.App)
+	app, err := db.UpdateApp(&appArgs.Data.App)
 	if err != nil {
 		return nil, err
 	}
