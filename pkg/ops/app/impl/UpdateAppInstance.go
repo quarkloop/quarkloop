@@ -8,8 +8,17 @@ import (
 )
 
 type UpdateAppInstanceArgs struct {
-	AppID       string            `json:"appId" binding:"required"`
-	AppInstance model.AppInstance `json:"appInstance"`
+	Where struct {
+		AppId      string `json:"appId" binding:"required"`
+		InstanceId string `json:"instanceId" binding:"required"`
+	} `json:"where" binding:"required"`
+	Data struct {
+		AppInstance model.AppInstance `json:"appInstance" binding:"required"`
+	} `json:"data" binding:"required"`
+	Select *struct {
+		Id   *bool `json:"id"`
+		Name *bool `json:"name"`
+	} `json:"select"`
 }
 
 func UpdateAppInstance(args json.RawMessage) (interface{}, error) {
@@ -18,7 +27,7 @@ func UpdateAppInstance(args json.RawMessage) (interface{}, error) {
 		return nil, err
 	}
 
-	appInstance, err := db.UpdateAppInstance(&appInstanceArgs.AppInstance)
+	appInstance, err := db.UpdateAppInstance(&appInstanceArgs.Data.AppInstance)
 	if err != nil {
 		return nil, err
 	}
