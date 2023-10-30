@@ -3,9 +3,10 @@
   "compilerOptions": {
     "target": "es5",
     "jsx": "preserve",
+    "strict": true,
     "baseUrl": ".",
     "resolveJsonModule": true
   },
-  "include": ["src", "index.ts"],
+  "include": ["."],
   "exclude": ["dist", "build", "node_modules"]
 }
