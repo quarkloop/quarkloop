@@ -1,13 +1,9 @@
 {
   "name": "@quarkloop/types",
   "version": "0.0.0",
+  "private": true,
   "main": "index.ts",
-  "type": "module",
-  "devDependencies": {
-    "@quarkloop/tsconfig": "workspace:*",
-    "typescript": "5.1.3"
-  },
   "dependencies": {
-    "@quarkloop/prisma": "workspace:*"
+    "zod": "^3.22.4"
   }
 }
