@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 
@@ -58,14 +60,14 @@ func (r *Repository) ListOperatingSystems(p *ListOperatingSystemsParams) ([]mode
 	return osList, nil
 }
 
-/// GetOperatingSystemById
+/// FindUniqueOperatingSystem
 
-type GetOperatingSystemByIdParams struct {
+type FindUniqueOperatingSystemParams struct {
 	Context context.Context
 	Id      string
 }
 
-const getOperatingSystemByIdQuery = `
+const findUniqueOperatingSystemQuery = `
 SELECT 
   "id", "name", "description", "path", "createdAt", "updatedAt"
 FROM 
@@ -74,8 +76,73 @@ WHERE
   "id" = @id;
 `
 
-func (r *Repository) GetOperatingSystemById(p *GetOperatingSystemByIdParams) (*model.OperatingSystem, error) {
-	row := r.Conn.QueryRow(p.Context, getOperatingSystemByIdQuery, pgx.NamedArgs{"id": p.Id})
+func (r *Repository) FindUniqueOperatingSystem(p *FindUniqueOperatingSystemParams) (*model.OperatingSystem, error) {
+	row := r.Conn.QueryRow(p.Context, findUniqueOperatingSystemQuery, pgx.NamedArgs{"id": p.Id})
+
+	var operatingSystem model.OperatingSystem
+	err := row.Scan(
+		&operatingSystem.Id,
+		&operatingSystem.Name,
+		&operatingSystem.Description,
+		&operatingSystem.Path,
+		&operatingSystem.CreatedAt,
+		&operatingSystem.UpdatedAt,
+	)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
+		return nil, err
+	}
+
+	return &operatingSystem, nil
+}
+
+/// FindFirstOperatingSystem
+
+type FindFirstOperatingSystemParams struct {
+	Context         context.Context
+	OperatingSystem model.OperatingSystem
+}
+
+const findFirstOperatingSystemQuery = `
+SELECT 
+  "id", "name", "description", "path", "createdAt", "updatedAt"
+FROM 
+  "app"."OperatingSystem" 
+WHERE
+`
+
+func (r *Repository) FindFirstOperatingSystem(p *FindFirstOperatingSystemParams) (*model.OperatingSystem, error) {
+	availableFields := []string{}
+	operatingSystemFields := map[string]interface{}{
+		"id":        p.OperatingSystem.Id,
+		"name":      p.OperatingSystem.Name,
+		"path":      p.OperatingSystem.Path,
+		"createdAt": p.OperatingSystem.CreatedAt,
+		"updatedAt": p.OperatingSystem.UpdatedAt,
+	}
+	for key, value := range operatingSystemFields {
+		switch v := value.(type) {
+		case int:
+			if v != 0 {
+				availableFields = append(availableFields, fmt.Sprintf("\"%s\" = '%d'", key, v))
+			}
+		case float64:
+			if v != 0.0 {
+				availableFields = append(availableFields, fmt.Sprintf("\"%s\" = '%f'", key, v))
+			}
+		case string:
+			if v != "" {
+				availableFields = append(availableFields, fmt.Sprintf("\"%s\" = '%s'", key, v))
+			}
+		case *time.Time:
+			if v != nil {
+				availableFields = append(availableFields, fmt.Sprintf("\"%s\" = '%s'", key, v))
+			}
+		}
+	}
+	finalQuery := findFirstOperatingSystemQuery + strings.Join(availableFields, " AND ")
+
+	row := r.Conn.QueryRow(p.Context, finalQuery)
 
 	var operatingSystem model.OperatingSystem
 	err := row.Scan(
