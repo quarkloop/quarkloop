@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -60,7 +61,11 @@ func (s *ServerApi) UpdateWorkspaceById(c *gin.Context) {
 		return
 	}
 
-	osId := c.Param("osId")
+	osId, exists := c.GetQuery("osId")
+	if !exists {
+		AbortWithBadRequestJSON(c, errors.New("osId neeeded"))
+		return
+	}
 	workspaceId := c.Param("workspaceId")
 
 	// query database
@@ -81,7 +86,11 @@ func (s *ServerApi) UpdateWorkspaceById(c *gin.Context) {
 }
 
 func (s *ServerApi) DeleteWorkspaceById(c *gin.Context) {
-	//osId := c.Param("osId")
+	// osId, exists := c.GetQuery("osId")
+	// if !exists {
+	// 	AbortWithBadRequestJSON(c, errors.New("osId neeeded"))
+	// 	return
+	// }
 	workspaceId := c.Param("workspaceId")
 
 	// query database
