@@ -45,8 +45,8 @@ func (s *ServerApi) GetOperatingSystemById(c *gin.Context) {
 	osId := c.Param("osId")
 
 	// query database
-	os, err := s.dataStore.GetOperatingSystemById(
-		&repository.GetOperatingSystemByIdParams{
+	os, err := s.dataStore.FindUniqueOperatingSystem(
+		&repository.FindUniqueOperatingSystemParams{
 			Context: c,
 			Id:      osId,
 		},
@@ -57,6 +57,44 @@ func (s *ServerApi) GetOperatingSystemById(c *gin.Context) {
 	}
 
 	res := &GetOperatingSystemByIdResponse{
+		ApiResponse: ApiResponse{
+			Status:       http.StatusOK,
+			StatusString: "OK",
+		},
+		Data: *os,
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+type GetOperatingSystemQueryParams struct {
+	model.OperatingSystem
+}
+
+type GetOperatingSystemResponse struct {
+	ApiResponse
+	Data model.OperatingSystem `json:"data,omitempty"`
+}
+
+func (s *ServerApi) GetOperatingSystem(c *gin.Context) {
+	queryParams := &GetOperatingSystemQueryParams{}
+	if err := c.ShouldBindQuery(queryParams); err != nil {
+		AbortWithBadRequestJSON(c, err)
+		return
+	}
+
+	// query database
+	os, err := s.dataStore.FindFirstOperatingSystem(
+		&repository.FindFirstOperatingSystemParams{
+			Context:         c,
+			OperatingSystem: queryParams.OperatingSystem,
+		},
+	)
+	if err != nil {
+		AbortWithInternalServerErrorJSON(c, err)
+		return
+	}
+
+	res := &GetOperatingSystemResponse{
 		ApiResponse: ApiResponse{
 			Status:       http.StatusOK,
 			StatusString: "OK",
