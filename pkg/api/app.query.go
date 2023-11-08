@@ -4,14 +4,19 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/quarkloop/quarkloop/pkg/db/model"
+	"github.com/quarkloop/quarkloop/pkg/db/repository"
 )
 
 type GetAppListUriParams struct {
-	OsId        string `uri:"osId" binding:"required"`
-	WorkspaceId string `uri:"workspaceId" binding:"required"`
+	OsId        []string `uri:"osId"`
+	WorkspaceId []string `uri:"workspaceId"`
 }
 
-type GetAppListResponse struct{}
+type GetAppListResponse struct {
+	ApiResponse
+	Data []model.App `json:"data,omitempty"`
+}
 
 func (s *ServerApi) GetAppList(c *gin.Context) {
 	uriParams := &GetAppListUriParams{}
@@ -21,8 +26,25 @@ func (s *ServerApi) GetAppList(c *gin.Context) {
 	}
 
 	// query database
+	appList, err := s.dataStore.ListApps(
+		&repository.ListAppsParams{
+			Context:     c,
+			OsId:        uriParams.OsId,
+			WorkspaceId: uriParams.WorkspaceId,
+		},
+	)
+	if err != nil {
+		AbortWithInternalServerErrorJSON(c, err)
+		return
+	}
 
-	res := &GetAppListResponse{}
+	res := &GetAppListResponse{
+		ApiResponse: ApiResponse{
+			Status:       http.StatusOK,
+			StatusString: "OK",
+		},
+		Data: appList,
+	}
 	c.JSON(http.StatusOK, res)
 }
 
