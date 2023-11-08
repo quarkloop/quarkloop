@@ -39,7 +39,7 @@ func (r *Repository) CreateWorkspace(p *CreateWorkspaceParams) (*model.Workspace
 	p.Workspace.Id = id
 	p.Workspace.Path = fmt.Sprintf("/os/%s/%s", p.OsId, p.Workspace.Id)
 
-	commandTag, err := r.Conn.Exec(
+	commandTag, err := r.SystemDbConn.Exec(
 		p.Context,
 		createWorkspaceMutation,
 		pgx.NamedArgs{
@@ -77,16 +77,16 @@ const updateWorkspaceByIdMutation = `
 UPDATE
   "app"."Workspace"
 set
-  name = @name,
-  description = @description,
-  path = @path
-  updatedAt = @updatedAt
+  "name" = @name,
+  "description" = @description,
+  "path" = @path
+  "updatedAt" = @updatedAt
 WHERE
   "id" = @id;
 `
 
 func (r *Repository) UpdateWorkspaceById(p *UpdateWorkspaceByIdParams) error {
-	commandTag, err := r.Conn.Exec(
+	commandTag, err := r.SystemDbConn.Exec(
 		p.Context,
 		updateWorkspaceByIdMutation,
 		pgx.NamedArgs{
@@ -126,7 +126,7 @@ WHERE
 `
 
 func (r *Repository) DeleteWorkspaceById(p *DeleteWorkspaceByIdParams) error {
-	commandTag, err := r.Conn.Exec(p.Context, deleteWorkspaceByIdMutation, pgx.NamedArgs{"id": p.Id})
+	commandTag, err := r.SystemDbConn.Exec(p.Context, deleteWorkspaceByIdMutation, pgx.NamedArgs{"id": p.Id})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
 		return err
