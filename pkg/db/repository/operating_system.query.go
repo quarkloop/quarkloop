@@ -26,7 +26,7 @@ FROM
 `
 
 func (r *Repository) ListOperatingSystems(p *ListOperatingSystemsParams) ([]model.OperatingSystem, error) {
-	rows, err := r.Conn.Query(p.Context, listOperatingSystemsQuery)
+	rows, err := r.SystemDbConn.Query(p.Context, listOperatingSystemsQuery)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
 		return nil, err
@@ -77,7 +77,7 @@ WHERE
 `
 
 func (r *Repository) FindUniqueOperatingSystem(p *FindUniqueOperatingSystemParams) (*model.OperatingSystem, error) {
-	row := r.Conn.QueryRow(p.Context, findUniqueOperatingSystemQuery, pgx.NamedArgs{"id": p.Id})
+	row := r.SystemDbConn.QueryRow(p.Context, findUniqueOperatingSystemQuery, pgx.NamedArgs{"id": p.Id})
 
 	var operatingSystem model.OperatingSystem
 	err := row.Scan(
@@ -142,7 +142,7 @@ func (r *Repository) FindFirstOperatingSystem(p *FindFirstOperatingSystemParams)
 	}
 	finalQuery := findFirstOperatingSystemQuery + strings.Join(availableFields, " AND ")
 
-	row := r.Conn.QueryRow(p.Context, finalQuery)
+	row := r.SystemDbConn.QueryRow(p.Context, finalQuery)
 
 	var operatingSystem model.OperatingSystem
 	err := row.Scan(
