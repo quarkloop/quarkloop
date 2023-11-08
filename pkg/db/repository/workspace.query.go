@@ -23,13 +23,13 @@ const listWorkspacesQuery = `
 SELECT 
   "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
 FROM 
-  "app"."Workspace"
+  "system"."Workspace"
 WHERE
   "osId" = ANY (@osId);
 `
 
 func (r *Repository) ListWorkspaces(p *ListWorkspacesParams) ([]model.Workspace, error) {
-	rows, err := r.Conn.Query(p.Context, listWorkspacesQuery, pgx.NamedArgs{"osId": p.OsId})
+	rows, err := r.SystemDbConn.Query(p.Context, listWorkspacesQuery, pgx.NamedArgs{"osId": p.OsId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
 		return nil, err
@@ -75,13 +75,13 @@ const findUniqueWorkspaceQuery = `
 SELECT 
   "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
 FROM 
-  "app"."Workspace" 
+  "system"."Workspace" 
 WHERE 
   "id" = @id;
 `
 
 func (r *Repository) FindUniqueWorkspace(p *FindUniqueWorkspaceParams) (*model.Workspace, error) {
-	row := r.Conn.QueryRow(p.Context, findUniqueWorkspaceQuery, pgx.NamedArgs{"id": p.Id})
+	row := r.SystemDbConn.QueryRow(p.Context, findUniqueWorkspaceQuery, pgx.NamedArgs{"id": p.Id})
 
 	var workspace model.Workspace
 	err := row.Scan(
@@ -113,7 +113,7 @@ const findFirstWorkspaceQuery = `
 SELECT 
   "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
 FROM 
-  "app"."Workspace" 
+  "system"."Workspace" 
 WHERE
 `
 
@@ -150,7 +150,7 @@ func (r *Repository) FindFirstWorkspace(p *FindFirstWorkspaceParams) (*model.Wor
 	}
 	finalQuery := findFirstWorkspaceQuery + strings.Join(availableFields, " AND ")
 
-	row := r.Conn.QueryRow(p.Context, finalQuery)
+	row := r.SystemDbConn.QueryRow(p.Context, finalQuery)
 
 	var workspace model.Workspace
 	err := row.Scan(
