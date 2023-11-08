@@ -1,7 +1,6 @@
 package api
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,7 +9,8 @@ import (
 )
 
 type CreateWorkspaceRequest struct {
-	model.Workspace
+	OsId      string          `json:"osId" binding:"required"`
+	Workspace model.Workspace `json:"workspace" binding:"required"`
 }
 
 type CreateWorkspaceResponse struct {
@@ -25,13 +25,11 @@ func (s *ServerApi) CreateWorkspace(c *gin.Context) {
 		return
 	}
 
-	osId := c.Param("osId")
-
 	// query database
 	ws, err := s.dataStore.CreateWorkspace(
 		&repository.CreateWorkspaceParams{
 			Context:   c,
-			OsId:      osId,
+			OsId:      req.OsId,
 			Workspace: req.Workspace,
 		},
 	)
@@ -50,30 +48,32 @@ func (s *ServerApi) CreateWorkspace(c *gin.Context) {
 	c.JSON(http.StatusCreated, res)
 }
 
+type UpdateWorkspaceByIdUriParams struct {
+	WorkspaceId string `uri:"workspaceId" binding:"required"`
+}
+
 type UpdateWorkspaceByIdRequest struct {
 	model.Workspace
 }
 
 func (s *ServerApi) UpdateWorkspaceById(c *gin.Context) {
+	uriParams := &UpdateWorkspaceByIdUriParams{}
+	if err := c.ShouldBindUri(uriParams); err != nil {
+		AbortWithBadRequestJSON(c, err)
+		return
+	}
+
 	req := &UpdateWorkspaceByIdRequest{}
 	if err := c.BindJSON(req); err != nil {
 		AbortWithBadRequestJSON(c, err)
 		return
 	}
 
-	osId, exists := c.GetQuery("osId")
-	if !exists {
-		AbortWithBadRequestJSON(c, errors.New("osId neeeded"))
-		return
-	}
-	workspaceId := c.Param("workspaceId")
-
 	// query database
 	err := s.dataStore.UpdateWorkspaceById(
 		&repository.UpdateWorkspaceByIdParams{
 			Context:     c,
-			OsId:        osId,
-			WorkspaceId: workspaceId,
+			WorkspaceId: uriParams.WorkspaceId,
 			Workspace:   req.Workspace,
 		},
 	)
@@ -85,19 +85,22 @@ func (s *ServerApi) UpdateWorkspaceById(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
+type DeleteWorkspaceByIdUriParams struct {
+	WorkspaceId string `uri:"workspaceId" binding:"required"`
+}
+
 func (s *ServerApi) DeleteWorkspaceById(c *gin.Context) {
-	// osId, exists := c.GetQuery("osId")
-	// if !exists {
-	// 	AbortWithBadRequestJSON(c, errors.New("osId neeeded"))
-	// 	return
-	// }
-	workspaceId := c.Param("workspaceId")
+	uriParams := &DeleteWorkspaceByIdUriParams{}
+	if err := c.ShouldBindUri(uriParams); err != nil {
+		AbortWithBadRequestJSON(c, err)
+		return
+	}
 
 	// query database
 	err := s.dataStore.DeleteWorkspaceById(
 		&repository.DeleteWorkspaceByIdParams{
-			Context: c,
-			Id:      workspaceId,
+			Context:     c,
+			WorkspaceId: uriParams.WorkspaceId,
 		},
 	)
 	if err != nil {
