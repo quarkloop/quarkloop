@@ -38,7 +38,7 @@ func (r *Repository) CreateOperatingSystem(p *CreateOperatingSystemParams) (*mod
 	p.Os.Id = id
 	p.Os.Path = fmt.Sprintf("/os/%s", id)
 
-	commandTag, err := r.Conn.Exec(
+	commandTag, err := r.SystemDbConn.Exec(
 		p.Context,
 		createOperatingSystemMutation,
 		pgx.NamedArgs{
@@ -77,16 +77,16 @@ const updateOperatingSystemByIdMutation = `
 UPDATE
   "app"."OperatingSystem"
 set
-  name = @name,
-  description = @description,
-  path = @path
-  updatedAt = @updatedAt
+  "name" = @name,
+  "description" = @description,
+  "path" = @path
+  "updatedAt" = @updatedAt
 WHERE
   "id" = @id;
 `
 
 func (r *Repository) UpdateOperatingSystemById(p *UpdateOperatingSystemByIdParams) error {
-	commandTag, err := r.Conn.Exec(
+	commandTag, err := r.SystemDbConn.Exec(
 		p.Context,
 		updateOperatingSystemByIdMutation,
 		pgx.NamedArgs{
@@ -126,7 +126,7 @@ WHERE
 `
 
 func (r *Repository) DeleteOperatingSystemById(p *DeleteOperatingSystemByIdParams) error {
-	commandTag, err := r.Conn.Exec(p.Context, deleteOperatingSystemByIdMutation, pgx.NamedArgs{"id": p.Id})
+	commandTag, err := r.SystemDbConn.Exec(p.Context, deleteOperatingSystemByIdMutation, pgx.NamedArgs{"id": p.Id})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
 		return err
