@@ -22,7 +22,7 @@ const listOperatingSystemsQuery = `
 SELECT 
   "id", "name", "description", "path", "createdAt", "updatedAt"
 FROM 
-  "app"."OperatingSystem";
+  "system"."OperatingSystem";
 `
 
 func (r *Repository) ListOperatingSystems(p *ListOperatingSystemsParams) ([]model.OperatingSystem, error) {
@@ -71,7 +71,7 @@ const findUniqueOperatingSystemQuery = `
 SELECT 
   "id", "name", "description", "path", "createdAt", "updatedAt"
 FROM 
-  "app"."OperatingSystem" 
+  "system"."OperatingSystem" 
 WHERE 
   "id" = @id;
 `
@@ -107,7 +107,7 @@ const findFirstOperatingSystemQuery = `
 SELECT 
   "id", "name", "description", "path", "createdAt", "updatedAt"
 FROM 
-  "app"."OperatingSystem" 
+  "system"."OperatingSystem" 
 WHERE
 `
 
