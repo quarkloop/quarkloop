@@ -5,10 +5,10 @@
   "license": "Apache-2.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter ./apps/db-server run dev",
-    "build": "pnpm --filter ./apps/db-server run build",
-    "start": "pnpm --filter ./apps/db-server run start",
-    "lint": "pnpm --filter ./apps/db-server run lint",
+    "dev": "pnpm --filter ./apps/quarkloop-web run dev",
+    "build": "pnpm --filter ./apps/quarkloop-web run build",
+    "start": "pnpm --filter ./apps/quarkloop-web run start",
+    "lint": "pnpm --filter ./apps/quarkloop-web run lint",
     "studio:dev": "dotenv -e .env.development -- prisma studio",
     "studio:prod": "dotenv -e .env.production -- prisma studio",
     "db:reset": "dotenv -e .env.development -- npx prisma migrate reset --preview-feature",
@@ -28,7 +28,7 @@
     "@types/node": "20.3.1",
     "@types/react": "18.2.13",
     "@types/react-dom": "18.2.6",
-    "next": "13.4.12",
+    "next": "^13.5.3",
     "next-transpile-modules": "^10.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0"
