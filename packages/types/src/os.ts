@@ -1,12 +1,6 @@
-// import {
-//     OperatingSystem as PrismaOperatingSystem,
-//     PermissionType,
-//     PermissionRole,
-// } from "@quarkloop/prisma/types";
 import { z } from "zod";
 
 import { PermissionType, PermissionRole } from "./planSubscription";
-import { ApiResponse } from "./api-response";
 
 export const operatingSystemSchema = z.object({
     id: z.string(),
@@ -28,23 +22,6 @@ export const operatingSystemSchema = z.object({
 
 export type OperatingSystem = z.infer<typeof operatingSystemSchema>;
 
-// export interface OperatingSystem {
-//     id: string;
-//     name: string;
-//     path: string;
-//     description: string;
-//     overview: string | null;
-//     imageUrl: string | null;
-//     websiteUrl: string | null;
-//     url1: string | null;
-//     url2: string | null;
-//     url3: string | null;
-//     url4: string | null;
-//     isVerified: boolean | null;
-//     createdAt: Date | null;
-//     isOwner: boolean | null;
-// }
-
 export interface OperatingSystemUser {
     osId: string | null;
     type: PermissionType;
@@ -57,12 +34,3 @@ export interface OperatingSystemUser {
         image: string | null;
     };
 }
-
-// export type OperatingSystemPluginArgs =
-//     | GetOperatingSystemByIdPluginArgs
-//     | GetOperatingSystemUsersPluginArgs
-//     | CreateOperatingSystemPluginArgs
-//     | UpdateOperatingSystemPluginArgs
-//     | DeleteOperatingSystemPluginArgs;
-
-// export type OperatingSystemApiResponse = GetOperatingSystemUsersApiResponse;
