@@ -7,11 +7,12 @@
   "type": "module",
   "main": "index.ts",
   "scripts": {
-    "postinstall": "npx prisma generate",
+    "postinstall": "npx prisma generate --schema database/auth/QuarkloopAuth.prisma",
     "studio:dev": "dotenv -e .env.local -- prisma studio",
     "studio:prod": "dotenv -e .env.production -- prisma studio",
     "db:reset": "dotenv -e .env.development -- npx prisma migrate reset",
     "db:migrate": "dotenv -e .env.development -- npx prisma migrate dev",
+    "db:migrate:auth:up": "./auth.up.bash",
     "db:resolve": "dotenv -e .env.development -- npx prisma migrate resolve",
     "db:seed": "dotenv -e .env.development -- bash prisma/seed/seed.bash",
     "db:test": "dotenv -e .env.development -- bash prisma/tests/test.bash",
