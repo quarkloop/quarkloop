@@ -5,6 +5,10 @@
     "jsx": "preserve",
     "resolveJsonModule": true
   },
-  "include": ["."],
+  "include": [
+    "src",
+    "index.ts",
+    "../../apps/quarkloop-auth-server/auth/authOptions.ts"
+  ],
   "exclude": ["dist", "build", "node_modules"]
 }
