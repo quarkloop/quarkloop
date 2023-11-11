@@ -22,7 +22,7 @@ type CreateOperatingSystemParams struct {
 
 const createOperatingSystemMutation = `
 INSERT INTO
-  "app"."OperatingSystem" ("id", "name", "description", "path")
+  "system"."OperatingSystem" ("id", "name", "description", "path")
 VALUES
   (@id, @name, @description, @path)
 RETURNING 
@@ -75,12 +75,12 @@ type UpdateOperatingSystemByIdParams struct {
 
 const updateOperatingSystemByIdMutation = `
 UPDATE
-  "app"."OperatingSystem"
-set
-  "name" = @name,
+  "system"."OperatingSystem"
+SET
+  "name"        = @name,
   "description" = @description,
-  "path" = @path
-  "updatedAt" = @updatedAt
+  "path"        = @path,
+  "updatedAt"   = @updatedAt
 WHERE
   "id" = @id;
 `
@@ -115,18 +115,18 @@ func (r *Repository) UpdateOperatingSystemById(p *UpdateOperatingSystemByIdParam
 
 type DeleteOperatingSystemByIdParams struct {
 	Context context.Context
-	Id      string
+	OsId    string
 }
 
 const deleteOperatingSystemByIdMutation = `
 DELETE FROM
-  "app"."OperatingSystem"
+  "system"."OperatingSystem"
 WHERE
   "id" = @id;
 `
 
 func (r *Repository) DeleteOperatingSystemById(p *DeleteOperatingSystemByIdParams) error {
-	commandTag, err := r.SystemDbConn.Exec(p.Context, deleteOperatingSystemByIdMutation, pgx.NamedArgs{"id": p.Id})
+	commandTag, err := r.SystemDbConn.Exec(p.Context, deleteOperatingSystemByIdMutation, pgx.NamedArgs{"id": p.OsId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
 		return err
