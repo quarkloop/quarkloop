@@ -23,7 +23,7 @@ type CreateWorkspaceParams struct {
 
 const createWorkspaceMutation = `
 INSERT INTO
-  "app"."Workspace" ("id", "osId", "name", "description", "path")
+  "system"."Workspace" ("id", "osId", "name", "description", "path")
 VALUES
   (@id, @osId, @name, @description, @path)
 RETURNING 
@@ -68,19 +68,18 @@ func (r *Repository) CreateWorkspace(p *CreateWorkspaceParams) (*model.Workspace
 
 type UpdateWorkspaceByIdParams struct {
 	Context     context.Context
-	OsId        string
 	WorkspaceId string
 	Workspace   model.Workspace
 }
 
 const updateWorkspaceByIdMutation = `
 UPDATE
-  "app"."Workspace"
-set
-  "name" = @name,
+  "system"."Workspace"
+SET
+  "name"        = @name,
   "description" = @description,
-  "path" = @path
-  "updatedAt" = @updatedAt
+  "path"        = @path,
+  "updatedAt"   = @updatedAt
 WHERE
   "id" = @id;
 `
@@ -114,19 +113,19 @@ func (r *Repository) UpdateWorkspaceById(p *UpdateWorkspaceByIdParams) error {
 /// DeleteWorkspaceById
 
 type DeleteWorkspaceByIdParams struct {
-	Context context.Context
-	Id      string
+	Context     context.Context
+	WorkspaceId string
 }
 
 const deleteWorkspaceByIdMutation = `
 DELETE FROM
-  "app"."Workspace"
+  "system"."Workspace"
 WHERE
   "id" = @id;
 `
 
 func (r *Repository) DeleteWorkspaceById(p *DeleteWorkspaceByIdParams) error {
-	commandTag, err := r.SystemDbConn.Exec(p.Context, deleteWorkspaceByIdMutation, pgx.NamedArgs{"id": p.Id})
+	commandTag, err := r.SystemDbConn.Exec(p.Context, deleteWorkspaceByIdMutation, pgx.NamedArgs{"id": p.WorkspaceId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
 		return err
