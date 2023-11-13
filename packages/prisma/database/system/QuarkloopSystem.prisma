@@ -1,0 +1,123 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("PG_QUARKLOOP_SYSTEM_URL") // uses connection pooling
+    directUrl = env("PG_QUARKLOOP_SYSTEM_URL_NON_POOLING") // used for migrations
+    schemas   = ["system"]
+}
+
+model OperatingSystem {
+    id String @id @default(cuid())
+
+    name        String
+    path        String    @unique
+    description String
+    overview    String?
+    imageUrl    String?
+    websiteUrl  String?
+    isVerified  Boolean   @default(false)
+    createdAt   DateTime? @default(now())
+    updatedAt   DateTime?
+
+    workspaces Workspace[]
+    apps       App[]
+
+    @@schema("system")
+}
+
+model Workspace {
+    id   String @id @default(cuid())
+    osId String
+
+    name        String
+    path        String    @unique
+    description String?
+    accessType  Int?
+    imageUrl    String?
+    createdAt   DateTime? @default(now())
+    updatedAt   DateTime?
+
+    os   OperatingSystem @relation(fields: [osId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    apps App[]
+
+    @@unique(fields: [osId, id])
+    @@schema("system")
+}
+
+model App {
+    id          String @id @default(cuid())
+    osId        String
+    workspaceId String
+
+    name        String
+    accessType  Int
+    path        String    @unique
+    description String?
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime? @default(now())
+
+    OperatingSystem OperatingSystem @relation(fields: [osId], references: [id])
+    Workspace       Workspace       @relation(fields: [workspaceId], references: [id])
+    components      AppComponent[]
+    issues          AppIssue[]
+    submissions     AppSubmission[]
+    deployments     AppDeployment[]
+
+    @@schema("system")
+}
+
+model AppComponent {
+    id String @id @default(cuid())
+
+    name      String
+    config    Json
+    createdAt DateTime  @default(now())
+    updatedAt DateTime? @default(now())
+
+    App   App?    @relation(fields: [appId], references: [id])
+    appId String?
+
+    @@schema("system")
+}
+
+model AppIssue {
+    id String @id @default(cuid())
+
+    title     String
+    createdAt DateTime  @default(now())
+    updatedAt DateTime? @default(now())
+
+    App   App?    @relation(fields: [appId], references: [id])
+    appId String?
+
+    @@schema("system")
+}
+
+model AppSubmission {
+    id String @id @default(cuid())
+
+    title     String
+    createdAt DateTime  @default(now())
+    updatedAt DateTime? @default(now())
+
+    App   App?    @relation(fields: [appId], references: [id])
+    appId String?
+
+    @@schema("system")
+}
+
+model AppDeployment {
+    id String @id @default(cuid())
+
+    name      String
+    createdAt DateTime @default(now())
+
+    App   App?    @relation(fields: [appId], references: [id])
+    appId String?
+
+    @@schema("system")
+}
