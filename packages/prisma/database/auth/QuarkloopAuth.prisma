@@ -1,0 +1,73 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("PG_QUARKLOOP_AUTH_URL") // uses connection pooling
+    directUrl = env("PG_QUARKLOOP_AUTH_URL_NON_POOLING") // used for migrations
+    schemas   = ["auth"]
+}
+
+model User {
+    id String @id @default(cuid())
+
+    name          String?
+    email         String    @unique
+    emailVerified DateTime?
+    password      String?
+    passwordSalt  String?
+    birthdate     DateTime?
+    country       String?
+    image         String?
+    createdAt     DateTime  @default(now())
+    status        Int       @default(1)
+
+    accounts Account[]
+    sessions Session[]
+
+    @@schema("auth")
+}
+
+model Account {
+    id String @id @default(cuid())
+
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? @db.Text
+    session_state     String?
+
+    user   User   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    userId String
+
+    @@unique([provider, providerAccountId])
+    @@schema("auth")
+}
+
+model Session {
+    id String @id @default(cuid())
+
+    sessionToken String   @unique
+    expires      DateTime
+
+    user   User   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    userId String
+
+    @@schema("auth")
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+    @@schema("auth")
+}
