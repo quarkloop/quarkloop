@@ -1,0 +1,38 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("PG_QUARKLOOP_SHEETS_URL") // uses connection pooling
+    directUrl = env("PG_QUARKLOOP_SHEETS_URL_NON_POOLING") // used for migrations
+    schemas   = ["app"]
+}
+
+model SheetInstance {
+    id    Int    @id @default(autoincrement())
+    appId String
+
+    title     String
+    rowCount  Int
+    rows      Json
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
+
+    @@index([appId])
+    @@schema("app")
+}
+
+model SheetComponent {
+    id    Int    @id @default(autoincrement())
+    appId String
+
+    type      Int
+    settings  Json
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
+
+    @@index([appId])
+    @@schema("app")
+}
