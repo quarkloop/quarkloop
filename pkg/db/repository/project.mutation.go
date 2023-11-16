@@ -17,16 +17,16 @@ import (
 
 type CreateProjectParams struct {
 	Context     context.Context
-	OsId        string
+	OrgId       string
 	WorkspaceId string
 	Project     model.Project
 }
 
 const createProjectMutation = `
 INSERT INTO
-  "system"."Project" ("osId", "workspaceId", "id", "name", "accessType", "path", "description", "updatedAt")
+  "system"."Project" ("orgId", "workspaceId", "id", "name", "accessType", "path", "description", "updatedAt")
 VALUES
-  (@osId, @workspaceId, @id, @name, @accessType, @path, @description, @updatedAt)
+  (@orgId, @workspaceId, @id, @name, @accessType, @path, @description, @updatedAt)
 RETURNING 
   "id", "name", "accessType", "path", "description", "createdAt", "updatedAt";
 `
@@ -38,7 +38,7 @@ func (r *Repository) CreateProject(p *CreateProjectParams) (*model.Project, erro
 	}
 
 	p.Project.Id = id
-	p.Project.Path = fmt.Sprintf("/os/%s/%s/%s", p.OsId, p.WorkspaceId, id)
+	p.Project.Path = fmt.Sprintf("/os/%s/%s/%s", p.OrgId, p.WorkspaceId, id)
 
 	fmt.Printf("\n%v\n", p)
 
@@ -46,7 +46,7 @@ func (r *Repository) CreateProject(p *CreateProjectParams) (*model.Project, erro
 		p.Context,
 		createProjectMutation,
 		pgx.NamedArgs{
-			"osId":        p.OsId,
+			"orgId":       p.OrgId,
 			"workspaceId": p.WorkspaceId,
 			"id":          p.Project.Id,
 			"name":        p.Project.Name,
