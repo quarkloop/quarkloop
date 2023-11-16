@@ -12,21 +12,21 @@ import (
 /// ListProjectPricings
 
 type ListProjectPricingsParams struct {
-	Context context.Context
-	AppId   string
+	Context   context.Context
+	ProjectId string
 }
 
 const listProjectPricingsQuery = `
 SELECT
-  "id", "title", "rowCount", "rows", "createdAt", "updatedAt"
+  "id", "name", "description", "metadata", "data", "createdAt", "updatedAt"
 FROM
   "app"."ProjectPricing"
 WHERE
-  "appId" = @appId;
+  "projectId" = @projectId;
 `
 
 func (r *Repository) ListProjectPricings(p *ListProjectPricingsParams) ([]model.ProjectPricing, error) {
-	rows, err := r.AppDbConn.Query(p.Context, listProjectPricingsQuery, pgx.NamedArgs{"appId": p.AppId})
+	rows, err := r.AppDbConn.Query(p.Context, listProjectPricingsQuery, pgx.NamedArgs{"projectId": p.ProjectId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
 		return nil, err
@@ -39,9 +39,10 @@ func (r *Repository) ListProjectPricings(p *ListProjectPricingsParams) ([]model.
 		var sheet model.ProjectPricing
 		err := rows.Scan(
 			&sheet.Id,
-			&sheet.Title,
-			&sheet.RowCount,
-			&sheet.Rows,
+			&sheet.Name,
+			&sheet.Description,
+			&sheet.Metadata,
+			&sheet.Data,
 			&sheet.CreatedAt,
 			&sheet.UpdatedAt,
 		)
@@ -64,13 +65,12 @@ func (r *Repository) ListProjectPricings(p *ListProjectPricingsParams) ([]model.
 
 type FindUniqueProjectPricingParams struct {
 	Context context.Context
-	AppId   string
 	Id      int
 }
 
 const findUniqueProjectPricingQuery = `
 SELECT
-  "id", "title", "rowCount", "rows", "createdAt", "updatedAt"
+  "id", "name", "description", "metadata", "data", "createdAt", "updatedAt"
 FROM
   "app"."ProjectPricing"
 WHERE
@@ -83,9 +83,10 @@ func (r *Repository) FindUniqueProjectPricing(p *FindUniqueProjectPricingParams)
 	var sheet model.ProjectPricing
 	err := row.Scan(
 		&sheet.Id,
-		&sheet.Title,
-		&sheet.RowCount,
-		&sheet.Rows,
+		&sheet.Name,
+		&sheet.Description,
+		&sheet.Metadata,
+		&sheet.Data,
 		&sheet.CreatedAt,
 		&sheet.UpdatedAt,
 	)
