@@ -16,17 +16,17 @@ import (
 
 type CreateProjectJsonDatasetParams struct {
 	Context            context.Context
-	AppId              string
+	ProjectId          string
 	ProjectJsonDataset model.ProjectJsonDataset
 }
 
 const createProjectJsonDatasetMutation = `
 INSERT INTO
-  "app"."ProjectJsonDataset" ("appId", "title", "rowCount", "rows", "updatedAt")
+  "app"."ProjectJsonDataset" ("projectId", "name", "description", "metadata", "data")
 VALUES
-  (@appId, @title, @rowCount, @rows, @updatedAt)
+  (@projectId, @name, @description, @metadata, @data)
 RETURNING
-  "id", "appId", "title", "rowCount", "rows", "createdAt", "updatedAt";
+  "id", "projectId", name", "description", "metadata", "data", "createdAt";
 `
 
 func (r *Repository) CreateProjectJsonDataset(p *CreateProjectJsonDatasetParams) (*model.ProjectJsonDataset, error) {
@@ -34,11 +34,11 @@ func (r *Repository) CreateProjectJsonDataset(p *CreateProjectJsonDatasetParams)
 		p.Context,
 		createProjectJsonDatasetMutation,
 		pgx.NamedArgs{
-			"appId":     p.AppId,
-			"title":     p.ProjectJsonDataset.Title,
-			"rowCount":  p.ProjectJsonDataset.RowCount,
-			"rows":      p.ProjectJsonDataset.Rows,
-			"updatedAt": p.ProjectJsonDataset.UpdatedAt,
+			"projectId":   p.ProjectId,
+			"name":        p.ProjectJsonDataset.Name,
+			"description": p.ProjectJsonDataset.Description,
+			"metadata":    p.ProjectJsonDataset.Metadata,
+			"data":        p.ProjectJsonDataset.Data,
 		},
 	)
 	if err != nil {
@@ -59,7 +59,7 @@ func (r *Repository) CreateProjectJsonDataset(p *CreateProjectJsonDatasetParams)
 
 type UpdateProjectJsonDatasetByIdParams struct {
 	Context            context.Context
-	AppId              string
+	ProjectId          string
 	Id                 int
 	ProjectJsonDataset model.ProjectJsonDataset
 }
@@ -68,14 +68,15 @@ const updateProjectJsonDatasetByIdMutation = `
 UPDATE
   "app"."ProjectJsonDataset"
 set
-  "title"     = @title,
-  "rowCount"  = @rowCount,
-  "rows"      = @rows,
-  "updatedAt" = @updatedAt
+  "name"        = @name,
+  "description" = @description,
+  "metadata"    = @metadata,
+  "data"        = @data,
+  "updatedAt"   = @updatedAt
 WHERE
   "id" = @id
 AND
-  "appId" = @appId;
+  "projectId" = @projectId;
 `
 
 func (r *Repository) UpdateProjectJsonDatasetById(p *UpdateProjectJsonDatasetByIdParams) error {
@@ -83,12 +84,13 @@ func (r *Repository) UpdateProjectJsonDatasetById(p *UpdateProjectJsonDatasetByI
 		p.Context,
 		updateProjectJsonDatasetByIdMutation,
 		pgx.NamedArgs{
-			"appId":     p.AppId,
-			"id":        p.Id,
-			"title":     p.ProjectJsonDataset.Title,
-			"rowCount":  p.ProjectJsonDataset.RowCount,
-			"rows":      p.ProjectJsonDataset.Rows,
-			"updatedAt": time.Now(),
+			"projectId":   p.ProjectId,
+			"id":          p.Id,
+			"name":        p.ProjectJsonDataset.Name,
+			"description": p.ProjectJsonDataset.Description,
+			"metadata":    p.ProjectJsonDataset.Metadata,
+			"data":        p.ProjectJsonDataset.Data,
+			"updatedAt":   time.Now(),
 		},
 	)
 	if err != nil {
@@ -108,9 +110,9 @@ func (r *Repository) UpdateProjectJsonDatasetById(p *UpdateProjectJsonDatasetByI
 /// DeleteProjectJsonDatasetById
 
 type DeleteProjectJsonDatasetByIdParams struct {
-	Context context.Context
-	AppId   string
-	Id      int
+	Context   context.Context
+	ProjectId string
+	Id        int
 }
 
 const deleteProjectJsonDatasetByIdMutation = `
@@ -119,13 +121,13 @@ DELETE FROM
 WHERE
   "id" = @id
 AND
-  "appId" = @appId;
+  "projectId" = @projectId;
 `
 
 func (r *Repository) DeleteProjectJsonDatasetById(p *DeleteProjectJsonDatasetByIdParams) error {
 	commandTag, err := r.AppDbConn.Exec(p.Context, deleteProjectJsonDatasetByIdMutation, pgx.NamedArgs{
-		"appId": p.AppId,
-		"id":    p.Id,
+		"projectId": p.ProjectId,
+		"id":        p.Id,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
