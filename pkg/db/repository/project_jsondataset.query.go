@@ -12,21 +12,21 @@ import (
 /// ListProjectJsonDatasets
 
 type ListProjectJsonDatasetsParams struct {
-	Context context.Context
-	AppId   string
+	Context   context.Context
+	ProjectId string
 }
 
 const listProjectJsonDatasetsQuery = `
 SELECT
-  "id", "title", "rowCount", "rows", "createdAt", "updatedAt"
+  "id", "name", "description", "metadata", "data", "createdAt", "updatedAt"
 FROM
   "app"."ProjectJsonDataset"
 WHERE
-  "appId" = @appId;
+  "projectId" = @projectId;
 `
 
 func (r *Repository) ListProjectJsonDatasets(p *ListProjectJsonDatasetsParams) ([]model.ProjectJsonDataset, error) {
-	rows, err := r.AppDbConn.Query(p.Context, listProjectJsonDatasetsQuery, pgx.NamedArgs{"appId": p.AppId})
+	rows, err := r.AppDbConn.Query(p.Context, listProjectJsonDatasetsQuery, pgx.NamedArgs{"projectId": p.ProjectId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
 		return nil, err
@@ -39,9 +39,10 @@ func (r *Repository) ListProjectJsonDatasets(p *ListProjectJsonDatasetsParams) (
 		var sheet model.ProjectJsonDataset
 		err := rows.Scan(
 			&sheet.Id,
-			&sheet.Title,
-			&sheet.RowCount,
-			&sheet.Rows,
+			&sheet.Name,
+			&sheet.Description,
+			&sheet.Metadata,
+			&sheet.Data,
 			&sheet.CreatedAt,
 			&sheet.UpdatedAt,
 		)
@@ -64,13 +65,12 @@ func (r *Repository) ListProjectJsonDatasets(p *ListProjectJsonDatasetsParams) (
 
 type FindUniqueProjectJsonDatasetParams struct {
 	Context context.Context
-	AppId   string
 	Id      int
 }
 
 const findUniqueProjectJsonDatasetQuery = `
 SELECT
-  "id", "title", "rowCount", "rows", "createdAt", "updatedAt"
+  "id", "name", "description", "metadata", "data", "createdAt", "updatedAt"
 FROM
   "app"."ProjectJsonDataset"
 WHERE
@@ -83,9 +83,10 @@ func (r *Repository) FindUniqueProjectJsonDataset(p *FindUniqueProjectJsonDatase
 	var sheet model.ProjectJsonDataset
 	err := row.Scan(
 		&sheet.Id,
-		&sheet.Title,
-		&sheet.RowCount,
-		&sheet.Rows,
+		&sheet.Name,
+		&sheet.Description,
+		&sheet.Metadata,
+		&sheet.Data,
 		&sheet.CreatedAt,
 		&sheet.UpdatedAt,
 	)
