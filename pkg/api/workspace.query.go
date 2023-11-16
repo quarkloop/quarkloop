@@ -16,9 +16,9 @@ type GetWorkspaceListResponse struct {
 }
 
 func (s *ServerApi) GetWorkspaceList(c *gin.Context) {
-	osId, exists := c.GetQueryArray("osId")
+	orgId, exists := c.GetQueryArray("orgId")
 	if !exists {
-		AbortWithBadRequestJSON(c, errors.New("missing osId parameter"))
+		AbortWithBadRequestJSON(c, errors.New("missing orgId parameter"))
 		return
 	}
 
@@ -26,7 +26,7 @@ func (s *ServerApi) GetWorkspaceList(c *gin.Context) {
 	wsList, err := s.dataStore.ListWorkspaces(
 		&repository.ListWorkspacesParams{
 			Context: c,
-			OsId:    osId,
+			OrgId:   orgId,
 		},
 	)
 	if err != nil {
@@ -75,14 +75,14 @@ func (s *ServerApi) GetWorkspaceById(c *gin.Context) {
 }
 
 type GetWorkspaceQueryParams struct {
-	OsId string `form:"osId" binding:"required"`
+	OrgId string `form:"orgId" binding:"required"`
 	model.Workspace
 }
 
 type GetWorkspaceResponse struct {
 	ApiResponse
-	OsId string          `json:"osId" binding:"required"`
-	Data model.Workspace `json:"data,omitempty"`
+	OrgId string          `json:"orgId" binding:"required"`
+	Data  model.Workspace `json:"data,omitempty"`
 }
 
 func (s *ServerApi) GetWorkspace(c *gin.Context) {
@@ -96,7 +96,7 @@ func (s *ServerApi) GetWorkspace(c *gin.Context) {
 	ws, err := s.dataStore.FindFirstWorkspace(
 		&repository.FindFirstWorkspaceParams{
 			Context:   c,
-			OsId:      queryParams.OsId,
+			OrgId:     queryParams.OrgId,
 			Workspace: queryParams.Workspace,
 		},
 	)
