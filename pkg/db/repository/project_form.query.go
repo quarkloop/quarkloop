@@ -12,21 +12,21 @@ import (
 /// ListProjectForms
 
 type ListProjectFormsParams struct {
-	Context context.Context
-	AppId   string
+	Context   context.Context
+	ProjectId string
 }
 
 const listProjectFormsQuery = `
 SELECT
-  "id", "title", "rowCount", "rows", "createdAt", "updatedAt"
+  "id", "name", "description", "metadata", "data", "createdAt", "updatedAt"
 FROM
   "app"."ProjectForm"
 WHERE
-  "appId" = @appId;
+  "projectId" = @projectId;
 `
 
 func (r *Repository) ListProjectForms(p *ListProjectFormsParams) ([]model.ProjectForm, error) {
-	rows, err := r.AppDbConn.Query(p.Context, listProjectFormsQuery, pgx.NamedArgs{"appId": p.AppId})
+	rows, err := r.AppDbConn.Query(p.Context, listProjectFormsQuery, pgx.NamedArgs{"projectId": p.ProjectId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
 		return nil, err
@@ -39,9 +39,10 @@ func (r *Repository) ListProjectForms(p *ListProjectFormsParams) ([]model.Projec
 		var sheet model.ProjectForm
 		err := rows.Scan(
 			&sheet.Id,
-			&sheet.Title,
-			&sheet.RowCount,
-			&sheet.Rows,
+			&sheet.Name,
+			&sheet.Description,
+			&sheet.Metadata,
+			&sheet.Data,
 			&sheet.CreatedAt,
 			&sheet.UpdatedAt,
 		)
@@ -64,13 +65,12 @@ func (r *Repository) ListProjectForms(p *ListProjectFormsParams) ([]model.Projec
 
 type FindUniqueProjectFormParams struct {
 	Context context.Context
-	AppId   string
 	Id      int
 }
 
 const findUniqueProjectFormQuery = `
 SELECT
-  "id", "title", "rowCount", "rows", "createdAt", "updatedAt"
+  "id", "name", "description", "metadata", "data", "createdAt", "updatedAt"
 FROM
   "app"."ProjectForm"
 WHERE
@@ -83,9 +83,10 @@ func (r *Repository) FindUniqueProjectForm(p *FindUniqueProjectFormParams) (*mod
 	var sheet model.ProjectForm
 	err := row.Scan(
 		&sheet.Id,
-		&sheet.Title,
-		&sheet.RowCount,
-		&sheet.Rows,
+		&sheet.Name,
+		&sheet.Description,
+		&sheet.Metadata,
+		&sheet.Data,
 		&sheet.CreatedAt,
 		&sheet.UpdatedAt,
 	)
