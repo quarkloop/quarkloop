@@ -17,17 +17,17 @@ import (
 
 type CreateWorkspaceParams struct {
 	Context   context.Context
-	OsId      string
+	OrgId     string
 	Workspace model.Workspace
 }
 
 const createWorkspaceMutation = `
 INSERT INTO
-  "system"."Workspace" ("id", "osId", "name", "description", "path")
+  "system"."Workspace" ("id", "orgId", "name", "description", "path")
 VALUES
-  (@id, @osId, @name, @description, @path)
+  (@id, @orgId, @name, @description, @path)
 RETURNING 
-  "id", "osId", "name", "description", "path", "createdAt";
+  "id", "orgId", "name", "description", "path", "createdAt";
 `
 
 func (r *Repository) CreateWorkspace(p *CreateWorkspaceParams) (*model.Workspace, error) {
@@ -37,14 +37,14 @@ func (r *Repository) CreateWorkspace(p *CreateWorkspaceParams) (*model.Workspace
 	}
 
 	p.Workspace.Id = id
-	p.Workspace.Path = fmt.Sprintf("/os/%s/%s", p.OsId, p.Workspace.Id)
+	p.Workspace.Path = fmt.Sprintf("/os/%s/%s", p.OrgId, p.Workspace.Id)
 
 	commandTag, err := r.SystemDbConn.Exec(
 		p.Context,
 		createWorkspaceMutation,
 		pgx.NamedArgs{
 			"id":          p.Workspace.Id,
-			"osId":        p.OsId,
+			"orgId":       p.OrgId,
 			"name":        p.Workspace.Name,
 			"description": p.Workspace.Description,
 			"path":        p.Workspace.Path,
