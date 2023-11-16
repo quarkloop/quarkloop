@@ -16,7 +16,7 @@ import (
 
 type ListProjectsParams struct {
 	Context     context.Context
-	OsId        []string
+	OrgId       []string
 	WorkspaceId []string
 }
 
@@ -31,8 +31,8 @@ WHERE
 
 func (r *Repository) ListProjects(p *ListProjectsParams) ([]model.Project, error) {
 	var whereClause string = `"accessType" = 1` // TODO: 1 => public, 2 => private
-	if len(p.OsId) != 0 {
-		whereClause = `"osId" = ANY (@osId)`
+	if len(p.OrgId) != 0 {
+		whereClause = `"orgId" = ANY (@orgId)`
 	}
 	if len(p.WorkspaceId) != 0 {
 		whereClause = `"workspaceId" = ANY (@workspaceId)`
@@ -40,7 +40,7 @@ func (r *Repository) ListProjects(p *ListProjectsParams) ([]model.Project, error
 	finalQuery := fmt.Sprintf(listProjectsQuery, whereClause)
 
 	rows, err := r.SystemDbConn.Query(p.Context, finalQuery, pgx.NamedArgs{
-		"osId":        p.OsId,
+		"orgId":       p.OrgId,
 		"workspaceId": p.WorkspaceId,
 	})
 	if err != nil {
