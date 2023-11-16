@@ -16,17 +16,17 @@ import (
 
 type CreateProjectPricingParams struct {
 	Context        context.Context
-	AppId          string
+	ProjectId      string
 	ProjectPricing model.ProjectPricing
 }
 
 const createProjectPricingMutation = `
 INSERT INTO
-  "app"."ProjectPricing" ("appId", "title", "rowCount", "rows", "updatedAt")
+  "app"."ProjectPricing" ("projectId", "name", "description", "metadata", "data")
 VALUES
-  (@appId, @title, @rowCount, @rows, @updatedAt)
+  (@projectId, @name, @description, @metadata, @data)
 RETURNING
-  "id", "appId", "title", "rowCount", "rows", "createdAt", "updatedAt";
+  "id", "projectId", "name", "description", "metadata", "data", "createdAt";
 `
 
 func (r *Repository) CreateProjectPricing(p *CreateProjectPricingParams) (*model.ProjectPricing, error) {
@@ -34,11 +34,11 @@ func (r *Repository) CreateProjectPricing(p *CreateProjectPricingParams) (*model
 		p.Context,
 		createProjectPricingMutation,
 		pgx.NamedArgs{
-			"appId":     p.AppId,
-			"title":     p.ProjectPricing.Title,
-			"rowCount":  p.ProjectPricing.RowCount,
-			"rows":      p.ProjectPricing.Rows,
-			"updatedAt": p.ProjectPricing.UpdatedAt,
+			"projectId":   p.ProjectId,
+			"name":        p.ProjectPricing.Name,
+			"description": p.ProjectPricing.Description,
+			"metadata":    p.ProjectPricing.Metadata,
+			"data":        p.ProjectPricing.Data,
 		},
 	)
 	if err != nil {
@@ -59,7 +59,7 @@ func (r *Repository) CreateProjectPricing(p *CreateProjectPricingParams) (*model
 
 type UpdateProjectPricingByIdParams struct {
 	Context        context.Context
-	AppId          string
+	ProjectId      string
 	Id             int
 	ProjectPricing model.ProjectPricing
 }
@@ -68,14 +68,15 @@ const updateProjectPricingByIdMutation = `
 UPDATE
   "app"."ProjectPricing"
 set
-  "title"     = @title,
-  "rowCount"  = @rowCount,
-  "rows"      = @rows,
-  "updatedAt" = @updatedAt
+  "name"        = @name,
+  "description" = @description,
+  "metadata"    = @metadata,
+  "data"        = @data,
+  "updatedAt"   = @updatedAt
 WHERE
   "id" = @id
 AND
-  "appId" = @appId;
+  "projectId" = @projectId;
 `
 
 func (r *Repository) UpdateProjectPricingById(p *UpdateProjectPricingByIdParams) error {
@@ -83,12 +84,13 @@ func (r *Repository) UpdateProjectPricingById(p *UpdateProjectPricingByIdParams)
 		p.Context,
 		updateProjectPricingByIdMutation,
 		pgx.NamedArgs{
-			"appId":     p.AppId,
-			"id":        p.Id,
-			"title":     p.ProjectPricing.Title,
-			"rowCount":  p.ProjectPricing.RowCount,
-			"rows":      p.ProjectPricing.Rows,
-			"updatedAt": time.Now(),
+			"projectId":   p.ProjectId,
+			"id":          p.Id,
+			"name":        p.ProjectPricing.Name,
+			"description": p.ProjectPricing.Description,
+			"metadata":    p.ProjectPricing.Metadata,
+			"data":        p.ProjectPricing.Data,
+			"updatedAt":   time.Now(),
 		},
 	)
 	if err != nil {
@@ -108,9 +110,9 @@ func (r *Repository) UpdateProjectPricingById(p *UpdateProjectPricingByIdParams)
 /// DeleteProjectPricingById
 
 type DeleteProjectPricingByIdParams struct {
-	Context context.Context
-	AppId   string
-	Id      int
+	Context   context.Context
+	ProjectId string
+	Id        int
 }
 
 const deleteProjectPricingByIdMutation = `
@@ -119,13 +121,13 @@ DELETE FROM
 WHERE
   "id" = @id
 AND
-  "appId" = @appId;
+  "projectId" = @projectId;
 `
 
 func (r *Repository) DeleteProjectPricingById(p *DeleteProjectPricingByIdParams) error {
 	commandTag, err := r.AppDbConn.Exec(p.Context, deleteProjectPricingByIdMutation, pgx.NamedArgs{
-		"appId": p.AppId,
-		"id":    p.Id,
+		"projectId": p.ProjectId,
+		"id":        p.Id,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
