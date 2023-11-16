@@ -16,17 +16,17 @@ import (
 
 type CreateProjectFormParams struct {
 	Context     context.Context
-	AppId       string
+	ProjectId   string
 	ProjectForm model.ProjectForm
 }
 
 const createProjectFormMutation = `
 INSERT INTO
-  "app"."ProjectForm" ("appId", "title", "rowCount", "rows", "updatedAt")
+  "app"."ProjectForm" ("projectId", "name", "description", "metadata", "data")
 VALUES
-  (@appId, @title, @rowCount, @rows, @updatedAt)
+  (@projectId, @name, @description, @metadata, @data)
 RETURNING
-  "id", "appId", "title", "rowCount", "rows", "createdAt", "updatedAt";
+  "id", "projectId", "name", "description", "metadata", "data", "createdAt";
 `
 
 func (r *Repository) CreateProjectForm(p *CreateProjectFormParams) (*model.ProjectForm, error) {
@@ -34,11 +34,11 @@ func (r *Repository) CreateProjectForm(p *CreateProjectFormParams) (*model.Proje
 		p.Context,
 		createProjectFormMutation,
 		pgx.NamedArgs{
-			"appId":     p.AppId,
-			"title":     p.ProjectForm.Title,
-			"rowCount":  p.ProjectForm.RowCount,
-			"rows":      p.ProjectForm.Rows,
-			"updatedAt": p.ProjectForm.UpdatedAt,
+			"projectId":   p.ProjectId,
+			"name":        p.ProjectForm.Name,
+			"description": p.ProjectForm.Description,
+			"metadata":    p.ProjectForm.Metadata,
+			"data":        p.ProjectForm.Data,
 		},
 	)
 	if err != nil {
@@ -59,7 +59,7 @@ func (r *Repository) CreateProjectForm(p *CreateProjectFormParams) (*model.Proje
 
 type UpdateProjectFormByIdParams struct {
 	Context     context.Context
-	AppId       string
+	ProjectId   string
 	Id          int
 	ProjectForm model.ProjectForm
 }
@@ -68,14 +68,15 @@ const updateProjectFormByIdMutation = `
 UPDATE
   "app"."ProjectForm"
 set
-  "title"     = @title,
-  "rowCount"  = @rowCount,
-  "rows"      = @rows,
-  "updatedAt" = @updatedAt
+  "name"        = @name,
+  "description" = @description,
+  "metadata"    = @metadata,
+  "data"        = @data,
+  "updatedAt"   = @updatedAt
 WHERE
   "id" = @id
 AND
-  "appId" = @appId;
+  "projectId" = @projectId;
 `
 
 func (r *Repository) UpdateProjectFormById(p *UpdateProjectFormByIdParams) error {
@@ -83,12 +84,13 @@ func (r *Repository) UpdateProjectFormById(p *UpdateProjectFormByIdParams) error
 		p.Context,
 		updateProjectFormByIdMutation,
 		pgx.NamedArgs{
-			"appId":     p.AppId,
-			"id":        p.Id,
-			"title":     p.ProjectForm.Title,
-			"rowCount":  p.ProjectForm.RowCount,
-			"rows":      p.ProjectForm.Rows,
-			"updatedAt": time.Now(),
+			"projectId":   p.ProjectId,
+			"id":          p.Id,
+			"name":        p.ProjectForm.Name,
+			"description": p.ProjectForm.Description,
+			"metadata":    p.ProjectForm.Metadata,
+			"data":        p.ProjectForm.Data,
+			"updatedAt":   time.Now(),
 		},
 	)
 	if err != nil {
@@ -108,9 +110,9 @@ func (r *Repository) UpdateProjectFormById(p *UpdateProjectFormByIdParams) error
 /// DeleteProjectFormById
 
 type DeleteProjectFormByIdParams struct {
-	Context context.Context
-	AppId   string
-	Id      int
+	Context   context.Context
+	ProjectId string
+	Id        int
 }
 
 const deleteProjectFormByIdMutation = `
@@ -119,13 +121,13 @@ DELETE FROM
 WHERE
   "id" = @id
 AND
-  "appId" = @appId;
+  "projectId" = @projectId;
 `
 
 func (r *Repository) DeleteProjectFormById(p *DeleteProjectFormByIdParams) error {
 	commandTag, err := r.AppDbConn.Exec(p.Context, deleteProjectFormByIdMutation, pgx.NamedArgs{
-		"appId": p.AppId,
-		"id":    p.Id,
+		"projectId": p.ProjectId,
+		"id":        p.Id,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
