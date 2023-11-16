@@ -9,7 +9,7 @@ import (
 )
 
 type CreateWorkspaceRequest struct {
-	OsId      string          `json:"osId" binding:"required"`
+	OrgId     string          `json:"orgId" binding:"required"`
 	Workspace model.Workspace `json:"workspace" binding:"required"`
 }
 
@@ -29,7 +29,7 @@ func (s *ServerApi) CreateWorkspace(c *gin.Context) {
 	ws, err := s.dataStore.CreateWorkspace(
 		&repository.CreateWorkspaceParams{
 			Context:   c,
-			OsId:      req.OsId,
+			OrgId:     req.OrgId,
 			Workspace: req.Workspace,
 		},
 	)
