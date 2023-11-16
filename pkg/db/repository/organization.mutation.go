@@ -69,7 +69,7 @@ func (r *Repository) CreateOrganization(p *CreateOrganizationParams) (*model.Org
 
 type UpdateOrganizationByIdParams struct {
 	Context context.Context
-	OsId    string
+	OrgId   string
 	Os      model.Organization
 }
 
@@ -90,7 +90,7 @@ func (r *Repository) UpdateOrganizationById(p *UpdateOrganizationByIdParams) err
 		p.Context,
 		updateOrganizationByIdMutation,
 		pgx.NamedArgs{
-			"id":          p.OsId,
+			"id":          p.OrgId,
 			"name":        p.Os.Name,
 			"description": p.Os.Description,
 			"path":        p.Os.Path,
@@ -115,7 +115,7 @@ func (r *Repository) UpdateOrganizationById(p *UpdateOrganizationByIdParams) err
 
 type DeleteOrganizationByIdParams struct {
 	Context context.Context
-	OsId    string
+	OrgId   string
 }
 
 const deleteOrganizationByIdMutation = `
@@ -126,7 +126,7 @@ WHERE
 `
 
 func (r *Repository) DeleteOrganizationById(p *DeleteOrganizationByIdParams) error {
-	commandTag, err := r.SystemDbConn.Exec(p.Context, deleteOrganizationByIdMutation, pgx.NamedArgs{"id": p.OsId})
+	commandTag, err := r.SystemDbConn.Exec(p.Context, deleteOrganizationByIdMutation, pgx.NamedArgs{"id": p.OrgId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
 		return err
