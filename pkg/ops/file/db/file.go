@@ -11,9 +11,9 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/ops/file/model"
 )
 
-func GetFileById(appId, instanceId, fileId string) (*model.File, error) {
+func GetFileById(projectId, instanceId, fileId string) (*model.File, error) {
 	params := url.Values{}
-	params.Add("appId", appId)
+	params.Add("projectId", projectId)
 	params.Add("instanceId", instanceId)
 	params.Add("fileId", fileId)
 
@@ -40,9 +40,9 @@ func GetFileById(appId, instanceId, fileId string) (*model.File, error) {
 	return nil, errors.New("file not found")
 }
 
-func CreateFile(appId, instanceId string, file *model.File) (*model.File, error) {
+func CreateFile(projectId, instanceId string, file *model.File) (*model.File, error) {
 	params := url.Values{}
-	params.Add("appId", appId)
+	params.Add("projectId", projectId)
 	params.Add("instanceId", instanceId)
 
 	payload, err := json.Marshal(file)
@@ -73,9 +73,9 @@ func CreateFile(appId, instanceId string, file *model.File) (*model.File, error)
 	return nil, errors.New("failed to create file")
 }
 
-func UpdateFile(appId, instanceId string, file *model.File) (*model.File, error) {
+func UpdateFile(projectId, instanceId string, file *model.File) (*model.File, error) {
 	params := url.Values{}
-	params.Add("appId", appId)
+	params.Add("projectId", projectId)
 	params.Add("instanceId", instanceId)
 
 	payload, err := json.Marshal(file)
@@ -106,9 +106,9 @@ func UpdateFile(appId, instanceId string, file *model.File) (*model.File, error)
 	return nil, errors.New("failed to update file")
 }
 
-func DeleteFile(appId, instanceId, fileId string) error {
+func DeleteFile(projectId, instanceId, fileId string) error {
 	params := url.Values{}
-	params.Add("appId", appId)
+	params.Add("projectId", projectId)
 	params.Add("instanceId", instanceId)
 	params.Add("fileId", fileId)
 
