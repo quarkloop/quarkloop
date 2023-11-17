@@ -9,7 +9,7 @@ import (
 
 type UpdateFileArgs struct {
 	Where struct {
-		AppId      string `json:"appId" binding:"required"`
+		AppId      string `json:"projectId" binding:"required"`
 		InstanceId string `json:"instanceId" binding:"required"`
 	} `json:"where" binding:"required"`
 	Data struct {
