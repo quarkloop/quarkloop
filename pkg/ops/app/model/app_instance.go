@@ -1,8 +1,11 @@
 package model
 
+import "time"
+
 type AppInstance struct {
-	AppId      string `json:"appId"`
-	InstanceId string `json:"instanceId"`
-	ID         string `json:"id,omitempty"`
-	Name       string `json:"name"`
+	ID        string    `json:"id,omitempty"`
+	AppId     string    `json:"projectId"`
+	Name      string    `json:"name,omitempty"`
+	CreatedAt time.Time `json:"createdAt,omitempty"`
+	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 }
