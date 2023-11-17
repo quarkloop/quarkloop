@@ -9,7 +9,7 @@ import (
 
 type CreateAppArgs struct {
 	Data struct {
-		App model.App `json:"app" binding:"required"`
+		Project model.Project `json:"app" binding:"required"`
 	} `json:"data" binding:"required"`
 	Select *struct {
 		Id   *bool `json:"id"`
@@ -23,7 +23,7 @@ func CreateApp(args json.RawMessage) (interface{}, error) {
 		return nil, err
 	}
 
-	app, err := db.CreateApp(&appArgs.Data.App)
+	app, err := db.CreateApp(&appArgs.Data.Project)
 	if err != nil {
 		return nil, err
 	}
