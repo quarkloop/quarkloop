@@ -8,7 +8,7 @@ import (
 
 type DeleteAppArgs struct {
 	Where struct {
-		AppId string `json:"appId" binding:"required"`
+		AppId string `json:"projectId" binding:"required"`
 	} `json:"where" binding:"required"`
 }
 
