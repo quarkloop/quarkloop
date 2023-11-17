@@ -9,10 +9,10 @@ import (
 
 type UpdateAppArgs struct {
 	Where struct {
-		AppId string `json:"appId" binding:"required"`
+		AppId string `json:"projectId" binding:"required"`
 	} `json:"where" binding:"required"`
 	Data struct {
-		App model.App `json:"app" binding:"required"`
+		Project model.Project `json:"app" binding:"required"`
 	} `json:"data" binding:"required"`
 	Select *struct {
 		Id   *bool `json:"id"`
@@ -26,7 +26,7 @@ func UpdateApp(args json.RawMessage) (interface{}, error) {
 		return nil, err
 	}
 
-	app, err := db.UpdateApp(&appArgs.Data.App)
+	app, err := db.UpdateApp(&appArgs.Data.Project)
 	if err != nil {
 		return nil, err
 	}
