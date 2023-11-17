@@ -11,7 +11,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/ops/app/model"
 )
 
-func CreateApp(app *model.App) (*model.App, error) {
+func CreateApp(app *model.Project) (*model.Project, error) {
 	payload, err := json.Marshal(app)
 	if err != nil {
 		return nil, err
@@ -29,8 +29,8 @@ func CreateApp(app *model.App) (*model.App, error) {
 			return nil, err
 		}
 
-		var app model.App
-		if err := json.Unmarshal(payload.Database.App.Records, &app); err != nil {
+		var app model.Project
+		if err := json.Unmarshal(payload.Database.Project.Records, &app); err != nil {
 			return nil, err
 		}
 
@@ -40,7 +40,7 @@ func CreateApp(app *model.App) (*model.App, error) {
 	return nil, errors.New("failed to create app")
 }
 
-func UpdateApp(app *model.App) (*model.App, error) {
+func UpdateApp(app *model.Project) (*model.Project, error) {
 	payload, err := json.Marshal(app)
 	if err != nil {
 		return nil, err
@@ -58,8 +58,8 @@ func UpdateApp(app *model.App) (*model.App, error) {
 			return nil, err
 		}
 
-		var app model.App
-		if err := json.Unmarshal(payload.Database.App.Records, &app); err != nil {
+		var app model.Project
+		if err := json.Unmarshal(payload.Database.Project.Records, &app); err != nil {
 			return nil, err
 		}
 
@@ -69,9 +69,9 @@ func UpdateApp(app *model.App) (*model.App, error) {
 	return nil, errors.New("failed to update app")
 }
 
-func DeleteApp(appId string) error {
+func DeleteApp(projectId string) error {
 	q := url.Values{}
-	q.Add("id", appId)
+	q.Add("id", projectId)
 
 	res, err := client.DatabaseClient.Delete("http://localhost:3000/api/v1/tables/app", &q)
 	if err != nil {
@@ -149,9 +149,9 @@ func UpdateAppInstance(instance *model.AppInstance) (*model.AppInstance, error) 
 	return nil, errors.New("failed to update app instance")
 }
 
-func DeleteAppInstance(appId string) error {
+func DeleteAppInstance(projectId string) error {
 	q := url.Values{}
-	q.Add("id", appId)
+	q.Add("id", projectId)
 
 	res, err := client.DatabaseClient.Delete("http://localhost:3000/api/v1/tables/appInstance", &q)
 	if err != nil {
