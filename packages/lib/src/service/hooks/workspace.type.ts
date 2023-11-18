@@ -12,20 +12,20 @@ export type GetWorkspaceByIdApiResponse = z.infer<
 >;
 export type GetWorkspaceByIdApiArgs = {
     id: string;
-    osId: string;
+    orgId: string;
 };
 
-/// GetWorkspacesByOsId
-export const getWorkspacesByOsIdSchema = apiResponseV2Schema.merge(
+/// GetWorkspacesByOrgId
+export const getWorkspacesByOrgIdSchema = apiResponseV2Schema.merge(
     z.object({
         data: z.array(workspaceSchema),
     })
 );
-export type GetWorkspacesByOsIdApiResponse = z.infer<
-    typeof getWorkspacesByOsIdSchema
+export type GetWorkspacesByOrgIdApiResponse = z.infer<
+    typeof getWorkspacesByOrgIdSchema
 >;
-export type GetWorkspacesByOsIdApiArgs = {
-    osId: string;
+export type GetWorkspacesByOrgIdApiArgs = {
+    orgId: string[];
 };
 
 /// CreateWorkspace
@@ -36,7 +36,7 @@ export const createWorkspaceSchema = apiResponseV2Schema.merge(
 );
 export type CreateWorkspaceApiResponse = z.infer<typeof createWorkspaceSchema>;
 export type CreateWorkspaceApiArgs = {
-    osId: string;
+    orgId: string;
     workspace: Partial<z.infer<typeof workspaceSchema>>;
 };
 
@@ -48,7 +48,7 @@ export const updateWorkspaceSchema = apiResponseV2Schema.merge(
 );
 export type UpdateWorkspaceApiResponse = z.infer<typeof updateWorkspaceSchema>;
 export type UpdateWorkspaceApiArgs = {
-    osId: string;
+    orgId: string;
     workspace: Partial<z.infer<typeof workspaceSchema>>;
 };
 
@@ -58,8 +58,8 @@ export const deleteWorkspaceSchema = apiResponseV2Schema.merge(
         data: workspaceSchema,
     })
 );
-export type DeleteWorkspaceApiResponse = z.infer<typeof deleteWorkspaceSchema>;
+export type DeleteWorkspaceApiResponse = void;
 export type DeleteWorkspaceApiArgs = {
     id: string;
-    osId: string;
+    orgId: string;
 };
