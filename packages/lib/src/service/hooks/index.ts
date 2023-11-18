@@ -1,11 +1,11 @@
 export * from "./user.service";
-export * from "./os.service";
+export * from "./organization.service";
 export * from "./workspace.service";
-export * from "./app.service";
+export * from "./project.service";
 export * from "./planSubscription.service";
 
-// export * from "./app.service";
-// export * from "./app-submission.service";
+// export * from "./project.service";
+// export * from "./project-submission.service";
 
 // export * from "./conversation-settings.service";
 // export * from "./conversation-data.service";
