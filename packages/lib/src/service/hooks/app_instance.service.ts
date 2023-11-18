@@ -32,7 +32,7 @@ const endpoint = enpointApi
                 GetAppInstanceByIdApiArgs
             >({
                 query: (queryArg) => ({
-                    url: `/apps/${queryArg.appId}/instances/${queryArg.instanceId}`,
+                    url: `/apps/${queryArg.projectId}/instances/${queryArg.instanceId}`,
                     method: "GET",
                 }),
                 providesTags: ["appInstance"],
@@ -47,7 +47,7 @@ const endpoint = enpointApi
                 GetAppInstanceListApiArgs
             >({
                 query: (queryArg) => ({
-                    url: `/apps/${queryArg.appId}/instances`,
+                    url: `/apps/${queryArg.projectId}/instances`,
                     method: "GET",
                 }),
                 providesTags: ["appInstance"],
@@ -62,7 +62,7 @@ const endpoint = enpointApi
                 CreateAppInstanceApiArgs
             >({
                 query: (queryArg) => ({
-                    url: `/apps/${queryArg.appId}/instances`,
+                    url: `/apps/${queryArg.projectId}/instances`,
                     method: "POST",
                     body: queryArg,
                 }),
@@ -78,7 +78,7 @@ const endpoint = enpointApi
                 UpdateAppInstanceApiArgs
             >({
                 query: (queryArg) => ({
-                    url: `/apps/${queryArg.appId}/instances/${queryArg.instanceId}`,
+                    url: `/apps/${queryArg.projectId}/instances/${queryArg.instanceId}`,
                     method: "PUT",
                     body: queryArg,
                 }),
@@ -94,7 +94,7 @@ const endpoint = enpointApi
                 DeleteAppInstanceApiArgs
             >({
                 query: (queryArg) => ({
-                    url: `/apps/${queryArg.appId}/instances/${queryArg.instanceId}`,
+                    url: `/apps/${queryArg.projectId}/instances/${queryArg.instanceId}`,
                     method: "DELETE",
                 }),
                 invalidatesTags: ["appInstance"],
