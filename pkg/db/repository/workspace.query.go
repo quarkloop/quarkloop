@@ -36,7 +36,7 @@ func (r *Repository) ListWorkspaces(p *ListWorkspacesParams) ([]model.Workspace,
 	}
 	defer rows.Close()
 
-	var wsList []model.Workspace
+	var wsList []model.Workspace = []model.Workspace{}
 
 	for rows.Next() {
 		var workspace model.Workspace
