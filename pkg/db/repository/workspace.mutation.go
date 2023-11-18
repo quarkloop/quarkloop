@@ -23,11 +23,11 @@ type CreateWorkspaceParams struct {
 
 const createWorkspaceMutation = `
 INSERT INTO
-  "system"."Workspace" ("id", "orgId", "name", "description", "path")
+  "system"."Workspace" ("orgId", "id", "name", "accessType", "description", "path")
 VALUES
-  (@id, @orgId, @name, @description, @path)
+  (@orgId, @id, @name, @accessType, @description, @path)
 RETURNING 
-  "id", "orgId", "name", "description", "path", "createdAt";
+  "orgId", "id", "name", "accessType", "description", "path", "createdAt";
 `
 
 func (r *Repository) CreateWorkspace(p *CreateWorkspaceParams) (*model.Workspace, error) {
@@ -37,15 +37,16 @@ func (r *Repository) CreateWorkspace(p *CreateWorkspaceParams) (*model.Workspace
 	}
 
 	p.Workspace.Id = id
-	p.Workspace.Path = fmt.Sprintf("/os/%s/%s", p.OrgId, p.Workspace.Id)
+	p.Workspace.Path = fmt.Sprintf("/org/%s/%s", p.OrgId, p.Workspace.Id)
 
 	commandTag, err := r.SystemDbConn.Exec(
 		p.Context,
 		createWorkspaceMutation,
 		pgx.NamedArgs{
-			"id":          p.Workspace.Id,
 			"orgId":       p.OrgId,
+			"id":          p.Workspace.Id,
 			"name":        p.Workspace.Name,
+			"accessType":  p.Workspace.AccessType,
 			"description": p.Workspace.Description,
 			"path":        p.Workspace.Path,
 		},
@@ -77,6 +78,7 @@ UPDATE
   "system"."Workspace"
 SET
   "name"        = @name,
+  "accessType"  = @accessType,
   "description" = @description,
   "path"        = @path,
   "updatedAt"   = @updatedAt
@@ -91,6 +93,7 @@ func (r *Repository) UpdateWorkspaceById(p *UpdateWorkspaceByIdParams) error {
 		pgx.NamedArgs{
 			"id":          p.WorkspaceId,
 			"name":        p.Workspace.Name,
+			"accessType":  p.Workspace.AccessType,
 			"description": p.Workspace.Description,
 			"path":        p.Workspace.Path,
 			"updatedAt":   time.Now(),
