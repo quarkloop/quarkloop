@@ -6,8 +6,8 @@ import {
     GetWorkspaceByIdApiArgs,
     // GetWorkspaceByNameApiResponse,
     // GetWorkspaceByNameApiArgs,
-    GetWorkspacesByOsIdApiResponse,
-    GetWorkspacesByOsIdApiArgs,
+    GetWorkspacesByOrgIdApiResponse,
+    GetWorkspacesByOrgIdApiArgs,
     CreateWorkspaceApiResponse,
     CreateWorkspaceApiArgs,
     UpdateWorkspaceApiResponse,
@@ -18,7 +18,7 @@ import {
 
 import {
     getWorkspaceByIdSchema,
-    getWorkspacesByOsIdSchema,
+    getWorkspacesByOrgIdSchema,
     createWorkspaceSchema,
     updateWorkspaceSchema,
     deleteWorkspaceSchema,
@@ -34,7 +34,7 @@ const endpoint = enpointApi
                 GetWorkspaceByIdApiArgs
             >({
                 query: (queryArg) => ({
-                    url: `/os/${queryArg.osId}/workspaces/${queryArg.id}`,
+                    url: `/workspaces/${queryArg.id}`,
                     method: "GET",
                 }),
                 providesTags: ["workspace"],
@@ -49,25 +49,28 @@ const endpoint = enpointApi
             //     GetWorkspaceByNameApiArgs
             // >({
             //     query: (queryArg) => ({
-            //         url: `/os/${queryArg.osId}/workspace`,
+            //         url: `/workspace`,
             //         method: "GET",
             //         params: { name: queryArg.name },
             //     }),
             //     providesTags: ['workspace'],
             // }),
 
-            // getWorkspacesByOsId endpoint
-            getWorkspacesByOsId: builder.query<
-                GetWorkspacesByOsIdApiResponse,
-                GetWorkspacesByOsIdApiArgs
+            // getWorkspacesByOrgId endpoint
+            getWorkspacesByOrgId: builder.query<
+                GetWorkspacesByOrgIdApiResponse,
+                GetWorkspacesByOrgIdApiArgs
             >({
                 query: (queryArg) => ({
-                    url: `/os/${queryArg.osId}/workspaces`,
+                    url: `/workspaces`,
                     method: "GET",
+                    params: {
+                        orgId: queryArg.orgId,
+                    },
                 }),
                 providesTags: ["workspace"],
                 extraOptions: {
-                    dataSchema: getWorkspacesByOsIdSchema,
+                    dataSchema: getWorkspacesByOrgIdSchema,
                 },
             }),
 
@@ -77,7 +80,7 @@ const endpoint = enpointApi
                 CreateWorkspaceApiArgs
             >({
                 query: (queryArg) => ({
-                    url: `/os/${queryArg.osId}/workspaces`,
+                    url: `/workspaces`,
                     method: "POST",
                     body: queryArg,
                 }),
@@ -93,9 +96,7 @@ const endpoint = enpointApi
                 UpdateWorkspaceApiArgs
             >({
                 query: (queryArg) => ({
-                    url: `/os/${queryArg.osId}/workspaces/${
-                        queryArg.workspace!.id
-                    }`,
+                    url: `/workspaces/${queryArg.workspace!.id}`,
                     method: "PUT",
                     body: queryArg,
                 }),
@@ -111,7 +112,7 @@ const endpoint = enpointApi
                 DeleteWorkspaceApiArgs
             >({
                 query: (queryArg) => ({
-                    url: `/os/${queryArg.osId}/workspaces/${queryArg.id}`,
+                    url: `/workspaces/${queryArg.id}`,
                     method: "DELETE",
                 }),
                 invalidatesTags: ["workspace"],
@@ -125,7 +126,7 @@ const endpoint = enpointApi
 export const {
     useGetWorkspaceByIdQuery,
     useLazyGetWorkspaceByIdQuery,
-    useGetWorkspacesByOsIdQuery,
+    useGetWorkspacesByOrgIdQuery,
     useCreateWorkspaceMutation,
     useUpdateWorkspaceMutation,
     useDeleteWorkspaceMutation,
