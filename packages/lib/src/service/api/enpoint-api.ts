@@ -34,10 +34,12 @@ const baseQueryWithZodValidation: (baseQuery: TBaseQuery) => TBaseQuery =
 
         const zodSchema = extraOptions?.dataSchema;
         const { data } = returnValue;
+
         if (data && zodSchema) {
             try {
                 zodSchema.parse(data);
             } catch (error: any) {
+                console.error(error);
                 return { error };
             }
         }
