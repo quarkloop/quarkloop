@@ -16,17 +16,17 @@ import (
 /// CreateOrganization
 
 type CreateOrganizationParams struct {
-	Context context.Context
-	Os      model.Organization
+	Context      context.Context
+	Organization model.Organization
 }
 
 const createOrganizationMutation = `
 INSERT INTO
-  "system"."Organization" ("id", "name", "description", "path")
+  "system"."Organization" ("id", "name", "accessType", "description", "path")
 VALUES
-  (@id, @name, @description, @path)
+  (@id, @name, @accessType, @description, @path)
 RETURNING 
-  "id", "name", "description", "path", "createdAt";
+  "id", "name", "accessType", "description", "path", "createdAt";
 `
 
 func (r *Repository) CreateOrganization(p *CreateOrganizationParams) (*model.Organization, error) {
@@ -35,20 +35,18 @@ func (r *Repository) CreateOrganization(p *CreateOrganizationParams) (*model.Org
 		return nil, err
 	}
 
-	p.Os.Id = id
-	p.Os.Path = fmt.Sprintf("/os/%s", id)
+	p.Organization.Id = id
+	p.Organization.Path = fmt.Sprintf("/org/%s", id)
 
 	commandTag, err := r.SystemDbConn.Exec(
 		p.Context,
 		createOrganizationMutation,
 		pgx.NamedArgs{
-			"id":          p.Os.Id,
-			"name":        p.Os.Name,
-			"description": p.Os.Description,
-			"path":        p.Os.Path,
-			// p.Os.Overview,
-			// p.Os.ImageUrl,
-			// p.Os.WebsiteUrl,
+			"id":          p.Organization.Id,
+			"name":        p.Organization.Name,
+			"accessType":  p.Organization.AccessType,
+			"description": p.Organization.Description,
+			"path":        p.Organization.Path,
 		},
 	)
 	if err != nil {
@@ -62,15 +60,15 @@ func (r *Repository) CreateOrganization(p *CreateOrganizationParams) (*model.Org
 		return nil, notFoundErr
 	}
 
-	return &p.Os, nil
+	return &p.Organization, nil
 }
 
 /// UpdateOrganizationById
 
 type UpdateOrganizationByIdParams struct {
-	Context context.Context
-	OrgId   string
-	Os      model.Organization
+	Context      context.Context
+	OrgId        string
+	Organization model.Organization
 }
 
 const updateOrganizationByIdMutation = `
@@ -78,6 +76,7 @@ UPDATE
   "system"."Organization"
 SET
   "name"        = @name,
+  "accessType"  = @accessType,
   "description" = @description,
   "path"        = @path,
   "updatedAt"   = @updatedAt
@@ -91,9 +90,10 @@ func (r *Repository) UpdateOrganizationById(p *UpdateOrganizationByIdParams) err
 		updateOrganizationByIdMutation,
 		pgx.NamedArgs{
 			"id":          p.OrgId,
-			"name":        p.Os.Name,
-			"description": p.Os.Description,
-			"path":        p.Os.Path,
+			"name":        p.Organization.Name,
+			"accessType":  p.Organization.AccessType,
+			"description": p.Organization.Description,
+			"path":        p.Organization.Path,
 			"updatedAt":   time.Now(),
 		},
 	)
@@ -131,6 +131,8 @@ func (r *Repository) DeleteOrganizationById(p *DeleteOrganizationByIdParams) err
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
 		return err
 	}
+
+	fmt.Printf("\nDE: %v\n", *p)
 
 	if commandTag.RowsAffected() != 1 {
 		notFoundErr := errors.New("cannot find to delete")
