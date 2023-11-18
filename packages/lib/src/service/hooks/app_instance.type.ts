@@ -15,7 +15,7 @@ export type GetAppInstanceListApiResponse = z.infer<
     typeof getAppInstanceListSchema
 >;
 export type GetAppInstanceListApiArgs = {
-    appId?: string;
+    projectId?: string;
 };
 
 /// GetAppInstanceById
@@ -28,7 +28,7 @@ export type GetAppInstanceByIdApiResponse = z.infer<
     typeof getAppInstanceByIdSchema
 >;
 export type GetAppInstanceByIdApiArgs = {
-    appId: string;
+    projectId: string;
     instanceId: string;
 };
 
@@ -42,8 +42,8 @@ export type CreateAppInstanceApiResponse = z.infer<
     typeof getAppInstanceByIdSchema
 >;
 export type CreateAppInstanceApiArgs = {
-    appId: string;
-    app: AppInstance;
+    projectId: string;
+    project: AppInstance;
 };
 
 /// UpdateAppInstance
@@ -56,9 +56,9 @@ export type UpdateAppInstanceApiResponse = z.infer<
     typeof updateAppInstanceSchema
 >;
 export type UpdateAppInstanceApiArgs = {
-    appId: string;
+    projectId: string;
     instanceId: string;
-    app: AppInstance;
+    project: AppInstance;
 };
 
 /// DeleteAppInstance
@@ -67,6 +67,6 @@ export type DeleteAppInstanceApiResponse = z.infer<
     typeof deleteAppInstanceSchema
 >;
 export type DeleteAppInstanceApiArgs = {
-    appId: string;
+    projectId: string;
     instanceId: string;
 };
