@@ -38,9 +38,7 @@ func (r *Repository) CreateProject(p *CreateProjectParams) (*model.Project, erro
 	}
 
 	p.Project.Id = id
-	p.Project.Path = fmt.Sprintf("/os/%s/%s/%s", p.OrgId, p.WorkspaceId, id)
-
-	fmt.Printf("\n%v\n", p)
+	p.Project.Path = fmt.Sprintf("/org/%s/%s/%s", p.OrgId, p.WorkspaceId, id)
 
 	commandTag, err := r.SystemDbConn.Exec(
 		p.Context,
