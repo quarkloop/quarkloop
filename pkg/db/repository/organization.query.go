@@ -20,7 +20,7 @@ type ListOrganizationsParams struct {
 
 const listOrganizationsQuery = `
 SELECT 
-  "id", "name", "description", "path", "createdAt", "updatedAt"
+  "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
 FROM 
   "system"."Organization";
 `
@@ -33,23 +33,24 @@ func (r *Repository) ListOrganizations(p *ListOrganizationsParams) ([]model.Orga
 	}
 	defer rows.Close()
 
-	var osList []model.Organization
+	var orgList []model.Organization = []model.Organization{}
 
 	for rows.Next() {
-		var operatingSystem model.Organization
+		var organization model.Organization
 		err := rows.Scan(
-			&operatingSystem.Id,
-			&operatingSystem.Name,
-			&operatingSystem.Description,
-			&operatingSystem.Path,
-			&operatingSystem.CreatedAt,
-			&operatingSystem.UpdatedAt,
+			&organization.Id,
+			&organization.Name,
+			&organization.AccessType,
+			&organization.Description,
+			&organization.Path,
+			&organization.CreatedAt,
+			&organization.UpdatedAt,
 		)
 		if err != nil {
 			return nil, err
 		}
 
-		osList = append(osList, operatingSystem)
+		orgList = append(orgList, organization)
 	}
 
 	if err := rows.Err(); err != nil {
@@ -57,7 +58,7 @@ func (r *Repository) ListOrganizations(p *ListOrganizationsParams) ([]model.Orga
 		return nil, err
 	}
 
-	return osList, nil
+	return orgList, nil
 }
 
 /// FindUniqueOrganization
@@ -69,7 +70,7 @@ type FindUniqueOrganizationParams struct {
 
 const findUniqueOrganizationQuery = `
 SELECT 
-  "id", "name", "description", "path", "createdAt", "updatedAt"
+  "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
 FROM 
   "system"."Organization" 
 WHERE 
@@ -79,21 +80,22 @@ WHERE
 func (r *Repository) FindUniqueOrganization(p *FindUniqueOrganizationParams) (*model.Organization, error) {
 	row := r.SystemDbConn.QueryRow(p.Context, findUniqueOrganizationQuery, pgx.NamedArgs{"id": p.Id})
 
-	var operatingSystem model.Organization
+	var organization model.Organization
 	err := row.Scan(
-		&operatingSystem.Id,
-		&operatingSystem.Name,
-		&operatingSystem.Description,
-		&operatingSystem.Path,
-		&operatingSystem.CreatedAt,
-		&operatingSystem.UpdatedAt,
+		&organization.Id,
+		&organization.Name,
+		&organization.AccessType,
+		&organization.Description,
+		&organization.Path,
+		&organization.CreatedAt,
+		&organization.UpdatedAt,
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
 		return nil, err
 	}
 
-	return &operatingSystem, nil
+	return &organization, nil
 }
 
 /// FindFirstOrganization
@@ -105,7 +107,7 @@ type FindFirstOrganizationParams struct {
 
 const findFirstOrganizationQuery = `
 SELECT 
-  "id", "name", "description", "path", "createdAt", "updatedAt"
+  "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
 FROM 
   "system"."Organization" 
 WHERE
@@ -113,14 +115,15 @@ WHERE
 
 func (r *Repository) FindFirstOrganization(p *FindFirstOrganizationParams) (*model.Organization, error) {
 	availableFields := []string{}
-	operatingSystemFields := map[string]interface{}{
-		"id":        p.Organization.Id,
-		"name":      p.Organization.Name,
-		"path":      p.Organization.Path,
-		"createdAt": p.Organization.CreatedAt,
-		"updatedAt": p.Organization.UpdatedAt,
+	organizationFields := map[string]interface{}{
+		"id":         p.Organization.Id,
+		"name":       p.Organization.Name,
+		"accessType": p.Organization.AccessType,
+		"path":       p.Organization.Path,
+		"createdAt":  p.Organization.CreatedAt,
+		"updatedAt":  p.Organization.UpdatedAt,
 	}
-	for key, value := range operatingSystemFields {
+	for key, value := range organizationFields {
 		switch v := value.(type) {
 		case int:
 			if v != 0 {
@@ -144,19 +147,20 @@ func (r *Repository) FindFirstOrganization(p *FindFirstOrganizationParams) (*mod
 
 	row := r.SystemDbConn.QueryRow(p.Context, finalQuery)
 
-	var operatingSystem model.Organization
+	var organization model.Organization
 	err := row.Scan(
-		&operatingSystem.Id,
-		&operatingSystem.Name,
-		&operatingSystem.Description,
-		&operatingSystem.Path,
-		&operatingSystem.CreatedAt,
-		&operatingSystem.UpdatedAt,
+		&organization.Id,
+		&organization.Name,
+		&organization.AccessType,
+		&organization.Description,
+		&organization.Path,
+		&organization.CreatedAt,
+		&organization.UpdatedAt,
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
 		return nil, err
 	}
 
-	return &operatingSystem, nil
+	return &organization, nil
 }
