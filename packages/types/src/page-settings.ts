@@ -8,7 +8,7 @@ export interface AppPageSettings {
     content: string;
     createdAt: Date | null;
     updatedAt: Date | null;
-    appId: string;
+    projectId: string;
 }
 
 // export type AppPageSettingsPluginArgs =
@@ -23,7 +23,7 @@ export interface GetAppPageSettingsById {}
 export interface GetAppPageSettingsByIdApiResponse extends ApiResponse {}
 export interface GetAppPageSettingsByIdApiArgs {
     id: string;
-    appId: string;
+    projectId: string;
 }
 export interface GetAppPageSettingsByIdPluginArgs
     extends GetAppPageSettingsByIdApiArgs {}
@@ -32,7 +32,7 @@ export interface GetAppPageSettingsByIdPluginArgs
 export interface GetAppPagesSettingsByAppId {}
 export interface GetAppPagesSettingsByAppIdApiResponse extends ApiResponse {}
 export interface GetAppPagesSettingsByAppIdApiArgs {
-    appId: string;
+    projectId: string;
 }
 export interface GetAppPagesSettingsByAppIdPluginArgs
     extends GetAppPagesSettingsByAppIdApiArgs {}
@@ -41,7 +41,7 @@ export interface GetAppPagesSettingsByAppIdPluginArgs
 export interface CreateAppPageSettings {}
 export interface CreateAppPageSettingsApiResponse extends ApiResponse {}
 export interface CreateAppPageSettingsApiArgs extends Partial<AppPageSettings> {
-    appId: string;
+    projectId: string;
 }
 export interface CreateAppPageSettingsPluginArgs
     extends CreateAppPageSettingsApiArgs {}
@@ -51,7 +51,7 @@ export interface UpdateAppPageSettings {}
 export interface UpdateAppPageSettingsApiResponse extends ApiResponse {}
 export interface UpdateAppPageSettingsApiArgs extends Partial<AppPageSettings> {
     id: string;
-    appId: string;
+    projectId: string;
 }
 export interface UpdateAppPageSettingsPluginArgs
     extends UpdateAppPageSettingsApiArgs {}
@@ -61,7 +61,7 @@ export interface DeleteAppPageSettings {}
 export interface DeleteAppPageSettingsApiResponse extends ApiResponse {}
 export interface DeleteAppPageSettingsApiArgs {
     id: string;
-    appId: string;
+    projectId: string;
 }
 export interface DeleteAppPageSettingsPluginArgs
     extends DeleteAppPageSettingsApiArgs {}
