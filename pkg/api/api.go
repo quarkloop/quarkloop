@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/quarkloop/quarkloop/pkg/db/repository"
+	"github.com/quarkloop/quarkloop/pkg/store/repository"
 )
 
 type ServerApi struct {
