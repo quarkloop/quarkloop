@@ -9,10 +9,10 @@ import (
 type GetAppDeploymentListResponse struct{}
 
 func (s *ServerApi) GetAppDeploymentList(c *gin.Context) {
-	osId := c.Param("osId")
+	orgId := c.Param("orgId")
 	workspaceId := c.Param("workspaceId")
-	appId := c.Param("appId")
-	_ = osId + workspaceId + appId
+	projectId := c.Param("projectId")
+	_ = orgId + workspaceId + projectId
 
 	// query database
 
@@ -23,11 +23,11 @@ func (s *ServerApi) GetAppDeploymentList(c *gin.Context) {
 type GetAppDeploymentByIdResponse struct{}
 
 func (s *ServerApi) GetAppDeploymentById(c *gin.Context) {
-	osId := c.Param("osId")
+	orgId := c.Param("orgId")
 	workspaceId := c.Param("workspaceId")
-	appId := c.Param("appId")
+	projectId := c.Param("projectId")
 	deploymentId := c.Param("deploymentId")
-	_ = osId + workspaceId + appId + deploymentId
+	_ = orgId + workspaceId + projectId + deploymentId
 
 	// query database
 
