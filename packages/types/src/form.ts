@@ -20,7 +20,7 @@ export interface AppForm {
 export interface GetAppFormByAppInstanceId {}
 export interface GetAppFormByAppInstanceIdApiResponse extends ApiResponse {}
 export interface GetAppFormByAppInstanceIdApiArgs {
-    appId: string;
+    projectId: string;
     instanceId: string;
 }
 export interface GetAppFormByAppInstanceIdPluginArgs
@@ -30,7 +30,7 @@ export interface GetAppFormByAppInstanceIdPluginArgs
 export interface GetAppFormById {}
 export interface GetAppFormByIdApiResponse extends ApiResponse {}
 export interface GetAppFormByIdApiArgs {
-    appId: string;
+    projectId: string;
     instanceId: string;
     formId: string;
 }
@@ -40,7 +40,7 @@ export interface GetAppFormByIdPluginArgs extends GetAppFormByIdApiArgs {}
 export interface CreateAppForm {}
 export interface CreateAppFormApiResponse extends ApiResponse {}
 export interface CreateAppFormApiArgs {
-    appId: string;
+    projectId: string;
     instanceId: string;
     form: Partial<AppForm>;
 }
@@ -50,7 +50,7 @@ export interface CreateAppFormPluginArgs extends CreateAppFormApiArgs {}
 export interface UpdateAppForm {}
 export interface UpdateAppFormApiResponse extends ApiResponse {}
 export interface UpdateAppFormApiArgs {
-    appId: string;
+    projectId: string;
     instanceId: string;
     form: Partial<AppForm>;
 }
@@ -60,7 +60,7 @@ export interface UpdateAppFormPluginArgs extends UpdateAppFormApiArgs {}
 export interface DeleteAppForm {}
 export interface DeleteAppFormApiResponse extends ApiResponse {}
 export interface DeleteAppFormApiArgs {
-    appId: string;
+    projectId: string;
     instanceId: string;
     formId: string;
 }
