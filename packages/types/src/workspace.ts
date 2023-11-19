@@ -1,17 +1,13 @@
 import { z } from "zod";
 
-import { ApiResponse } from "./api-response";
-
 export const workspaceSchema = z.object({
-    relId: z.number(),
     id: z.string(),
-    osId: z.string(),
     name: z.string(),
+    accessType: z.number(),
     path: z.string(),
-    description: z.string().optional(),
-    accessType: z.string().optional(),
-    imageUrl: z.string().optional(),
-    createdAt: z.coerce.date(),
+    description: z.string(),
+    createdAt: z.coerce.date().optional(),
+    updatedAt: z.coerce.date().optional(),
 });
 
 export type Workspace = z.infer<typeof workspaceSchema>;
@@ -25,7 +21,7 @@ export type Workspace = z.infer<typeof workspaceSchema>;
 //     accessType: number | null;
 //     imageUrl: string | null;
 //     createdAt: Date;
-//     osId: string;
+//     orgId: string;
 // }
 
 export enum WorkspaceAccessType {
