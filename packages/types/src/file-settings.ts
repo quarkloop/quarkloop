@@ -6,7 +6,7 @@ export interface AppFileSettings {
     enable: boolean;
     createdAt: Date | null;
     updatedAt: Date | null;
-    appId: string;
+    projectId: string;
 }
 
 // export type AppFileSettingsPluginArgs =
@@ -29,7 +29,7 @@ export interface GetAppFileSettingsByIdPluginArgs
 export interface GetAppFileSettingsByAppId {}
 export interface GetAppFileSettingsByAppIdApiResponse extends ApiResponse {}
 export interface GetAppFileSettingsByAppIdApiArgs {
-    appId: string;
+    projectId: string;
 }
 export interface GetAppFileSettingsByAppIdPluginArgs
     extends GetAppFileSettingsByAppIdApiArgs {}
@@ -38,7 +38,7 @@ export interface GetAppFileSettingsByAppIdPluginArgs
 export interface CreateAppFileSettings {}
 export interface CreateAppFileSettingsApiResponse extends ApiResponse {}
 export interface CreateAppFileSettingsApiArgs extends Partial<AppFileSettings> {
-    appId: string;
+    projectId: string;
 }
 export interface CreateAppFileSettingsPluginArgs
     extends CreateAppFileSettingsApiArgs {}
@@ -48,7 +48,7 @@ export interface UpdateAppFileSettings {}
 export interface UpdateAppFileSettingsApiResponse extends ApiResponse {}
 export interface UpdateAppFileSettingsApiArgs extends Partial<AppFileSettings> {
     id: string;
-    appId: string;
+    projectId: string;
 }
 export interface UpdateAppFileSettingsPluginArgs
     extends UpdateAppFileSettingsApiArgs {}
@@ -58,7 +58,7 @@ export interface DeleteAppFileSettings {}
 export interface DeleteAppFileSettingsApiResponse extends ApiResponse {}
 export interface DeleteAppFileSettingsApiArgs {
     id: string;
-    appId: string;
+    projectId: string;
 }
 export interface DeleteAppFileSettingsPluginArgs
     extends DeleteAppFileSettingsApiArgs {}
