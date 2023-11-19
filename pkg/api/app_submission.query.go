@@ -9,10 +9,10 @@ import (
 type GetAppSubmissionListResponse struct{}
 
 func (s *ServerApi) GetAppSubmissionList(c *gin.Context) {
-	osId := c.Param("osId")
+	orgId := c.Param("orgId")
 	workspaceId := c.Param("workspaceId")
-	appId := c.Param("appId")
-	_ = osId + workspaceId + appId
+	projectId := c.Param("projectId")
+	_ = orgId + workspaceId + projectId
 
 	// query database
 
@@ -23,11 +23,11 @@ func (s *ServerApi) GetAppSubmissionList(c *gin.Context) {
 type GetAppSubmissionByIdResponse struct{}
 
 func (s *ServerApi) GetAppSubmissionById(c *gin.Context) {
-	osId := c.Param("osId")
+	orgId := c.Param("orgId")
 	workspaceId := c.Param("workspaceId")
-	appId := c.Param("appId")
+	projectId := c.Param("projectId")
 	submissionId := c.Param("submissionId")
-	_ = osId + workspaceId + appId + submissionId
+	_ = orgId + workspaceId + projectId + submissionId
 
 	// query database
 
