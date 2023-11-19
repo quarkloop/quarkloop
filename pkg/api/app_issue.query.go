@@ -9,10 +9,10 @@ import (
 type GetAppIssueListResponse struct{}
 
 func (s *ServerApi) GetAppIssueList(c *gin.Context) {
-	osId := c.Param("osId")
+	orgId := c.Param("orgId")
 	workspaceId := c.Param("workspaceId")
-	appId := c.Param("appId")
-	_ = osId + workspaceId + appId
+	projectId := c.Param("projectId")
+	_ = orgId + workspaceId + projectId
 
 	// query database
 
@@ -23,11 +23,11 @@ func (s *ServerApi) GetAppIssueList(c *gin.Context) {
 type GetAppIssueByIdResponse struct{}
 
 func (s *ServerApi) GetAppIssueById(c *gin.Context) {
-	osId := c.Param("osId")
+	orgId := c.Param("orgId")
 	workspaceId := c.Param("workspaceId")
-	appId := c.Param("appId")
+	projectId := c.Param("projectId")
 	issueId := c.Param("issueId")
-	_ = osId + workspaceId + appId + issueId
+	_ = orgId + workspaceId + projectId + issueId
 
 	// query database
 
