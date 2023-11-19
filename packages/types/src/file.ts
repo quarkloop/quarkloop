@@ -20,7 +20,7 @@ export interface AppFile {
 export interface GetAppFileByAppInstanceId {}
 export interface GetAppFileByAppInstanceIdApiResponse extends ApiResponse {}
 export interface GetAppFileByAppInstanceIdApiArgs {
-    appId: string;
+    projectId: string;
     instanceId: string;
 }
 export interface GetAppFileByAppInstanceIdPluginArgs
@@ -30,7 +30,7 @@ export interface GetAppFileByAppInstanceIdPluginArgs
 export interface GetAppFileById {}
 export interface GetAppFileByIdApiResponse extends ApiResponse {}
 export interface GetAppFileByIdApiArgs {
-    appId: string;
+    projectId: string;
     instanceId: string;
     fileId: string;
 }
@@ -40,7 +40,7 @@ export interface GetAppFileByIdPluginArgs extends GetAppFileByIdApiArgs {}
 export interface CreateAppFile {}
 export interface CreateAppFileApiResponse extends ApiResponse {}
 export interface CreateAppFileApiArgs {
-    appId: string;
+    projectId: string;
     instanceId: string;
     file: Partial<AppFile>;
 }
@@ -50,7 +50,7 @@ export interface CreateAppFilePluginArgs extends CreateAppFileApiArgs {}
 export interface UpdateAppFile {}
 export interface UpdateAppFileApiResponse extends ApiResponse {}
 export interface UpdateAppFileApiArgs {
-    appId: string;
+    projectId: string;
     instanceId: string;
     file: Partial<AppFile>;
 }
@@ -60,7 +60,7 @@ export interface UpdateAppFilePluginArgs extends UpdateAppFileApiArgs {}
 export interface DeleteAppFile {}
 export interface DeleteAppFileApiResponse extends ApiResponse {}
 export interface DeleteAppFileApiArgs {
-    appId: string;
+    projectId: string;
     instanceId: string;
     fileId: string;
 }
