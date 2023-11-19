@@ -20,7 +20,7 @@ export interface AppPage {
 export interface GetAppPageByAppInstanceId {}
 export interface GetAppPageByAppInstanceIdApiResponse extends ApiResponse {}
 export interface GetAppPageByAppInstanceIdApiArgs {
-    appId: string;
+    projectId: string;
     instanceId: string;
 }
 export interface GetAppPageByAppInstanceIdPluginArgs
@@ -30,7 +30,7 @@ export interface GetAppPageByAppInstanceIdPluginArgs
 export interface GetAppPageById {}
 export interface GetAppPageByIdApiResponse extends ApiResponse {}
 export interface GetAppPageByIdApiArgs {
-    appId: string;
+    projectId: string;
     instanceId: string;
     pageId: string;
 }
@@ -40,7 +40,7 @@ export interface GetAppPageByIdPluginArgs extends GetAppPageByIdApiArgs {}
 export interface CreateAppPage {}
 export interface CreateAppPageApiResponse extends ApiResponse {}
 export interface CreateAppPageApiArgs {
-    appId: string;
+    projectId: string;
     instanceId: string;
     page: Partial<AppPage>;
 }
@@ -50,7 +50,7 @@ export interface CreateAppPagePluginArgs extends CreateAppPageApiArgs {}
 export interface UpdateAppPage {}
 export interface UpdateAppPageApiResponse extends ApiResponse {}
 export interface UpdateAppPageApiArgs {
-    appId: string;
+    projectId: string;
     instanceId: string;
     page: Partial<AppPage>;
 }
@@ -60,7 +60,7 @@ export interface UpdateAppPagePluginArgs extends UpdateAppPageApiArgs {}
 export interface DeleteAppPage {}
 export interface DeleteAppPageApiResponse extends ApiResponse {}
 export interface DeleteAppPageApiArgs {
-    appId: string;
+    projectId: string;
     instanceId: string;
     pageId: string;
 }
