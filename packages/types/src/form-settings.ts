@@ -8,7 +8,7 @@ export interface AppFormSettings {
     fieldCount: number | null;
     createdAt: Date | null;
     updatedAt: Date | null;
-    appId: string;
+    projectId: string;
 }
 export interface AppFormField {
     id: string;
@@ -28,7 +28,7 @@ export interface GetAppFormSettingsById {}
 export interface GetAppFormSettingsByIdApiResponse extends ApiResponse {}
 export interface GetAppFormSettingsByIdApiArgs {
     id: string;
-    appId: string;
+    projectId: string;
 }
 export interface GetAppFormSettingsByIdPluginArgs
     extends GetAppFormSettingsByIdApiArgs {}
@@ -37,7 +37,7 @@ export interface GetAppFormSettingsByIdPluginArgs
 export interface GetAppFormsSettingsByAppId {}
 export interface GetAppFormsSettingsByAppIdApiResponse extends ApiResponse {}
 export interface GetAppFormsSettingsByAppIdApiArgs {
-    appId: string;
+    projectId: string;
 }
 export interface GetAppFormsSettingsByAppIdPluginArgs
     extends GetAppFormsSettingsByAppIdApiArgs {}
@@ -46,7 +46,7 @@ export interface GetAppFormsSettingsByAppIdPluginArgs
 export interface CreateAppFormSettings {}
 export interface CreateAppFormSettingsApiResponse extends ApiResponse {}
 export interface CreateAppFormSettingsApiArgs extends Partial<AppFormSettings> {
-    appId: string;
+    projectId: string;
 }
 export interface CreateAppFormSettingsPluginArgs
     extends CreateAppFormSettingsApiArgs {}
@@ -56,7 +56,7 @@ export interface UpdateAppFormSettings {}
 export interface UpdateAppFormSettingsApiResponse extends ApiResponse {}
 export interface UpdateAppFormSettingsApiArgs extends Partial<AppFormSettings> {
     id: string;
-    appId: string;
+    projectId: string;
     formFieldCreate?: boolean;
     formFieldUpdate?: boolean;
     formFieldDelete?: boolean;
@@ -69,7 +69,7 @@ export interface DeleteAppFormSettings {}
 export interface DeleteAppFormSettingsApiResponse extends ApiResponse {}
 export interface DeleteAppFormSettingsApiArgs {
     id: string;
-    appId: string;
+    projectId: string;
 }
 export interface DeleteAppFormSettingsPluginArgs
     extends DeleteAppFormSettingsApiArgs {}
