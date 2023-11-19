@@ -16,10 +16,10 @@ func (s *ServerApi) CreateAppSubmission(c *gin.Context) {
 		return
 	}
 
-	osId := c.Param("osId")
+	orgId := c.Param("orgId")
 	workspaceId := c.Param("workspaceId")
-	appId := c.Param("appId")
-	_ = osId + workspaceId + appId
+	projectId := c.Param("projectId")
+	_ = orgId + workspaceId + projectId
 
 	// query database
 
@@ -37,11 +37,11 @@ func (s *ServerApi) UpdateAppSubmissionById(c *gin.Context) {
 		return
 	}
 
-	osId := c.Param("osId")
+	orgId := c.Param("orgId")
 	workspaceId := c.Param("workspaceId")
-	appId := c.Param("appId")
+	projectId := c.Param("projectId")
 	submissionId := c.Param("submissionId")
-	_ = osId + workspaceId + appId + submissionId
+	_ = orgId + workspaceId + projectId + submissionId
 
 	// query database
 
@@ -50,11 +50,11 @@ func (s *ServerApi) UpdateAppSubmissionById(c *gin.Context) {
 }
 
 func (s *ServerApi) DeleteAppSubmissionById(c *gin.Context) {
-	osId := c.Param("osId")
+	orgId := c.Param("orgId")
 	workspaceId := c.Param("workspaceId")
-	appId := c.Param("appId")
+	projectId := c.Param("projectId")
 	submissionId := c.Param("submissionId")
-	_ = osId + workspaceId + appId + submissionId
+	_ = orgId + workspaceId + projectId + submissionId
 
 	// query database
 
