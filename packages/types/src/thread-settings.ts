@@ -5,7 +5,7 @@ export interface AppThreadSettings {
     id: string;
     createdAt: Date | null;
     updatedAt: Date | null;
-    appId: string;
+    projectId: string;
 }
 
 // export type AppThreadSettingsPluginArgs =
@@ -20,7 +20,7 @@ export interface GetAppThreadSettingsById {}
 export interface GetAppThreadSettingsByIdApiResponse extends ApiResponse {}
 export interface GetAppThreadSettingsByIdApiArgs {
     id: string;
-    appId: string;
+    projectId: string;
 }
 export interface GetAppThreadSettingsByIdPluginArgs
     extends GetAppThreadSettingsByIdApiArgs {}
@@ -29,7 +29,7 @@ export interface GetAppThreadSettingsByIdPluginArgs
 export interface GetAppThreadSettingsByAppId {}
 export interface GetAppThreadSettingsByAppIdApiResponse extends ApiResponse {}
 export interface GetAppThreadSettingsByAppIdApiArgs {
-    appId: string;
+    projectId: string;
 }
 export interface GetAppThreadSettingsByAppIdPluginArgs
     extends GetAppThreadSettingsByAppIdApiArgs {}
@@ -39,7 +39,7 @@ export interface CreateAppThreadSettings {}
 export interface CreateAppThreadSettingsApiResponse extends ApiResponse {}
 export interface CreateAppThreadSettingsApiArgs
     extends Partial<AppThreadSettings> {
-    appId: string;
+    projectId: string;
 }
 export interface CreateAppThreadSettingsPluginArgs
     extends CreateAppThreadSettingsApiArgs {}
@@ -50,7 +50,7 @@ export interface UpdateAppThreadSettingsApiResponse extends ApiResponse {}
 export interface UpdateAppThreadSettingsApiArgs
     extends Partial<AppThreadSettings> {
     id: string;
-    appId: string;
+    projectId: string;
 }
 export interface UpdateAppThreadSettingsPluginArgs
     extends UpdateAppThreadSettingsApiArgs {}
@@ -60,7 +60,7 @@ export interface DeleteAppThreadSettings {}
 export interface DeleteAppThreadSettingsApiResponse extends ApiResponse {}
 export interface DeleteAppThreadSettingsApiArgs {
     id: string;
-    appId: string;
+    projectId: string;
 }
 export interface DeleteAppThreadSettingsPluginArgs
     extends DeleteAppThreadSettingsApiArgs {}
