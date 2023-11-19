@@ -76,7 +76,7 @@ export const userSessionSchema = z.object({
 // }
 
 export interface UserPermissions {
-    os: {
+    org: {
         canRead: boolean;
         canCreate: boolean;
         canUpdate: boolean;
@@ -88,7 +88,7 @@ export interface UserPermissions {
         canUpdate: boolean;
         canDelete: boolean;
     };
-    app: {
+    project: {
         canRead: boolean;
         canCreate: boolean;
         canUpdate: boolean;
@@ -125,9 +125,9 @@ export type UserAccount = z.infer<typeof userAccountSchema>;
 // export const getUserPermissionsApiArgsSchema = userSchema
 //     .merge(
 //         z.object({
-//             osId: z.string().optional(),
+//             orgId: z.string().optional(),
 //             workspaceId: z.string().optional(),
-//             appId: z.string().optional(),
+//             projectId: z.string().optional(),
 //         })
 //     )
 //     .extend(apiResponseSchema.shape);
@@ -143,9 +143,9 @@ export type UserAccount = z.infer<typeof userAccountSchema>;
 // export const deleteUserApiArgsSchema = userSchema
 //     .merge(
 //         z.object({
-//             osId: z.string().optional(),
+//             orgId: z.string().optional(),
 //             workspaceId: z.string().optional(),
-//             appId: z.string().optional(),
+//             projectId: z.string().optional(),
 //         })
 //     )
 //     .extend(apiResponseSchema.shape);
@@ -159,9 +159,9 @@ export type UserAccount = z.infer<typeof userAccountSchema>;
 // export const updateUserApiArgsSchema = userSchema
 //     .merge(
 //         z.object({
-//             osId: z.string().optional(),
+//             orgId: z.string().optional(),
 //             workspaceId: z.string().optional(),
-//             appId: z.string().optional(),
+//             projectId: z.string().optional(),
 //         })
 //     )
 //     .extend(apiResponseSchema.shape);
