@@ -27,8 +27,8 @@ export interface Plan {
 
 export interface PlanFeatures {
     id: string;
-    maxOs: number;
-    maxOsLabel: string;
+    maxOrganization: number;
+    maxOrganizationLabel: string;
     maxWorkspaces: number;
     maxWorkspacesLabel: string;
     maxApps: number;
@@ -82,7 +82,7 @@ export interface PlanMetrics {
     type: PlanMetricsType;
     value: any | null;
     subscriptionId: string;
-    osId: string | null;
+    orgId: string | null;
     workspaceId: number | null;
 }
 
@@ -118,9 +118,9 @@ export enum PlanSubscriptionStatus {
 }
 
 export enum PlanMetricsType {
-    Os = "Os",
+    Organization = "Organization",
     Workspace = "Workspace",
-    App = "App",
+    Project = "Project",
     AppConversation = "AppConversation",
     AppForm = "AppForm",
     AppFormField = "AppFormField",
@@ -140,7 +140,7 @@ export enum PermissionRole {
 export enum PermissionType {
     OS = "OS",
     Workspace = "Workspace",
-    App = "App",
+    Project = "Project",
 }
 
 export type Usage = { used: number; max: number; usagePercentage: number };
@@ -220,8 +220,8 @@ export interface DeletePlanSubscriptionPluginArgs
 export interface UpdatePlanSubscriptionMetrics {}
 export interface UpdatePlanSubscriptionMetricsApiResponse extends ApiResponse {}
 export interface UpdatePlanSubscriptionMetricsApiArgs {
-    incOs?: boolean;
-    decOs?: boolean;
+    incOrganization?: boolean;
+    decOrganization?: boolean;
     incWorkspace?: boolean;
     decWorkspace?: boolean;
     incApp?: boolean;
