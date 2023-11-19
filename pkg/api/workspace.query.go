@@ -6,13 +6,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/quarkloop/quarkloop/pkg/db/model"
-	"github.com/quarkloop/quarkloop/pkg/db/repository"
+	"github.com/quarkloop/quarkloop/pkg/model"
+	"github.com/quarkloop/quarkloop/pkg/store/repository"
 )
 
 type GetWorkspaceListResponse struct {
 	ApiResponse
-	Data []model.Workspace `json:"data,omitempty"`
+	Data []model.Workspace `json:"data"`
 }
 
 func (s *ServerApi) GetWorkspaceList(c *gin.Context) {
