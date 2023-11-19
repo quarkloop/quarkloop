@@ -16,10 +16,10 @@ func (s *ServerApi) CreateAppDeployment(c *gin.Context) {
 		return
 	}
 
-	osId := c.Param("osId")
+	orgId := c.Param("orgId")
 	workspaceId := c.Param("workspaceId")
-	appId := c.Param("appId")
-	_ = osId + workspaceId + appId
+	projectId := c.Param("projectId")
+	_ = orgId + workspaceId + projectId
 
 	// query database
 
@@ -37,11 +37,11 @@ func (s *ServerApi) UpdateAppDeploymentById(c *gin.Context) {
 		return
 	}
 
-	osId := c.Param("osId")
+	orgId := c.Param("orgId")
 	workspaceId := c.Param("workspaceId")
-	appId := c.Param("appId")
+	projectId := c.Param("projectId")
 	deploymentId := c.Param("deploymentId")
-	_ = osId + workspaceId + appId + deploymentId
+	_ = orgId + workspaceId + projectId + deploymentId
 
 	// query database
 
@@ -50,11 +50,11 @@ func (s *ServerApi) UpdateAppDeploymentById(c *gin.Context) {
 }
 
 func (s *ServerApi) DeleteAppDeploymentById(c *gin.Context) {
-	osId := c.Param("osId")
+	orgId := c.Param("orgId")
 	workspaceId := c.Param("workspaceId")
-	appId := c.Param("appId")
+	projectId := c.Param("projectId")
 	deploymentId := c.Param("deploymentId")
-	_ = osId + workspaceId + appId + deploymentId
+	_ = orgId + workspaceId + projectId + deploymentId
 
 	// query database
 
