@@ -15,12 +15,6 @@ import (
 
 /// CreateWorkspace
 
-type CreateWorkspaceParams struct {
-	Context   context.Context
-	OrgId     string
-	Workspace model.Workspace
-}
-
 const createWorkspaceMutation = `
 INSERT INTO
   "system"."Workspace" ("orgId", "id", "name", "accessType", "description", "path")
@@ -30,25 +24,25 @@ RETURNING
   "orgId", "id", "name", "accessType", "description", "path", "createdAt";
 `
 
-func (r *Repository) CreateWorkspace(p *CreateWorkspaceParams) (*model.Workspace, error) {
+func (r *Repository) CreateWorkspace(ctx context.Context, orgId string, workspace *model.Workspace) (*model.Workspace, error) {
 	id, err := gonanoid.New()
 	if err != nil {
 		return nil, err
 	}
 
-	p.Workspace.Id = id
-	p.Workspace.Path = fmt.Sprintf("/org/%s/%s", p.OrgId, p.Workspace.Id)
+	workspace.Id = id
+	workspace.Path = fmt.Sprintf("/org/%s/%s", orgId, workspace.Id)
 
 	commandTag, err := r.SystemDbConn.Exec(
-		p.Context,
+		ctx,
 		createWorkspaceMutation,
 		pgx.NamedArgs{
-			"orgId":       p.OrgId,
-			"id":          p.Workspace.Id,
-			"name":        p.Workspace.Name,
-			"accessType":  p.Workspace.AccessType,
-			"description": p.Workspace.Description,
-			"path":        p.Workspace.Path,
+			"orgId":       orgId,
+			"id":          workspace.Id,
+			"name":        workspace.Name,
+			"accessType":  workspace.AccessType,
+			"description": workspace.Description,
+			"path":        workspace.Path,
 		},
 	)
 	if err != nil {
@@ -62,16 +56,10 @@ func (r *Repository) CreateWorkspace(p *CreateWorkspaceParams) (*model.Workspace
 		return nil, notFoundErr
 	}
 
-	return &p.Workspace, nil
+	return workspace, nil
 }
 
 /// UpdateWorkspaceById
-
-type UpdateWorkspaceByIdParams struct {
-	Context     context.Context
-	WorkspaceId string
-	Workspace   model.Workspace
-}
 
 const updateWorkspaceByIdMutation = `
 UPDATE
@@ -86,16 +74,16 @@ WHERE
   "id" = @id;
 `
 
-func (r *Repository) UpdateWorkspaceById(p *UpdateWorkspaceByIdParams) error {
+func (r *Repository) UpdateWorkspaceById(ctx context.Context, workspaceId string, workspace *model.Workspace) error {
 	commandTag, err := r.SystemDbConn.Exec(
-		p.Context,
+		ctx,
 		updateWorkspaceByIdMutation,
 		pgx.NamedArgs{
-			"id":          p.WorkspaceId,
-			"name":        p.Workspace.Name,
-			"accessType":  p.Workspace.AccessType,
-			"description": p.Workspace.Description,
-			"path":        p.Workspace.Path,
+			"id":          workspaceId,
+			"name":        workspace.Name,
+			"accessType":  *workspace.AccessType,
+			"description": workspace.Description,
+			"path":        workspace.Path,
 			"updatedAt":   time.Now(),
 		},
 	)
@@ -115,11 +103,6 @@ func (r *Repository) UpdateWorkspaceById(p *UpdateWorkspaceByIdParams) error {
 
 /// DeleteWorkspaceById
 
-type DeleteWorkspaceByIdParams struct {
-	Context     context.Context
-	WorkspaceId string
-}
-
 const deleteWorkspaceByIdMutation = `
 DELETE FROM
   "system"."Workspace"
@@ -127,8 +110,8 @@ WHERE
   "id" = @id;
 `
 
-func (r *Repository) DeleteWorkspaceById(p *DeleteWorkspaceByIdParams) error {
-	commandTag, err := r.SystemDbConn.Exec(p.Context, deleteWorkspaceByIdMutation, pgx.NamedArgs{"id": p.WorkspaceId})
+func (r *Repository) DeleteWorkspaceById(ctx context.Context, workspaceId string) error {
+	commandTag, err := r.SystemDbConn.Exec(ctx, deleteWorkspaceByIdMutation, pgx.NamedArgs{"id": workspaceId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
 		return err
