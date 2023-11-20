@@ -15,11 +15,6 @@ import (
 
 /// CreateOrganization
 
-type CreateOrganizationParams struct {
-	Context      context.Context
-	Organization model.Organization
-}
-
 const createOrganizationMutation = `
 INSERT INTO
   "system"."Organization" ("id", "name", "accessType", "description", "path")
@@ -29,24 +24,24 @@ RETURNING
   "id", "name", "accessType", "description", "path", "createdAt";
 `
 
-func (r *Repository) CreateOrganization(p *CreateOrganizationParams) (*model.Organization, error) {
+func (r *Repository) CreateOrganization(ctx context.Context, org *model.Organization) (*model.Organization, error) {
 	id, err := gonanoid.New()
 	if err != nil {
 		return nil, err
 	}
 
-	p.Organization.Id = id
-	p.Organization.Path = fmt.Sprintf("/org/%s", id)
+	org.Id = id
+	org.Path = fmt.Sprintf("/org/%s", id)
 
 	commandTag, err := r.SystemDbConn.Exec(
-		p.Context,
+		ctx,
 		createOrganizationMutation,
 		pgx.NamedArgs{
-			"id":          p.Organization.Id,
-			"name":        p.Organization.Name,
-			"accessType":  p.Organization.AccessType,
-			"description": p.Organization.Description,
-			"path":        p.Organization.Path,
+			"id":          org.Id,
+			"name":        org.Name,
+			"accessType":  org.AccessType,
+			"description": org.Description,
+			"path":        org.Path,
 		},
 	)
 	if err != nil {
@@ -60,16 +55,10 @@ func (r *Repository) CreateOrganization(p *CreateOrganizationParams) (*model.Org
 		return nil, notFoundErr
 	}
 
-	return &p.Organization, nil
+	return org, nil
 }
 
 /// UpdateOrganizationById
-
-type UpdateOrganizationByIdParams struct {
-	Context      context.Context
-	OrgId        string
-	Organization model.Organization
-}
 
 const updateOrganizationByIdMutation = `
 UPDATE
@@ -84,16 +73,16 @@ WHERE
   "id" = @id;
 `
 
-func (r *Repository) UpdateOrganizationById(p *UpdateOrganizationByIdParams) error {
+func (r *Repository) UpdateOrganizationById(ctx context.Context, orgId string, org *model.Organization) error {
 	commandTag, err := r.SystemDbConn.Exec(
-		p.Context,
+		ctx,
 		updateOrganizationByIdMutation,
 		pgx.NamedArgs{
-			"id":          p.OrgId,
-			"name":        p.Organization.Name,
-			"accessType":  p.Organization.AccessType,
-			"description": p.Organization.Description,
-			"path":        p.Organization.Path,
+			"id":          orgId,
+			"name":        org.Name,
+			"accessType":  org.AccessType,
+			"description": org.Description,
+			"path":        org.Path,
 			"updatedAt":   time.Now(),
 		},
 	)
@@ -113,11 +102,6 @@ func (r *Repository) UpdateOrganizationById(p *UpdateOrganizationByIdParams) err
 
 /// DeleteOrganizationById
 
-type DeleteOrganizationByIdParams struct {
-	Context context.Context
-	OrgId   string
-}
-
 const deleteOrganizationByIdMutation = `
 DELETE FROM
   "system"."Organization"
@@ -125,14 +109,12 @@ WHERE
   "id" = @id;
 `
 
-func (r *Repository) DeleteOrganizationById(p *DeleteOrganizationByIdParams) error {
-	commandTag, err := r.SystemDbConn.Exec(p.Context, deleteOrganizationByIdMutation, pgx.NamedArgs{"id": p.OrgId})
+func (r *Repository) DeleteOrganizationById(ctx context.Context, orgId string) error {
+	commandTag, err := r.SystemDbConn.Exec(ctx, deleteOrganizationByIdMutation, pgx.NamedArgs{"id": orgId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
 		return err
 	}
-
-	fmt.Printf("\nDE: %v\n", *p)
 
 	if commandTag.RowsAffected() != 1 {
 		notFoundErr := errors.New("cannot find to delete")
