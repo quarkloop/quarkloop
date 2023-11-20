@@ -14,10 +14,6 @@ import (
 
 /// ListOrganizations
 
-type ListOrganizationsParams struct {
-	Context context.Context
-}
-
 const listOrganizationsQuery = `
 SELECT 
   "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
@@ -25,8 +21,8 @@ FROM
   "system"."Organization";
 `
 
-func (r *Repository) ListOrganizations(p *ListOrganizationsParams) ([]model.Organization, error) {
-	rows, err := r.SystemDbConn.Query(p.Context, listOrganizationsQuery)
+func (r *Repository) ListOrganizations(ctx context.Context) ([]model.Organization, error) {
+	rows, err := r.SystemDbConn.Query(ctx, listOrganizationsQuery)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
 		return nil, err
@@ -63,11 +59,6 @@ func (r *Repository) ListOrganizations(p *ListOrganizationsParams) ([]model.Orga
 
 /// FindUniqueOrganization
 
-type FindUniqueOrganizationParams struct {
-	Context context.Context
-	Id      string
-}
-
 const findUniqueOrganizationQuery = `
 SELECT 
   "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
@@ -77,8 +68,8 @@ WHERE
   "id" = @id;
 `
 
-func (r *Repository) FindUniqueOrganization(p *FindUniqueOrganizationParams) (*model.Organization, error) {
-	row := r.SystemDbConn.QueryRow(p.Context, findUniqueOrganizationQuery, pgx.NamedArgs{"id": p.Id})
+func (r *Repository) FindUniqueOrganization(ctx context.Context, orgId string) (*model.Organization, error) {
+	row := r.SystemDbConn.QueryRow(ctx, findUniqueOrganizationQuery, pgx.NamedArgs{"id": orgId})
 
 	var organization model.Organization
 	err := row.Scan(
@@ -100,11 +91,6 @@ func (r *Repository) FindUniqueOrganization(p *FindUniqueOrganizationParams) (*m
 
 /// FindFirstOrganization
 
-type FindFirstOrganizationParams struct {
-	Context      context.Context
-	Organization model.Organization
-}
-
 const findFirstOrganizationQuery = `
 SELECT 
   "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
@@ -113,15 +99,15 @@ FROM
 WHERE
 `
 
-func (r *Repository) FindFirstOrganization(p *FindFirstOrganizationParams) (*model.Organization, error) {
+func (r *Repository) FindFirstOrganization(ctx context.Context, org *model.Organization) (*model.Organization, error) {
 	availableFields := []string{}
 	organizationFields := map[string]interface{}{
-		"id":         p.Organization.Id,
-		"name":       p.Organization.Name,
-		"accessType": p.Organization.AccessType,
-		"path":       p.Organization.Path,
-		"createdAt":  p.Organization.CreatedAt,
-		"updatedAt":  p.Organization.UpdatedAt,
+		"id":         org.Id,
+		"name":       org.Name,
+		"accessType": org.AccessType,
+		"path":       org.Path,
+		"createdAt":  org.CreatedAt,
+		"updatedAt":  org.UpdatedAt,
 	}
 	for key, value := range organizationFields {
 		switch v := value.(type) {
@@ -145,7 +131,7 @@ func (r *Repository) FindFirstOrganization(p *FindFirstOrganizationParams) (*mod
 	}
 	finalQuery := findFirstOrganizationQuery + strings.Join(availableFields, " AND ")
 
-	row := r.SystemDbConn.QueryRow(p.Context, finalQuery)
+	row := r.SystemDbConn.QueryRow(ctx, finalQuery)
 
 	var organization model.Organization
 	err := row.Scan(
