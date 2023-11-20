@@ -14,12 +14,6 @@ import (
 
 /// ListProjects
 
-type ListProjectsParams struct {
-	Context     context.Context
-	OrgId       []string
-	WorkspaceId []string
-}
-
 const listProjectsQuery = `
 SELECT 
   "id", "name", "accessType", "path", "description", "createdAt", "updatedAt"
@@ -29,19 +23,19 @@ WHERE
   %s;
 `
 
-func (r *Repository) ListProjects(p *ListProjectsParams) ([]model.Project, error) {
+func (r *Repository) ListProjects(ctx context.Context, orgId []string, workspaceId []string) ([]model.Project, error) {
 	var whereClause string = `"accessType" = 1` // TODO: 1 => public, 2 => private
-	if len(p.OrgId) != 0 {
+	if len(orgId) != 0 {
 		whereClause = `"orgId" = ANY (@orgId)`
 	}
-	if len(p.WorkspaceId) != 0 {
+	if len(workspaceId) != 0 {
 		whereClause = `"workspaceId" = ANY (@workspaceId)`
 	}
 	finalQuery := fmt.Sprintf(listProjectsQuery, whereClause)
 
-	rows, err := r.SystemDbConn.Query(p.Context, finalQuery, pgx.NamedArgs{
-		"orgId":       p.OrgId,
-		"workspaceId": p.WorkspaceId,
+	rows, err := r.SystemDbConn.Query(ctx, finalQuery, pgx.NamedArgs{
+		"orgId":       orgId,
+		"workspaceId": workspaceId,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
@@ -79,11 +73,6 @@ func (r *Repository) ListProjects(p *ListProjectsParams) ([]model.Project, error
 
 /// FindUniqueProject
 
-type FindUniqueProjectParams struct {
-	Context   context.Context
-	ProjectId string
-}
-
 const findUniqueProjectQuery = `
 SELECT
   "id", "name", "accessType", "path", "description", "createdAt", "updatedAt"
@@ -93,8 +82,8 @@ WHERE
   "id" = @id;
 `
 
-func (r *Repository) FindUniqueProject(p *FindUniqueProjectParams) (*model.Project, error) {
-	row := r.SystemDbConn.QueryRow(p.Context, findUniqueProjectQuery, pgx.NamedArgs{"id": p.ProjectId})
+func (r *Repository) FindUniqueProject(ctx context.Context, projectId string) (*model.Project, error) {
+	row := r.SystemDbConn.QueryRow(ctx, findUniqueProjectQuery, pgx.NamedArgs{"id": projectId})
 
 	var project model.Project
 	err := row.Scan(
@@ -116,11 +105,6 @@ func (r *Repository) FindUniqueProject(p *FindUniqueProjectParams) (*model.Proje
 
 /// FindFirstProject
 
-type FindFirstProjectParams struct {
-	Context context.Context
-	Project model.Project
-}
-
 const findFirstProjectQuery = `
 SELECT
   "id", "name", "accessType", "path", "description", "createdAt", "updatedAt"
@@ -132,14 +116,14 @@ ORDER BY "updatedAt" ASC
 LIMIT 1;
 `
 
-func (r *Repository) FindFirstProject(p *FindFirstProjectParams) (*model.Project, error) {
+func (r *Repository) FindFirstProject(ctx context.Context, project *model.Project) (*model.Project, error) {
 	availableFields := []string{}
 	projectFields := map[string]interface{}{
-		"id":         p.Project.Id,
-		"name":       p.Project.Name,
-		"accessType": p.Project.AccessType,
-		"createdAt":  p.Project.CreatedAt,
-		"updatedAt":  p.Project.UpdatedAt,
+		"id":         project.Id,
+		"name":       project.Name,
+		"accessType": project.AccessType,
+		"createdAt":  project.CreatedAt,
+		"updatedAt":  project.UpdatedAt,
 	}
 	for key, value := range projectFields {
 		switch v := value.(type) {
@@ -163,22 +147,22 @@ func (r *Repository) FindFirstProject(p *FindFirstProjectParams) (*model.Project
 	}
 	finalQuery := fmt.Sprintf(findFirstProjectQuery, strings.Join(availableFields, " AND "))
 
-	row := r.SystemDbConn.QueryRow(p.Context, finalQuery)
+	row := r.SystemDbConn.QueryRow(ctx, finalQuery)
 
-	var project model.Project
+	var p model.Project
 	err := row.Scan(
-		&project.Id,
-		&project.Name,
-		&project.AccessType,
-		&project.Path,
-		&project.Description,
-		&project.CreatedAt,
-		&project.UpdatedAt,
+		&p.Id,
+		&p.Name,
+		&p.AccessType,
+		&p.Path,
+		&p.Description,
+		&p.CreatedAt,
+		&p.UpdatedAt,
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
 		return nil, err
 	}
 
-	return &project, nil
+	return &p, nil
 }
