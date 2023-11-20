@@ -15,13 +15,6 @@ import (
 
 /// CreateProject
 
-type CreateProjectParams struct {
-	Context     context.Context
-	OrgId       string
-	WorkspaceId string
-	Project     model.Project
-}
-
 const createProjectMutation = `
 INSERT INTO
   "system"."Project" ("orgId", "workspaceId", "id", "name", "accessType", "path", "description", "updatedAt")
@@ -31,26 +24,26 @@ RETURNING
   "id", "name", "accessType", "path", "description", "createdAt", "updatedAt";
 `
 
-func (r *Repository) CreateProject(p *CreateProjectParams) (*model.Project, error) {
+func (r *Repository) CreateProject(ctx context.Context, orgId string, workspaceId string, project *model.Project) (*model.Project, error) {
 	id, err := gonanoid.New()
 	if err != nil {
 		return nil, err
 	}
 
-	p.Project.Id = id
-	p.Project.Path = fmt.Sprintf("/org/%s/%s/%s", p.OrgId, p.WorkspaceId, id)
+	project.Id = id
+	project.Path = fmt.Sprintf("/org/%s/%s/%s", orgId, workspaceId, id)
 
 	commandTag, err := r.SystemDbConn.Exec(
-		p.Context,
+		ctx,
 		createProjectMutation,
 		pgx.NamedArgs{
-			"orgId":       p.OrgId,
-			"workspaceId": p.WorkspaceId,
-			"id":          p.Project.Id,
-			"name":        p.Project.Name,
-			"accessType":  p.Project.AccessType,
-			"path":        p.Project.Path,
-			"description": p.Project.Description,
+			"orgId":       orgId,
+			"workspaceId": workspaceId,
+			"id":          project.Id,
+			"name":        project.Name,
+			"accessType":  project.AccessType,
+			"path":        project.Path,
+			"description": project.Description,
 			"updatedAt":   time.Now(),
 		},
 	)
@@ -65,16 +58,10 @@ func (r *Repository) CreateProject(p *CreateProjectParams) (*model.Project, erro
 		return nil, notFoundErr
 	}
 
-	return &p.Project, nil
+	return project, nil
 }
 
 /// UpdateProjectById
-
-type UpdateProjectByIdParams struct {
-	Context   context.Context
-	ProjectId string
-	Project   model.Project
-}
 
 const updateProjectByIdMutation = `
 UPDATE
@@ -88,15 +75,15 @@ WHERE
   "id" = @id;
 `
 
-func (r *Repository) UpdateProjectById(p *UpdateProjectByIdParams) error {
+func (r *Repository) UpdateProjectById(ctx context.Context, projectId string, project *model.Project) error {
 	commandTag, err := r.SystemDbConn.Exec(
-		p.Context,
+		ctx,
 		updateProjectByIdMutation,
 		pgx.NamedArgs{
-			"id":          p.ProjectId,
-			"name":        p.Project.Name,
-			"path":        p.Project.Path,
-			"description": p.Project.Description,
+			"id":          projectId,
+			"name":        project.Name,
+			"path":        project.Path,
+			"description": project.Description,
 			"updatedAt":   time.Now(),
 		},
 	)
@@ -116,11 +103,6 @@ func (r *Repository) UpdateProjectById(p *UpdateProjectByIdParams) error {
 
 /// DeleteProjectById
 
-type DeleteProjectByIdParams struct {
-	Context   context.Context
-	ProjectId string
-}
-
 const deleteProjectByIdMutation = `
 DELETE FROM
   "system"."Project"
@@ -128,8 +110,8 @@ WHERE
   "id" = @id;
 `
 
-func (r *Repository) DeleteProjectById(p *DeleteProjectByIdParams) error {
-	commandTag, err := r.SystemDbConn.Exec(p.Context, deleteProjectByIdMutation, pgx.NamedArgs{"id": p.ProjectId})
+func (r *Repository) DeleteProjectById(ctx context.Context, projectId string) error {
+	commandTag, err := r.SystemDbConn.Exec(ctx, deleteProjectByIdMutation, pgx.NamedArgs{"id": projectId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
 		return err
