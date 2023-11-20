@@ -14,11 +14,6 @@ import (
 
 /// ListWorkspaces
 
-type ListWorkspacesParams struct {
-	Context context.Context
-	OrgId   []string
-}
-
 const listWorkspacesQuery = `
 SELECT 
   "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
@@ -28,8 +23,8 @@ WHERE
   "orgId" = ANY (@orgId);
 `
 
-func (r *Repository) ListWorkspaces(p *ListWorkspacesParams) ([]model.Workspace, error) {
-	rows, err := r.SystemDbConn.Query(p.Context, listWorkspacesQuery, pgx.NamedArgs{"orgId": p.OrgId})
+func (r *Repository) ListWorkspaces(ctx context.Context, orgId []string) ([]model.Workspace, error) {
+	rows, err := r.SystemDbConn.Query(ctx, listWorkspacesQuery, pgx.NamedArgs{"orgId": orgId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
 		return nil, err
@@ -66,11 +61,6 @@ func (r *Repository) ListWorkspaces(p *ListWorkspacesParams) ([]model.Workspace,
 
 /// FindUniqueWorkspace
 
-type FindUniqueWorkspaceParams struct {
-	Context     context.Context
-	WorkspaceId string
-}
-
 const findUniqueWorkspaceQuery = `
 SELECT 
   "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
@@ -80,8 +70,8 @@ WHERE
   "id" = @id;
 `
 
-func (r *Repository) FindUniqueWorkspace(p *FindUniqueWorkspaceParams) (*model.Workspace, error) {
-	row := r.SystemDbConn.QueryRow(p.Context, findUniqueWorkspaceQuery, pgx.NamedArgs{"id": p.WorkspaceId})
+func (r *Repository) FindUniqueWorkspace(ctx context.Context, workspaceId string) (*model.Workspace, error) {
+	row := r.SystemDbConn.QueryRow(ctx, findUniqueWorkspaceQuery, pgx.NamedArgs{"id": workspaceId})
 
 	var workspace model.Workspace
 	err := row.Scan(
@@ -103,12 +93,6 @@ func (r *Repository) FindUniqueWorkspace(p *FindUniqueWorkspaceParams) (*model.W
 
 /// FindFirstWorkspace
 
-type FindFirstWorkspaceParams struct {
-	Context   context.Context
-	OrgId     string
-	Workspace model.Workspace
-}
-
 const findFirstWorkspaceQuery = `
 SELECT 
   "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
@@ -120,16 +104,16 @@ ORDER BY "updatedAt" ASC
 LIMIT 1;
 `
 
-func (r *Repository) FindFirstWorkspace(p *FindFirstWorkspaceParams) (*model.Workspace, error) {
+func (r *Repository) FindFirstWorkspace(ctx context.Context, orgId string, workspace *model.Workspace) (*model.Workspace, error) {
 	availableFields := []string{}
 	workspaceFields := map[string]interface{}{
-		"orgId":      p.OrgId,
-		"id":         p.Workspace.Id,
-		"name":       p.Workspace.Name,
-		"accessType": *p.Workspace.AccessType,
-		"path":       p.Workspace.Path,
-		"createdAt":  p.Workspace.CreatedAt,
-		"updatedAt":  p.Workspace.UpdatedAt,
+		"orgId":      orgId,
+		"id":         workspace.Id,
+		"name":       workspace.Name,
+		"accessType": *workspace.AccessType,
+		"path":       workspace.Path,
+		"createdAt":  workspace.CreatedAt,
+		"updatedAt":  workspace.UpdatedAt,
 	}
 	for key, value := range workspaceFields {
 		switch v := value.(type) {
@@ -153,22 +137,22 @@ func (r *Repository) FindFirstWorkspace(p *FindFirstWorkspaceParams) (*model.Wor
 	}
 	finalQuery := fmt.Sprintf(findFirstWorkspaceQuery, strings.Join(availableFields, " AND "))
 
-	row := r.SystemDbConn.QueryRow(p.Context, finalQuery)
+	row := r.SystemDbConn.QueryRow(ctx, finalQuery)
 
-	var workspace model.Workspace
+	var ws model.Workspace
 	err := row.Scan(
-		&workspace.Id,
-		&workspace.Name,
-		&workspace.AccessType,
-		&workspace.Description,
-		&workspace.Path,
-		&workspace.CreatedAt,
-		&workspace.UpdatedAt,
+		&ws.Id,
+		&ws.Name,
+		&ws.AccessType,
+		&ws.Description,
+		&ws.Path,
+		&ws.CreatedAt,
+		&ws.UpdatedAt,
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
 		return nil, err
 	}
 
-	return &workspace, nil
+	return &ws, nil
 }
