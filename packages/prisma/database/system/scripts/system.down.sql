@@ -1,51 +1,51 @@
 -- DropForeignKey
 ALTER TABLE "system"."Workspace"
-DROP CONSTRAINT "Workspace_osId_fkey";
+DROP CONSTRAINT "Workspace_orgId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "system"."App"
-DROP CONSTRAINT "App_osId_fkey";
+ALTER TABLE "system"."Project"
+DROP CONSTRAINT "Project_orgId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "system"."App"
-DROP CONSTRAINT "App_workspaceId_fkey";
+ALTER TABLE "system"."Project"
+DROP CONSTRAINT "Project_workspaceId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "system"."AppComponent"
-DROP CONSTRAINT "AppComponent_appId_fkey";
+ALTER TABLE "system"."ProjectService"
+DROP CONSTRAINT "ProjectService_projectId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "system"."AppIssue"
-DROP CONSTRAINT "AppIssue_appId_fkey";
+ALTER TABLE "system"."ProjectSubmission"
+DROP CONSTRAINT "ProjectSubmission_projectId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "system"."AppSubmission"
-DROP CONSTRAINT "AppSubmission_appId_fkey";
+ALTER TABLE "system"."ProjectDiscussion"
+DROP CONSTRAINT "ProjectDiscussion_projectId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "system"."AppDeployment"
-DROP CONSTRAINT "AppDeployment_appId_fkey";
+ALTER TABLE "system"."ProjectForm"
+DROP CONSTRAINT "ProjectForm_projectId_fkey";
 
 -- DropTable
-DROP TABLE "system"."OperatingSystem";
+DROP TABLE "system"."Organization";
 
 -- DropTable
 DROP TABLE "system"."Workspace";
 
 -- DropTable
-DROP TABLE "system"."App";
+DROP TABLE "system"."Project";
 
 -- DropTable
-DROP TABLE "system"."AppComponent";
+DROP TABLE "system"."ProjectService";
 
 -- DropTable
-DROP TABLE "system"."AppIssue";
+DROP TABLE "system"."ProjectSubmission";
 
 -- DropTable
-DROP TABLE "system"."AppSubmission";
+DROP TABLE "system"."ProjectDiscussion";
 
 -- DropTable
-DROP TABLE "system"."AppDeployment";
+DROP TABLE "system"."ProjectForm";
 
 -- DropSchema
 DROP SCHEMA IF EXISTS "system";
