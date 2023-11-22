@@ -10,114 +10,130 @@ datasource db {
     schemas   = ["system"]
 }
 
-model OperatingSystem {
-    id String @id @default(cuid())
+model Organization {
+    id String @id
 
     name        String
     path        String    @unique
     description String
-    overview    String?
-    imageUrl    String?
-    websiteUrl  String?
-    isVerified  Boolean   @default(false)
+    accessType  Int
     createdAt   DateTime? @default(now())
     updatedAt   DateTime?
 
     workspaces Workspace[]
-    apps       App[]
+    apps       Project[]
 
     @@schema("system")
 }
 
 model Workspace {
-    id   String @id @default(cuid())
-    osId String
+    id    String @id
+    orgId String
 
     name        String
     path        String    @unique
-    description String?
-    accessType  Int?
-    imageUrl    String?
+    description String
+    accessType  Int
     createdAt   DateTime? @default(now())
     updatedAt   DateTime?
 
-    os   OperatingSystem @relation(fields: [osId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-    apps App[]
+    organization Organization @relation(fields: [orgId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    projects     Project[]
 
-    @@unique(fields: [osId, id])
+    @@unique(fields: [orgId, id])
     @@schema("system")
 }
 
-model App {
+model Project {
     id          String @id @default(cuid())
-    osId        String
+    orgId       String
     workspaceId String
 
     name        String
-    accessType  Int
     path        String    @unique
-    description String?
-    createdAt   DateTime  @default(now())
-    updatedAt   DateTime? @default(now())
+    description String
+    accessType  Int
+    metadata    Json?
+    createdAt   DateTime? @default(now())
+    updatedAt   DateTime?
 
-    OperatingSystem OperatingSystem @relation(fields: [osId], references: [id])
-    Workspace       Workspace       @relation(fields: [workspaceId], references: [id])
-    components      AppComponent[]
-    issues          AppIssue[]
-    submissions     AppSubmission[]
-    deployments     AppDeployment[]
-
-    @@schema("system")
-}
-
-model AppComponent {
-    id String @id @default(cuid())
-
-    name      String
-    config    Json
-    createdAt DateTime  @default(now())
-    updatedAt DateTime? @default(now())
-
-    App   App?    @relation(fields: [appId], references: [id])
-    appId String?
+    organization Organization        @relation(fields: [orgId], references: [id])
+    workspace    Workspace           @relation(fields: [workspaceId], references: [id])
+    components   ProjectService[]
+    submissions  ProjectSubmission[]
 
     @@schema("system")
 }
 
-model AppIssue {
-    id String @id @default(cuid())
+model ProjectService {
+    id Int @id @default(autoincrement())
+
+    name        String
+    type        Int
+    description String
+    metadata    Json?
+    data        Json
+    // TODO: delete
+    isBuiltin   Boolean   @default(false)
+    createdAt   DateTime? @default(now())
+    updatedAt   DateTime?
+
+    project   Project @relation(fields: [projectId], references: [id])
+    projectId String
+
+    @@schema("system")
+}
+
+model ProjectSubmission {
+    id        Int    @id @default(autoincrement())
+    projectId String
+    userId    String
 
     title     String
-    createdAt DateTime  @default(now())
-    updatedAt DateTime? @default(now())
+    metadata  Json?
+    data      Json
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
 
-    App   App?    @relation(fields: [appId], references: [id])
-    appId String?
+    project     Project             @relation(fields: [projectId], references: [id])
+    discussions ProjectDiscussion[]
+    forms       ProjectForm[]
 
+    @@index([userId])
     @@schema("system")
 }
 
-model AppSubmission {
-    id String @id @default(cuid())
-
-    title     String
-    createdAt DateTime  @default(now())
-    updatedAt DateTime? @default(now())
-
-    App   App?    @relation(fields: [appId], references: [id])
-    appId String?
-
-    @@schema("system")
-}
-
-model AppDeployment {
-    id String @id @default(cuid())
+model ProjectDiscussion {
+    id           Int    @id @default(autoincrement())
+    submissionId Int
+    userId       String
 
     name      String
-    createdAt DateTime @default(now())
+    metadata  Json?
+    data      String
+    createdAt DateTime? @default(now())
+    updatedAt DateTime?
 
-    App   App?    @relation(fields: [appId], references: [id])
-    appId String?
+    submission ProjectSubmission @relation(fields: [submissionId], references: [id])
 
+    @@index([userId])
+    @@schema("system")
+}
+
+model ProjectForm {
+    id           Int    @id @default(autoincrement())
+    submissionId Int
+    userId       String
+
+    name        String
+    description String
+    metadata    Json?
+    data        Json
+    createdAt   DateTime? @default(now())
+    updatedAt   DateTime?
+
+    submission ProjectSubmission @relation(fields: [submissionId], references: [id])
+
+    @@index([userId])
     @@schema("system")
 }
