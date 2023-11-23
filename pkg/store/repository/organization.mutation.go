@@ -21,41 +21,45 @@ INSERT INTO
 VALUES
   (@id, @name, @accessType, @description, @path)
 RETURNING 
-  "id", "name", "accessType", "description", "path", "createdAt";
+  "id", "name", "accessType", "path", "description", "createdAt";
 `
 
-func (r *Repository) CreateOrganization(ctx context.Context, org *model.Organization) (*model.Organization, error) {
+func (r *Repository) CreateOrganization(ctx context.Context, organization *model.Organization) (*model.Organization, error) {
 	id, err := gonanoid.New()
 	if err != nil {
 		return nil, err
 	}
 
-	org.Id = id
-	org.Path = fmt.Sprintf("/org/%s", id)
+	organization.Id = id
+	organization.Path = fmt.Sprintf("/org/%s", id)
 
-	commandTag, err := r.SystemDbConn.Exec(
+	row := r.SystemDbConn.QueryRow(
 		ctx,
 		createOrganizationMutation,
 		pgx.NamedArgs{
-			"id":          org.Id,
-			"name":        org.Name,
-			"accessType":  org.AccessType,
-			"description": org.Description,
-			"path":        org.Path,
+			"id":          organization.Id,
+			"name":        organization.Name,
+			"accessType":  organization.AccessType,
+			"description": organization.Description,
+			"path":        organization.Path,
 		},
 	)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", err)
-		return nil, err
+
+	var org model.Organization
+	rowErr := row.Scan(
+		&org.Id,
+		&org.Name,
+		&org.AccessType,
+		&org.Path,
+		&org.Description,
+		&org.CreatedAt,
+	)
+	if rowErr != nil {
+		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", rowErr)
+		return nil, rowErr
 	}
 
-	if commandTag.RowsAffected() != 1 {
-		notFoundErr := errors.New("cannot find to create")
-		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", notFoundErr)
-		return nil, notFoundErr
-	}
-
-	return org, nil
+	return &org, nil
 }
 
 /// UpdateOrganizationById
