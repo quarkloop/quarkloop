@@ -21,7 +21,7 @@ INSERT INTO
 VALUES
   (@orgId, @workspaceId, @id, @name, @accessType, @path, @description, @updatedAt)
 RETURNING 
-  "id", "name", "accessType", "path", "description", "createdAt", "updatedAt";
+  "id", "name", "accessType", "path", "description", "createdAt";
 `
 
 func (r *Repository) CreateProject(ctx context.Context, orgId string, workspaceId string, project *model.Project) (*model.Project, error) {
@@ -33,7 +33,7 @@ func (r *Repository) CreateProject(ctx context.Context, orgId string, workspaceI
 	project.Id = id
 	project.Path = fmt.Sprintf("/org/%s/%s/%s", orgId, workspaceId, id)
 
-	commandTag, err := r.SystemDbConn.Exec(
+	row := r.SystemDbConn.QueryRow(
 		ctx,
 		createProjectMutation,
 		pgx.NamedArgs{
@@ -47,18 +47,22 @@ func (r *Repository) CreateProject(ctx context.Context, orgId string, workspaceI
 			"updatedAt":   time.Now(),
 		},
 	)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", err)
-		return nil, err
+
+	var prj model.Project
+	rowErr := row.Scan(
+		&prj.Id,
+		&prj.Name,
+		&prj.AccessType,
+		&prj.Path,
+		&prj.Description,
+		&prj.CreatedAt,
+	)
+	if rowErr != nil {
+		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", rowErr)
+		return nil, rowErr
 	}
 
-	if commandTag.RowsAffected() != 1 {
-		notFoundErr := errors.New("cannot find to create")
-		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", notFoundErr)
-		return nil, notFoundErr
-	}
-
-	return project, nil
+	return &prj, nil
 }
 
 /// UpdateProjectById
