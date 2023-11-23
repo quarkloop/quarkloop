@@ -21,7 +21,7 @@ INSERT INTO
 VALUES
   (@orgId, @id, @name, @accessType, @description, @path)
 RETURNING 
-  "orgId", "id", "name", "accessType", "description", "path", "createdAt";
+  "id", "name", "accessType", "path", "description", "createdAt";
 `
 
 func (r *Repository) CreateWorkspace(ctx context.Context, orgId string, workspace *model.Workspace) (*model.Workspace, error) {
@@ -33,7 +33,7 @@ func (r *Repository) CreateWorkspace(ctx context.Context, orgId string, workspac
 	workspace.Id = id
 	workspace.Path = fmt.Sprintf("/org/%s/%s", orgId, workspace.Id)
 
-	commandTag, err := r.SystemDbConn.Exec(
+	row := r.SystemDbConn.QueryRow(
 		ctx,
 		createWorkspaceMutation,
 		pgx.NamedArgs{
@@ -45,18 +45,22 @@ func (r *Repository) CreateWorkspace(ctx context.Context, orgId string, workspac
 			"path":        workspace.Path,
 		},
 	)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", err)
-		return nil, err
+
+	var ws model.Workspace
+	rowErr := row.Scan(
+		&ws.Id,
+		&ws.Name,
+		&ws.AccessType,
+		&ws.Path,
+		&ws.Description,
+		&ws.CreatedAt,
+	)
+	if rowErr != nil {
+		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", rowErr)
+		return nil, rowErr
 	}
 
-	if commandTag.RowsAffected() != 1 {
-		notFoundErr := errors.New("cannot find to create")
-		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", notFoundErr)
-		return nil, notFoundErr
-	}
-
-	return workspace, nil
+	return &ws, nil
 }
 
 /// UpdateWorkspaceById
