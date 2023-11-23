@@ -21,23 +21,23 @@ func NewWorkspaceService(ds *repository.Repository) workspace.Service {
 }
 
 func (s *workspaceService) GetWorkspaceList(p *workspace.GetWorkspaceListParams) ([]model.Workspace, error) {
-	orgList, err := s.dataStore.ListWorkspaces(p.Context, p.OrgId)
-	return orgList, err
+	workspaceList, err := s.dataStore.ListWorkspaces(p.Context, p.OrgId)
+	return workspaceList, err
 }
 
 func (s *workspaceService) GetWorkspaceById(p *workspace.GetWorkspaceByIdParams) (*model.Workspace, error) {
-	org, err := s.dataStore.FindUniqueWorkspace(p.Context, p.WorkspaceId)
-	return org, err
+	workspace, err := s.dataStore.FindUniqueWorkspace(p.Context, p.WorkspaceId)
+	return workspace, err
 }
 
 func (s *workspaceService) GetWorkspace(p *workspace.GetWorkspaceParams) (*model.Workspace, error) {
-	org, err := s.dataStore.FindFirstWorkspace(p.Context, p.OrgId, &p.Workspace)
-	return org, err
+	workspace, err := s.dataStore.FindFirstWorkspace(p.Context, p.OrgId, &p.Workspace)
+	return workspace, err
 }
 
 func (s *workspaceService) CreateWorkspace(p *workspace.CreateWorkspaceParams) (*model.Workspace, error) {
-	org, err := s.dataStore.CreateWorkspace(p.Context, p.OrgId, &p.Workspace)
-	return org, err
+	workspace, err := s.dataStore.CreateWorkspace(p.Context, p.OrgId, &p.Workspace)
+	return workspace, err
 }
 
 func (s *workspaceService) UpdateWorkspaceById(p *workspace.UpdateWorkspaceByIdParams) error {
