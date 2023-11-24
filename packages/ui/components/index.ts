@@ -75,3 +75,4 @@ export {
     TableCell,
     TableCaption,
 } from "./Table";
+export { TabLink } from "./TabLink";
