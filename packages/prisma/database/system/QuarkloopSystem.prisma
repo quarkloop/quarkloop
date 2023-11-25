@@ -90,6 +90,9 @@ model ProjectSubmission {
     userId    String
 
     title     String
+    status    Int       @default(1)
+    labels    Json?
+    dueDate   DateTime?
     metadata  Json?
     data      Json
     createdAt DateTime? @default(now())
