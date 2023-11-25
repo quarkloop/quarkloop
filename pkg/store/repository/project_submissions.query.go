@@ -14,7 +14,7 @@ import (
 
 const listProjectSubmissionsQuery = `
 SELECT 
-  "id", "title", "metadata", "data", "createdAt", "updatedAt"
+  "id", "title", "status", "labels", "dueDate", "metadata", "data", "createdAt", "updatedAt"
 FROM 
   "system"."ProjectSubmission"
 WHERE
@@ -38,6 +38,9 @@ func (r *Repository) ListProjectSubmissions(ctx context.Context, projectId strin
 		err := rows.Scan(
 			&submission.Id,
 			&submission.Title,
+			&submission.Status,
+			&submission.LabelList,
+			&submission.DueDate,
 			&submission.Metadata,
 			&submission.Data,
 			&submission.CreatedAt,
@@ -62,7 +65,7 @@ func (r *Repository) ListProjectSubmissions(ctx context.Context, projectId strin
 
 const findUniqueProjectSubmissionQuery = `
 SELECT
-  "id", "title", "metadata", "data", "createdAt", "updatedAt"
+  "id", "title", "status", "labels", "dueDate", "metadata", "data", "createdAt", "updatedAt"
 FROM
   "system"."ProjectSubmission"
 WHERE
@@ -81,6 +84,9 @@ func (r *Repository) FindUniqueProjectSubmission(ctx context.Context, projectId 
 	err := row.Scan(
 		&submission.Id,
 		&submission.Title,
+		&submission.Status,
+		&submission.LabelList,
+		&submission.DueDate,
 		&submission.Metadata,
 		&submission.Data,
 		&submission.CreatedAt,
