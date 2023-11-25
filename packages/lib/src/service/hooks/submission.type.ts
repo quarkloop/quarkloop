@@ -29,7 +29,7 @@ export type GetSubmissionByIdApiResponse = z.infer<
 >;
 export type GetSubmissionByIdApiArgs = {
     projectId: string;
-    submissionId: string;
+    submissionId: number;
 };
 
 /// CreateSubmission
@@ -57,7 +57,7 @@ export type UpdateSubmissionApiResponse = z.infer<
 >;
 export type UpdateSubmissionApiArgs = {
     projectId: string;
-    submissionId: string;
+    submissionId: number;
     submission: Partial<Submission>;
 };
 
@@ -68,5 +68,5 @@ export type DeleteSubmissionApiResponse = z.infer<
 >;
 export type DeleteSubmissionApiArgs = {
     projectId: string;
-    submissionId: string;
+    submissionId: number;
 };
