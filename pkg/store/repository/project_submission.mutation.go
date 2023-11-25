@@ -20,7 +20,7 @@ INSERT INTO
 VALUES
   (@userId, @projectId, @title, @metadata, @data)
 RETURNING 
-  "id", "title", "metadata", "data", "createdAt";
+  "id", "title", "status", "metadata", "data", "createdAt";
 `
 
 func (r *Repository) CreateProjectSubmission(ctx context.Context, userId string, projectId string, pSubmission *model.ProjectSubmission) (*model.ProjectSubmission, error) {
@@ -40,6 +40,7 @@ func (r *Repository) CreateProjectSubmission(ctx context.Context, userId string,
 	err := row.Scan(
 		&submission.Id,
 		&submission.Title,
+		&submission.Status,
 		&submission.Metadata,
 		&submission.Data,
 		&submission.CreatedAt,
@@ -59,6 +60,9 @@ UPDATE
   "system"."ProjectSubmission"
 SET
   "title"     = COALESCE(@title, "title"),
+  "status"    = COALESCE(@status, "status"),
+  "labels"    = COALESCE(@labels, "labels"),
+  "dueDate"   = COALESCE(@dueDate, "dueDate"),
   "metadata"  = COALESCE(@metadata, "metadata"),
   "data"      = COALESCE(@data, "data"),
   "updatedAt" = COALESCE(@updatedAt, "updatedAt")
@@ -73,6 +77,9 @@ func (r *Repository) UpdateProjectSubmissionById(ctx context.Context, projectSub
 		pgx.NamedArgs{
 			"id":        projectSubmissionId,
 			"title":     pSubmission.Title,
+			"status":    pSubmission.Status,
+			"labels":    pSubmission.LabelList,
+			"dueDate":   pSubmission.DueDate,
 			"metadata":  pSubmission.Metadata,
 			"data":      pSubmission.Data,
 			"updatedAt": time.Now(),
