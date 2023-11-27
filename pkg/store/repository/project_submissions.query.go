@@ -35,6 +35,7 @@ func (r *Repository) ListProjectSubmissions(ctx context.Context, projectId strin
 
 	for rows.Next() {
 		var submission model.ProjectSubmission
+
 		err := rows.Scan(
 			&submission.Id,
 			&submission.Title,
@@ -50,6 +51,9 @@ func (r *Repository) ListProjectSubmissions(ctx context.Context, projectId strin
 			return nil, err
 		}
 
+		if submission.LabelList == nil {
+			submission.LabelList = []string{}
+		}
 		submissionList = append(submissionList, submission)
 	}
 
@@ -95,6 +99,10 @@ func (r *Repository) FindUniqueProjectSubmission(ctx context.Context, projectId 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
 		return nil, err
+	}
+
+	if submission.LabelList == nil {
+		submission.LabelList = []string{}
 	}
 
 	return &submission, nil
