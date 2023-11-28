@@ -1,3 +1,4 @@
+export { Badge, badgeVariants } from "./Badge";
 export { Button, buttonVariants } from "./Button";
 export {
     Command,
@@ -37,6 +38,7 @@ export {
     DropdownMenuRadioGroup,
 } from "./DropdownMenu";
 export { Editor } from "./Editor";
+export { Input } from "./Input";
 export {
     navigationMenuTriggerStyle,
     NavigationMenu,
