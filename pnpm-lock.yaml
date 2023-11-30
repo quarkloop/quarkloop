@@ -364,6 +364,9 @@ importers:
       '@mantine/tiptap':
         specifier: ^7.1.2
         version: 7.1.2(@mantine/core@7.1.2)(@mantine/hooks@7.1.2)(@tabler/icons-react@2.38.0)(@tiptap/extension-link@2.1.12)(@tiptap/react@2.1.11)(react-dom@18.2.0)(react@18.2.0)
+      '@quarkloop/database':
+        specifier: workspace:*
+        version: link:../database
       '@quarkloop/icons':
         specifier: workspace:*
         version: link:../icons
@@ -488,6 +491,49 @@ importers:
       '@quarkloop/types':
         specifier: workspace:*
         version: link:../types
+      typescript:
+        specifier: 5.1.3
+        version: 5.1.3
+
+  packages/database:
+    dependencies:
+      '@quarkloop/lib':
+        specifier: workspace:*
+        version: link:../lib
+      '@quarkloop/ui':
+        specifier: workspace:*
+        version: link:../ui
+      '@tanstack/react-table':
+        specifier: ^8.10.7
+        version: 8.10.7(react-dom@18.2.0)(react@18.2.0)
+      class-variance-authority:
+        specifier: ^0.7.0
+        version: 0.7.0
+      clsx:
+        specifier: ^2.0.0
+        version: 2.0.0
+      cmdk:
+        specifier: ^0.2.0
+        version: 0.2.0(@types/react@18.2.13)(react-dom@18.2.0)(react@18.2.0)
+      lucide-react:
+        specifier: ^0.269.0
+        version: 0.269.0(react@18.2.0)
+      moment:
+        specifier: ^2.29.4
+        version: 2.29.4
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      tailwind-merge:
+        specifier: ^1.14.0
+        version: 1.14.0
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
+    devDependencies:
+      '@quarkloop/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       typescript:
         specifier: 5.1.3
         version: 5.1.3
