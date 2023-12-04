@@ -37,14 +37,14 @@ func PerformRequestWithBody(r http.Handler, method, path string, body any) *http
 	return w
 }
 
-func SetUpServer() *Server {
-	router := NewTestRouter()
+// func SetUpServer() *Server {
+// 	router := NewTestRouter()
 
-	s := Server{
-		Status: 0,
-		Router: router,
-	}
-	s.BindHandlers()
+// 	s := Server{
+// 		Status: 0,
+// 		Router: router,
+// 	}
+// 	s.BindHandlers()
 
-	return &s
-}
+// 	return &s
+// }
