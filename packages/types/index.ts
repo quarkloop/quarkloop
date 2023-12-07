@@ -3,7 +3,7 @@ export * from "./src/user";
 export * from "./src/organization";
 export * from "./src/workspace";
 export * from "./src/project";
-export * from "./src/service";
+export * from "./src/table";
 export * from "./src/submission";
 
 export * from "./src/planSubscription";
