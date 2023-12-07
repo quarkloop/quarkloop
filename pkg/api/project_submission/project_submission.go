@@ -6,19 +6,19 @@ import (
 )
 
 type Api interface {
-	GetProjectSubmissionList(c *gin.Context)
-	GetProjectSubmissionById(c *gin.Context)
-	CreateProjectSubmission(c *gin.Context)
-	UpdateProjectSubmissionById(c *gin.Context)
-	DeleteProjectSubmissionById(c *gin.Context)
+	GetAppSubmissionList(c *gin.Context)
+	GetAppSubmissionById(c *gin.Context)
+	CreateAppSubmission(c *gin.Context)
+	UpdateAppSubmissionById(c *gin.Context)
+	DeleteAppSubmissionById(c *gin.Context)
 }
 
-type ProjectSubmissionApi struct {
+type AppSubmissionApi struct {
 	projectSubmission project_submission.Service
 }
 
-func NewProjectSubmissionApi(service project_submission.Service) *ProjectSubmissionApi {
-	return &ProjectSubmissionApi{
+func NewAppSubmissionApi(service project_submission.Service) *AppSubmissionApi {
+	return &AppSubmissionApi{
 		projectSubmission: service,
 	}
 }
