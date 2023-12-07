@@ -2,7 +2,7 @@ export * from "./user.service";
 export * from "./organization.service";
 export * from "./workspace.service";
 export * from "./project.service";
-export * from "./service.service";
+export * from "./table.service";
 export * from "./submission.service";
 export * from "./planSubscription.service";
 
