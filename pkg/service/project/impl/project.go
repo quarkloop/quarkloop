@@ -1,21 +1,18 @@
 package project_impl
 
 import (
-	"encoding/json"
-
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
-	"github.com/quarkloop/quarkloop/pkg/service/project_service"
+	"github.com/quarkloop/quarkloop/pkg/service/project_table"
 	"github.com/quarkloop/quarkloop/pkg/store/repository"
 )
 
 type projectService struct {
-	projectSvc project_service.Service
-
-	dataStore *repository.Repository
+	projectSvc project_table.Service
+	dataStore  *repository.Repository
 }
 
-func NewProjectService(ds *repository.Repository, projectSvc project_service.Service) project.Service {
+func NewProjectService(ds *repository.Repository, projectSvc project_table.Service) project.Service {
 	return &projectService{
 		dataStore:  ds,
 		projectSvc: projectSvc,
@@ -43,34 +40,34 @@ func (s *projectService) CreateProject(p *project.CreateProjectParams) (*model.P
 		return nil, err
 	}
 
-	serviceData := model.ProjectServiceData{
-		DiscussionsEnabled: false,
-		DiscussionsSettings: model.ProjectDiscussion{
-			MaxMessageLimit: 2048,
-		},
-	}
+	// serviceData := model.ProjectServiceData{
+	// 	DiscussionsEnabled: false,
+	// 	DiscussionsSettings: model.ProjectDiscussion{
+	// 		MaxMessageLimit: 2048,
+	// 	},
+	// }
 
-	serviceList := []model.ProjectService{
-		{
-			Name:        "Discussions",
-			Type:        model.DiscussionsService,
-			Description: "Used for discussions",
-			Metadata:    json.RawMessage{},
-			Data:        serviceData,
-		},
-	}
+	// serviceList := []model.ProjectService{
+	// 	{
+	// 		Name:        "Discussions",
+	// 		Type:        model.DiscussionsService,
+	// 		Description: "Used for discussions",
+	// 		Metadata:    json.RawMessage{},
+	// 		Data:        serviceData,
+	// 	},
+	// }
 
 	// create project services
-	var _, pErr = s.projectSvc.CreateBulkProjectService(
-		&project_service.CreateBulkProjectServiceParams{
-			Context:            p.Context,
-			ProjectId:          project.Id,
-			ProjectServiceList: serviceList,
-		},
-	)
-	if pErr != nil {
-		return nil, pErr
-	}
+	// var _, pErr = s.projectSvc.CreateBulkProjectService(
+	// 	&project_table.CreateBulkProjectServiceParams{
+	// 		Context:   p.Context,
+	// 		ProjectId: project.Id,
+	// 		//ProjectServiceList: serviceList,
+	// 	},
+	// )
+	// if pErr != nil {
+	// 	return nil, pErr
+	// }
 
 	return project, nil
 }
