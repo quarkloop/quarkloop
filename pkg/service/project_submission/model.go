@@ -6,31 +6,31 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/model"
 )
 
-type GetProjectSubmissionListParams struct {
+type GetAppSubmissionListParams struct {
 	Context   context.Context
 	ProjectId string
 }
 
-type GetProjectSubmissionByIdParams struct {
-	Context             context.Context
-	ProjectId           string
-	ProjectSubmissionId string
+type GetAppSubmissionByIdParams struct {
+	Context         context.Context
+	ProjectId       string
+	AppSubmissionId string
 }
 
-type CreateProjectSubmissionParams struct {
-	Context           context.Context
-	UserId            string
-	ProjectId         string
-	ProjectSubmission *model.ProjectSubmission
+type CreateAppSubmissionParams struct {
+	Context       context.Context
+	UserId        string
+	ProjectId     string
+	AppSubmission *model.AppSubmission
 }
 
-type UpdateProjectSubmissionByIdParams struct {
-	Context             context.Context
-	ProjectSubmissionId string
-	ProjectSubmission   *model.ProjectSubmission
+type UpdateAppSubmissionByIdParams struct {
+	Context         context.Context
+	AppSubmissionId string
+	AppSubmission   *model.AppSubmission
 }
 
-type DeleteProjectSubmissionByIdParams struct {
-	Context             context.Context
-	ProjectSubmissionId string
+type DeleteAppSubmissionByIdParams struct {
+	Context         context.Context
+	AppSubmissionId string
 }
