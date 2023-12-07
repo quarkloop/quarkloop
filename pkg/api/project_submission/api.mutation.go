@@ -9,41 +9,41 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/project_submission"
 )
 
-type CreateProjectSubmissionUriParams struct {
+type CreateAppSubmissionUriParams struct {
 	ProjectId string `uri:"projectId" binding:"required"`
 }
 
-type CreateProjectSubmissionRequest struct {
+type CreateAppSubmissionRequest struct {
 	// UserId     string                  `json:"userId" binding:"required"`
-	// Submission model.ProjectSubmission `json:"submission" binding:"required"`
-	model.ProjectSubmission
+	// Submission model.AppSubmission `json:"submission" binding:"required"`
+	model.AppSubmission
 }
 
-type CreateProjectSubmissionResponse struct {
+type CreateAppSubmissionResponse struct {
 	api.ApiResponse
-	Data model.ProjectSubmission `json:"data,omitempty"`
+	Data model.AppSubmission `json:"data,omitempty"`
 }
 
-func (s *ProjectSubmissionApi) CreateProjectSubmission(c *gin.Context) {
-	uriParams := &CreateProjectSubmissionUriParams{}
+func (s *AppSubmissionApi) CreateAppSubmission(c *gin.Context) {
+	uriParams := &CreateAppSubmissionUriParams{}
 	if err := c.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(c, err)
 		return
 	}
 
-	req := &CreateProjectSubmissionRequest{}
+	req := &CreateAppSubmissionRequest{}
 	if err := c.BindJSON(req); err != nil {
 		api.AbortWithBadRequestJSON(c, err)
 		return
 	}
 
 	// query service
-	ws, err := s.projectSubmission.CreateProjectSubmission(
-		&project_submission.CreateProjectSubmissionParams{
-			Context:           c,
-			UserId:            "req.UserId",
-			ProjectId:         uriParams.ProjectId,
-			ProjectSubmission: &req.ProjectSubmission,
+	ws, err := s.projectSubmission.CreateAppSubmission(
+		&project_submission.CreateAppSubmissionParams{
+			Context:       c,
+			UserId:        "req.UserId",
+			ProjectId:     uriParams.ProjectId,
+			AppSubmission: &req.AppSubmission,
 		},
 	)
 	if err != nil {
@@ -51,7 +51,7 @@ func (s *ProjectSubmissionApi) CreateProjectSubmission(c *gin.Context) {
 		return
 	}
 
-	res := &CreateProjectSubmissionResponse{
+	res := &CreateAppSubmissionResponse{
 		ApiResponse: api.ApiResponse{
 			Status:       http.StatusCreated,
 			StatusString: "Created",
@@ -61,33 +61,33 @@ func (s *ProjectSubmissionApi) CreateProjectSubmission(c *gin.Context) {
 	c.JSON(http.StatusCreated, res)
 }
 
-type UpdateProjectSubmissionByIdUriParams struct {
+type UpdateAppSubmissionByIdUriParams struct {
 	SubmissionId string `uri:"submissionId" binding:"required"`
 }
 
-type UpdateProjectSubmissionByIdRequest struct {
-	model.ProjectSubmission
+type UpdateAppSubmissionByIdRequest struct {
+	model.AppSubmission
 }
 
-func (s *ProjectSubmissionApi) UpdateProjectSubmissionById(c *gin.Context) {
-	uriParams := &UpdateProjectSubmissionByIdUriParams{}
+func (s *AppSubmissionApi) UpdateAppSubmissionById(c *gin.Context) {
+	uriParams := &UpdateAppSubmissionByIdUriParams{}
 	if err := c.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(c, err)
 		return
 	}
 
-	req := &UpdateProjectSubmissionByIdRequest{}
+	req := &UpdateAppSubmissionByIdRequest{}
 	if err := c.BindJSON(req); err != nil {
 		api.AbortWithBadRequestJSON(c, err)
 		return
 	}
 
 	// query service
-	err := s.projectSubmission.UpdateProjectSubmissionById(
-		&project_submission.UpdateProjectSubmissionByIdParams{
-			Context:             c,
-			ProjectSubmissionId: uriParams.SubmissionId,
-			ProjectSubmission:   &req.ProjectSubmission,
+	err := s.projectSubmission.UpdateAppSubmissionById(
+		&project_submission.UpdateAppSubmissionByIdParams{
+			Context:         c,
+			AppSubmissionId: uriParams.SubmissionId,
+			AppSubmission:   &req.AppSubmission,
 		},
 	)
 	if err != nil {
@@ -98,22 +98,22 @@ func (s *ProjectSubmissionApi) UpdateProjectSubmissionById(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-type DeleteProjectSubmissionByIdUriParams struct {
+type DeleteAppSubmissionByIdUriParams struct {
 	SubmissionId string `uri:"submissionId" binding:"required"`
 }
 
-func (s *ProjectSubmissionApi) DeleteProjectSubmissionById(c *gin.Context) {
-	uriParams := &DeleteProjectSubmissionByIdUriParams{}
+func (s *AppSubmissionApi) DeleteAppSubmissionById(c *gin.Context) {
+	uriParams := &DeleteAppSubmissionByIdUriParams{}
 	if err := c.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(c, err)
 		return
 	}
 
 	// query service
-	err := s.projectSubmission.DeleteProjectSubmissionById(
-		&project_submission.DeleteProjectSubmissionByIdParams{
-			Context:             c,
-			ProjectSubmissionId: uriParams.SubmissionId,
+	err := s.projectSubmission.DeleteAppSubmissionById(
+		&project_submission.DeleteAppSubmissionByIdParams{
+			Context:         c,
+			AppSubmissionId: uriParams.SubmissionId,
 		},
 	)
 	if err != nil {
