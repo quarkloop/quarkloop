@@ -9,25 +9,25 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/project_submission"
 )
 
-type GetProjectSubmissionListUriParams struct {
+type GetAppSubmissionListUriParams struct {
 	ProjectId string `uri:"projectId"`
 }
 
-type GetProjectSubmissionListResponse struct {
+type GetAppSubmissionListResponse struct {
 	api.ApiResponse
-	Data []model.ProjectSubmission `json:"data"`
+	Data []model.AppSubmission `json:"data"`
 }
 
-func (s *ProjectSubmissionApi) GetProjectSubmissionList(c *gin.Context) {
-	uriParams := &GetProjectSubmissionListUriParams{}
+func (s *AppSubmissionApi) GetAppSubmissionList(c *gin.Context) {
+	uriParams := &GetAppSubmissionListUriParams{}
 	if err := c.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(c, err)
 		return
 	}
 
 	// query service
-	projectList, err := s.projectSubmission.GetProjectSubmissionList(
-		&project_submission.GetProjectSubmissionListParams{
+	projectList, err := s.projectSubmission.GetAppSubmissionList(
+		&project_submission.GetAppSubmissionListParams{
 			Context:   c,
 			ProjectId: uriParams.ProjectId,
 		},
@@ -37,7 +37,7 @@ func (s *ProjectSubmissionApi) GetProjectSubmissionList(c *gin.Context) {
 		return
 	}
 
-	res := &GetProjectSubmissionListResponse{
+	res := &GetAppSubmissionListResponse{
 		ApiResponse: api.ApiResponse{
 			Status:       http.StatusOK,
 			StatusString: "OK",
@@ -47,29 +47,29 @@ func (s *ProjectSubmissionApi) GetProjectSubmissionList(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-type GetProjectSubmissionByIdUriParams struct {
+type GetAppSubmissionByIdUriParams struct {
 	ProjectId    string `uri:"projectId"`
 	SubmissionId string `uri:"submissionId" binding:"required"`
 }
 
-type GetProjectSubmissionByIdResponse struct {
+type GetAppSubmissionByIdResponse struct {
 	api.ApiResponse
-	Data model.ProjectSubmission `json:"data,omitempty"`
+	Data model.AppSubmission `json:"data,omitempty"`
 }
 
-func (s *ProjectSubmissionApi) GetProjectSubmissionById(c *gin.Context) {
-	uriParams := &GetProjectSubmissionByIdUriParams{}
+func (s *AppSubmissionApi) GetAppSubmissionById(c *gin.Context) {
+	uriParams := &GetAppSubmissionByIdUriParams{}
 	if err := c.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(c, err)
 		return
 	}
 
 	// query service
-	project_submission, err := s.projectSubmission.GetProjectSubmissionById(
-		&project_submission.GetProjectSubmissionByIdParams{
-			Context:             c,
-			ProjectId:           uriParams.ProjectId,
-			ProjectSubmissionId: uriParams.SubmissionId,
+	project_submission, err := s.projectSubmission.GetAppSubmissionById(
+		&project_submission.GetAppSubmissionByIdParams{
+			Context:         c,
+			ProjectId:       uriParams.ProjectId,
+			AppSubmissionId: uriParams.SubmissionId,
 		},
 	)
 	if err != nil {
@@ -77,7 +77,7 @@ func (s *ProjectSubmissionApi) GetProjectSubmissionById(c *gin.Context) {
 		return
 	}
 
-	res := &GetProjectSubmissionByIdResponse{
+	res := &GetAppSubmissionByIdResponse{
 		ApiResponse: api.ApiResponse{
 			Status:       http.StatusOK,
 			StatusString: "OK",
