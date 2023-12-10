@@ -4,7 +4,6 @@
   "sideEffects": false,
   "version": "1.0.0",
   "author": "Quarkloop",
-  "type": "module",
   "main": "index.ts",
   "scripts": {
     "postinstall": "npx prisma generate --schema database/auth/QuarkloopAuth.prisma",
@@ -14,7 +13,7 @@
     "db:migrate": "dotenv -e .env.development -- npx prisma migrate dev",
     "db:migrate:auth:up": "./auth.up.bash",
     "db:resolve": "dotenv -e .env.development -- npx prisma migrate resolve",
-    "db:seed": "dotenv -e .env.development -- bash prisma/seed/seed.bash",
+    "db:seed": "dotenv -e .env.development -- bash seed/seed.bash",
     "db:test": "dotenv -e .env.development -- bash prisma/tests/test.bash",
     "db:deploy": "dotenv -e .env.production -- npx prisma migrate deploy --preview-feature"
   },
