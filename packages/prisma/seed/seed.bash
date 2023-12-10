@@ -6,6 +6,5 @@ seed() {
 
 echo
 
-
-# seed $PWD/prisma/seed/seed.App.ts
+seed $PWD/seed/seed.ts
 
