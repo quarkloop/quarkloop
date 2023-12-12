@@ -76,7 +76,7 @@ func NewDefaultServer(ds *repository.Repository) Server {
 func (s *Server) BindHandlers(api *api.ServerApi) {
 	router := s.router.Group("/api/v1")
 
-	// organizations apis
+	// Organizations apis
 	orgGroup := router.Group("/orgs")
 	orgGroup.GET("", s.orgApi.GetOrganizationList)
 	orgGroup.POST("", s.orgApi.CreateOrganization)
@@ -86,7 +86,7 @@ func (s *Server) BindHandlers(api *api.ServerApi) {
 	orgGroup.PUT("/:orgId", s.orgApi.UpdateOrganizationById)
 	orgGroup.DELETE("/:orgId", s.orgApi.DeleteOrganizationById)
 
-	// workspaces apis
+	// Workspaces apis
 	wsGroup := router.Group("/workspaces")
 	wsGroup.GET("", s.workspaceApi.GetWorkspaceList)
 	wsGroup.POST("", s.workspaceApi.CreateWorkspace)
@@ -96,7 +96,7 @@ func (s *Server) BindHandlers(api *api.ServerApi) {
 	wsGroup.PUT("/:workspaceId", s.workspaceApi.UpdateWorkspaceById)
 	wsGroup.DELETE("/:workspaceId", s.workspaceApi.DeleteWorkspaceById)
 
-	// projects apis
+	// Projects apis
 	projectGroup := router.Group("/projects")
 	projectGroup.GET("", s.projectApi.GetProjectList)
 	projectGroup.POST("", s.projectApi.CreateProject)
@@ -104,67 +104,39 @@ func (s *Server) BindHandlers(api *api.ServerApi) {
 	projectGroup.PUT("/:projectId", s.projectApi.UpdateProjectById)
 	projectGroup.DELETE("/:projectId", s.projectApi.DeleteProjectById)
 
-	// table apis
-	projectGroup.GET("/:projectId/tables", s.projectTableApi.GetProjectTableList)
+	// Tables apis
+	projectGroup.GET("/:projectId/tables", s.projectTableApi.ListTableRecords)
 	projectGroup.POST("/:projectId/tables", s.projectTableApi.CreateProjectTable)
-	projectGroup.GET("/:projectId/tables/:tableId", s.projectTableApi.GetProjectTableById)
-	projectGroup.PUT("/:projectId/tables/:tableId", s.projectTableApi.UpdateProjectTableById)
-	projectGroup.DELETE("/:projectId/tables/:tableId", s.projectTableApi.DeleteProjectTableById)
+	projectGroup.DELETE("/:projectId/tables/:tableType", s.projectTableApi.DeleteProjectTableById)
 
-	// submissions apis
-	projectGroup.GET("/:projectId/submissions", s.projectSubmissionApi.GetAppSubmissionList)
-	projectGroup.POST("/:projectId/submissions", s.projectSubmissionApi.CreateAppSubmission)
-	projectGroup.GET("/:projectId/submissions/:submissionId", s.projectSubmissionApi.GetAppSubmissionById)
-	projectGroup.PUT("/:projectId/submissions/:submissionId", s.projectSubmissionApi.UpdateAppSubmissionById)
-	projectGroup.DELETE("/:projectId/submissions/:submissionId", s.projectSubmissionApi.DeleteAppSubmissionById)
+	// Branches apis
+	projectGroup.GET("/:projectId/tables/main/branches", s.projectTableApi.ListTableRecords)
+	projectGroup.POST("/:projectId/tables/main/branches", s.projectTableApi.CreateProjectTable)
+	projectGroup.GET("/:projectId/tables/main/branches/:branchId", s.projectTableApi.GetTableRecordById)
+	projectGroup.PUT("/:projectId/tables/main/branches/:branchId", s.projectTableApi.UpdateProjectTableById)
+	projectGroup.DELETE("/:projectId/tables/main/branches/:branchId", s.projectTableApi.DeleteProjectTableById)
 
-	// // json dataset apis
-	// projectGroup.GET("/:projectId/datasets", api.GetProjectJsonDatasetList)
-	// projectGroup.POST("/:projectId/datasets", api.CreateProjectJsonDataset)
-	// projectGroup.GET("/:projectId/datasets/:datasetId", api.GetProjectJsonDatasetById)
-	// projectGroup.PUT("/:projectId/datasets/:datasetId", api.UpdateProjectJsonDatasetById)
-	// projectGroup.DELETE("/:projectId/datasets/:datasetId", api.DeleteProjectJsonDatasetById)
+	// Records apis
+	projectGroup.GET("/:projectId/tables/:tableType/branches/:branchId/records", s.projectTableApi.ListTableRecords)
+	projectGroup.GET("/:projectId/tables/:tableType/branches/:branchId/records/count", s.projectTableApi.ListTableRecords)
+	projectGroup.POST("/:projectId/tables/:tableType/branches/:branchId/records", s.projectTableApi.CreateProjectTable)
+	projectGroup.GET("/:projectId/tables/:tableType/branches/:branchId/records/:recordId", s.projectTableApi.GetTableRecordById)
+	projectGroup.PUT("/:projectId/tables/:tableType/branches/:branchId/records/:recordId", s.projectTableApi.UpdateProjectTableById)
+	projectGroup.DELETE("/:projectId/tables/:tableType/branches/:branchId/records/:recordId", s.projectTableApi.DeleteProjectTableById)
 
-	// // forms apis
-	// projectGroup.GET("/:projectId/forms", api.GetProjectFormList)
-	// projectGroup.POST("/:projectId/forms", api.CreateProjectForm)
-	// projectGroup.GET("/:projectId/forms/:formId", api.GetProjectFormById)
-	// projectGroup.PUT("/:projectId/forms/:formId", api.UpdateProjectFormById)
-	// projectGroup.DELETE("/:projectId/forms/:formId", api.DeleteProjectFormById)
+	// Schemas apis
+	projectGroup.GET("/:projectId/tables/form/schemas", s.projectTableApi.ListTableRecords)
+	projectGroup.POST("/:projectId/tables/form/schemas", s.projectTableApi.CreateProjectTable)
+	projectGroup.GET("/:projectId/tables/form/schemas/:schemaId", s.projectTableApi.GetTableRecordById)
+	projectGroup.PUT("/:projectId/tables/form/schemas/:schemaId", s.projectTableApi.UpdateProjectTableById)
+	projectGroup.DELETE("/:projectId/tables/form/schemas/:schemaId", s.projectTableApi.DeleteProjectTableById)
 
-	// // pricing apis
-	// projectGroup.GET("/:projectId/pricing", api.GetProjectAccountingList)
-	// projectGroup.POST("/:projectId/pricing", api.CreateProjectAccounting)
-	// projectGroup.GET("/:projectId/pricing/:priceId", api.GetProjectAccountingById)
-	// projectGroup.PUT("/:projectId/pricing/:priceId", api.UpdateProjectAccountingById)
-	// projectGroup.DELETE("/:projectId/pricing/:priceId", api.DeleteProjectAccountingById)
-
-	// // issues
-	// appGroup.GET("/:projectId/issues", api.GetAppIssueList)
-	// appGroup.POST("/:projectId/issues", api.CreateAppIssue)
-	// appGroup.GET("/:projectId/issues/:issueId", api.GetAppIssueById)
-	// appGroup.PUT("/:projectId/issues/:issueId", api.UpdateAppIssueById)
-	// appGroup.DELETE("/:projectId/issues/:issueId", api.DeleteAppIssueById)
-
-	// // deployments
-	// appGroup.GET("/:projectId/deployments", api.GetAppDeploymentList)
-	// appGroup.POST("/:projectId/deployments", api.CreateAppDeployment)
-	// appGroup.GET("/:projectId/deployments/:deploymentId", api.GetAppDeploymentById)
-	// appGroup.PUT("/:projectId/deployments/:deploymentId", api.UpdateAppDeploymentById)
-	// appGroup.DELETE("/:projectId/deployments/:deploymentId", api.DeleteAppDeploymentById)
-
-	// // app instances apis
-	// appGroup.GET("/:projectId/instances", api.GetSheetInstanceList)
-	// appGroup.POST("/:projectId/instances", api.CreateSheetInstance)
-	// appGroup.GET("/:projectId/instances/first", api.GetSheetInstance)
-	// appGroup.GET("/:projectId/instances/:instanceId", api.GetSheetInstanceById)
-	// appGroup.PUT("/:projectId/instances/:instanceId", api.UpdateSheetInstanceById)
-	// appGroup.DELETE("/:projectId/instances/:instanceId", api.DeleteSheetInstanceById)
-
-	// // app sheets apis
-	// appGroup.GET("/sheets/:instanceId/records", api.GetSheetInstanceList)
-	// appGroup.GET("/sheets/:instanceId/records/:recordId", api.GetSheetInstanceList)
-	// appGroup.GET("/sheets/:instanceId/records/:", api.GetSheetInstanceList)
+	// // submissions apis
+	// projectGroup.GET("/:projectId/submissions", s.projectSubmissionApi.GetAppSubmissionList)
+	// projectGroup.POST("/:projectId/submissions", s.projectSubmissionApi.CreateAppSubmission)
+	// projectGroup.GET("/:projectId/submissions/:submissionId", s.projectSubmissionApi.GetAppSubmissionById)
+	// projectGroup.PUT("/:projectId/submissions/:submissionId", s.projectSubmissionApi.UpdateAppSubmissionById)
+	// projectGroup.DELETE("/:projectId/submissions/:submissionId", s.projectSubmissionApi.DeleteAppSubmissionById)
 }
 
 func (server *Server) Router() *gin.Engine {
