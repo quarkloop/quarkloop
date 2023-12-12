@@ -1,0 +1,254 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("PG_QUARKLOOP_PROJECT_URL") // uses connection pooling
+    directUrl = env("PG_QUARKLOOP_PROJECT_URL_NON_POOLING") // used for migrations
+    schemas   = ["project"]
+}
+
+model TableBranch {
+    id        String @id
+    projectId String
+
+    // history
+    createdAt DateTime  @default(now())
+    updatedAt DateTime?
+    createdBy String
+    updatedBy String?
+
+    tables         Table[]
+    documentTables TableDocument[]
+    formTables     TableForm[]
+    paymentTables  TablePayment[]
+
+    @@index([projectId])
+    @@index([createdBy, updatedBy])
+    @@schema("project")
+}
+
+model Table {
+    id        Int    @id @default(autoincrement())
+    projectId String
+    branchId  String
+
+    name        String
+    type        Int
+    description String
+    metadata    Json?
+    data        Json
+
+    // history
+    createdAt DateTime  @default(now())
+    updatedAt DateTime?
+    createdBy String
+    updatedBy String?
+
+    documents TableDocument[]
+    payments  TablePayment[]
+    forms     TableForm[]
+    branch    TableBranch     @relation(fields: [branchId], references: [id])
+
+    @@index([projectId])
+    @@index([createdBy, updatedBy])
+    @@schema("project")
+}
+
+model TableDocumentSchema {
+    id        Int    @id @default(autoincrement())
+    projectId String
+
+    metadata Json?
+    data     Json
+
+    // history
+    createdAt DateTime  @default(now())
+    updatedAt DateTime?
+    createdBy String
+    updatedBy String?
+
+    documents TableDocument[]
+
+    @@index([projectId])
+    @@index([createdBy, updatedBy])
+    @@schema("project")
+}
+
+model TableDocument {
+    id       Int    @id @default(autoincrement())
+    tableId  Int
+    schemaId Int
+    branchId String
+
+    name        String
+    description String
+    metadata    Json?
+    data        Json
+
+    // history
+    createdAt DateTime  @default(now())
+    updatedAt DateTime?
+    createdBy String
+    updatedBy String?
+
+    table  Table               @relation(fields: [tableId], references: [id])
+    schema TableDocumentSchema @relation(fields: [schemaId], references: [id])
+    branch TableBranch         @relation(fields: [branchId], references: [id])
+
+    @@index([createdBy, updatedBy])
+    @@schema("project")
+}
+
+model TablePaymentSchema {
+    id        Int    @id @default(autoincrement())
+    projectId String
+
+    metadata Json?
+    data     Json
+
+    // history
+    createdAt DateTime  @default(now())
+    updatedAt DateTime?
+    createdBy String
+    updatedBy String?
+
+    payments TablePayment[]
+
+    @@index([projectId])
+    @@index([createdBy, updatedBy])
+    @@schema("project")
+}
+
+model TablePayment {
+    id       Int    @id @default(autoincrement())
+    tableId  Int
+    schemaId Int
+    branchId String
+
+    name        String
+    description String
+    metadata    Json?
+    data        Json
+
+    // history
+    createdAt DateTime  @default(now())
+    updatedAt DateTime?
+    createdBy String
+    updatedBy String?
+
+    table  Table              @relation(fields: [tableId], references: [id])
+    schema TablePaymentSchema @relation(fields: [schemaId], references: [id])
+    branch TableBranch        @relation(fields: [branchId], references: [id])
+
+    @@index([createdBy, updatedBy])
+    @@schema("project")
+}
+
+model TableFormSchema {
+    id        Int    @id @default(autoincrement())
+    projectId String
+
+    metadata Json?
+    data     Json
+
+    // history
+    createdAt DateTime  @default(now())
+    updatedAt DateTime?
+    createdBy String
+    updatedBy String?
+
+    forms TableForm[]
+
+    @@index([projectId])
+    @@index([createdBy, updatedBy])
+    @@schema("project")
+}
+
+model TableForm {
+    id       Int    @id @default(autoincrement())
+    tableId  Int
+    schemaId Int
+    branchId String
+
+    name        String
+    description String
+    metadata    Json?
+    data        Json
+
+    // history
+    createdAt DateTime  @default(now())
+    updatedAt DateTime?
+    createdBy String
+    updatedBy String?
+
+    table  Table           @relation(fields: [tableId], references: [id])
+    schema TableFormSchema @relation(fields: [schemaId], references: [id])
+    branch TableBranch     @relation(fields: [branchId], references: [id])
+
+    @@index([createdBy, updatedBy])
+    @@schema("project")
+}
+
+model App {
+    id        Int    @id @default(autoincrement())
+    projectId String
+
+    name     String
+    metadata Json?
+    data     Json
+
+    // history
+    createdAt DateTime  @default(now())
+    updatedAt DateTime?
+    createdBy String
+    updatedBy String?
+
+    @@index([createdBy, updatedBy])
+    @@schema("project")
+}
+
+model AppSubmission {
+    id        Int    @id @default(autoincrement())
+    projectId String
+
+    title    String
+    status   Int       @default(1)
+    labels   Json?
+    dueDate  DateTime?
+    metadata Json?
+    data     Json
+
+    // history
+    createdAt DateTime  @default(now())
+    updatedAt DateTime?
+    createdBy String
+    updatedBy String?
+
+    discussions AppDiscussion[]
+
+    @@index([createdBy, updatedBy])
+    @@schema("project")
+}
+
+model AppDiscussion {
+    id           Int @id @default(autoincrement())
+    submissionId Int
+
+    name     String
+    metadata Json?
+    data     String
+
+    // history
+    createdAt DateTime  @default(now())
+    updatedAt DateTime?
+    createdBy String
+    updatedBy String?
+
+    submission AppSubmission @relation(fields: [submissionId], references: [id])
+
+    @@index([createdBy, updatedBy])
+    @@schema("project")
+}
