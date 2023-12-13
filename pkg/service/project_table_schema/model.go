@@ -6,36 +6,38 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/model"
 )
 
-type GetTableListParams struct {
+type GetTableSchemaListParams struct {
 	Context   context.Context
 	ProjectId string
 }
 
-type GetTableByIdParams struct {
+type GetTableSchemaByIdParams struct {
 	Context   context.Context
 	ProjectId string
-	TableId   string
+	SchemaId  string
 }
 
-type CreateTableParams struct {
+type CreateTableSchemaParams struct {
 	Context   context.Context
 	ProjectId string
-	Table     *model.Table
+	Schema    *model.TableSchema
 }
 
-type CreateBulkTableParams struct {
+type CreateBulkTableSchemaParams struct {
+	Context    context.Context
+	ProjectId  string
+	SchemaList []model.TableSchema
+}
+
+type UpdateTableSchemaByIdParams struct {
 	Context   context.Context
 	ProjectId string
-	TableList []model.Table
+	SchemaId  string
+	Schema    *model.TableSchema
 }
 
-type UpdateTableByIdParams struct {
-	Context context.Context
-	TableId string
-	Table   *model.Table
-}
-
-type DeleteTableByIdParams struct {
-	Context context.Context
-	TableId string
+type DeleteTableSchemaByIdParams struct {
+	Context   context.Context
+	ProjectId string
+	SchemaId  string
 }
