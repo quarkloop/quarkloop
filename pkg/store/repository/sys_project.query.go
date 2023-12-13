@@ -71,9 +71,9 @@ func (r *Repository) ListProjects(ctx context.Context, orgId []string, workspace
 	return projectList, nil
 }
 
-/// FindUniqueProject
+/// GetProjectById
 
-const findUniqueProjectQuery = `
+const getProjectByIdQuery = `
 SELECT
   "id", "name", "accessType", "path", "description", "createdAt", "updatedAt"
 FROM
@@ -82,8 +82,8 @@ WHERE
   "id" = @id;
 `
 
-func (r *Repository) FindUniqueProject(ctx context.Context, projectId string) (*model.Project, error) {
-	row := r.SystemDbConn.QueryRow(ctx, findUniqueProjectQuery, pgx.NamedArgs{"id": projectId})
+func (r *Repository) GetProjectById(ctx context.Context, projectId string) (*model.Project, error) {
+	row := r.SystemDbConn.QueryRow(ctx, getProjectByIdQuery, pgx.NamedArgs{"id": projectId})
 
 	var project model.Project
 	err := row.Scan(
