@@ -59,9 +59,9 @@ func (r *Repository) ListWorkspaces(ctx context.Context, orgId []string) ([]mode
 	return wsList, nil
 }
 
-/// FindUniqueWorkspace
+/// GetWorkspaceById
 
-const findUniqueWorkspaceQuery = `
+const getWorkspaceByIdQuery = `
 SELECT 
   "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
 FROM 
@@ -70,8 +70,8 @@ WHERE
   "id" = @id;
 `
 
-func (r *Repository) FindUniqueWorkspace(ctx context.Context, workspaceId string) (*model.Workspace, error) {
-	row := r.SystemDbConn.QueryRow(ctx, findUniqueWorkspaceQuery, pgx.NamedArgs{"id": workspaceId})
+func (r *Repository) GetWorkspaceById(ctx context.Context, workspaceId string) (*model.Workspace, error) {
+	row := r.SystemDbConn.QueryRow(ctx, getWorkspaceByIdQuery, pgx.NamedArgs{"id": workspaceId})
 
 	var workspace model.Workspace
 	err := row.Scan(
