@@ -6,36 +6,38 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/model"
 )
 
-type GetTableListParams struct {
+type GetTableBranchListParams struct {
 	Context   context.Context
 	ProjectId string
 }
 
-type GetTableByIdParams struct {
+type GetTableBranchByIdParams struct {
 	Context   context.Context
 	ProjectId string
-	TableId   string
+	BranchId  string
 }
 
-type CreateTableParams struct {
+type CreateTableBranchParams struct {
 	Context   context.Context
 	ProjectId string
-	Table     *model.Table
+	Branch    *model.TableBranch
 }
 
-type CreateBulkTableParams struct {
+type CreateBulkTableBranchParams struct {
+	Context    context.Context
+	ProjectId  string
+	BranchList []model.TableBranch
+}
+
+type UpdateTableBranchByIdParams struct {
 	Context   context.Context
 	ProjectId string
-	TableList []model.Table
+	BranchId  string
+	Branch    *model.TableBranch
 }
 
-type UpdateTableByIdParams struct {
-	Context context.Context
-	TableId string
-	Table   *model.Table
-}
-
-type DeleteTableByIdParams struct {
-	Context context.Context
-	TableId string
+type DeleteTableBranchByIdParams struct {
+	Context   context.Context
+	ProjectId string
+	BranchId  string
 }
