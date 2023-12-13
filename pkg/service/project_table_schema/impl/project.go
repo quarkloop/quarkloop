@@ -1,4 +1,4 @@
-package project_table_impl
+package table_schema_impl
 
 import (
 	"github.com/quarkloop/quarkloop/pkg/model"
@@ -6,37 +6,37 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/store/repository"
 )
 
-type tableService struct {
+type tableSchemaService struct {
 	dataStore *repository.Repository
 }
 
-func NewTableService(ds *repository.Repository) table_schema.Service {
-	return &tableService{
+func NewTableSchemaService(ds *repository.Repository) table_schema.Service {
+	return &tableSchemaService{
 		dataStore: ds,
 	}
 }
 
-func (s *tableService) ListTableSchemas(p *table_schema.GetTableListParams) ([]model.TableWithRelationCount, error) {
-	projectList, err := s.dataStore.ListTableSchemas(p.Context, p.ProjectId)
-	return projectList, err
+func (s *tableSchemaService) ListTableSchemas(p *table_schema.GetTableSchemaListParams) ([]model.TableSchema, error) {
+	schemaList, err := s.dataStore.ListTableSchemas(p.Context, p.ProjectId)
+	return schemaList, err
 }
 
-func (s *tableService) GetTableSchemaById(p *table_schema.GetTableByIdParams) (*model.TableWithRelationCount, error) {
-	project, err := s.dataStore.GetTableSchemaById(p.Context, p.ProjectId, p.TableId)
-	return project, err
+func (s *tableSchemaService) GetTableSchemaById(p *table_schema.GetTableSchemaByIdParams) (*model.TableSchema, error) {
+	schema, err := s.dataStore.GetTableSchemaById(p.Context, p.SchemaId)
+	return schema, err
 }
 
-func (s *tableService) CreateTableSchema(p *table_schema.CreateTableParams) (*model.Table, error) {
-	project, err := s.dataStore.CreateTableSchema(p.Context, p.ProjectId, p.Table)
-	return project, err
+func (s *tableSchemaService) CreateTableSchema(p *table_schema.CreateTableSchemaParams) (*model.TableSchema, error) {
+	schema, err := s.dataStore.CreateTableSchema(p.Context, p.ProjectId, p.Schema)
+	return schema, err
 }
 
-func (s *tableService) UpdateTableSchemaById(p *table_schema.UpdateTableByIdParams) error {
-	err := s.dataStore.UpdateTableSchemaById(p.Context, p.TableId, p.Table)
+func (s *tableSchemaService) UpdateTableSchemaById(p *table_schema.UpdateTableSchemaByIdParams) error {
+	err := s.dataStore.UpdateTableSchemaById(p.Context, p.ProjectId, p.SchemaId, p.Schema)
 	return err
 }
 
-func (s *tableService) DeleteTableSchemaById(p *table_schema.DeleteTableByIdParams) error {
-	err := s.dataStore.DeleteTableSchemaById(p.Context, p.TableId)
+func (s *tableSchemaService) DeleteTableSchemaById(p *table_schema.DeleteTableSchemaByIdParams) error {
+	err := s.dataStore.DeleteTableSchemaById(p.Context, p.ProjectId, p.SchemaId)
 	return err
 }
