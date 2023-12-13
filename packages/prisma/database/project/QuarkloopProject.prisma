@@ -11,6 +11,7 @@ datasource db {
 }
 
 model TableBranch {
+    // id
     id        String @id
     projectId String
 
@@ -20,6 +21,7 @@ model TableBranch {
     createdBy String
     updatedBy String?
 
+    // relation
     tables         Table[]
     documentTables TableDocument[]
     formTables     TableForm[]
@@ -31,13 +33,14 @@ model TableBranch {
 }
 
 model Table {
+    // id
     id        Int    @id @default(autoincrement())
     projectId String
     branchId  String
 
+    // table
     name        String
-    type        Int
-    description String
+    description String?
     metadata    Json?
     data        Json
 
@@ -47,6 +50,7 @@ model Table {
     createdBy String
     updatedBy String?
 
+    // relation
     documents TableDocument[]
     payments  TablePayment[]
     forms     TableForm[]
@@ -58,11 +62,15 @@ model Table {
 }
 
 model TableDocumentSchema {
+    // id
     id        Int    @id @default(autoincrement())
     projectId String
 
-    metadata Json?
-    data     Json
+    // schema
+    name        String
+    description String?
+    metadata    Json?
+    data        Json
 
     // history
     createdAt DateTime  @default(now())
@@ -70,6 +78,7 @@ model TableDocumentSchema {
     createdBy String
     updatedBy String?
 
+    // relation
     documents TableDocument[]
 
     @@index([projectId])
@@ -78,13 +87,16 @@ model TableDocumentSchema {
 }
 
 model TableDocument {
-    id       Int    @id @default(autoincrement())
-    tableId  Int
-    schemaId Int
-    branchId String
+    // id
+    id        Int    @id @default(autoincrement())
+    projectId String
+    branchId  String
+    tableId   Int
+    schemaId  Int
 
+    // document
     name        String
-    description String
+    description String?
     metadata    Json?
     data        Json
 
@@ -94,20 +106,26 @@ model TableDocument {
     createdBy String
     updatedBy String?
 
+    // relation
     table  Table               @relation(fields: [tableId], references: [id])
-    schema TableDocumentSchema @relation(fields: [schemaId], references: [id])
     branch TableBranch         @relation(fields: [branchId], references: [id])
+    schema TableDocumentSchema @relation(fields: [schemaId], references: [id])
 
+    @@index([projectId])
     @@index([createdBy, updatedBy])
     @@schema("project")
 }
 
 model TablePaymentSchema {
+    // id
     id        Int    @id @default(autoincrement())
     projectId String
 
-    metadata Json?
-    data     Json
+    // schema
+    name        String
+    description String?
+    metadata    Json?
+    data        Json
 
     // history
     createdAt DateTime  @default(now())
@@ -115,6 +133,7 @@ model TablePaymentSchema {
     createdBy String
     updatedBy String?
 
+    // relation
     payments TablePayment[]
 
     @@index([projectId])
@@ -123,13 +142,16 @@ model TablePaymentSchema {
 }
 
 model TablePayment {
-    id       Int    @id @default(autoincrement())
-    tableId  Int
-    schemaId Int
-    branchId String
+    // id
+    id        Int    @id @default(autoincrement())
+    projectId String
+    branchId  String
+    tableId   Int
+    schemaId  Int
 
+    // payment
     name        String
-    description String
+    description String?
     metadata    Json?
     data        Json
 
@@ -139,20 +161,26 @@ model TablePayment {
     createdBy String
     updatedBy String?
 
+    // relation
     table  Table              @relation(fields: [tableId], references: [id])
-    schema TablePaymentSchema @relation(fields: [schemaId], references: [id])
     branch TableBranch        @relation(fields: [branchId], references: [id])
+    schema TablePaymentSchema @relation(fields: [schemaId], references: [id])
 
+    @@index([projectId])
     @@index([createdBy, updatedBy])
     @@schema("project")
 }
 
 model TableFormSchema {
+    // id
     id        Int    @id @default(autoincrement())
     projectId String
 
-    metadata Json?
-    data     Json
+    // schema
+    name        String
+    description String?
+    metadata    Json?
+    data        Json
 
     // history
     createdAt DateTime  @default(now())
@@ -160,6 +188,7 @@ model TableFormSchema {
     createdBy String
     updatedBy String?
 
+    // relation
     forms TableForm[]
 
     @@index([projectId])
@@ -168,13 +197,16 @@ model TableFormSchema {
 }
 
 model TableForm {
-    id       Int    @id @default(autoincrement())
-    tableId  Int
-    schemaId Int
-    branchId String
+    // id
+    id        Int    @id @default(autoincrement())
+    projectId String
+    branchId  String
+    tableId   Int
+    schemaId  Int
 
+    // form
     name        String
-    description String
+    description String?
     metadata    Json?
     data        Json
 
@@ -184,21 +216,26 @@ model TableForm {
     createdBy String
     updatedBy String?
 
+    // relation
     table  Table           @relation(fields: [tableId], references: [id])
-    schema TableFormSchema @relation(fields: [schemaId], references: [id])
     branch TableBranch     @relation(fields: [branchId], references: [id])
+    schema TableFormSchema @relation(fields: [schemaId], references: [id])
 
+    @@index([projectId])
     @@index([createdBy, updatedBy])
     @@schema("project")
 }
 
 model App {
+    // id
     id        Int    @id @default(autoincrement())
     projectId String
 
-    name     String
-    metadata Json?
-    data     Json
+    // app
+    name        String
+    description String?
+    metadata    Json?
+    data        Json
 
     // history
     createdAt DateTime  @default(now())
@@ -211,9 +248,11 @@ model App {
 }
 
 model AppSubmission {
+    // id
     id        Int    @id @default(autoincrement())
     projectId String
 
+    // submission
     title    String
     status   Int       @default(1)
     labels   Json?
@@ -227,6 +266,7 @@ model AppSubmission {
     createdBy String
     updatedBy String?
 
+    // relation
     discussions AppDiscussion[]
 
     @@index([createdBy, updatedBy])
@@ -234,12 +274,15 @@ model AppSubmission {
 }
 
 model AppDiscussion {
+    // id
     id           Int @id @default(autoincrement())
     submissionId Int
 
-    name     String
-    metadata Json?
-    data     String
+    // discussion
+    name        String
+    description String?
+    metadata    Json?
+    data        Json
 
     // history
     createdAt DateTime  @default(now())
@@ -247,6 +290,7 @@ model AppDiscussion {
     createdBy String
     updatedBy String?
 
+    // relation
     submission AppSubmission @relation(fields: [submissionId], references: [id])
 
     @@index([createdBy, updatedBy])
