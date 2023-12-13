@@ -1,4 +1,4 @@
-package project_table_impl
+package table_table_impl
 
 import (
 	"github.com/quarkloop/quarkloop/pkg/model"
@@ -17,23 +17,23 @@ func NewTableService(ds *repository.Repository) table.Service {
 }
 
 func (s *tableService) ListTableRecords(p *table.GetTableListParams) ([]model.TableWithRelationCount, error) {
-	projectList, err := s.dataStore.ListTableRecords(p.Context, p.ProjectId)
-	return projectList, err
+	tableList, err := s.dataStore.ListTableRecords(p.Context, p.ProjectId)
+	return tableList, err
 }
 
 func (s *tableService) GetTableRecordById(p *table.GetTableByIdParams) (*model.TableWithRelationCount, error) {
-	project, err := s.dataStore.GetTableRecordById(p.Context, p.ProjectId, p.TableId)
-	return project, err
+	table, err := s.dataStore.GetTableRecordById(p.Context, p.ProjectId, p.TableId)
+	return table, err
 }
 
 func (s *tableService) CreateTable(p *table.CreateTableParams) (*model.Table, error) {
-	project, err := s.dataStore.CreateTable(p.Context, p.ProjectId, p.Table)
-	return project, err
+	table, err := s.dataStore.CreateTable(p.Context, p.ProjectId, p.Table)
+	return table, err
 }
 
 func (s *tableService) CreateBulkTable(p *table.CreateBulkTableParams) (int64, error) {
-	project, err := s.dataStore.CreateBulkTable(p.Context, p.ProjectId, p.TableList)
-	return project, err
+	table, err := s.dataStore.CreateBulkTable(p.Context, p.ProjectId, p.TableList)
+	return table, err
 }
 
 func (s *tableService) UpdateTableById(p *table.UpdateTableByIdParams) error {
