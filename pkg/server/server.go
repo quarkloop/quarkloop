@@ -111,10 +111,7 @@ func (s *Server) BindHandlers(api *api.ServerApi) {
 
 	// Branches apis
 	projectGroup.GET("/:projectId/tables/main/branches", s.projectTableApi.ListTableRecords)
-	projectGroup.POST("/:projectId/tables/main/branches", s.projectTableApi.CreateProjectTable)
 	projectGroup.GET("/:projectId/tables/main/branches/:branchId", s.projectTableApi.GetTableRecordById)
-	projectGroup.PUT("/:projectId/tables/main/branches/:branchId", s.projectTableApi.UpdateProjectTableById)
-	projectGroup.DELETE("/:projectId/tables/main/branches/:branchId", s.projectTableApi.DeleteProjectTableById)
 
 	// Records apis
 	projectGroup.GET("/:projectId/tables/:tableType/branches/:branchId/records", s.projectTableApi.ListTableRecords)
