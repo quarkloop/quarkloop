@@ -1,4 +1,4 @@
-package project_table_impl
+package table_branch_impl
 
 import (
 	"github.com/quarkloop/quarkloop/pkg/model"
@@ -6,37 +6,37 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/store/repository"
 )
 
-type tableService struct {
+type tableBranchService struct {
 	dataStore *repository.Repository
 }
 
-func NewTableService(ds *repository.Repository) table_branch.Service {
-	return &tableService{
+func NewTableBranchService(ds *repository.Repository) table_branch.Service {
+	return &tableBranchService{
 		dataStore: ds,
 	}
 }
 
-func (s *tableService) ListTableBranches(p *table_branch.GetTableListParams) ([]model.TableWithRelationCount, error) {
-	projectList, err := s.dataStore.ListTableBranches(p.Context, p.ProjectId)
-	return projectList, err
+func (s *tableBranchService) ListTableBranches(p *table_branch.GetTableBranchListParams) ([]model.TableBranch, error) {
+	branchList, err := s.dataStore.ListTableBranches(p.Context, p.ProjectId)
+	return branchList, err
 }
 
-func (s *tableService) GetTableBranchById(p *table_branch.GetTableByIdParams) (*model.TableWithRelationCount, error) {
-	project, err := s.dataStore.GetTableBranchById(p.Context, p.ProjectId, p.TableId)
-	return project, err
+func (s *tableBranchService) GetTableBranchById(p *table_branch.GetTableBranchByIdParams) (*model.TableBranch, error) {
+	branch, err := s.dataStore.GetTableBranchById(p.Context, p.ProjectId, p.BranchId)
+	return branch, err
 }
 
-func (s *tableService) CreateTableBranch(p *table_branch.CreateTableParams) (*model.Table, error) {
-	project, err := s.dataStore.CreateTableBranch(p.Context, p.ProjectId, p.Table)
-	return project, err
+func (s *tableBranchService) CreateTableBranch(p *table_branch.CreateTableBranchParams) (*model.TableBranch, error) {
+	branch, err := s.dataStore.CreateTableBranch(p.Context, p.ProjectId, p.Branch)
+	return branch, err
 }
 
-func (s *tableService) UpdateTableBranchById(p *table_branch.UpdateTableByIdParams) error {
-	err := s.dataStore.UpdateTableBranchById(p.Context, p.TableId, p.Table)
+func (s *tableBranchService) UpdateTableBranchById(p *table_branch.UpdateTableBranchByIdParams) error {
+	err := s.dataStore.UpdateTableBranchById(p.Context, p.ProjectId, p.BranchId, p.Branch)
 	return err
 }
 
-func (s *tableService) DeleteTableBranchById(p *table_branch.DeleteTableByIdParams) error {
-	err := s.dataStore.DeleteTableBranchById(p.Context, p.TableId)
+func (s *tableBranchService) DeleteTableBranchById(p *table_branch.DeleteTableBranchByIdParams) error {
+	err := s.dataStore.DeleteTableBranchById(p.Context, p.ProjectId, p.BranchId)
 	return err
 }
