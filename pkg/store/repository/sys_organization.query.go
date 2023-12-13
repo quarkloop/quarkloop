@@ -57,9 +57,9 @@ func (r *Repository) ListOrganizations(ctx context.Context) ([]model.Organizatio
 	return orgList, nil
 }
 
-/// FindUniqueOrganization
+/// GetOrganizationById
 
-const findUniqueOrganizationQuery = `
+const getOrganizationByIdQuery = `
 SELECT 
   "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
 FROM 
@@ -68,8 +68,8 @@ WHERE
   "id" = @id;
 `
 
-func (r *Repository) FindUniqueOrganization(ctx context.Context, orgId string) (*model.Organization, error) {
-	row := r.SystemDbConn.QueryRow(ctx, findUniqueOrganizationQuery, pgx.NamedArgs{"id": orgId})
+func (r *Repository) GetOrganizationById(ctx context.Context, orgId string) (*model.Organization, error) {
+	row := r.SystemDbConn.QueryRow(ctx, getOrganizationByIdQuery, pgx.NamedArgs{"id": orgId})
 
 	var organization model.Organization
 	err := row.Scan(
