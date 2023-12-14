@@ -6,16 +6,16 @@ import (
 )
 
 type Api interface {
-	ListTableRecords(c *gin.Context)
-	GetTableRecordById(c *gin.Context)
+	ListTableBranches(c *gin.Context)
+	GetTableBranchById(c *gin.Context)
 }
 
 type TableBranchApi struct {
-	tableBranch table_branch.Service
+	tableBranchService table_branch.Service
 }
 
 func NewTableBranchApi(service table_branch.Service) *TableBranchApi {
 	return &TableBranchApi{
-		tableBranch: service,
+		tableBranchService: service,
 	}
 }
