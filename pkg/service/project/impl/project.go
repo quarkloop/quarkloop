@@ -3,19 +3,16 @@ package project_impl
 import (
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
-	"github.com/quarkloop/quarkloop/pkg/service/project_table"
 	"github.com/quarkloop/quarkloop/pkg/store/repository"
 )
 
 type projectService struct {
-	projectSvc project_table.Service
-	dataStore  *repository.Repository
+	dataStore *repository.Repository
 }
 
-func NewProjectService(ds *repository.Repository, projectSvc project_table.Service) project.Service {
+func NewProjectService(ds *repository.Repository) project.Service {
 	return &projectService{
-		dataStore:  ds,
-		projectSvc: projectSvc,
+		dataStore: ds,
 	}
 }
 
@@ -25,12 +22,12 @@ func (s *projectService) GetProjectList(p *project.GetProjectListParams) ([]mode
 }
 
 func (s *projectService) GetProjectById(p *project.GetProjectByIdParams) (*model.Project, error) {
-	project, err := s.dataStore.FindUniqueProject(p.Context, p.ProjectId)
+	project, err := s.dataStore.GetProjectById(p.Context, p.ProjectId)
 	return project, err
 }
 
 func (s *projectService) GetProject(p *project.GetProjectParams) (*model.Project, error) {
-	project, err := s.dataStore.FindFirstProject(p.Context, &p.Project)
+	project, err := s.dataStore.GetProject(p.Context, &p.Project)
 	return project, err
 }
 
