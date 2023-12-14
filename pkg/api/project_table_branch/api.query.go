@@ -6,28 +6,28 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/api"
 	"github.com/quarkloop/quarkloop/pkg/model"
-	"github.com/quarkloop/quarkloop/pkg/service/project_table_branch"
+	table_branch "github.com/quarkloop/quarkloop/pkg/service/project_table_branch"
 )
 
-type ListTableRecordsUriParams struct {
+type ListTableBranchesUriParams struct {
 	ProjectId string `uri:"projectId" binding:"required"`
 }
 
-type ListTableRecordsResponse struct {
+type ListTableBranchesResponse struct {
 	api.ApiResponse
-	Data []model.TableWithRelationCount `json:"data"`
+	Data []model.TableBranch `json:"data"`
 }
 
-func (s *TableBranchApi) ListTableRecords(c *gin.Context) {
-	uriParams := &ListTableRecordsUriParams{}
+func (s *TableBranchApi) ListTableBranches(c *gin.Context) {
+	uriParams := &ListTableBranchesUriParams{}
 	if err := c.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(c, err)
 		return
 	}
 
 	// query service
-	projectList, err := s.tableBranch.ListTableRecords(
-		&project_table_branch.GetTableListParams{
+	projectList, err := s.tableBranchService.ListTableBranches(
+		&table_branch.GetTableBranchListParams{
 			Context:   c,
 			ProjectId: uriParams.ProjectId,
 		},
@@ -37,7 +37,7 @@ func (s *TableBranchApi) ListTableRecords(c *gin.Context) {
 		return
 	}
 
-	res := &ListTableRecordsResponse{
+	res := &ListTableBranchesResponse{
 		ApiResponse: api.ApiResponse{
 			Status:       http.StatusOK,
 			StatusString: "OK",
@@ -47,29 +47,29 @@ func (s *TableBranchApi) ListTableRecords(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-type GetTableRecordByIdUriParams struct {
-	ProjectId     string `uri:"projectId" binding:"required"`
-	TableBranchId string `uri:"tableId" binding:"required"`
+type GetTableBranchByIdUriParams struct {
+	ProjectId string `uri:"projectId" binding:"required"`
+	BranchId  string `uri:"branchId" binding:"required"`
 }
 
-type GetTableRecordByIdResponse struct {
+type GetTableBranchByIdResponse struct {
 	api.ApiResponse
-	Data model.TableWithRelationCount `json:"data,omitempty"`
+	Data model.TableBranch `json:"data,omitempty"`
 }
 
-func (s *TableBranchApi) GetTableRecordById(c *gin.Context) {
-	uriParams := &GetTableRecordByIdUriParams{}
+func (s *TableBranchApi) GetTableBranchById(c *gin.Context) {
+	uriParams := &GetTableBranchByIdUriParams{}
 	if err := c.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(c, err)
 		return
 	}
 
 	// query service
-	project_table_branch, err := s.tableBranch.GetTableRecordById(
-		&project_table_branch.GetTableByIdParams{
+	project_table_branch, err := s.tableBranchService.GetTableBranchById(
+		&table_branch.GetTableBranchByIdParams{
 			Context:   c,
 			ProjectId: uriParams.ProjectId,
-			TableId:   uriParams.TableBranchId,
+			BranchId:  uriParams.BranchId,
 		},
 	)
 	if err != nil {
@@ -77,7 +77,7 @@ func (s *TableBranchApi) GetTableRecordById(c *gin.Context) {
 		return
 	}
 
-	res := &GetTableRecordByIdResponse{
+	res := &GetTableBranchByIdResponse{
 		ApiResponse: api.ApiResponse{
 			Status:       http.StatusOK,
 			StatusString: "OK",
