@@ -11,54 +11,81 @@ datasource db {
 }
 
 model Organization {
-    id String @id
+    // id
+    id  Int    @id @default(autoincrement())
+    sid String @unique // scoped id
 
+    // organization
     name        String
-    path        String    @unique
     description String
     accessType  Int
-    createdAt   DateTime? @default(now())
-    updatedAt   DateTime?
+    metadata    Json?
 
+    // history
+    createdAt DateTime  @default(now())
+    updatedAt DateTime?
+    createdBy String
+    updatedBy String?
+
+    // relation
     workspaces Workspace[]
-    apps       Project[]
+    projects   Project[]
 
     @@schema("system")
 }
 
 model Workspace {
-    id    String @id
-    orgId String
+    // id
+    id    Int    @id @default(autoincrement())
+    orgId Int
+    sid   String // scoped id
 
+    // workspace
     name        String
-    path        String    @unique
     description String
     accessType  Int
-    createdAt   DateTime? @default(now())
-    updatedAt   DateTime?
+    metadata    Json?
 
-    organization Organization @relation(fields: [orgId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    // history
+    createdAt DateTime  @default(now())
+    updatedAt DateTime?
+    createdBy String
+    updatedBy String?
+
+    // relation
+    organization Organization @relation(fields: [orgId], references: [id])
     projects     Project[]
 
-    @@unique(fields: [orgId, id])
+    @@unique([orgId, sid])
+    @@index([orgId])
     @@schema("system")
 }
 
 model Project {
-    id          String @id @default(cuid())
-    orgId       String
-    workspaceId String
+    // id
+    id          Int    @id @default(autoincrement())
+    orgId       Int
+    workspaceId Int
+    sid         String // scoped id
 
+    // project
     name        String
-    path        String    @unique
     description String
     accessType  Int
     metadata    Json?
-    createdAt   DateTime? @default(now())
-    updatedAt   DateTime?
 
+    // history
+    createdAt DateTime  @default(now())
+    updatedAt DateTime?
+    createdBy String
+    updatedBy String?
+
+    // relation
     organization Organization @relation(fields: [orgId], references: [id])
     workspace    Workspace    @relation(fields: [workspaceId], references: [id])
 
+    @@unique([orgId, workspaceId, sid])
+    @@index([orgId, workspaceId])
+    @@index([orgId])
     @@schema("system")
 }
