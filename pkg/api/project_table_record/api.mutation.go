@@ -6,20 +6,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/api"
 	"github.com/quarkloop/quarkloop/pkg/model"
-	"github.com/quarkloop/quarkloop/pkg/service/project_table"
+	table_record "github.com/quarkloop/quarkloop/pkg/service/project_table_record"
 )
 
 type CreateTableRecordUriParams struct {
 	ProjectId string `uri:"projectId" binding:"required"`
-}
-
-type CreateTableRecordRequest struct {
-	model.Table
+	BranchId  string `uri:"branchId" binding:"required"`
+	TableType string `uri:"tableType" binding:"required"`
+	RecordId  string `uri:"recordId" binding:"required"`
 }
 
 type CreateTableRecordResponse struct {
 	api.ApiResponse
-	Data model.Table `json:"data,omitempty"`
+	Data interface{} `json:"data,omitempty"`
 }
 
 func (s *TableRecordApi) CreateTableRecord(c *gin.Context) {
@@ -29,18 +28,29 @@ func (s *TableRecordApi) CreateTableRecord(c *gin.Context) {
 		return
 	}
 
-	req := &CreateTableRecordRequest{}
-	if err := c.BindJSON(req); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
-		return
+	var req interface{}
+	if uriParams.TableType == "main" {
+		req = model.MainRecordWithRelationCount{}
+		if err := c.BindJSON(req); err != nil {
+			api.AbortWithBadRequestJSON(c, err)
+			return
+		}
+	} else if uriParams.TableType == "document" {
+		req = model.DocumentRecord{}
+		if err := c.BindJSON(req); err != nil {
+			api.AbortWithBadRequestJSON(c, err)
+			return
+		}
 	}
 
 	// query service
-	ws, err := s.tableRecord.CreateTable(
-		&project_table.CreateTableParams{
+	record, err := s.tableRecordService.CreateTableRecord(
+		&table_record.CreateTableRecordParams{
 			Context:   c,
 			ProjectId: uriParams.ProjectId,
-			Table:     &req.Table,
+			BranchId:  uriParams.BranchId,
+			TableType: uriParams.TableType,
+			Record:    req,
 		},
 	)
 	if err != nil {
@@ -53,18 +63,16 @@ func (s *TableRecordApi) CreateTableRecord(c *gin.Context) {
 			Status:       http.StatusCreated,
 			StatusString: "Created",
 		},
-		Data: *ws,
+		Data: record,
 	}
 	c.JSON(http.StatusCreated, res)
 }
 
 type UpdateTableRecordByIdUriParams struct {
-	ProjectId     string `uri:"projectId" binding:"required"`
-	TableRecordId string `uri:"tableId" binding:"required"`
-}
-
-type UpdateTableRecordByIdRequest struct {
-	model.Table
+	ProjectId string `uri:"projectId" binding:"required"`
+	BranchId  string `uri:"branchId" binding:"required"`
+	RecordId  string `uri:"recordId" binding:"required"`
+	TableType string `uri:"tableType" binding:"required"`
 }
 
 func (s *TableRecordApi) UpdateTableRecordById(c *gin.Context) {
@@ -74,18 +82,30 @@ func (s *TableRecordApi) UpdateTableRecordById(c *gin.Context) {
 		return
 	}
 
-	req := &UpdateTableRecordByIdRequest{}
-	if err := c.BindJSON(req); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
-		return
+	var req interface{}
+	if uriParams.TableType == "main" {
+		req = model.MainRecordWithRelationCount{}
+		if err := c.BindJSON(req); err != nil {
+			api.AbortWithBadRequestJSON(c, err)
+			return
+		}
+	} else if uriParams.TableType == "document" {
+		req = model.DocumentRecord{}
+		if err := c.BindJSON(req); err != nil {
+			api.AbortWithBadRequestJSON(c, err)
+			return
+		}
 	}
 
 	// query service
-	err := s.tableRecord.UpdateTableById(
-		&project_table.UpdateTableByIdParams{
-			Context: c,
-			TableId: uriParams.TableRecordId,
-			Table:   &req.Table,
+	err := s.tableRecordService.UpdateTableRecordById(
+		&table_record.UpdateTableRecordByIdParams{
+			Context:   c,
+			ProjectId: uriParams.ProjectId,
+			BranchId:  uriParams.BranchId,
+			RecordId:  uriParams.RecordId,
+			TableType: uriParams.TableType,
+			Record:    req,
 		},
 	)
 	if err != nil {
@@ -97,7 +117,10 @@ func (s *TableRecordApi) UpdateTableRecordById(c *gin.Context) {
 }
 
 type DeleteTableRecordByIdUriParams struct {
-	TableRecordId string `uri:"tableRecordId" binding:"required"`
+	ProjectId string `uri:"projectId" binding:"required"`
+	BranchId  string `uri:"branchId" binding:"required"`
+	RecordId  string `uri:"recordId" binding:"required"`
+	TableType string `uri:"tableType" binding:"required"`
 }
 
 func (s *TableRecordApi) DeleteTableRecordById(c *gin.Context) {
@@ -108,10 +131,13 @@ func (s *TableRecordApi) DeleteTableRecordById(c *gin.Context) {
 	}
 
 	// query service
-	err := s.tableRecord.DeleteTableById(
-		&project_table.DeleteTableByIdParams{
-			Context: c,
-			TableId: uriParams.TableRecordId,
+	err := s.tableRecordService.DeleteTableRecordById(
+		&table_record.DeleteTableRecordByIdParams{
+			Context:   c,
+			ProjectId: uriParams.ProjectId,
+			BranchId:  uriParams.BranchId,
+			RecordId:  uriParams.RecordId,
+			TableType: uriParams.TableType,
 		},
 	)
 	if err != nil {
