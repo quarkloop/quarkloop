@@ -26,12 +26,12 @@ func (s *orgService) GetOrganizationList(p *organization.GetOrganizationListPara
 }
 
 func (s *orgService) GetOrganizationById(p *organization.GetOrganizationByIdParams) (*model.Organization, error) {
-	org, err := s.dataStore.FindUniqueOrganization(p.Context, p.Id)
+	org, err := s.dataStore.GetOrganizationById(p.Context, p.Id)
 	return org, err
 }
 
 func (s *orgService) GetOrganization(p *organization.GetOrganizationParams) (*model.Organization, error) {
-	org, err := s.dataStore.FindFirstOrganization(p.Context, &p.Organization)
+	org, err := s.dataStore.GetOrganization(p.Context, &p.Organization)
 	return org, err
 }
 
