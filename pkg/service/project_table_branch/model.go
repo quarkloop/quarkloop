@@ -14,7 +14,7 @@ type GetTableBranchListParams struct {
 type GetTableBranchByIdParams struct {
 	Context   context.Context
 	ProjectId string
-	BranchId  string
+	BranchId  int
 }
 
 type CreateTableBranchParams struct {
@@ -23,21 +23,15 @@ type CreateTableBranchParams struct {
 	Branch    *model.TableBranch
 }
 
-type CreateBulkTableBranchParams struct {
-	Context    context.Context
-	ProjectId  string
-	BranchList []model.TableBranch
-}
-
 type UpdateTableBranchByIdParams struct {
 	Context   context.Context
 	ProjectId string
-	BranchId  string
+	BranchId  int
 	Branch    *model.TableBranch
 }
 
 type DeleteTableBranchByIdParams struct {
 	Context   context.Context
 	ProjectId string
-	BranchId  string
+	BranchId  int
 }
