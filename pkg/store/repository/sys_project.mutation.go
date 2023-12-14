@@ -17,22 +17,21 @@ import (
 
 const createProjectMutation = `
 INSERT INTO
-  "system"."Project" ("orgId", "workspaceId", "id", "name", "accessType", "path", "description", "updatedAt")
+  "system"."Project" ("orgId", "workspaceId", "sid", "name", "description", "accessType", "createdBy")
 VALUES
-  (@orgId, @workspaceId, @id, @name, @accessType, @path, @description, @updatedAt)
+  (@orgId, @workspaceId, @sid, @name, @description, @accessType, @createdBy)
 RETURNING 
-  "id", "name", "accessType", "path", "description", "createdAt";
+  "id", "sid", "name", "description", "accessType", "createdAt", "createdBy";
 `
 
-func (r *Repository) CreateProject(ctx context.Context, orgId string, workspaceId string, project *model.Project) (*model.Project, error) {
-	if project.Id == "" {
-		id, err := gonanoid.New()
+func (r *Repository) CreateProject(ctx context.Context, orgId int, workspaceId int, project *model.Project) (*model.Project, error) {
+	if project.ScopedId == "" {
+		sid, err := gonanoid.New()
 		if err != nil {
 			return nil, err
 		}
-		project.Id = id
+		project.ScopedId = sid
 	}
-	project.Path = fmt.Sprintf("/org/%s/%s/%s", orgId, workspaceId, project.Id)
 
 	row := r.SystemDbConn.QueryRow(
 		ctx,
@@ -40,22 +39,23 @@ func (r *Repository) CreateProject(ctx context.Context, orgId string, workspaceI
 		pgx.NamedArgs{
 			"orgId":       orgId,
 			"workspaceId": workspaceId,
-			"id":          project.Id,
+			"sid":         project.ScopedId,
 			"name":        project.Name,
-			"accessType":  project.AccessType,
-			"path":        project.Path,
 			"description": project.Description,
+			"accessType":  project.AccessType,
+			"createdBy":   project.CreatedBy,
 		},
 	)
 
 	var prj model.Project
 	rowErr := row.Scan(
 		&prj.Id,
+		&prj.ScopedId,
 		&prj.Name,
-		&prj.AccessType,
-		&prj.Path,
 		&prj.Description,
+		&prj.AccessType,
 		&prj.CreatedAt,
+		&prj.CreatedBy,
 	)
 	if rowErr != nil {
 		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", rowErr)
@@ -71,24 +71,26 @@ const updateProjectByIdMutation = `
 UPDATE
   "system"."Project"
 SET
+  "sid"         = @sid,
   "name"        = @name,
-  "path"        = @path,
   "description" = @description,
-  "updatedAt"   = @updatedAt
+  "updatedAt"   = @updatedAt,
+  "updatedBy"   = @updatedBy,
 WHERE
   "id" = @id;
 `
 
-func (r *Repository) UpdateProjectById(ctx context.Context, projectId string, project *model.Project) error {
+func (r *Repository) UpdateProjectById(ctx context.Context, projectId int, project *model.Project) error {
 	commandTag, err := r.SystemDbConn.Exec(
 		ctx,
 		updateProjectByIdMutation,
 		pgx.NamedArgs{
 			"id":          projectId,
+			"sid":         project.ScopedId,
 			"name":        project.Name,
-			"path":        project.Path,
 			"description": project.Description,
 			"updatedAt":   time.Now(),
+			"updatedBy":   project.UpdatedBy,
 		},
 	)
 	if err != nil {
@@ -114,7 +116,7 @@ WHERE
   "id" = @id;
 `
 
-func (r *Repository) DeleteProjectById(ctx context.Context, projectId string) error {
+func (r *Repository) DeleteProjectById(ctx context.Context, projectId int) error {
 	commandTag, err := r.SystemDbConn.Exec(ctx, deleteProjectByIdMutation, pgx.NamedArgs{"id": projectId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
