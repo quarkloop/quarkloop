@@ -16,14 +16,14 @@ import (
 
 const listWorkspacesQuery = `
 SELECT 
-  "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
+  "id", "name", "description", "accessType",  "createdAt", "updatedAt"
 FROM 
   "system"."Workspace"
 WHERE
   "orgId" = ANY (@orgId);
 `
 
-func (r *Repository) ListWorkspaces(ctx context.Context, orgId []string) ([]model.Workspace, error) {
+func (r *Repository) ListWorkspaces(ctx context.Context, orgId []int) ([]model.Workspace, error) {
 	rows, err := r.SystemDbConn.Query(ctx, listWorkspacesQuery, pgx.NamedArgs{"orgId": orgId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
@@ -38,9 +38,8 @@ func (r *Repository) ListWorkspaces(ctx context.Context, orgId []string) ([]mode
 		err := rows.Scan(
 			&workspace.Id,
 			&workspace.Name,
-			&workspace.AccessType,
 			&workspace.Description,
-			&workspace.Path,
+			&workspace.AccessType,
 			&workspace.CreatedAt,
 			&workspace.UpdatedAt,
 		)
@@ -63,23 +62,22 @@ func (r *Repository) ListWorkspaces(ctx context.Context, orgId []string) ([]mode
 
 const getWorkspaceByIdQuery = `
 SELECT 
-  "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
+  "id", "name", "description", "accessType",  "createdAt", "updatedAt"
 FROM 
   "system"."Workspace" 
 WHERE 
   "id" = @id;
 `
 
-func (r *Repository) GetWorkspaceById(ctx context.Context, workspaceId string) (*model.Workspace, error) {
+func (r *Repository) GetWorkspaceById(ctx context.Context, workspaceId int) (*model.Workspace, error) {
 	row := r.SystemDbConn.QueryRow(ctx, getWorkspaceByIdQuery, pgx.NamedArgs{"id": workspaceId})
 
 	var workspace model.Workspace
 	err := row.Scan(
 		&workspace.Id,
 		&workspace.Name,
-		&workspace.AccessType,
 		&workspace.Description,
-		&workspace.Path,
+		&workspace.AccessType,
 		&workspace.CreatedAt,
 		&workspace.UpdatedAt,
 	)
@@ -91,11 +89,11 @@ func (r *Repository) GetWorkspaceById(ctx context.Context, workspaceId string) (
 	return &workspace, nil
 }
 
-/// FindFirstWorkspace
+/// GetWorkspace
 
-const findFirstWorkspaceQuery = `
+const getWorkspaceQuery = `
 SELECT 
-  "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
+  "id", "name", "description", "accessType",  "createdAt", "updatedAt"
 FROM 
   "system"."Workspace" 
 WHERE
@@ -104,14 +102,13 @@ ORDER BY "updatedAt" ASC
 LIMIT 1;
 `
 
-func (r *Repository) FindFirstWorkspace(ctx context.Context, orgId string, workspace *model.Workspace) (*model.Workspace, error) {
+func (r *Repository) GetWorkspace(ctx context.Context, orgId int, workspace *model.Workspace) (*model.Workspace, error) {
 	availableFields := []string{}
 	workspaceFields := map[string]interface{}{
 		"orgId":      orgId,
 		"id":         workspace.Id,
 		"name":       workspace.Name,
 		"accessType": *workspace.AccessType,
-		"path":       workspace.Path,
 		"createdAt":  workspace.CreatedAt,
 		"updatedAt":  workspace.UpdatedAt,
 	}
@@ -135,7 +132,7 @@ func (r *Repository) FindFirstWorkspace(ctx context.Context, orgId string, works
 			}
 		}
 	}
-	finalQuery := fmt.Sprintf(findFirstWorkspaceQuery, strings.Join(availableFields, " AND "))
+	finalQuery := fmt.Sprintf(getWorkspaceQuery, strings.Join(availableFields, " AND "))
 
 	row := r.SystemDbConn.QueryRow(ctx, finalQuery)
 
@@ -143,9 +140,8 @@ func (r *Repository) FindFirstWorkspace(ctx context.Context, orgId string, works
 	err := row.Scan(
 		&ws.Id,
 		&ws.Name,
-		&ws.AccessType,
 		&ws.Description,
-		&ws.Path,
+		&ws.AccessType,
 		&ws.CreatedAt,
 		&ws.UpdatedAt,
 	)
