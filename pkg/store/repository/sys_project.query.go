@@ -16,14 +16,14 @@ import (
 
 const listProjectsQuery = `
 SELECT 
-  "id", "name", "accessType", "path", "description", "createdAt", "updatedAt"
+  "id", "sid", "name", "description", "accessType",  "createdAt", "updatedAt"
 FROM 
   "system"."Project"
 WHERE
   %s;
 `
 
-func (r *Repository) ListProjects(ctx context.Context, orgId []string, workspaceId []string) ([]model.Project, error) {
+func (r *Repository) ListProjects(ctx context.Context, orgId []int, workspaceId []int) ([]model.Project, error) {
 	var whereClause string = `"accessType" = 1` // TODO: 1 => public, 2 => private
 	if len(orgId) != 0 {
 		whereClause = `"orgId" = ANY (@orgId)`
@@ -49,10 +49,10 @@ func (r *Repository) ListProjects(ctx context.Context, orgId []string, workspace
 		var project model.Project
 		err := rows.Scan(
 			&project.Id,
+			&project.ScopedId,
 			&project.Name,
-			&project.AccessType,
-			&project.Path,
 			&project.Description,
+			&project.AccessType,
 			&project.CreatedAt,
 			&project.UpdatedAt,
 		)
@@ -75,23 +75,23 @@ func (r *Repository) ListProjects(ctx context.Context, orgId []string, workspace
 
 const getProjectByIdQuery = `
 SELECT
-  "id", "name", "accessType", "path", "description", "createdAt", "updatedAt"
+  "id", "sid", "name", "description", "accessType",  "createdAt", "updatedAt"
 FROM
   "system"."Project"
 WHERE
   "id" = @id;
 `
 
-func (r *Repository) GetProjectById(ctx context.Context, projectId string) (*model.Project, error) {
+func (r *Repository) GetProjectById(ctx context.Context, projectId int) (*model.Project, error) {
 	row := r.SystemDbConn.QueryRow(ctx, getProjectByIdQuery, pgx.NamedArgs{"id": projectId})
 
 	var project model.Project
 	err := row.Scan(
 		&project.Id,
+		&project.ScopedId,
 		&project.Name,
-		&project.AccessType,
-		&project.Path,
 		&project.Description,
+		&project.AccessType,
 		&project.CreatedAt,
 		&project.UpdatedAt,
 	)
@@ -103,11 +103,11 @@ func (r *Repository) GetProjectById(ctx context.Context, projectId string) (*mod
 	return &project, nil
 }
 
-/// FindFirstProject
+/// GetProject
 
-const findFirstProjectQuery = `
+const getProjectQuery = `
 SELECT
-  "id", "name", "accessType", "path", "description", "createdAt", "updatedAt"
+  "id", "sid", "name", "description", "accessType",  "createdAt", "updatedAt"
 FROM
   "system"."Project"
 WHERE 
@@ -116,10 +116,10 @@ ORDER BY "updatedAt" ASC
 LIMIT 1;
 `
 
-func (r *Repository) FindFirstProject(ctx context.Context, project *model.Project) (*model.Project, error) {
+func (r *Repository) GetProject(ctx context.Context, project *model.Project) (*model.Project, error) {
 	availableFields := []string{}
 	projectFields := map[string]interface{}{
-		"id":         project.Id,
+		"sid":        project.ScopedId,
 		"name":       project.Name,
 		"accessType": project.AccessType,
 		"createdAt":  project.CreatedAt,
@@ -145,17 +145,17 @@ func (r *Repository) FindFirstProject(ctx context.Context, project *model.Projec
 			}
 		}
 	}
-	finalQuery := fmt.Sprintf(findFirstProjectQuery, strings.Join(availableFields, " AND "))
+	finalQuery := fmt.Sprintf(getProjectQuery, strings.Join(availableFields, " AND "))
 
 	row := r.SystemDbConn.QueryRow(ctx, finalQuery)
 
 	var p model.Project
 	err := row.Scan(
 		&p.Id,
+		&p.ScopedId,
 		&p.Name,
-		&p.AccessType,
-		&p.Path,
 		&p.Description,
+		&p.AccessType,
 		&p.CreatedAt,
 		&p.UpdatedAt,
 	)
