@@ -2,40 +2,44 @@ package table_record
 
 import (
 	"context"
-
-	"github.com/quarkloop/quarkloop/pkg/model"
 )
 
-type GetTableListParams struct {
+type GetTableRecordListParams struct {
 	Context   context.Context
+	TableType string
 	ProjectId string
+	BranchId  string
 }
 
-type GetTableByIdParams struct {
+type GetTableRecordByIdParams struct {
 	Context   context.Context
+	TableType string
 	ProjectId string
-	TableId   string
+	BranchId  string
+	RecordId  string
 }
 
-type CreateTableParams struct {
+type CreateTableRecordParams struct {
 	Context   context.Context
+	TableType string
 	ProjectId string
-	Table     *model.Table
+	BranchId  string
+	Record    interface{}
 }
 
-type CreateBulkTableParams struct {
+type UpdateTableRecordByIdParams struct {
 	Context   context.Context
+	TableType string
 	ProjectId string
-	TableList []model.Table
+	BranchId  string
+	RecordId  string
+	Record    interface{}
 }
 
-type UpdateTableByIdParams struct {
-	Context context.Context
-	TableId string
-	Table   *model.Table
-}
-
-type DeleteTableByIdParams struct {
-	Context context.Context
-	TableId string
+type DeleteTableRecordByIdParams struct {
+	Context   context.Context
+	TableType string
+	ProjectId string
+	BranchId  string
+	RecordId  string
 }
