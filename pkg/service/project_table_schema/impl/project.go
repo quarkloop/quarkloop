@@ -22,7 +22,7 @@ func (s *tableSchemaService) ListTableSchemas(p *table_schema.GetTableSchemaList
 }
 
 func (s *tableSchemaService) GetTableSchemaById(p *table_schema.GetTableSchemaByIdParams) (*model.TableSchema, error) {
-	schema, err := s.dataStore.GetTableSchemaById(p.Context, p.SchemaId)
+	schema, err := s.dataStore.GetTableSchemaById(p.Context, p.ProjectId, p.SchemaId)
 	return schema, err
 }
 
