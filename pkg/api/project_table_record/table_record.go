@@ -14,11 +14,11 @@ type Api interface {
 }
 
 type TableRecordApi struct {
-	tableRecord table_record.Service
+	tableRecordService table_record.Service
 }
 
 func NewTableRecordApi(service table_record.Service) *TableRecordApi {
 	return &TableRecordApi{
-		tableRecord: service,
+		tableRecordService: service,
 	}
 }
