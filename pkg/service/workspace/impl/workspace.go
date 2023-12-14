@@ -31,7 +31,7 @@ func (s *workspaceService) GetWorkspaceById(p *workspace.GetWorkspaceByIdParams)
 }
 
 func (s *workspaceService) GetWorkspace(p *workspace.GetWorkspaceParams) (*model.Workspace, error) {
-	workspace, err := s.dataStore.FindFirstWorkspace(p.Context, p.OrgId, &p.Workspace)
+	workspace, err := s.dataStore.GetWorkspace(p.Context, p.OrgId, &p.Workspace)
 	return workspace, err
 }
 
