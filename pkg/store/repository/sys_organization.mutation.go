@@ -17,43 +17,43 @@ import (
 
 const createOrganizationMutation = `
 INSERT INTO
-  "system"."Organization" ("id", "name", "accessType", "description", "path")
+  "system"."Organization" ("sid", "name", "description", "accessType", "createdBy")
 VALUES
-  (@id, @name, @accessType, @description, @path)
+  (@sid, @name, @description, @accessType, @createdBy)
 RETURNING 
-  "id", "name", "accessType", "path", "description", "createdAt";
+  "id", "sid", "name", "description", "accessType", "createdAt", "createdBy";
 `
 
 func (r *Repository) CreateOrganization(ctx context.Context, organization *model.Organization) (*model.Organization, error) {
-	if organization.Id == "" {
-		id, err := gonanoid.New()
+	if organization.ScopedId == "" {
+		sid, err := gonanoid.New()
 		if err != nil {
 			return nil, err
 		}
-		organization.Id = id
+		organization.ScopedId = sid
 	}
-	organization.Path = fmt.Sprintf("/org/%s", organization.Id)
 
 	row := r.SystemDbConn.QueryRow(
 		ctx,
 		createOrganizationMutation,
 		pgx.NamedArgs{
-			"id":          organization.Id,
+			"sid":         organization.ScopedId,
 			"name":        organization.Name,
-			"accessType":  organization.AccessType,
 			"description": organization.Description,
-			"path":        organization.Path,
+			"accessType":  organization.AccessType,
+			"createdBy":   organization.CreatedBy,
 		},
 	)
 
 	var org model.Organization
 	rowErr := row.Scan(
 		&org.Id,
+		&org.ScopedId,
 		&org.Name,
-		&org.AccessType,
-		&org.Path,
 		&org.Description,
+		&org.AccessType,
 		&org.CreatedAt,
+		&org.CreatedBy,
 	)
 	if rowErr != nil {
 		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", rowErr)
@@ -69,26 +69,28 @@ const updateOrganizationByIdMutation = `
 UPDATE
   "system"."Organization"
 SET
+  "sid"         = @sid, 
   "name"        = @name,
-  "accessType"  = @accessType,
   "description" = @description,
-  "path"        = @path,
-  "updatedAt"   = @updatedAt
+  "accessType"  = @accessType,
+  "updatedAt"   = @updatedAt,
+  "updatedBy"   = @updatedBy,
 WHERE
   "id" = @id;
 `
 
-func (r *Repository) UpdateOrganizationById(ctx context.Context, orgId string, org *model.Organization) error {
+func (r *Repository) UpdateOrganizationById(ctx context.Context, orgId int, org *model.Organization) error {
 	commandTag, err := r.SystemDbConn.Exec(
 		ctx,
 		updateOrganizationByIdMutation,
 		pgx.NamedArgs{
 			"id":          orgId,
+			"sid":         org.ScopedId,
 			"name":        org.Name,
-			"accessType":  org.AccessType,
 			"description": org.Description,
-			"path":        org.Path,
+			"accessType":  org.AccessType,
 			"updatedAt":   time.Now(),
+			"updatedBy":   org.UpdatedBy,
 		},
 	)
 	if err != nil {
@@ -114,7 +116,7 @@ WHERE
   "id" = @id;
 `
 
-func (r *Repository) DeleteOrganizationById(ctx context.Context, orgId string) error {
+func (r *Repository) DeleteOrganizationById(ctx context.Context, orgId int) error {
 	commandTag, err := r.SystemDbConn.Exec(ctx, deleteOrganizationByIdMutation, pgx.NamedArgs{"id": orgId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
