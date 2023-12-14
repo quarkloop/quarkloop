@@ -6,28 +6,28 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/api"
 	"github.com/quarkloop/quarkloop/pkg/model"
-	"github.com/quarkloop/quarkloop/pkg/service/project_table"
+	table_schema "github.com/quarkloop/quarkloop/pkg/service/project_table_schema"
 )
 
-type ListTableRecordsUriParams struct {
+type ListTableSchemasUriParams struct {
 	ProjectId string `uri:"projectId" binding:"required"`
 }
 
-type ListTableRecordsResponse struct {
+type ListTableSchemasResponse struct {
 	api.ApiResponse
-	Data []model.TableWithRelationCount `json:"data"`
+	Data []model.TableSchema `json:"data"`
 }
 
-func (s *TableSchemaApi) ListTableRecords(c *gin.Context) {
-	uriParams := &ListTableRecordsUriParams{}
+func (s *TableSchemaApi) ListTableSchemas(c *gin.Context) {
+	uriParams := &ListTableSchemasUriParams{}
 	if err := c.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(c, err)
 		return
 	}
 
 	// query service
-	projectList, err := s.tableSchema.ListTableRecords(
-		&project_table.GetTableListParams{
+	projectList, err := s.tableSchemaService.ListTableSchemas(
+		&table_schema.GetTableSchemaListParams{
 			Context:   c,
 			ProjectId: uriParams.ProjectId,
 		},
@@ -37,7 +37,7 @@ func (s *TableSchemaApi) ListTableRecords(c *gin.Context) {
 		return
 	}
 
-	res := &ListTableRecordsResponse{
+	res := &ListTableSchemasResponse{
 		ApiResponse: api.ApiResponse{
 			Status:       http.StatusOK,
 			StatusString: "OK",
@@ -47,29 +47,29 @@ func (s *TableSchemaApi) ListTableRecords(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-type GetTableRecordByIdUriParams struct {
-	ProjectId     string `uri:"projectId" binding:"required"`
-	TableSchemaId string `uri:"tableId" binding:"required"`
+type GetTableSchemaByIdUriParams struct {
+	ProjectId string `uri:"projectId" binding:"required"`
+	SchemaId  string `uri:"schemaId" binding:"required"`
 }
 
-type GetTableRecordByIdResponse struct {
+type GetTableSchemaByIdResponse struct {
 	api.ApiResponse
-	Data model.TableWithRelationCount `json:"data,omitempty"`
+	Data model.TableSchema `json:"data,omitempty"`
 }
 
-func (s *TableSchemaApi) GetTableRecordById(c *gin.Context) {
-	uriParams := &GetTableRecordByIdUriParams{}
+func (s *TableSchemaApi) GetTableSchemaById(c *gin.Context) {
+	uriParams := &GetTableSchemaByIdUriParams{}
 	if err := c.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(c, err)
 		return
 	}
 
 	// query service
-	project_table, err := s.tableSchema.GetTableRecordById(
-		&project_table.GetTableByIdParams{
+	project_table, err := s.tableSchemaService.GetTableSchemaById(
+		&table_schema.GetTableSchemaByIdParams{
 			Context:   c,
 			ProjectId: uriParams.ProjectId,
-			TableId:   uriParams.TableSchemaId,
+			SchemaId:  uriParams.SchemaId,
 		},
 	)
 	if err != nil {
@@ -77,7 +77,7 @@ func (s *TableSchemaApi) GetTableRecordById(c *gin.Context) {
 		return
 	}
 
-	res := &GetTableRecordByIdResponse{
+	res := &GetTableSchemaByIdResponse{
 		ApiResponse: api.ApiResponse{
 			Status:       http.StatusOK,
 			StatusString: "OK",
