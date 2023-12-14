@@ -16,7 +16,7 @@ import (
 
 const listOrganizationsQuery = `
 SELECT 
-  "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
+  "id", "sid", "name", "description", "accessType",  "createdAt", "updatedAt"
 FROM 
   "system"."Organization";
 `
@@ -35,10 +35,10 @@ func (r *Repository) ListOrganizations(ctx context.Context) ([]model.Organizatio
 		var organization model.Organization
 		err := rows.Scan(
 			&organization.Id,
+			&organization.ScopedId,
 			&organization.Name,
-			&organization.AccessType,
 			&organization.Description,
-			&organization.Path,
+			&organization.AccessType,
 			&organization.CreatedAt,
 			&organization.UpdatedAt,
 		)
@@ -61,23 +61,23 @@ func (r *Repository) ListOrganizations(ctx context.Context) ([]model.Organizatio
 
 const getOrganizationByIdQuery = `
 SELECT 
-  "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
+  "id", "sid", "name", "description", "accessType",  "createdAt", "updatedAt"
 FROM 
   "system"."Organization" 
 WHERE 
   "id" = @id;
 `
 
-func (r *Repository) GetOrganizationById(ctx context.Context, orgId string) (*model.Organization, error) {
+func (r *Repository) GetOrganizationById(ctx context.Context, orgId int) (*model.Organization, error) {
 	row := r.SystemDbConn.QueryRow(ctx, getOrganizationByIdQuery, pgx.NamedArgs{"id": orgId})
 
 	var organization model.Organization
 	err := row.Scan(
 		&organization.Id,
+		&organization.ScopedId,
 		&organization.Name,
-		&organization.AccessType,
 		&organization.Description,
-		&organization.Path,
+		&organization.AccessType,
 		&organization.CreatedAt,
 		&organization.UpdatedAt,
 	)
@@ -89,23 +89,22 @@ func (r *Repository) GetOrganizationById(ctx context.Context, orgId string) (*mo
 	return &organization, nil
 }
 
-/// FindFirstOrganization
+/// GetOrganization
 
-const findFirstOrganizationQuery = `
+const getOrganizationQuery = `
 SELECT 
-  "id", "name", "accessType", "description", "path", "createdAt", "updatedAt"
+  "id", "sid", "name", "description", "accessType",  "createdAt", "updatedAt"
 FROM 
   "system"."Organization" 
 WHERE
 `
 
-func (r *Repository) FindFirstOrganization(ctx context.Context, org *model.Organization) (*model.Organization, error) {
+func (r *Repository) GetOrganization(ctx context.Context, org *model.Organization) (*model.Organization, error) {
 	availableFields := []string{}
 	organizationFields := map[string]interface{}{
-		"id":         org.Id,
+		"sid":        org.ScopedId,
 		"name":       org.Name,
 		"accessType": org.AccessType,
-		"path":       org.Path,
 		"createdAt":  org.CreatedAt,
 		"updatedAt":  org.UpdatedAt,
 	}
@@ -129,17 +128,17 @@ func (r *Repository) FindFirstOrganization(ctx context.Context, org *model.Organ
 			}
 		}
 	}
-	finalQuery := findFirstOrganizationQuery + strings.Join(availableFields, " AND ")
+	finalQuery := getOrganizationQuery + strings.Join(availableFields, " AND ")
 
 	row := r.SystemDbConn.QueryRow(ctx, finalQuery)
 
 	var organization model.Organization
 	err := row.Scan(
 		&organization.Id,
+		&organization.ScopedId,
 		&organization.Name,
-		&organization.AccessType,
 		&organization.Description,
-		&organization.Path,
+		&organization.AccessType,
 		&organization.CreatedAt,
 		&organization.UpdatedAt,
 	)
