@@ -1,6 +1,14 @@
 -- DropForeignKey
+ALTER TABLE "project"."TableMain"
+DROP CONSTRAINT "TableMain_branchId_fkey";
+
+-- DropForeignKey
 ALTER TABLE "project"."TableDocument"
-DROP CONSTRAINT "TableDocument_mainTableId_fkey";
+DROP CONSTRAINT "TableDocument_mainId_fkey";
+
+-- DropForeignKey
+ALTER TABLE "project"."TableDocument"
+DROP CONSTRAINT "TableDocument_branchId_fkey";
 
 -- DropForeignKey
 ALTER TABLE "project"."TableDocument"
@@ -8,7 +16,11 @@ DROP CONSTRAINT "TableDocument_schemaId_fkey";
 
 -- DropForeignKey
 ALTER TABLE "project"."TablePayment"
-DROP CONSTRAINT "TablePayment_mainTableId_fkey";
+DROP CONSTRAINT "TablePayment_mainId_fkey";
+
+-- DropForeignKey
+ALTER TABLE "project"."TablePayment"
+DROP CONSTRAINT "TablePayment_branchId_fkey";
 
 -- DropForeignKey
 ALTER TABLE "project"."TablePayment"
@@ -16,7 +28,11 @@ DROP CONSTRAINT "TablePayment_schemaId_fkey";
 
 -- DropForeignKey
 ALTER TABLE "project"."TableForm"
-DROP CONSTRAINT "TableForm_mainTableId_fkey";
+DROP CONSTRAINT "TableForm_mainId_fkey";
+
+-- DropForeignKey
+ALTER TABLE "project"."TableForm"
+DROP CONSTRAINT "TableForm_branchId_fkey";
 
 -- DropForeignKey
 ALTER TABLE "project"."TableForm"
@@ -27,22 +43,19 @@ ALTER TABLE "project"."AppDiscussion"
 DROP CONSTRAINT "AppDiscussion_submissionId_fkey";
 
 -- DropTable
-DROP TABLE "project"."Table";
+DROP TABLE "project"."TableBranch";
 
 -- DropTable
-DROP TABLE "project"."TableDocumentSchema";
+DROP TABLE "project"."TableSchema";
+
+-- DropTable
+DROP TABLE "project"."TableMain";
 
 -- DropTable
 DROP TABLE "project"."TableDocument";
 
 -- DropTable
-DROP TABLE "project"."TablePaymentSchema";
-
--- DropTable
 DROP TABLE "project"."TablePayment";
-
--- DropTable
-DROP TABLE "project"."TableFormSchema";
 
 -- DropTable
 DROP TABLE "project"."TableForm";
