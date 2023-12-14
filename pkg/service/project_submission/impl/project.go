@@ -22,7 +22,7 @@ func (s *projectSubmission) GetAppSubmissionList(p *project_submission.GetAppSub
 }
 
 func (s *projectSubmission) GetAppSubmissionById(p *project_submission.GetAppSubmissionByIdParams) (*model.AppSubmission, error) {
-	project, err := s.dataStore.FindUniqueAppSubmission(p.Context, p.ProjectId, p.AppSubmissionId)
+	project, err := s.dataStore.GetAppSubmissionById(p.Context, p.ProjectId, p.AppSubmissionId)
 	return project, err
 }
 
