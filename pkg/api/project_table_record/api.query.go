@@ -5,17 +5,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/api"
-	"github.com/quarkloop/quarkloop/pkg/model"
-	"github.com/quarkloop/quarkloop/pkg/service/project_table"
+	table_record "github.com/quarkloop/quarkloop/pkg/service/project_table_record"
 )
 
 type ListTableRecordsUriParams struct {
 	ProjectId string `uri:"projectId" binding:"required"`
+	BranchId  string `uri:"branchId" binding:"required"`
+	TableType string `uri:"tableType" binding:"required"`
 }
 
 type ListTableRecordsResponse struct {
 	api.ApiResponse
-	Data []model.TableWithRelationCount `json:"data"`
+	Data interface{} `json:"data"`
 }
 
 func (s *TableRecordApi) ListTableRecords(c *gin.Context) {
@@ -26,10 +27,12 @@ func (s *TableRecordApi) ListTableRecords(c *gin.Context) {
 	}
 
 	// query service
-	projectList, err := s.tableRecord.ListTableRecords(
-		&project_table.GetTableListParams{
+	recordList, err := s.tableRecordService.ListTableRecords(
+		&table_record.GetTableRecordListParams{
 			Context:   c,
 			ProjectId: uriParams.ProjectId,
+			BranchId:  uriParams.BranchId,
+			TableType: uriParams.TableType,
 		},
 	)
 	if err != nil {
@@ -42,19 +45,20 @@ func (s *TableRecordApi) ListTableRecords(c *gin.Context) {
 			Status:       http.StatusOK,
 			StatusString: "OK",
 		},
-		Data: projectList,
+		Data: recordList,
 	}
 	c.JSON(http.StatusOK, res)
 }
 
 type GetTableRecordByIdUriParams struct {
-	ProjectId     string `uri:"projectId" binding:"required"`
-	TableRecordId string `uri:"tableId" binding:"required"`
+	ProjectId string `uri:"projectId" binding:"required"`
+	BranchId  string `uri:"branchId" binding:"required"`
+	RecordId  string `uri:"recordId" binding:"required"`
 }
 
 type GetTableRecordByIdResponse struct {
 	api.ApiResponse
-	Data model.TableWithRelationCount `json:"data,omitempty"`
+	Data interface{} `json:"data,omitempty"`
 }
 
 func (s *TableRecordApi) GetTableRecordById(c *gin.Context) {
@@ -65,11 +69,12 @@ func (s *TableRecordApi) GetTableRecordById(c *gin.Context) {
 	}
 
 	// query service
-	project_table, err := s.tableRecord.GetTableRecordById(
-		&project_table.GetTableByIdParams{
+	record, err := s.tableRecordService.GetTableRecordById(
+		&table_record.GetTableRecordByIdParams{
 			Context:   c,
 			ProjectId: uriParams.ProjectId,
-			TableId:   uriParams.TableRecordId,
+			BranchId:  uriParams.BranchId,
+			RecordId:  uriParams.RecordId,
 		},
 	)
 	if err != nil {
@@ -82,7 +87,7 @@ func (s *TableRecordApi) GetTableRecordById(c *gin.Context) {
 			Status:       http.StatusOK,
 			StatusString: "OK",
 		},
-		Data: *project_table,
+		Data: record,
 	}
 	c.JSON(http.StatusOK, res)
 }
