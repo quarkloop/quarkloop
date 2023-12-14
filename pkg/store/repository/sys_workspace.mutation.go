@@ -17,44 +17,44 @@ import (
 
 const createWorkspaceMutation = `
 INSERT INTO
-  "system"."Workspace" ("orgId", "id", "name", "accessType", "description", "path")
+  "system"."Workspace" ("orgId", "sid", "name", "description", "accessType", "createdBy")
 VALUES
-  (@orgId, @id, @name, @accessType, @description, @path)
+  (@orgId, @sid, @name, @description, @accessType, @createdBy)
 RETURNING 
-  "id", "name", "accessType", "path", "description", "createdAt";
+  "id", "sid", "name", "description", "accessType", "createdAt", "createdBy";
 `
 
-func (r *Repository) CreateWorkspace(ctx context.Context, orgId string, workspace *model.Workspace) (*model.Workspace, error) {
-	if workspace.Id == "" {
-		id, err := gonanoid.New()
+func (r *Repository) CreateWorkspace(ctx context.Context, orgId int, workspace *model.Workspace) (*model.Workspace, error) {
+	if workspace.ScopedId == "" {
+		sid, err := gonanoid.New()
 		if err != nil {
 			return nil, err
 		}
-		workspace.Id = id
+		workspace.ScopedId = sid
 	}
-	workspace.Path = fmt.Sprintf("/org/%s/%s", orgId, workspace.Id)
 
 	row := r.SystemDbConn.QueryRow(
 		ctx,
 		createWorkspaceMutation,
 		pgx.NamedArgs{
 			"orgId":       orgId,
-			"id":          workspace.Id,
+			"sid":         workspace.ScopedId,
 			"name":        workspace.Name,
-			"accessType":  workspace.AccessType,
 			"description": workspace.Description,
-			"path":        workspace.Path,
+			"accessType":  workspace.AccessType,
+			"createdBy":   workspace.CreatedBy,
 		},
 	)
 
 	var ws model.Workspace
 	rowErr := row.Scan(
 		&ws.Id,
+		&ws.ScopedId,
 		&ws.Name,
-		&ws.AccessType,
-		&ws.Path,
 		&ws.Description,
+		&ws.AccessType,
 		&ws.CreatedAt,
+		&ws.CreatedBy,
 	)
 	if rowErr != nil {
 		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", rowErr)
@@ -70,26 +70,28 @@ const updateWorkspaceByIdMutation = `
 UPDATE
   "system"."Workspace"
 SET
+  "sid"         = @sid,
   "name"        = @name,
-  "accessType"  = @accessType,
   "description" = @description,
-  "path"        = @path,
-  "updatedAt"   = @updatedAt
+  "accessType"  = @accessType,
+  "updatedAt"   = @updatedAt,
+  "updatedBy"   = @updatedBy,
 WHERE
   "id" = @id;
 `
 
-func (r *Repository) UpdateWorkspaceById(ctx context.Context, workspaceId string, workspace *model.Workspace) error {
+func (r *Repository) UpdateWorkspaceById(ctx context.Context, workspaceId int, workspace *model.Workspace) error {
 	commandTag, err := r.SystemDbConn.Exec(
 		ctx,
 		updateWorkspaceByIdMutation,
 		pgx.NamedArgs{
 			"id":          workspaceId,
+			"sid":         workspace.ScopedId,
 			"name":        workspace.Name,
-			"accessType":  *workspace.AccessType,
 			"description": workspace.Description,
-			"path":        workspace.Path,
+			"accessType":  *workspace.AccessType,
 			"updatedAt":   time.Now(),
+			"updatedBy":   workspace.UpdatedBy,
 		},
 	)
 	if err != nil {
@@ -115,7 +117,7 @@ WHERE
   "id" = @id;
 `
 
-func (r *Repository) DeleteWorkspaceById(ctx context.Context, workspaceId string) error {
+func (r *Repository) DeleteWorkspaceById(ctx context.Context, workspaceId int) error {
 	commandTag, err := r.SystemDbConn.Exec(ctx, deleteWorkspaceByIdMutation, pgx.NamedArgs{"id": workspaceId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
