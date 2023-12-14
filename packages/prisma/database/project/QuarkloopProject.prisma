@@ -12,8 +12,13 @@ datasource db {
 
 model TableBranch {
     // id
-    id        String @id
+    id        Int    @id @default(autoincrement())
     projectId String
+
+    // branch
+    name        String
+    description String?
+    default     Boolean @default(false)
 
     // history
     createdAt DateTime  @default(now())
@@ -22,23 +27,49 @@ model TableBranch {
     updatedBy String?
 
     // relation
-    tables         Table[]
-    documentTables TableDocument[]
-    formTables     TableForm[]
-    paymentTables  TablePayment[]
+    mainTable TableMain[]
+    documents TableDocument[]
+    payments  TablePayment[]
+    forms     TableForm[]
 
+    @@unique([projectId, name])
     @@index([projectId])
-    @@index([createdBy, updatedBy])
     @@schema("project")
 }
 
-model Table {
+model TableSchema {
     // id
     id        Int    @id @default(autoincrement())
     projectId String
-    branchId  String
 
-    // table
+    // schema
+    name        String
+    description String?
+    metadata    Json?
+    data        Json
+
+    // history
+    createdAt DateTime  @default(now())
+    updatedAt DateTime?
+    createdBy String
+    updatedBy String?
+
+    // relation
+    documents TableDocument[]
+    payments  TablePayment[]
+    forms     TableForm[]
+
+    @@index([projectId])
+    @@schema("project")
+}
+
+model TableMain {
+    // id
+    id        Int    @id @default(autoincrement())
+    projectId String
+    branchId  Int
+
+    // main
     name        String
     description String?
     metadata    Json?
@@ -56,33 +87,7 @@ model Table {
     forms     TableForm[]
     branch    TableBranch     @relation(fields: [branchId], references: [id])
 
-    @@index([projectId])
-    @@index([createdBy, updatedBy])
-    @@schema("project")
-}
-
-model TableDocumentSchema {
-    // id
-    id        Int    @id @default(autoincrement())
-    projectId String
-
-    // schema
-    name        String
-    description String?
-    metadata    Json?
-    data        Json
-
-    // history
-    createdAt DateTime  @default(now())
-    updatedAt DateTime?
-    createdBy String
-    updatedBy String?
-
-    // relation
-    documents TableDocument[]
-
-    @@index([projectId])
-    @@index([createdBy, updatedBy])
+    @@index([projectId, branchId])
     @@schema("project")
 }
 
@@ -90,8 +95,8 @@ model TableDocument {
     // id
     id        Int    @id @default(autoincrement())
     projectId String
-    branchId  String
-    tableId   Int
+    branchId  Int
+    mainId    Int
     schemaId  Int
 
     // document
@@ -107,37 +112,12 @@ model TableDocument {
     updatedBy String?
 
     // relation
-    table  Table               @relation(fields: [tableId], references: [id])
-    branch TableBranch         @relation(fields: [branchId], references: [id])
-    schema TableDocumentSchema @relation(fields: [schemaId], references: [id])
+    mainTable TableMain   @relation(fields: [mainId], references: [id])
+    branch    TableBranch @relation(fields: [branchId], references: [id])
+    schema    TableSchema @relation(fields: [schemaId], references: [id])
 
-    @@index([projectId])
-    @@index([createdBy, updatedBy])
-    @@schema("project")
-}
-
-model TablePaymentSchema {
-    // id
-    id        Int    @id @default(autoincrement())
-    projectId String
-
-    // schema
-    name        String
-    description String?
-    metadata    Json?
-    data        Json
-
-    // history
-    createdAt DateTime  @default(now())
-    updatedAt DateTime?
-    createdBy String
-    updatedBy String?
-
-    // relation
-    payments TablePayment[]
-
-    @@index([projectId])
-    @@index([createdBy, updatedBy])
+    @@index([projectId, branchId])
+    @@index([projectId, branchId, mainId])
     @@schema("project")
 }
 
@@ -145,8 +125,8 @@ model TablePayment {
     // id
     id        Int    @id @default(autoincrement())
     projectId String
-    branchId  String
-    tableId   Int
+    branchId  Int
+    mainId    Int
     schemaId  Int
 
     // payment
@@ -162,37 +142,12 @@ model TablePayment {
     updatedBy String?
 
     // relation
-    table  Table              @relation(fields: [tableId], references: [id])
-    branch TableBranch        @relation(fields: [branchId], references: [id])
-    schema TablePaymentSchema @relation(fields: [schemaId], references: [id])
+    mainTable TableMain   @relation(fields: [mainId], references: [id])
+    branch    TableBranch @relation(fields: [branchId], references: [id])
+    schema    TableSchema @relation(fields: [schemaId], references: [id])
 
-    @@index([projectId])
-    @@index([createdBy, updatedBy])
-    @@schema("project")
-}
-
-model TableFormSchema {
-    // id
-    id        Int    @id @default(autoincrement())
-    projectId String
-
-    // schema
-    name        String
-    description String?
-    metadata    Json?
-    data        Json
-
-    // history
-    createdAt DateTime  @default(now())
-    updatedAt DateTime?
-    createdBy String
-    updatedBy String?
-
-    // relation
-    forms TableForm[]
-
-    @@index([projectId])
-    @@index([createdBy, updatedBy])
+    @@index([projectId, branchId])
+    @@index([projectId, branchId, mainId])
     @@schema("project")
 }
 
@@ -200,8 +155,8 @@ model TableForm {
     // id
     id        Int    @id @default(autoincrement())
     projectId String
-    branchId  String
-    tableId   Int
+    branchId  Int
+    mainId    Int
     schemaId  Int
 
     // form
@@ -217,12 +172,12 @@ model TableForm {
     updatedBy String?
 
     // relation
-    table  Table           @relation(fields: [tableId], references: [id])
-    branch TableBranch     @relation(fields: [branchId], references: [id])
-    schema TableFormSchema @relation(fields: [schemaId], references: [id])
+    mainTable TableMain   @relation(fields: [mainId], references: [id])
+    branch    TableBranch @relation(fields: [branchId], references: [id])
+    schema    TableSchema @relation(fields: [schemaId], references: [id])
 
-    @@index([projectId])
-    @@index([createdBy, updatedBy])
+    @@index([projectId, branchId])
+    @@index([projectId, branchId, mainId])
     @@schema("project")
 }
 
@@ -243,7 +198,6 @@ model App {
     createdBy String
     updatedBy String?
 
-    @@index([createdBy, updatedBy])
     @@schema("project")
 }
 
@@ -269,7 +223,6 @@ model AppSubmission {
     // relation
     discussions AppDiscussion[]
 
-    @@index([createdBy, updatedBy])
     @@schema("project")
 }
 
@@ -293,6 +246,5 @@ model AppDiscussion {
     // relation
     submission AppSubmission @relation(fields: [submissionId], references: [id])
 
-    @@index([createdBy, updatedBy])
     @@schema("project")
 }
