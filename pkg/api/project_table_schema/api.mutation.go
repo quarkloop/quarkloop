@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/api"
 	"github.com/quarkloop/quarkloop/pkg/model"
-	"github.com/quarkloop/quarkloop/pkg/service/project_table"
+	table_schema "github.com/quarkloop/quarkloop/pkg/service/project_table_schema"
 )
 
 type CreateTableSchemaUriParams struct {
@@ -14,12 +14,12 @@ type CreateTableSchemaUriParams struct {
 }
 
 type CreateTableSchemaRequest struct {
-	model.Table
+	model.TableSchema
 }
 
 type CreateTableSchemaResponse struct {
 	api.ApiResponse
-	Data model.Table `json:"data,omitempty"`
+	Data model.TableSchema `json:"data,omitempty"`
 }
 
 func (s *TableSchemaApi) CreateTableSchema(c *gin.Context) {
@@ -36,11 +36,11 @@ func (s *TableSchemaApi) CreateTableSchema(c *gin.Context) {
 	}
 
 	// query service
-	ws, err := s.tableSchema.CreateTable(
-		&project_table.CreateTableParams{
+	ws, err := s.tableSchemaService.CreateTableSchema(
+		&table_schema.CreateTableSchemaParams{
 			Context:   c,
 			ProjectId: uriParams.ProjectId,
-			Table:     &req.Table,
+			Schema:    &req.TableSchema,
 		},
 	)
 	if err != nil {
@@ -59,12 +59,12 @@ func (s *TableSchemaApi) CreateTableSchema(c *gin.Context) {
 }
 
 type UpdateTableSchemaByIdUriParams struct {
-	ProjectId     string `uri:"projectId" binding:"required"`
-	TableSchemaId string `uri:"tableId" binding:"required"`
+	ProjectId string `uri:"projectId" binding:"required"`
+	SchemaId  string `uri:"schemaId" binding:"required"`
 }
 
 type UpdateTableSchemaByIdRequest struct {
-	model.Table
+	model.TableSchema
 }
 
 func (s *TableSchemaApi) UpdateTableSchemaById(c *gin.Context) {
@@ -81,11 +81,12 @@ func (s *TableSchemaApi) UpdateTableSchemaById(c *gin.Context) {
 	}
 
 	// query service
-	err := s.tableSchema.UpdateTableById(
-		&project_table.UpdateTableByIdParams{
-			Context: c,
-			TableId: uriParams.TableSchemaId,
-			Table:   &req.Table,
+	err := s.tableSchemaService.UpdateTableSchemaById(
+		&table_schema.UpdateTableSchemaByIdParams{
+			Context:   c,
+			ProjectId: uriParams.ProjectId,
+			SchemaId:  uriParams.SchemaId,
+			Schema:    &req.TableSchema,
 		},
 	)
 	if err != nil {
@@ -97,7 +98,8 @@ func (s *TableSchemaApi) UpdateTableSchemaById(c *gin.Context) {
 }
 
 type DeleteTableSchemaByIdUriParams struct {
-	TableSchemaId string `uri:"tableSchemaId" binding:"required"`
+	ProjectId string `uri:"projectId" binding:"required"`
+	SchemaId  string `uri:"schemaId" binding:"required"`
 }
 
 func (s *TableSchemaApi) DeleteTableSchemaById(c *gin.Context) {
@@ -108,10 +110,11 @@ func (s *TableSchemaApi) DeleteTableSchemaById(c *gin.Context) {
 	}
 
 	// query service
-	err := s.tableSchema.DeleteTableById(
-		&project_table.DeleteTableByIdParams{
-			Context: c,
-			TableId: uriParams.TableSchemaId,
+	err := s.tableSchemaService.DeleteTableSchemaById(
+		&table_schema.DeleteTableSchemaByIdParams{
+			Context:   c,
+			ProjectId: uriParams.ProjectId,
+			SchemaId:  uriParams.SchemaId,
 		},
 	)
 	if err != nil {
