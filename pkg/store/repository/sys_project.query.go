@@ -16,7 +16,7 @@ import (
 
 const listProjectsQuery = `
 SELECT 
-  "id", "sid", "name", "description", "accessType",  "createdAt", "updatedAt"
+  "id", "sid", "name", "description", "accessType",  "createdAt", "createdBy", "updatedAt", "updatedBy"
 FROM 
   "system"."Project"
 WHERE
@@ -54,9 +54,12 @@ func (r *Repository) ListProjects(ctx context.Context, orgId []int, workspaceId 
 			&project.Description,
 			&project.AccessType,
 			&project.CreatedAt,
+			&project.CreatedBy,
 			&project.UpdatedAt,
+			&project.UpdatedBy,
 		)
 		if err != nil {
+			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
 			return nil, err
 		}
 
@@ -75,7 +78,7 @@ func (r *Repository) ListProjects(ctx context.Context, orgId []int, workspaceId 
 
 const getProjectByIdQuery = `
 SELECT
-  "id", "sid", "name", "description", "accessType",  "createdAt", "updatedAt"
+  "id", "sid", "name", "description", "accessType",  "createdAt", "createdBy", "updatedAt", "updatedBy"
 FROM
   "system"."Project"
 WHERE
@@ -93,7 +96,9 @@ func (r *Repository) GetProjectById(ctx context.Context, projectId int) (*model.
 		&project.Description,
 		&project.AccessType,
 		&project.CreatedAt,
+		&project.CreatedBy,
 		&project.UpdatedAt,
+		&project.UpdatedBy,
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
@@ -107,7 +112,7 @@ func (r *Repository) GetProjectById(ctx context.Context, projectId int) (*model.
 
 const getProjectQuery = `
 SELECT
-  "id", "sid", "name", "description", "accessType",  "createdAt", "updatedAt"
+  "id", "sid", "name", "description", "accessType", "createdAt", "createdBy", "updatedAt", "updatedBy"
 FROM
   "system"."Project"
 WHERE 
@@ -157,7 +162,9 @@ func (r *Repository) GetProject(ctx context.Context, project *model.Project) (*m
 		&p.Description,
 		&p.AccessType,
 		&p.CreatedAt,
+		&p.CreatedBy,
 		&p.UpdatedAt,
+		&p.UpdatedBy,
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
