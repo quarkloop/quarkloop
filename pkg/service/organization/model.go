@@ -12,7 +12,7 @@ type GetOrganizationListParams struct {
 
 type GetOrganizationByIdParams struct {
 	Context context.Context
-	Id      string
+	OrgId   int
 }
 
 type GetOrganizationParams struct {
@@ -27,11 +27,11 @@ type CreateOrganizationParams struct {
 
 type UpdateOrganizationByIdParams struct {
 	Context      context.Context
-	OrgId        string
+	OrgId        int
 	Organization model.Organization
 }
 
 type DeleteOrganizationByIdParams struct {
 	Context context.Context
-	OrgId   string
+	OrgId   int
 }
