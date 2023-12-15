@@ -8,30 +8,30 @@ import (
 
 type GetTableBranchListParams struct {
 	Context   context.Context
-	ProjectId string
+	ProjectId int
 }
 
 type GetTableBranchByIdParams struct {
 	Context   context.Context
-	ProjectId string
+	ProjectId int
 	BranchId  int
 }
 
 type CreateTableBranchParams struct {
 	Context   context.Context
-	ProjectId string
+	ProjectId int
 	Branch    *model.TableBranch
 }
 
 type UpdateTableBranchByIdParams struct {
 	Context   context.Context
-	ProjectId string
+	ProjectId int
 	BranchId  int
 	Branch    *model.TableBranch
 }
 
 type DeleteTableBranchByIdParams struct {
 	Context   context.Context
-	ProjectId string
+	ProjectId int
 	BranchId  int
 }
