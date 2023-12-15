@@ -9,8 +9,8 @@ import (
 )
 
 type ListTableRecordsUriParams struct {
-	ProjectId string `uri:"projectId" binding:"required"`
-	BranchId  string `uri:"branchId" binding:"required"`
+	ProjectId int    `uri:"projectId" binding:"required"`
+	BranchId  int    `uri:"branchId" binding:"required"`
 	TableType string `uri:"tableType" binding:"required"`
 }
 
@@ -51,8 +51,8 @@ func (s *TableRecordApi) ListTableRecords(c *gin.Context) {
 }
 
 type GetTableRecordByIdUriParams struct {
-	ProjectId string `uri:"projectId" binding:"required"`
-	BranchId  string `uri:"branchId" binding:"required"`
+	ProjectId int    `uri:"projectId" binding:"required"`
+	BranchId  int    `uri:"branchId" binding:"required"`
 	RecordId  string `uri:"recordId" binding:"required"`
 }
 
