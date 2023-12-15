@@ -10,7 +10,7 @@ import (
 )
 
 type ListTableBranchesUriParams struct {
-	ProjectId string `uri:"projectId" binding:"required"`
+	ProjectId int `uri:"projectId" binding:"required"`
 }
 
 type ListTableBranchesResponse struct {
@@ -26,7 +26,7 @@ func (s *TableBranchApi) ListTableBranches(c *gin.Context) {
 	}
 
 	// query service
-	projectList, err := s.tableBranchService.ListTableBranches(
+	branchList, err := s.tableBranchService.ListTableBranches(
 		&table_branch.GetTableBranchListParams{
 			Context:   c,
 			ProjectId: uriParams.ProjectId,
@@ -42,14 +42,14 @@ func (s *TableBranchApi) ListTableBranches(c *gin.Context) {
 			Status:       http.StatusOK,
 			StatusString: "OK",
 		},
-		Data: projectList,
+		Data: branchList,
 	}
 	c.JSON(http.StatusOK, res)
 }
 
 type GetTableBranchByIdUriParams struct {
-	ProjectId string `uri:"projectId" binding:"required"`
-	BranchId  string `uri:"branchId" binding:"required"`
+	ProjectId int `uri:"projectId" binding:"required"`
+	BranchId  int `uri:"branchId" binding:"required"`
 }
 
 type GetTableBranchByIdResponse struct {
@@ -65,7 +65,7 @@ func (s *TableBranchApi) GetTableBranchById(c *gin.Context) {
 	}
 
 	// query service
-	project_table_branch, err := s.tableBranchService.GetTableBranchById(
+	branch, err := s.tableBranchService.GetTableBranchById(
 		&table_branch.GetTableBranchByIdParams{
 			Context:   c,
 			ProjectId: uriParams.ProjectId,
@@ -82,7 +82,7 @@ func (s *TableBranchApi) GetTableBranchById(c *gin.Context) {
 			Status:       http.StatusOK,
 			StatusString: "OK",
 		},
-		Data: *project_table_branch,
+		Data: *branch,
 	}
 	c.JSON(http.StatusOK, res)
 }
