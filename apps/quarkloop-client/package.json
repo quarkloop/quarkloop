@@ -32,6 +32,7 @@
     "@quarkloop/components": "workspace:*",
     "@quarkloop/lib": "workspace:*",
     "@quarkloop/apps": "workspace:*",
+    "@quarkloop/types": "workspace:*",
     "@quarkloop/ui": "workspace:*",
     "@reduxjs/toolkit": "^1.9.5",
     "@tabler/icons-react": "^2.38.0",
