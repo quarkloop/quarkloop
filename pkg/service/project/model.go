@@ -8,35 +8,35 @@ import (
 
 type GetProjectListParams struct {
 	Context     context.Context
-	OrgId       []string
-	WorkspaceId []string
+	OrgId       []int
+	WorkspaceId []int
 }
 
 type GetProjectByIdParams struct {
 	Context   context.Context
-	ProjectId string
+	ProjectId int
 }
 
 type GetProjectParams struct {
 	Context context.Context
-	OrgId   string
+	OrgId   int
 	Project model.Project
 }
 
 type CreateProjectParams struct {
 	Context     context.Context
-	OrgId       string
-	WorkspaceId string
+	OrgId       int
+	WorkspaceId int
 	Project     model.Project
 }
 
 type UpdateProjectByIdParams struct {
 	Context   context.Context
-	ProjectId string
+	ProjectId int
 	Project   model.Project
 }
 
 type DeleteProjectByIdParams struct {
 	Context   context.Context
-	ProjectId string
+	ProjectId int
 }
