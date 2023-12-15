@@ -10,8 +10,8 @@ import (
 )
 
 type CreateTableRecordUriParams struct {
-	ProjectId string `uri:"projectId" binding:"required"`
-	BranchId  string `uri:"branchId" binding:"required"`
+	ProjectId int    `uri:"projectId" binding:"required"`
+	BranchId  int    `uri:"branchId" binding:"required"`
 	TableType string `uri:"tableType" binding:"required"`
 	RecordId  string `uri:"recordId" binding:"required"`
 }
@@ -69,8 +69,8 @@ func (s *TableRecordApi) CreateTableRecord(c *gin.Context) {
 }
 
 type UpdateTableRecordByIdUriParams struct {
-	ProjectId string `uri:"projectId" binding:"required"`
-	BranchId  string `uri:"branchId" binding:"required"`
+	ProjectId int    `uri:"projectId" binding:"required"`
+	BranchId  int    `uri:"branchId" binding:"required"`
 	RecordId  string `uri:"recordId" binding:"required"`
 	TableType string `uri:"tableType" binding:"required"`
 }
@@ -117,8 +117,8 @@ func (s *TableRecordApi) UpdateTableRecordById(c *gin.Context) {
 }
 
 type DeleteTableRecordByIdUriParams struct {
-	ProjectId string `uri:"projectId" binding:"required"`
-	BranchId  string `uri:"branchId" binding:"required"`
+	ProjectId int    `uri:"projectId" binding:"required"`
+	BranchId  int    `uri:"branchId" binding:"required"`
 	RecordId  string `uri:"recordId" binding:"required"`
 	TableType string `uri:"tableType" binding:"required"`
 }
