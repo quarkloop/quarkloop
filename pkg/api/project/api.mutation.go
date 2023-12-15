@@ -10,8 +10,8 @@ import (
 )
 
 type CreateProjectRequest struct {
-	OrgId       string        `json:"orgId" binding:"required"`
-	WorkspaceId string        `json:"workspaceId" binding:"required"`
+	OrgId       int           `json:"orgId" binding:"required"`
+	WorkspaceId int           `json:"workspaceId" binding:"required"`
 	Project     model.Project `json:"project" binding:"required"`
 }
 
@@ -52,7 +52,7 @@ func (s *ProjectApi) CreateProject(c *gin.Context) {
 }
 
 type UpdateProjectByIdUriParams struct {
-	ProjectId string `uri:"projectId" binding:"required"`
+	ProjectId int `uri:"projectId" binding:"required"`
 }
 
 type UpdateProjectByIdRequest struct {
@@ -89,7 +89,7 @@ func (s *ProjectApi) UpdateProjectById(c *gin.Context) {
 }
 
 type DeleteProjectByIdUriParams struct {
-	ProjectId string `uri:"projectId" binding:"required"`
+	ProjectId int `uri:"projectId" binding:"required"`
 }
 
 func (s *ProjectApi) DeleteProjectById(c *gin.Context) {
