@@ -26,7 +26,7 @@ func (s *orgService) GetOrganizationList(p *organization.GetOrganizationListPara
 }
 
 func (s *orgService) GetOrganizationById(p *organization.GetOrganizationByIdParams) (*model.Organization, error) {
-	org, err := s.dataStore.GetOrganizationById(p.Context, p.Id)
+	org, err := s.dataStore.GetOrganizationById(p.Context, p.OrgId)
 	return org, err
 }
 
