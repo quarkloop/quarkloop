@@ -16,7 +16,7 @@ import (
 
 const listWorkspacesQuery = `
 SELECT 
-  "id", "name", "description", "accessType",  "createdAt", "updatedAt"
+  "id", "name", "description", "accessType",  "createdAt", "createdBy", "updatedAt", "updatedBy"
 FROM 
   "system"."Workspace"
 WHERE
@@ -41,9 +41,12 @@ func (r *Repository) ListWorkspaces(ctx context.Context, orgId []int) ([]model.W
 			&workspace.Description,
 			&workspace.AccessType,
 			&workspace.CreatedAt,
+			&workspace.CreatedBy,
 			&workspace.UpdatedAt,
+			&workspace.UpdatedBy,
 		)
 		if err != nil {
+			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
 			return nil, err
 		}
 
@@ -51,7 +54,7 @@ func (r *Repository) ListWorkspaces(ctx context.Context, orgId []int) ([]model.W
 	}
 
 	if err := rows.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
+		fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
 		return nil, err
 	}
 
@@ -62,7 +65,7 @@ func (r *Repository) ListWorkspaces(ctx context.Context, orgId []int) ([]model.W
 
 const getWorkspaceByIdQuery = `
 SELECT 
-  "id", "name", "description", "accessType",  "createdAt", "updatedAt"
+  "id", "name", "description", "accessType",  "createdAt", "createdBy", "updatedAt", "updatedBy"
 FROM 
   "system"."Workspace" 
 WHERE 
@@ -79,7 +82,9 @@ func (r *Repository) GetWorkspaceById(ctx context.Context, workspaceId int) (*mo
 		&workspace.Description,
 		&workspace.AccessType,
 		&workspace.CreatedAt,
+		&workspace.CreatedBy,
 		&workspace.UpdatedAt,
+		&workspace.UpdatedBy,
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
@@ -93,7 +98,7 @@ func (r *Repository) GetWorkspaceById(ctx context.Context, workspaceId int) (*mo
 
 const getWorkspaceQuery = `
 SELECT 
-  "id", "name", "description", "accessType",  "createdAt", "updatedAt"
+  "id", "name", "description", "accessType",  "createdAt", "createdBy", "updatedAt", "updatedBy"
 FROM 
   "system"."Workspace" 
 WHERE
@@ -143,7 +148,9 @@ func (r *Repository) GetWorkspace(ctx context.Context, orgId int, workspace *mod
 		&ws.Description,
 		&ws.AccessType,
 		&ws.CreatedAt,
+		&ws.CreatedBy,
 		&ws.UpdatedAt,
+		&ws.UpdatedBy,
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
