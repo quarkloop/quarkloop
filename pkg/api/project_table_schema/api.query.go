@@ -10,7 +10,7 @@ import (
 )
 
 type ListTableSchemasUriParams struct {
-	ProjectId string `uri:"projectId" binding:"required"`
+	ProjectId int `uri:"projectId" binding:"required"`
 }
 
 type ListTableSchemasResponse struct {
@@ -48,7 +48,7 @@ func (s *TableSchemaApi) ListTableSchemas(c *gin.Context) {
 }
 
 type GetTableSchemaByIdUriParams struct {
-	ProjectId string `uri:"projectId" binding:"required"`
+	ProjectId int    `uri:"projectId" binding:"required"`
 	SchemaId  string `uri:"schemaId" binding:"required"`
 }
 
