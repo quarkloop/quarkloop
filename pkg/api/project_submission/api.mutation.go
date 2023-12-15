@@ -10,7 +10,7 @@ import (
 )
 
 type CreateAppSubmissionUriParams struct {
-	ProjectId string `uri:"projectId" binding:"required"`
+	ProjectId int `uri:"projectId" binding:"required"`
 }
 
 type CreateAppSubmissionRequest struct {
