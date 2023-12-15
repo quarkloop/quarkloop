@@ -10,8 +10,8 @@ import (
 )
 
 type GetProjectListQueryParams struct {
-	OrgId       []string `form:"orgId"`
-	WorkspaceId []string `form:"workspaceId"`
+	OrgId       []int `form:"orgId"`
+	WorkspaceId []int `form:"workspaceId"`
 }
 
 type GetProjectListResponse struct {
@@ -50,7 +50,7 @@ func (s *ProjectApi) GetProjectList(c *gin.Context) {
 }
 
 type GetProjectByIdUriParams struct {
-	ProjectId string `uri:"projectId" binding:"required"`
+	ProjectId int `uri:"projectId" binding:"required"`
 }
 
 type GetProjectByIdResponse struct {
