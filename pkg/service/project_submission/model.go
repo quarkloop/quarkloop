@@ -8,19 +8,19 @@ import (
 
 type GetAppSubmissionListParams struct {
 	Context   context.Context
-	ProjectId string
+	ProjectId int
 }
 
 type GetAppSubmissionByIdParams struct {
 	Context         context.Context
-	ProjectId       string
+	ProjectId       int
 	AppSubmissionId string
 }
 
 type CreateAppSubmissionParams struct {
 	Context       context.Context
 	UserId        string
-	ProjectId     string
+	ProjectId     int
 	AppSubmission *model.AppSubmission
 }
 
