@@ -8,33 +8,33 @@ import (
 
 type GetWorkspaceListParams struct {
 	Context context.Context
-	OrgId   []string
+	OrgId   []int
 }
 
 type GetWorkspaceByIdParams struct {
 	Context     context.Context
-	WorkspaceId string
+	WorkspaceId int
 }
 
 type GetWorkspaceParams struct {
 	Context   context.Context
-	OrgId     string
+	OrgId     int
 	Workspace model.Workspace
 }
 
 type CreateWorkspaceParams struct {
 	Context   context.Context
-	OrgId     string
+	OrgId     int
 	Workspace model.Workspace
 }
 
 type UpdateWorkspaceByIdParams struct {
 	Context     context.Context
-	WorkspaceId string
+	WorkspaceId int
 	Workspace   model.Workspace
 }
 
 type DeleteWorkspaceByIdParams struct {
 	Context     context.Context
-	WorkspaceId string
+	WorkspaceId int
 }
