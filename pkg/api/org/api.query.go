@@ -38,7 +38,7 @@ func (s *OrganizationApi) GetOrganizationList(c *gin.Context) {
 }
 
 type GetOrganizationByIdUriParams struct {
-	OrgId string `uri:"orgId" binding:"required"`
+	OrgId int `uri:"orgId" binding:"required"`
 }
 
 type GetOrganizationByIdResponse struct {
@@ -57,7 +57,7 @@ func (s *OrganizationApi) GetOrganizationById(c *gin.Context) {
 	org, err := s.orgService.GetOrganizationById(
 		&organization.GetOrganizationByIdParams{
 			Context: c,
-			Id:      uriParams.OrgId,
+			OrgId:   uriParams.OrgId,
 		},
 	)
 	if err != nil {
