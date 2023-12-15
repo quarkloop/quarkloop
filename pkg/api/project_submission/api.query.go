@@ -10,7 +10,7 @@ import (
 )
 
 type GetAppSubmissionListUriParams struct {
-	ProjectId string `uri:"projectId"`
+	ProjectId int `uri:"projectId"`
 }
 
 type GetAppSubmissionListResponse struct {
@@ -48,7 +48,7 @@ func (s *AppSubmissionApi) GetAppSubmissionList(c *gin.Context) {
 }
 
 type GetAppSubmissionByIdUriParams struct {
-	ProjectId    string `uri:"projectId"`
+	ProjectId    int    `uri:"projectId"`
 	SubmissionId string `uri:"submissionId" binding:"required"`
 }
 
