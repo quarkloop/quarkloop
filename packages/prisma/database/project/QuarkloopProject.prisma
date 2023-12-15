@@ -12,8 +12,8 @@ datasource db {
 
 model TableBranch {
     // id
-    id        Int    @id @default(autoincrement())
-    projectId String
+    id        Int @id @default(autoincrement())
+    projectId Int
 
     // branch
     name        String
@@ -39,8 +39,8 @@ model TableBranch {
 
 model TableSchema {
     // id
-    id        Int    @id @default(autoincrement())
-    projectId String
+    id        Int @id @default(autoincrement())
+    projectId Int
 
     // schema
     name        String
@@ -65,8 +65,8 @@ model TableSchema {
 
 model TableMain {
     // id
-    id        Int    @id @default(autoincrement())
-    projectId String
+    id        Int @id @default(autoincrement())
+    projectId Int
     branchId  Int
 
     // main
@@ -93,8 +93,8 @@ model TableMain {
 
 model TableDocument {
     // id
-    id        Int    @id @default(autoincrement())
-    projectId String
+    id        Int @id @default(autoincrement())
+    projectId Int
     branchId  Int
     mainId    Int
     schemaId  Int
@@ -123,8 +123,8 @@ model TableDocument {
 
 model TablePayment {
     // id
-    id        Int    @id @default(autoincrement())
-    projectId String
+    id        Int @id @default(autoincrement())
+    projectId Int
     branchId  Int
     mainId    Int
     schemaId  Int
@@ -153,8 +153,8 @@ model TablePayment {
 
 model TableForm {
     // id
-    id        Int    @id @default(autoincrement())
-    projectId String
+    id        Int @id @default(autoincrement())
+    projectId Int
     branchId  Int
     mainId    Int
     schemaId  Int
@@ -183,8 +183,8 @@ model TableForm {
 
 model App {
     // id
-    id        Int    @id @default(autoincrement())
-    projectId String
+    id        Int @id @default(autoincrement())
+    projectId Int
 
     // app
     name        String
@@ -203,8 +203,8 @@ model App {
 
 model AppSubmission {
     // id
-    id        Int    @id @default(autoincrement())
-    projectId String
+    id        Int @id @default(autoincrement())
+    projectId Int
 
     // submission
     title    String
