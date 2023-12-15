@@ -8,18 +8,18 @@ import (
 
 type GetTableSchemaListParams struct {
 	Context   context.Context
-	ProjectId string
+	ProjectId int
 }
 
 type GetTableSchemaByIdParams struct {
 	Context   context.Context
-	ProjectId string
+	ProjectId int
 	SchemaId  string
 }
 
 type CreateTableSchemaParams struct {
 	Context   context.Context
-	ProjectId string
+	ProjectId int
 	Schema    *model.TableSchema
 }
 
@@ -31,13 +31,13 @@ type CreateBulkTableSchemaParams struct {
 
 type UpdateTableSchemaByIdParams struct {
 	Context   context.Context
-	ProjectId string
+	ProjectId int
 	SchemaId  string
 	Schema    *model.TableSchema
 }
 
 type DeleteTableSchemaByIdParams struct {
 	Context   context.Context
-	ProjectId string
+	ProjectId int
 	SchemaId  string
 }
