@@ -49,7 +49,7 @@ func (s *OrganizationApi) CreateOrganization(c *gin.Context) {
 }
 
 type UpdateOrganizationByIdUriParams struct {
-	OrgId string `uri:"orgId" binding:"required"`
+	OrgId int `uri:"orgId" binding:"required"`
 }
 
 type UpdateOrganizationByIdRequest struct {
@@ -86,7 +86,7 @@ func (s *OrganizationApi) UpdateOrganizationById(c *gin.Context) {
 }
 
 type DeleteOrganizationByIdUriParams struct {
-	OrgId string `uri:"orgId" binding:"required"`
+	OrgId int `uri:"orgId" binding:"required"`
 }
 
 func (s *OrganizationApi) DeleteOrganizationById(c *gin.Context) {
