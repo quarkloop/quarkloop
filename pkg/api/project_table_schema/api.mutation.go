@@ -10,7 +10,7 @@ import (
 )
 
 type CreateTableSchemaUriParams struct {
-	ProjectId string `uri:"projectId" binding:"required"`
+	ProjectId int `uri:"projectId" binding:"required"`
 }
 
 type CreateTableSchemaRequest struct {
@@ -59,7 +59,7 @@ func (s *TableSchemaApi) CreateTableSchema(c *gin.Context) {
 }
 
 type UpdateTableSchemaByIdUriParams struct {
-	ProjectId string `uri:"projectId" binding:"required"`
+	ProjectId int    `uri:"projectId" binding:"required"`
 	SchemaId  string `uri:"schemaId" binding:"required"`
 }
 
@@ -98,7 +98,7 @@ func (s *TableSchemaApi) UpdateTableSchemaById(c *gin.Context) {
 }
 
 type DeleteTableSchemaByIdUriParams struct {
-	ProjectId string `uri:"projectId" binding:"required"`
+	ProjectId int    `uri:"projectId" binding:"required"`
 	SchemaId  string `uri:"schemaId" binding:"required"`
 }
 
