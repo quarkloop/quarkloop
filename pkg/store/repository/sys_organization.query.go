@@ -16,7 +16,7 @@ import (
 
 const listOrganizationsQuery = `
 SELECT 
-  "id", "sid", "name", "description", "accessType",  "createdAt", "updatedAt"
+  "id", "sid", "name", "description", "accessType", "createdAt", "createdBy", "updatedAt", "updatedBy"
 FROM 
   "system"."Organization";
 `
@@ -40,9 +40,12 @@ func (r *Repository) ListOrganizations(ctx context.Context) ([]model.Organizatio
 			&organization.Description,
 			&organization.AccessType,
 			&organization.CreatedAt,
+			&organization.CreatedBy,
 			&organization.UpdatedAt,
+			&organization.UpdatedBy,
 		)
 		if err != nil {
+			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
 			return nil, err
 		}
 
@@ -50,7 +53,7 @@ func (r *Repository) ListOrganizations(ctx context.Context) ([]model.Organizatio
 	}
 
 	if err := rows.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
+		fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
 		return nil, err
 	}
 
@@ -61,7 +64,7 @@ func (r *Repository) ListOrganizations(ctx context.Context) ([]model.Organizatio
 
 const getOrganizationByIdQuery = `
 SELECT 
-  "id", "sid", "name", "description", "accessType",  "createdAt", "updatedAt"
+  "id", "sid", "name", "description", "accessType", "createdAt", "createdBy", "updatedAt", "updatedBy"
 FROM 
   "system"."Organization" 
 WHERE 
@@ -79,7 +82,9 @@ func (r *Repository) GetOrganizationById(ctx context.Context, orgId int) (*model
 		&organization.Description,
 		&organization.AccessType,
 		&organization.CreatedAt,
+		&organization.CreatedBy,
 		&organization.UpdatedAt,
+		&organization.UpdatedBy,
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
@@ -93,7 +98,7 @@ func (r *Repository) GetOrganizationById(ctx context.Context, orgId int) (*model
 
 const getOrganizationQuery = `
 SELECT 
-  "id", "sid", "name", "description", "accessType",  "createdAt", "updatedAt"
+  "id", "sid", "name", "description", "accessType", "createdAt", "createdBy", "updatedAt", "updatedBy"
 FROM 
   "system"."Organization" 
 WHERE
@@ -140,7 +145,9 @@ func (r *Repository) GetOrganization(ctx context.Context, org *model.Organizatio
 		&organization.Description,
 		&organization.AccessType,
 		&organization.CreatedAt,
+		&organization.CreatedBy,
 		&organization.UpdatedAt,
+		&organization.UpdatedBy,
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
