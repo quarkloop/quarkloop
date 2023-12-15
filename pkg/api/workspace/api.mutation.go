@@ -10,7 +10,7 @@ import (
 )
 
 type CreateWorkspaceRequest struct {
-	OrgId     string          `json:"orgId" binding:"required"`
+	OrgId     int             `json:"orgId" binding:"required"`
 	Workspace model.Workspace `json:"workspace" binding:"required"`
 }
 
@@ -50,7 +50,7 @@ func (s *WorkspaceApi) CreateWorkspace(c *gin.Context) {
 }
 
 type UpdateWorkspaceByIdUriParams struct {
-	WorkspaceId string `uri:"workspaceId" binding:"required"`
+	WorkspaceId int `uri:"workspaceId" binding:"required"`
 }
 
 type UpdateWorkspaceByIdRequest struct {
@@ -87,7 +87,7 @@ func (s *WorkspaceApi) UpdateWorkspaceById(c *gin.Context) {
 }
 
 type DeleteWorkspaceByIdUriParams struct {
-	WorkspaceId string `uri:"workspaceId" binding:"required"`
+	WorkspaceId int `uri:"workspaceId" binding:"required"`
 }
 
 func (s *WorkspaceApi) DeleteWorkspaceById(c *gin.Context) {
