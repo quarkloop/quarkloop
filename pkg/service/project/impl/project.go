@@ -18,17 +18,35 @@ func NewProjectService(ds *repository.Repository) project.Service {
 
 func (s *projectService) GetProjectList(p *project.GetProjectListParams) ([]model.Project, error) {
 	projectList, err := s.dataStore.ListProjects(p.Context, p.OrgId, p.WorkspaceId)
-	return projectList, err
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range projectList {
+		project := &projectList[i]
+		project.GeneratePath()
+	}
+	return projectList, nil
 }
 
 func (s *projectService) GetProjectById(p *project.GetProjectByIdParams) (*model.Project, error) {
 	project, err := s.dataStore.GetProjectById(p.Context, p.ProjectId)
-	return project, err
+	if err != nil {
+		return nil, err
+	}
+
+	project.GeneratePath()
+	return project, nil
 }
 
 func (s *projectService) GetProject(p *project.GetProjectParams) (*model.Project, error) {
 	project, err := s.dataStore.GetProject(p.Context, &p.Project)
-	return project, err
+	if err != nil {
+		return nil, err
+	}
+
+	project.GeneratePath()
+	return project, nil
 }
 
 func (s *projectService) CreateProject(p *project.CreateProjectParams) (*model.Project, error) {
@@ -36,6 +54,8 @@ func (s *projectService) CreateProject(p *project.CreateProjectParams) (*model.P
 	if err != nil {
 		return nil, err
 	}
+
+	project.GeneratePath()
 
 	// serviceData := model.ProjectServiceData{
 	// 	DiscussionsEnabled: false,
