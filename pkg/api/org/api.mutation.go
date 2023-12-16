@@ -6,17 +6,11 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/quarkloop/quarkloop/pkg/api"
-	"github.com/quarkloop/quarkloop/pkg/model"
-	"github.com/quarkloop/quarkloop/pkg/service/organization"
+	org "github.com/quarkloop/quarkloop/pkg/service/organization"
 )
 
 type CreateOrganizationRequest struct {
-	model.Organization
-}
-
-type CreateOrganizationResponse struct {
-	api.ApiResponse
-	Data model.Organization `json:"data,omitempty"`
+	org.Organization
 }
 
 func (s *OrganizationApi) CreateOrganization(c *gin.Context) {
@@ -28,7 +22,7 @@ func (s *OrganizationApi) CreateOrganization(c *gin.Context) {
 
 	// query database
 	org, err := s.orgService.CreateOrganization(
-		&organization.CreateOrganizationParams{
+		&org.CreateOrganizationParams{
 			Context:      c,
 			Organization: req.Organization,
 		},
@@ -38,14 +32,7 @@ func (s *OrganizationApi) CreateOrganization(c *gin.Context) {
 		return
 	}
 
-	res := &CreateOrganizationResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusCreated,
-			StatusString: "Created",
-		},
-		Data: *org,
-	}
-	c.JSON(http.StatusCreated, res)
+	c.JSON(http.StatusCreated, org)
 }
 
 type UpdateOrganizationByIdUriParams struct {
@@ -53,7 +40,7 @@ type UpdateOrganizationByIdUriParams struct {
 }
 
 type UpdateOrganizationByIdRequest struct {
-	model.Organization
+	org.Organization
 }
 
 func (s *OrganizationApi) UpdateOrganizationById(c *gin.Context) {
@@ -71,7 +58,7 @@ func (s *OrganizationApi) UpdateOrganizationById(c *gin.Context) {
 
 	// query database
 	err := s.orgService.UpdateOrganizationById(
-		&organization.UpdateOrganizationByIdParams{
+		&org.UpdateOrganizationByIdParams{
 			Context:      c,
 			OrgId:        uriParams.OrgId,
 			Organization: req.Organization,
@@ -98,7 +85,7 @@ func (s *OrganizationApi) DeleteOrganizationById(c *gin.Context) {
 
 	// query database
 	err := s.orgService.DeleteOrganizationById(
-		&organization.DeleteOrganizationByIdParams{
+		&org.DeleteOrganizationByIdParams{
 			Context: c,
 			OrgId:   uriParams.OrgId,
 		},
