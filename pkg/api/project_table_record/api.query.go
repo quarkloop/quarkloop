@@ -14,11 +14,6 @@ type ListTableRecordsUriParams struct {
 	TableType string `uri:"tableType" binding:"required"`
 }
 
-type ListTableRecordsResponse struct {
-	api.ApiResponse
-	Data interface{} `json:"data"`
-}
-
 func (s *TableRecordApi) ListTableRecords(c *gin.Context) {
 	uriParams := &ListTableRecordsUriParams{}
 	if err := c.ShouldBindUri(uriParams); err != nil {
@@ -40,25 +35,13 @@ func (s *TableRecordApi) ListTableRecords(c *gin.Context) {
 		return
 	}
 
-	res := &ListTableRecordsResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusOK,
-			StatusString: "OK",
-		},
-		Data: recordList,
-	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, &recordList)
 }
 
 type GetTableRecordByIdUriParams struct {
 	ProjectId int    `uri:"projectId" binding:"required"`
 	BranchId  int    `uri:"branchId" binding:"required"`
 	RecordId  string `uri:"recordId" binding:"required"`
-}
-
-type GetTableRecordByIdResponse struct {
-	api.ApiResponse
-	Data interface{} `json:"data,omitempty"`
 }
 
 func (s *TableRecordApi) GetTableRecordById(c *gin.Context) {
@@ -82,12 +65,5 @@ func (s *TableRecordApi) GetTableRecordById(c *gin.Context) {
 		return
 	}
 
-	res := &GetTableRecordByIdResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusOK,
-			StatusString: "OK",
-		},
-		Data: record,
-	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, record)
 }
