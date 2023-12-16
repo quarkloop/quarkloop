@@ -6,19 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/quarkloop/quarkloop/pkg/api"
-	"github.com/quarkloop/quarkloop/pkg/model"
-	"github.com/quarkloop/quarkloop/pkg/service/organization"
+	org "github.com/quarkloop/quarkloop/pkg/service/organization"
 )
-
-type GetOrganizationListResponse struct {
-	api.ApiResponse
-	Data []model.Organization `json:"data"`
-}
 
 func (s *OrganizationApi) GetOrganizationList(c *gin.Context) {
 	// query service
 	orgList, err := s.orgService.GetOrganizationList(
-		&organization.GetOrganizationListParams{
+		&org.GetOrganizationListParams{
 			Context: c,
 		},
 	)
@@ -27,23 +21,11 @@ func (s *OrganizationApi) GetOrganizationList(c *gin.Context) {
 		return
 	}
 
-	res := &GetOrganizationListResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusOK,
-			StatusString: "OK",
-		},
-		Data: orgList,
-	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, &orgList)
 }
 
 type GetOrganizationByIdUriParams struct {
 	OrgId int `uri:"orgId" binding:"required"`
-}
-
-type GetOrganizationByIdResponse struct {
-	api.ApiResponse
-	Data model.Organization `json:"data,omitempty"`
 }
 
 func (s *OrganizationApi) GetOrganizationById(c *gin.Context) {
@@ -55,7 +37,7 @@ func (s *OrganizationApi) GetOrganizationById(c *gin.Context) {
 
 	// query service
 	org, err := s.orgService.GetOrganizationById(
-		&organization.GetOrganizationByIdParams{
+		&org.GetOrganizationByIdParams{
 			Context: c,
 			OrgId:   uriParams.OrgId,
 		},
@@ -65,23 +47,11 @@ func (s *OrganizationApi) GetOrganizationById(c *gin.Context) {
 		return
 	}
 
-	res := &GetOrganizationByIdResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusOK,
-			StatusString: "OK",
-		},
-		Data: *org,
-	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, org)
 }
 
 type GetOrganizationQueryParams struct {
-	model.Organization
-}
-
-type GetOrganizationResponse struct {
-	api.ApiResponse
-	Data model.Organization `json:"data,omitempty"`
+	org.Organization
 }
 
 func (s *OrganizationApi) GetOrganization(c *gin.Context) {
@@ -93,7 +63,7 @@ func (s *OrganizationApi) GetOrganization(c *gin.Context) {
 
 	// query service
 	org, err := s.orgService.GetOrganization(
-		&organization.GetOrganizationParams{
+		&org.GetOrganizationParams{
 			Context:      c,
 			Organization: queryParams.Organization,
 		},
@@ -103,12 +73,5 @@ func (s *OrganizationApi) GetOrganization(c *gin.Context) {
 		return
 	}
 
-	res := &GetOrganizationResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusOK,
-			StatusString: "OK",
-		},
-		Data: *org,
-	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, org)
 }
