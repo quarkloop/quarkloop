@@ -15,11 +15,6 @@ type CreateProjectRequest struct {
 	Project     model.Project `json:"project" binding:"required"`
 }
 
-type CreateProjectResponse struct {
-	api.ApiResponse
-	Data model.Project `json:"data,omitempty"`
-}
-
 func (s *ProjectApi) CreateProject(c *gin.Context) {
 	req := &CreateProjectRequest{}
 	if err := c.BindJSON(req); err != nil {
@@ -41,14 +36,7 @@ func (s *ProjectApi) CreateProject(c *gin.Context) {
 		return
 	}
 
-	res := &CreateProjectResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusCreated,
-			StatusString: "Created",
-		},
-		Data: *ws,
-	}
-	c.JSON(http.StatusCreated, res)
+	c.JSON(http.StatusCreated, ws)
 }
 
 type UpdateProjectByIdUriParams struct {
