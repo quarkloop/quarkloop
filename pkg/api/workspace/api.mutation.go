@@ -5,18 +5,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/api"
-	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
 type CreateWorkspaceRequest struct {
-	OrgId     int             `json:"orgId" binding:"required"`
-	Workspace model.Workspace `json:"workspace" binding:"required"`
-}
-
-type CreateWorkspaceResponse struct {
-	api.ApiResponse
-	Data model.Workspace `json:"data,omitempty"`
+	OrgId     int                 `json:"orgId" binding:"required"`
+	Workspace workspace.Workspace `json:"workspace" binding:"required"`
 }
 
 func (s *WorkspaceApi) CreateWorkspace(c *gin.Context) {
@@ -39,14 +33,7 @@ func (s *WorkspaceApi) CreateWorkspace(c *gin.Context) {
 		return
 	}
 
-	res := &CreateWorkspaceResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusCreated,
-			StatusString: "Created",
-		},
-		Data: *ws,
-	}
-	c.JSON(http.StatusCreated, res)
+	c.JSON(http.StatusCreated, ws)
 }
 
 type UpdateWorkspaceByIdUriParams struct {
@@ -54,7 +41,7 @@ type UpdateWorkspaceByIdUriParams struct {
 }
 
 type UpdateWorkspaceByIdRequest struct {
-	model.Workspace
+	workspace.Workspace
 }
 
 func (s *WorkspaceApi) UpdateWorkspaceById(c *gin.Context) {
