@@ -5,17 +5,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/api"
-	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project_submission"
 )
 
 type GetAppSubmissionListUriParams struct {
 	ProjectId int `uri:"projectId"`
-}
-
-type GetAppSubmissionListResponse struct {
-	api.ApiResponse
-	Data []model.AppSubmission `json:"data"`
 }
 
 func (s *AppSubmissionApi) GetAppSubmissionList(c *gin.Context) {
@@ -37,24 +31,12 @@ func (s *AppSubmissionApi) GetAppSubmissionList(c *gin.Context) {
 		return
 	}
 
-	res := &GetAppSubmissionListResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusOK,
-			StatusString: "OK",
-		},
-		Data: projectList,
-	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, &projectList)
 }
 
 type GetAppSubmissionByIdUriParams struct {
 	ProjectId    int    `uri:"projectId"`
 	SubmissionId string `uri:"submissionId" binding:"required"`
-}
-
-type GetAppSubmissionByIdResponse struct {
-	api.ApiResponse
-	Data model.AppSubmission `json:"data,omitempty"`
 }
 
 func (s *AppSubmissionApi) GetAppSubmissionById(c *gin.Context) {
@@ -77,12 +59,5 @@ func (s *AppSubmissionApi) GetAppSubmissionById(c *gin.Context) {
 		return
 	}
 
-	res := &GetAppSubmissionByIdResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusOK,
-			StatusString: "OK",
-		},
-		Data: *project_submission,
-	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, project_submission)
 }
