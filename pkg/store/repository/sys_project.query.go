@@ -16,7 +16,9 @@ import (
 
 const listProjectsQuery = `
 SELECT 
-  "id", "sid", "name", "description", "accessType",  "createdAt", "createdBy", "updatedAt", "updatedBy"
+  "id", "sid", "orgId", "workspaceId",
+  "name", "description", "accessType",
+  "createdAt", "createdBy", "updatedAt", "updatedBy"
 FROM 
   "system"."Project"
 WHERE
@@ -50,6 +52,8 @@ func (r *Repository) ListProjects(ctx context.Context, orgId []int, workspaceId 
 		err := rows.Scan(
 			&project.Id,
 			&project.ScopedId,
+			&project.OrgId,
+			&project.WorkspaceId,
 			&project.Name,
 			&project.Description,
 			&project.AccessType,
@@ -78,7 +82,9 @@ func (r *Repository) ListProjects(ctx context.Context, orgId []int, workspaceId 
 
 const getProjectByIdQuery = `
 SELECT
-  "id", "sid", "name", "description", "accessType",  "createdAt", "createdBy", "updatedAt", "updatedBy"
+  "id", "sid", "orgId", "workspaceId",
+  "name", "description", "accessType",
+  "createdAt", "createdBy", "updatedAt", "updatedBy"
 FROM
   "system"."Project"
 WHERE
@@ -92,6 +98,8 @@ func (r *Repository) GetProjectById(ctx context.Context, projectId int) (*model.
 	err := row.Scan(
 		&project.Id,
 		&project.ScopedId,
+		&project.OrgId,
+		&project.WorkspaceId,
 		&project.Name,
 		&project.Description,
 		&project.AccessType,
@@ -112,7 +120,9 @@ func (r *Repository) GetProjectById(ctx context.Context, projectId int) (*model.
 
 const getProjectQuery = `
 SELECT
-  "id", "sid", "name", "description", "accessType", "createdAt", "createdBy", "updatedAt", "updatedBy"
+  "id", "sid", "orgId", "workspaceId",
+  "name", "description", "accessType",
+  "createdAt", "createdBy", "updatedAt", "updatedBy"
 FROM
   "system"."Project"
 WHERE 
@@ -158,6 +168,8 @@ func (r *Repository) GetProject(ctx context.Context, project *model.Project) (*m
 	err := row.Scan(
 		&p.Id,
 		&p.ScopedId,
+		&p.OrgId,
+		&p.WorkspaceId,
 		&p.Name,
 		&p.Description,
 		&p.AccessType,
