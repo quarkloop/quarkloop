@@ -1,9 +1,8 @@
 package workspace_impl
 
 import (
-	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
-	"github.com/quarkloop/quarkloop/pkg/store/repository"
+	"github.com/quarkloop/quarkloop/pkg/service/workspace/store"
 )
 
 type workspaceService struct {
@@ -11,33 +10,56 @@ type workspaceService struct {
 	WorkspaceService interface{}
 	QuotaService     interface{}
 
-	dataStore *repository.Repository
+	dataStore store.WorkspaceStore
 }
 
-func NewWorkspaceService(ds *repository.Repository) workspace.Service {
+func NewWorkspaceService(ds store.WorkspaceStore) workspace.Service {
 	return &workspaceService{
 		dataStore: ds,
 	}
 }
 
-func (s *workspaceService) GetWorkspaceList(p *workspace.GetWorkspaceListParams) ([]model.Workspace, error) {
+func (s *workspaceService) GetWorkspaceList(p *workspace.GetWorkspaceListParams) ([]workspace.Workspace, error) {
 	workspaceList, err := s.dataStore.ListWorkspaces(p.Context, p.OrgId)
-	return workspaceList, err
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range workspaceList {
+		workspace := &workspaceList[i]
+		workspace.GeneratePath()
+	}
+	return workspaceList, nil
 }
 
-func (s *workspaceService) GetWorkspaceById(p *workspace.GetWorkspaceByIdParams) (*model.Workspace, error) {
+func (s *workspaceService) GetWorkspaceById(p *workspace.GetWorkspaceByIdParams) (*workspace.Workspace, error) {
 	workspace, err := s.dataStore.GetWorkspaceById(p.Context, p.WorkspaceId)
-	return workspace, err
+	if err != nil {
+		return nil, err
+	}
+
+	workspace.GeneratePath()
+	return workspace, nil
 }
 
-func (s *workspaceService) GetWorkspace(p *workspace.GetWorkspaceParams) (*model.Workspace, error) {
+func (s *workspaceService) GetWorkspace(p *workspace.GetWorkspaceParams) (*workspace.Workspace, error) {
 	workspace, err := s.dataStore.GetWorkspace(p.Context, p.OrgId, &p.Workspace)
-	return workspace, err
+	if err != nil {
+		return nil, err
+	}
+
+	workspace.GeneratePath()
+	return workspace, nil
 }
 
-func (s *workspaceService) CreateWorkspace(p *workspace.CreateWorkspaceParams) (*model.Workspace, error) {
+func (s *workspaceService) CreateWorkspace(p *workspace.CreateWorkspaceParams) (*workspace.Workspace, error) {
 	workspace, err := s.dataStore.CreateWorkspace(p.Context, p.OrgId, &p.Workspace)
-	return workspace, err
+	if err != nil {
+		return nil, err
+	}
+
+	workspace.GeneratePath()
+	return workspace, nil
 }
 
 func (s *workspaceService) UpdateWorkspaceById(p *workspace.UpdateWorkspaceByIdParams) error {
