@@ -9,23 +9,34 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/api/org"
 	"github.com/quarkloop/quarkloop/pkg/api/project"
 	"github.com/quarkloop/quarkloop/pkg/api/project_submission"
-	"github.com/quarkloop/quarkloop/pkg/api/project_table"
+	table_branch "github.com/quarkloop/quarkloop/pkg/api/project_table_branch"
+	table_record "github.com/quarkloop/quarkloop/pkg/api/project_table_record"
+	table_schema "github.com/quarkloop/quarkloop/pkg/api/project_table_schema"
 	"github.com/quarkloop/quarkloop/pkg/api/workspace"
-	organization_impl "github.com/quarkloop/quarkloop/pkg/service/organization/impl"
+	org_impl "github.com/quarkloop/quarkloop/pkg/service/organization/impl"
+	org_store "github.com/quarkloop/quarkloop/pkg/service/organization/store"
 	project_impl "github.com/quarkloop/quarkloop/pkg/service/project/impl"
 	project_submission_impl "github.com/quarkloop/quarkloop/pkg/service/project_submission/impl"
-	project_table_impl "github.com/quarkloop/quarkloop/pkg/service/project_table/impl"
-	workspace_impl "github.com/quarkloop/quarkloop/pkg/service/workspace/impl"
+	table_branch_impl "github.com/quarkloop/quarkloop/pkg/service/project_table_branch/impl"
+	table_record_impl "github.com/quarkloop/quarkloop/pkg/service/project_table_record/impl"
+	table_schema_impl "github.com/quarkloop/quarkloop/pkg/service/project_table_schema/impl"
+	ws_impl "github.com/quarkloop/quarkloop/pkg/service/workspace/impl"
+	ws_store "github.com/quarkloop/quarkloop/pkg/service/workspace/store"
 	"github.com/quarkloop/quarkloop/pkg/store/repository"
 )
 
 type Server struct {
-	router               *gin.Engine
-	dataStore            *repository.Repository
-	orgApi               org.Api
-	workspaceApi         workspace.Api
-	projectApi           project.Api
-	projectTableApi      project_table.Api
+	router    *gin.Engine
+	dataStore *repository.Repository
+
+	orgApi       org.Api
+	workspaceApi workspace.Api
+	projectApi   project.Api
+
+	tableBranchApi table_branch.Api
+	tableSchemaApi table_schema.Api
+	tableRecordApi table_record.Api
+
 	projectSubmissionApi project_submission.Api
 }
 
@@ -54,20 +65,29 @@ func NewDefaultServer(ds *repository.Repository) Server {
 		MaxAge:        12 * time.Hour,
 	}))
 
-	orgService := organization_impl.NewOrganizationService(ds)
-	workspaceService := workspace_impl.NewWorkspaceService(ds)
-	projectTableService := project_table_impl.NewTableService(ds)
-	projectTable := project_impl.NewProjectService(ds, projectTableService)
-	projectSubmission := project_submission_impl.NewAppSubmissionService(ds)
+	orgService := org_impl.NewOrganizationService(org_store.NewOrgStore(ds.SystemDbConn))
+	workspaceService := ws_impl.NewWorkspaceService(ws_store.NewWorkspaceStore(ds.SystemDbConn))
+	projectTableService := project_impl.NewProjectService(ds)
+
+	tableBranchService := table_branch_impl.NewTableBranchService(ds)
+	tableSchemaService := table_schema_impl.NewTableSchemaService(ds)
+	tableRecordService := table_record_impl.NewTableRecordService(ds)
+
+	projectSubmissionService := project_submission_impl.NewAppSubmissionService(ds)
 
 	serve := Server{
-		router:               router,
-		dataStore:            ds,
-		orgApi:               org.NewOrganizationApi(orgService),
-		workspaceApi:         workspace.NewWorkspaceApi(workspaceService),
-		projectApi:           project.NewProjectApi(projectTable),
-		projectTableApi:      project_table.NewProjectTableApi(projectTableService),
-		projectSubmissionApi: project_submission.NewAppSubmissionApi(projectSubmission),
+		router:    router,
+		dataStore: ds,
+
+		orgApi:       org.NewOrganizationApi(orgService),
+		workspaceApi: workspace.NewWorkspaceApi(workspaceService),
+		projectApi:   project.NewProjectApi(projectTableService),
+
+		tableBranchApi: table_branch.NewTableBranchApi(tableBranchService),
+		tableSchemaApi: table_schema.NewTableSchemaApi(tableSchemaService),
+		tableRecordApi: table_record.NewTableRecordApi(tableRecordService),
+
+		projectSubmissionApi: project_submission.NewAppSubmissionApi(projectSubmissionService),
 	}
 
 	return serve
@@ -104,29 +124,29 @@ func (s *Server) BindHandlers(api *api.ServerApi) {
 	projectGroup.PUT("/:projectId", s.projectApi.UpdateProjectById)
 	projectGroup.DELETE("/:projectId", s.projectApi.DeleteProjectById)
 
-	// Tables apis
-	projectGroup.GET("/:projectId/tables", s.projectTableApi.ListTableRecords)
-	projectGroup.POST("/:projectId/tables", s.projectTableApi.CreateProjectTable)
-	projectGroup.DELETE("/:projectId/tables/:tableType", s.projectTableApi.DeleteProjectTableById)
+	// // Tables apis
+	// projectGroup.GET("/:projectId/tables", s.projectTableApi.ListTableRecords)
+	// projectGroup.POST("/:projectId/tables", s.projectTableApi.CreateProjectTable)
+	// projectGroup.DELETE("/:projectId/tables/:tableType", s.projectTableApi.DeleteProjectTableById)
 
 	// Branches apis
-	projectGroup.GET("/:projectId/tables/main/branches", s.projectTableApi.ListTableRecords)
-	projectGroup.GET("/:projectId/tables/main/branches/:branchId", s.projectTableApi.GetTableRecordById)
-
-	// Records apis
-	projectGroup.GET("/:projectId/tables/:tableType/branches/:branchId/records", s.projectTableApi.ListTableRecords)
-	projectGroup.GET("/:projectId/tables/:tableType/branches/:branchId/records/count", s.projectTableApi.ListTableRecords)
-	projectGroup.POST("/:projectId/tables/:tableType/branches/:branchId/records", s.projectTableApi.CreateProjectTable)
-	projectGroup.GET("/:projectId/tables/:tableType/branches/:branchId/records/:recordId", s.projectTableApi.GetTableRecordById)
-	projectGroup.PUT("/:projectId/tables/:tableType/branches/:branchId/records/:recordId", s.projectTableApi.UpdateProjectTableById)
-	projectGroup.DELETE("/:projectId/tables/:tableType/branches/:branchId/records/:recordId", s.projectTableApi.DeleteProjectTableById)
+	projectGroup.GET("/:projectId/tables/main/branches", s.tableBranchApi.ListTableBranches)
+	projectGroup.GET("/:projectId/tables/main/branches/:branchId", s.tableBranchApi.GetTableBranchById)
 
 	// Schemas apis
-	projectGroup.GET("/:projectId/tables/form/schemas", s.projectTableApi.ListTableRecords)
-	projectGroup.POST("/:projectId/tables/form/schemas", s.projectTableApi.CreateProjectTable)
-	projectGroup.GET("/:projectId/tables/form/schemas/:schemaId", s.projectTableApi.GetTableRecordById)
-	projectGroup.PUT("/:projectId/tables/form/schemas/:schemaId", s.projectTableApi.UpdateProjectTableById)
-	projectGroup.DELETE("/:projectId/tables/form/schemas/:schemaId", s.projectTableApi.DeleteProjectTableById)
+	projectGroup.GET("/:projectId/tables/form/schemas", s.tableSchemaApi.ListTableSchemas)
+	projectGroup.POST("/:projectId/tables/form/schemas", s.tableSchemaApi.CreateTableSchema)
+	projectGroup.GET("/:projectId/tables/form/schemas/:schemaId", s.tableSchemaApi.GetTableSchemaById)
+	projectGroup.PUT("/:projectId/tables/form/schemas/:schemaId", s.tableSchemaApi.UpdateTableSchemaById)
+	projectGroup.DELETE("/:projectId/tables/form/schemas/:schemaId", s.tableSchemaApi.DeleteTableSchemaById)
+
+	// Records apis
+	projectGroup.GET("/:projectId/tables/:tableType/branches/:branchId/records", s.tableRecordApi.ListTableRecords)
+	//projectGroup.GET("/:projectId/tables/:tableType/branches/:branchId/records/count", s.tableRecordApi.ListTableRecords)
+	projectGroup.POST("/:projectId/tables/:tableType/branches/:branchId/records", s.tableRecordApi.CreateTableRecord)
+	projectGroup.GET("/:projectId/tables/:tableType/branches/:branchId/records/:recordId", s.tableRecordApi.GetTableRecordById)
+	projectGroup.PUT("/:projectId/tables/:tableType/branches/:branchId/records/:recordId", s.tableRecordApi.UpdateTableRecordById)
+	projectGroup.DELETE("/:projectId/tables/:tableType/branches/:branchId/records/:recordId", s.tableRecordApi.DeleteTableRecordById)
 
 	// // submissions apis
 	// projectGroup.GET("/:projectId/submissions", s.projectSubmissionApi.GetAppSubmissionList)
