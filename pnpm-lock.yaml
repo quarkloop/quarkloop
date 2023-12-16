@@ -127,6 +127,9 @@ importers:
       '@quarkloop/lib':
         specifier: workspace:*
         version: link:../../packages/lib
+      '@quarkloop/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       '@quarkloop/ui':
         specifier: workspace:*
         version: link:../../packages/ui
