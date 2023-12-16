@@ -19,11 +19,6 @@ type CreateAppSubmissionRequest struct {
 	model.AppSubmission
 }
 
-type CreateAppSubmissionResponse struct {
-	api.ApiResponse
-	Data model.AppSubmission `json:"data,omitempty"`
-}
-
 func (s *AppSubmissionApi) CreateAppSubmission(c *gin.Context) {
 	uriParams := &CreateAppSubmissionUriParams{}
 	if err := c.ShouldBindUri(uriParams); err != nil {
@@ -51,14 +46,7 @@ func (s *AppSubmissionApi) CreateAppSubmission(c *gin.Context) {
 		return
 	}
 
-	res := &CreateAppSubmissionResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusCreated,
-			StatusString: "Created",
-		},
-		Data: *ws,
-	}
-	c.JSON(http.StatusCreated, res)
+	c.JSON(http.StatusCreated, ws)
 }
 
 type UpdateAppSubmissionByIdUriParams struct {
