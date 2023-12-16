@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/api"
-	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
@@ -14,14 +13,9 @@ type GetProjectListQueryParams struct {
 	WorkspaceId []int `form:"workspaceId"`
 }
 
-type GetProjectListResponse struct {
-	api.ApiResponse
-	Data []model.Project `json:"data"`
-}
-
 func (s *ProjectApi) GetProjectList(c *gin.Context) {
-	uriParams := &GetProjectListQueryParams{}
-	if err := c.ShouldBindQuery(uriParams); err != nil {
+	queryParams := &GetProjectListQueryParams{}
+	if err := c.ShouldBindQuery(queryParams); err != nil {
 		api.AbortWithBadRequestJSON(c, err)
 		return
 	}
@@ -30,8 +24,8 @@ func (s *ProjectApi) GetProjectList(c *gin.Context) {
 	projectList, err := s.projectService.GetProjectList(
 		&project.GetProjectListParams{
 			Context:     c,
-			OrgId:       uriParams.OrgId,
-			WorkspaceId: uriParams.WorkspaceId,
+			OrgId:       queryParams.OrgId,
+			WorkspaceId: queryParams.WorkspaceId,
 		},
 	)
 	if err != nil {
@@ -39,23 +33,11 @@ func (s *ProjectApi) GetProjectList(c *gin.Context) {
 		return
 	}
 
-	res := &GetProjectListResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusOK,
-			StatusString: "OK",
-		},
-		Data: projectList,
-	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, &projectList)
 }
 
 type GetProjectByIdUriParams struct {
 	ProjectId int `uri:"projectId" binding:"required"`
-}
-
-type GetProjectByIdResponse struct {
-	api.ApiResponse
-	Data model.Project `json:"data,omitempty"`
 }
 
 func (s *ProjectApi) GetProjectById(c *gin.Context) {
@@ -77,12 +59,5 @@ func (s *ProjectApi) GetProjectById(c *gin.Context) {
 		return
 	}
 
-	res := &GetProjectByIdResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusOK,
-			StatusString: "OK",
-		},
-		Data: *project,
-	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, project)
 }
