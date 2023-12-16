@@ -17,11 +17,6 @@ type CreateTableSchemaRequest struct {
 	model.TableSchema
 }
 
-type CreateTableSchemaResponse struct {
-	api.ApiResponse
-	Data model.TableSchema `json:"data,omitempty"`
-}
-
 func (s *TableSchemaApi) CreateTableSchema(c *gin.Context) {
 	uriParams := &CreateTableSchemaUriParams{}
 	if err := c.ShouldBindUri(uriParams); err != nil {
@@ -48,14 +43,7 @@ func (s *TableSchemaApi) CreateTableSchema(c *gin.Context) {
 		return
 	}
 
-	res := &CreateTableSchemaResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusCreated,
-			StatusString: "Created",
-		},
-		Data: *ws,
-	}
-	c.JSON(http.StatusCreated, res)
+	c.JSON(http.StatusCreated, ws)
 }
 
 type UpdateTableSchemaByIdUriParams struct {
