@@ -16,7 +16,7 @@ func NewServerApi(ds *repository.Repository) ServerApi {
 	return ServerApi{dataStore: ds}
 }
 
-type ApiResponse struct {
+type ErrorResponse struct {
 	Status       int    `json:"status"`
 	StatusString string `json:"statusString"`
 	Error        error  `json:"error,omitempty"`
@@ -24,7 +24,7 @@ type ApiResponse struct {
 }
 
 func AbortWithBadRequestJSON(c *gin.Context, err error) {
-	response := ApiResponse{
+	response := ErrorResponse{
 		Status:       http.StatusBadRequest,
 		StatusString: "BadRequest",
 		Error:        err,
@@ -35,7 +35,7 @@ func AbortWithBadRequestJSON(c *gin.Context, err error) {
 }
 
 func AbortWithInternalServerErrorJSON(c *gin.Context, err error) {
-	response := ApiResponse{
+	response := ErrorResponse{
 		Status:       http.StatusInternalServerError,
 		StatusString: "InternalServerError",
 		Error:        err,
