@@ -6,22 +6,16 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/quarkloop/quarkloop/pkg/api"
-	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
-type GetWorkspaceListUriParams struct {
-	OrgId []int `uri:"orgId" binding:"required"`
-}
-
-type GetWorkspaceListResponse struct {
-	api.ApiResponse
-	Data []model.Workspace `json:"data"`
+type GetWorkspaceListQueryParams struct {
+	OrgId []int `form:"orgId"`
 }
 
 func (s *WorkspaceApi) GetWorkspaceList(c *gin.Context) {
-	uriParams := &GetWorkspaceListUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
+	queryParams := &GetWorkspaceListQueryParams{}
+	if err := c.ShouldBindQuery(queryParams); err != nil {
 		api.AbortWithBadRequestJSON(c, err)
 		return
 	}
@@ -30,7 +24,7 @@ func (s *WorkspaceApi) GetWorkspaceList(c *gin.Context) {
 	wsList, err := s.workspaceService.GetWorkspaceList(
 		&workspace.GetWorkspaceListParams{
 			Context: c,
-			OrgId:   uriParams.OrgId,
+			OrgId:   queryParams.OrgId,
 		},
 	)
 	if err != nil {
@@ -38,23 +32,11 @@ func (s *WorkspaceApi) GetWorkspaceList(c *gin.Context) {
 		return
 	}
 
-	res := &GetWorkspaceListResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusOK,
-			StatusString: "OK",
-		},
-		Data: wsList,
-	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, &wsList)
 }
 
 type GetWorkspaceByIdUriParams struct {
-	workspaceId int `uri:"orgId" binding:"required"`
-}
-
-type GetWorkspaceByIdResponse struct {
-	api.ApiResponse
-	Data model.Workspace `json:"data,omitempty"`
+	WorkspaceId int `uri:"workspaceId" binding:"required"`
 }
 
 func (s *WorkspaceApi) GetWorkspaceById(c *gin.Context) {
@@ -68,7 +50,7 @@ func (s *WorkspaceApi) GetWorkspaceById(c *gin.Context) {
 	ws, err := s.workspaceService.GetWorkspaceById(
 		&workspace.GetWorkspaceByIdParams{
 			Context:     c,
-			WorkspaceId: uriParams.workspaceId,
+			WorkspaceId: uriParams.WorkspaceId,
 		},
 	)
 	if err != nil {
@@ -76,25 +58,12 @@ func (s *WorkspaceApi) GetWorkspaceById(c *gin.Context) {
 		return
 	}
 
-	res := &GetWorkspaceByIdResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusOK,
-			StatusString: "OK",
-		},
-		Data: *ws,
-	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, ws)
 }
 
 type GetWorkspaceQueryParams struct {
 	OrgId int `form:"orgId" binding:"required"`
-	model.Workspace
-}
-
-type GetWorkspaceResponse struct {
-	api.ApiResponse
-	OrgId int             `json:"orgId" binding:"required"`
-	Data  model.Workspace `json:"data,omitempty"`
+	workspace.Workspace
 }
 
 func (s *WorkspaceApi) GetWorkspace(c *gin.Context) {
@@ -117,12 +86,5 @@ func (s *WorkspaceApi) GetWorkspace(c *gin.Context) {
 		return
 	}
 
-	res := &GetWorkspaceResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusOK,
-			StatusString: "OK",
-		},
-		Data: *ws,
-	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, ws)
 }
