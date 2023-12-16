@@ -16,11 +16,6 @@ type CreateTableRecordUriParams struct {
 	RecordId  string `uri:"recordId" binding:"required"`
 }
 
-type CreateTableRecordResponse struct {
-	api.ApiResponse
-	Data interface{} `json:"data,omitempty"`
-}
-
 func (s *TableRecordApi) CreateTableRecord(c *gin.Context) {
 	uriParams := &CreateTableRecordUriParams{}
 	if err := c.ShouldBindUri(uriParams); err != nil {
@@ -58,14 +53,7 @@ func (s *TableRecordApi) CreateTableRecord(c *gin.Context) {
 		return
 	}
 
-	res := &CreateTableRecordResponse{
-		ApiResponse: api.ApiResponse{
-			Status:       http.StatusCreated,
-			StatusString: "Created",
-		},
-		Data: record,
-	}
-	c.JSON(http.StatusCreated, res)
+	c.JSON(http.StatusCreated, record)
 }
 
 type UpdateTableRecordByIdUriParams struct {
