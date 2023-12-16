@@ -2,7 +2,7 @@ package org
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/quarkloop/quarkloop/pkg/service/organization"
+	org "github.com/quarkloop/quarkloop/pkg/service/organization"
 )
 
 type Api interface {
@@ -15,10 +15,10 @@ type Api interface {
 }
 
 type OrganizationApi struct {
-	orgService organization.Service
+	orgService org.Service
 }
 
-func NewOrganizationApi(service organization.Service) *OrganizationApi {
+func NewOrganizationApi(service org.Service) *OrganizationApi {
 	return &OrganizationApi{
 		orgService: service,
 	}
