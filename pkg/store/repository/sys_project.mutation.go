@@ -21,7 +21,9 @@ INSERT INTO
 VALUES
   (@orgId, @workspaceId, @sid, @name, @description, @accessType, @createdBy)
 RETURNING 
-  "id", "sid", "name", "description", "accessType", "createdAt", "createdBy";
+  "id", "sid", "orgId", "workspaceId",
+  "name", "description", "accessType",
+  "createdAt", "createdBy", "updatedAt", "updatedBy";
 `
 
 func (r *Repository) CreateProject(ctx context.Context, orgId int, workspaceId int, project *model.Project) (*model.Project, error) {
@@ -51,6 +53,8 @@ func (r *Repository) CreateProject(ctx context.Context, orgId int, workspaceId i
 	rowErr := row.Scan(
 		&prj.Id,
 		&prj.ScopedId,
+		&prj.OrgId,
+		&prj.WorkspaceId,
 		&prj.Name,
 		&prj.Description,
 		&prj.AccessType,
