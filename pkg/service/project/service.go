@@ -1,10 +1,12 @@
 package project
 
+import "context"
+
 type Service interface {
-	GetProjectList(*GetProjectListParams) ([]Project, error)
-	GetProjectById(*GetProjectByIdParams) (*Project, error)
-	GetProject(*GetProjectParams) (*Project, error)
-	CreateProject(*CreateProjectParams) (*Project, error)
-	UpdateProjectById(*UpdateProjectByIdParams) error
-	DeleteProjectById(*DeleteProjectByIdParams) error
+	GetProjectList(context.Context, *GetProjectListParams) ([]Project, error)
+	GetProjectById(context.Context, *GetProjectByIdParams) (*Project, error)
+	GetProject(context.Context, *GetProjectParams) (*Project, error)
+	CreateProject(context.Context, *CreateProjectParams) (*Project, error)
+	UpdateProjectById(context.Context, *UpdateProjectByIdParams) error
+	DeleteProjectById(context.Context, *DeleteProjectByIdParams) error
 }
