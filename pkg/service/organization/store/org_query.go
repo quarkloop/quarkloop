@@ -12,9 +12,6 @@ import (
 	org "github.com/quarkloop/quarkloop/pkg/service/organization"
 )
 
-type S interface {
-}
-
 /// ListOrganizations
 
 const listOrganizationsQuery = `
