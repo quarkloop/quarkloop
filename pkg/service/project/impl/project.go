@@ -1,23 +1,27 @@
 package project_impl
 
 import (
-	"github.com/quarkloop/quarkloop/pkg/model"
+	"context"
+
 	"github.com/quarkloop/quarkloop/pkg/service/project"
-	"github.com/quarkloop/quarkloop/pkg/store/repository"
+	"github.com/quarkloop/quarkloop/pkg/service/project/store"
+	"github.com/quarkloop/quarkloop/pkg/service/table_branch"
 )
 
 type projectService struct {
-	dataStore *repository.Repository
+	store         store.ProjectStore
+	branchService table_branch.Service
 }
 
-func NewProjectService(ds *repository.Repository) project.Service {
+func NewProjectService(ds store.ProjectStore, branchService table_branch.Service) project.Service {
 	return &projectService{
-		dataStore: ds,
+		store:         ds,
+		branchService: branchService,
 	}
 }
 
-func (s *projectService) GetProjectList(p *project.GetProjectListParams) ([]model.Project, error) {
-	projectList, err := s.dataStore.ListProjects(p.Context, p.OrgId, p.WorkspaceId)
+func (s *projectService) GetProjectList(p *project.GetProjectListParams) ([]project.Project, error) {
+	projectList, err := s.store.ListProjects(p.Context, p.OrgId, p.WorkspaceId)
 	if err != nil {
 		return nil, err
 	}
@@ -29,8 +33,8 @@ func (s *projectService) GetProjectList(p *project.GetProjectListParams) ([]mode
 	return projectList, nil
 }
 
-func (s *projectService) GetProjectById(p *project.GetProjectByIdParams) (*model.Project, error) {
-	project, err := s.dataStore.GetProjectById(p.Context, p.ProjectId)
+func (s *projectService) GetProjectById(p *project.GetProjectByIdParams) (*project.Project, error) {
+	project, err := s.store.GetProjectById(p.Context, p.ProjectId)
 	if err != nil {
 		return nil, err
 	}
@@ -39,8 +43,8 @@ func (s *projectService) GetProjectById(p *project.GetProjectByIdParams) (*model
 	return project, nil
 }
 
-func (s *projectService) GetProject(p *project.GetProjectParams) (*model.Project, error) {
-	project, err := s.dataStore.GetProject(p.Context, &p.Project)
+func (s *projectService) GetProject(p *project.GetProjectParams) (*project.Project, error) {
+	project, err := s.store.GetProject(p.Context, &p.Project)
 	if err != nil {
 		return nil, err
 	}
@@ -49,52 +53,35 @@ func (s *projectService) GetProject(p *project.GetProjectParams) (*model.Project
 	return project, nil
 }
 
-func (s *projectService) CreateProject(p *project.CreateProjectParams) (*model.Project, error) {
-	project, err := s.dataStore.CreateProject(p.Context, p.OrgId, p.WorkspaceId, &p.Project)
+func (s *projectService) CreateProject(p *project.CreateProjectParams) (*project.Project, error) {
+	project, err := s.store.CreateProject(p.Context, p.OrgId, p.WorkspaceId, &p.Project)
 	if err != nil {
 		return nil, err
 	}
 
 	project.GeneratePath()
 
-	// serviceData := model.ProjectServiceData{
-	// 	DiscussionsEnabled: false,
-	// 	DiscussionsSettings: model.ProjectDiscussion{
-	// 		MaxMessageLimit: 2048,
-	// 	},
-	// }
-
-	// serviceList := []model.ProjectService{
-	// 	{
-	// 		Name:        "Discussions",
-	// 		Type:        model.DiscussionsService,
-	// 		Description: "Used for discussions",
-	// 		Metadata:    json.RawMessage{},
-	// 		Data:        serviceData,
-	// 	},
-	// }
-
-	// create project services
-	// var _, pErr = s.projectSvc.CreateBulkProjectService(
-	// 	&project_table.CreateBulkProjectServiceParams{
-	// 		Context:   p.Context,
-	// 		ProjectId: project.Id,
-	// 		//ProjectServiceList: serviceList,
-	// 	},
-	// )
-	// if pErr != nil {
-	// 	return nil, pErr
-	// }
+	s.branchService.CreateTableBranch(&table_branch.CreateTableBranchParams{
+		Context:   context.Background(),
+		ProjectId: project.Id,
+		Branch: &table_branch.TableBranch{
+			Name:        "main",
+			Type:        "main",
+			Default:     true,
+			Description: "main branch",
+			CreatedBy:   "user",
+		},
+	})
 
 	return project, nil
 }
 
 func (s *projectService) UpdateProjectById(p *project.UpdateProjectByIdParams) error {
-	err := s.dataStore.UpdateProjectById(p.Context, p.ProjectId, &p.Project)
+	err := s.store.UpdateProjectById(p.Context, p.ProjectId, &p.Project)
 	return err
 }
 
 func (s *projectService) DeleteProjectById(p *project.DeleteProjectByIdParams) error {
-	err := s.dataStore.DeleteProjectById(p.Context, p.ProjectId)
+	err := s.store.DeleteProjectById(p.Context, p.ProjectId)
 	return err
 }
