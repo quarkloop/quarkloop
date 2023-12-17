@@ -1,7 +1,6 @@
 package table_schema
 
 import (
-	"context"
 	"encoding/json"
 	"time"
 )
@@ -20,37 +19,31 @@ type TableSchema struct {
 }
 
 type GetTableSchemaListParams struct {
-	Context   context.Context
 	ProjectId int
 }
 
 type GetTableSchemaByIdParams struct {
-	Context   context.Context
 	ProjectId int
 	SchemaId  string
 }
 
 type CreateTableSchemaParams struct {
-	Context   context.Context
 	ProjectId int
 	Schema    *TableSchema
 }
 
 type CreateBulkTableSchemaParams struct {
-	Context    context.Context
 	ProjectId  string
 	SchemaList []TableSchema
 }
 
 type UpdateTableSchemaByIdParams struct {
-	Context   context.Context
 	ProjectId int
 	SchemaId  string
 	Schema    *TableSchema
 }
 
 type DeleteTableSchemaByIdParams struct {
-	Context   context.Context
 	ProjectId int
 	SchemaId  string
 }
