@@ -1,7 +1,6 @@
 package table_record
 
 import (
-	"context"
 	"encoding/json"
 	"time"
 )
@@ -68,14 +67,12 @@ type MainRecordWithRelationCount struct {
 }
 
 type GetTableRecordListParams struct {
-	Context   context.Context
 	TableType string
 	ProjectId int
 	BranchId  int
 }
 
 type GetTableRecordByIdParams struct {
-	Context   context.Context
 	TableType string
 	ProjectId int
 	BranchId  int
@@ -83,7 +80,6 @@ type GetTableRecordByIdParams struct {
 }
 
 type CreateTableRecordParams struct {
-	Context   context.Context
 	TableType string
 	ProjectId int
 	BranchId  int
@@ -91,7 +87,6 @@ type CreateTableRecordParams struct {
 }
 
 type UpdateTableRecordByIdParams struct {
-	Context   context.Context
 	TableType string
 	ProjectId int
 	BranchId  int
@@ -100,7 +95,6 @@ type UpdateTableRecordByIdParams struct {
 }
 
 type DeleteTableRecordByIdParams struct {
-	Context   context.Context
 	TableType string
 	ProjectId int
 	BranchId  int
