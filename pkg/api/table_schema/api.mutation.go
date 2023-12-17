@@ -16,33 +16,31 @@ type CreateTableSchemaRequest struct {
 	table_schema.TableSchema
 }
 
-func (s *TableSchemaApi) CreateTableSchema(c *gin.Context) {
+func (s *TableSchemaApi) CreateTableSchema(ctx *gin.Context) {
 	uriParams := &CreateTableSchemaUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	req := &CreateTableSchemaRequest{}
-	if err := c.BindJSON(req); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.BindJSON(req); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	ws, err := s.tableSchemaService.CreateTableSchema(
-		&table_schema.CreateTableSchemaParams{
-			Context:   c,
-			ProjectId: uriParams.ProjectId,
-			Schema:    &req.TableSchema,
-		},
+	ws, err := s.tableSchemaService.CreateTableSchema(ctx, &table_schema.CreateTableSchemaParams{
+		ProjectId: uriParams.ProjectId,
+		Schema:    &req.TableSchema,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusCreated, ws)
+	ctx.JSON(http.StatusCreated, ws)
 }
 
 type UpdateTableSchemaByIdUriParams struct {
@@ -54,34 +52,32 @@ type UpdateTableSchemaByIdRequest struct {
 	table_schema.TableSchema
 }
 
-func (s *TableSchemaApi) UpdateTableSchemaById(c *gin.Context) {
+func (s *TableSchemaApi) UpdateTableSchemaById(ctx *gin.Context) {
 	uriParams := &UpdateTableSchemaByIdUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	req := &UpdateTableSchemaByIdRequest{}
-	if err := c.BindJSON(req); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.BindJSON(req); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	err := s.tableSchemaService.UpdateTableSchemaById(
-		&table_schema.UpdateTableSchemaByIdParams{
-			Context:   c,
-			ProjectId: uriParams.ProjectId,
-			SchemaId:  uriParams.SchemaId,
-			Schema:    &req.TableSchema,
-		},
+	err := s.tableSchemaService.UpdateTableSchemaById(ctx, &table_schema.UpdateTableSchemaByIdParams{
+		ProjectId: uriParams.ProjectId,
+		SchemaId:  uriParams.SchemaId,
+		Schema:    &req.TableSchema,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, nil)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 type DeleteTableSchemaByIdUriParams struct {
@@ -89,25 +85,23 @@ type DeleteTableSchemaByIdUriParams struct {
 	SchemaId  string `uri:"schemaId" binding:"required"`
 }
 
-func (s *TableSchemaApi) DeleteTableSchemaById(c *gin.Context) {
+func (s *TableSchemaApi) DeleteTableSchemaById(ctx *gin.Context) {
 	uriParams := &DeleteTableSchemaByIdUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	err := s.tableSchemaService.DeleteTableSchemaById(
-		&table_schema.DeleteTableSchemaByIdParams{
-			Context:   c,
-			ProjectId: uriParams.ProjectId,
-			SchemaId:  uriParams.SchemaId,
-		},
+	err := s.tableSchemaService.DeleteTableSchemaById(ctx, &table_schema.DeleteTableSchemaByIdParams{
+		ProjectId: uriParams.ProjectId,
+		SchemaId:  uriParams.SchemaId,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusNoContent, nil)
+	ctx.JSON(http.StatusNoContent, nil)
 }
