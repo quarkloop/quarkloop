@@ -9,17 +9,21 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/api/org"
 	"github.com/quarkloop/quarkloop/pkg/api/project"
 	"github.com/quarkloop/quarkloop/pkg/api/project_submission"
-	table_branch "github.com/quarkloop/quarkloop/pkg/api/project_table_branch"
-	table_record "github.com/quarkloop/quarkloop/pkg/api/project_table_record"
-	table_schema "github.com/quarkloop/quarkloop/pkg/api/project_table_schema"
+	table_branch "github.com/quarkloop/quarkloop/pkg/api/table_branch"
+	table_record "github.com/quarkloop/quarkloop/pkg/api/table_record"
+	table_schema "github.com/quarkloop/quarkloop/pkg/api/table_schema"
 	"github.com/quarkloop/quarkloop/pkg/api/workspace"
 	org_impl "github.com/quarkloop/quarkloop/pkg/service/organization/impl"
 	org_store "github.com/quarkloop/quarkloop/pkg/service/organization/store"
 	project_impl "github.com/quarkloop/quarkloop/pkg/service/project/impl"
+	project_store "github.com/quarkloop/quarkloop/pkg/service/project/store"
 	project_submission_impl "github.com/quarkloop/quarkloop/pkg/service/project_submission/impl"
-	table_branch_impl "github.com/quarkloop/quarkloop/pkg/service/project_table_branch/impl"
-	table_record_impl "github.com/quarkloop/quarkloop/pkg/service/project_table_record/impl"
-	table_schema_impl "github.com/quarkloop/quarkloop/pkg/service/project_table_schema/impl"
+	table_branch_impl "github.com/quarkloop/quarkloop/pkg/service/table_branch/impl"
+	table_branch_store "github.com/quarkloop/quarkloop/pkg/service/table_branch/store"
+	table_record_impl "github.com/quarkloop/quarkloop/pkg/service/table_record/impl"
+	table_record_store "github.com/quarkloop/quarkloop/pkg/service/table_record/store"
+	table_schema_impl "github.com/quarkloop/quarkloop/pkg/service/table_schema/impl"
+	table_schema_store "github.com/quarkloop/quarkloop/pkg/service/table_schema/store"
 	ws_impl "github.com/quarkloop/quarkloop/pkg/service/workspace/impl"
 	ws_store "github.com/quarkloop/quarkloop/pkg/service/workspace/store"
 	"github.com/quarkloop/quarkloop/pkg/store/repository"
@@ -67,11 +71,11 @@ func NewDefaultServer(ds *repository.Repository) Server {
 
 	orgService := org_impl.NewOrganizationService(org_store.NewOrgStore(ds.SystemDbConn))
 	workspaceService := ws_impl.NewWorkspaceService(ws_store.NewWorkspaceStore(ds.SystemDbConn))
-	projectTableService := project_impl.NewProjectService(ds)
+	projectTableService := project_impl.NewProjectService(project_store.NewProjectStore(ds.SystemDbConn))
 
-	tableBranchService := table_branch_impl.NewTableBranchService(ds)
-	tableSchemaService := table_schema_impl.NewTableSchemaService(ds)
-	tableRecordService := table_record_impl.NewTableRecordService(ds)
+	tableBranchService := table_branch_impl.NewTableBranchService(table_branch_store.NewTableBranchStore(ds.ProjectDbConn))
+	tableSchemaService := table_schema_impl.NewTableSchemaService(table_schema_store.NewTableSchemaStore(ds.ProjectDbConn))
+	tableRecordService := table_record_impl.NewTableRecordService(table_record_store.NewTableRecordStore(ds.ProjectDbConn))
 
 	projectSubmissionService := project_submission_impl.NewAppSubmissionService(ds)
 
