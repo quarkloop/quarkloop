@@ -1,7 +1,6 @@
 package workspace
 
 import (
-	"context"
 	"fmt"
 	"time"
 )
@@ -31,34 +30,28 @@ func (w *Workspace) GeneratePath() {
 }
 
 type GetWorkspaceListParams struct {
-	Context context.Context
-	OrgId   []int
+	OrgId []int
 }
 
 type GetWorkspaceByIdParams struct {
-	Context     context.Context
 	WorkspaceId int
 }
 
 type GetWorkspaceParams struct {
-	Context   context.Context
 	OrgId     int
 	Workspace Workspace
 }
 
 type CreateWorkspaceParams struct {
-	Context   context.Context
 	OrgId     int
 	Workspace Workspace
 }
 
 type UpdateWorkspaceByIdParams struct {
-	Context     context.Context
 	WorkspaceId int
 	Workspace   Workspace
 }
 
 type DeleteWorkspaceByIdParams struct {
-	Context     context.Context
 	WorkspaceId int
 }
