@@ -1,10 +1,12 @@
 package workspace
 
+import "context"
+
 type Service interface {
-	GetWorkspaceList(*GetWorkspaceListParams) ([]Workspace, error)
-	GetWorkspaceById(*GetWorkspaceByIdParams) (*Workspace, error)
-	GetWorkspace(*GetWorkspaceParams) (*Workspace, error)
-	CreateWorkspace(*CreateWorkspaceParams) (*Workspace, error)
-	UpdateWorkspaceById(*UpdateWorkspaceByIdParams) error
-	DeleteWorkspaceById(*DeleteWorkspaceByIdParams) error
+	GetWorkspaceList(context.Context, *GetWorkspaceListParams) ([]Workspace, error)
+	GetWorkspaceById(context.Context, *GetWorkspaceByIdParams) (*Workspace, error)
+	GetWorkspace(context.Context, *GetWorkspaceParams) (*Workspace, error)
+	CreateWorkspace(context.Context, *CreateWorkspaceParams) (*Workspace, error)
+	UpdateWorkspaceById(context.Context, *UpdateWorkspaceByIdParams) error
+	DeleteWorkspaceById(context.Context, *DeleteWorkspaceByIdParams) error
 }
