@@ -1,7 +1,6 @@
 package org
 
 import (
-	"context"
 	"fmt"
 	"time"
 )
@@ -28,32 +27,25 @@ func (o *Organization) GeneratePath() {
 	o.Path = fmt.Sprintf("/org/%s", o.ScopedId)
 }
 
-type GetOrganizationListParams struct {
-	Context context.Context
-}
+type GetOrganizationListParams struct{}
 
 type GetOrganizationByIdParams struct {
-	Context context.Context
-	OrgId   int
+	OrgId int
 }
 
 type GetOrganizationParams struct {
-	Context      context.Context
 	Organization Organization
 }
 
 type CreateOrganizationParams struct {
-	Context      context.Context
 	Organization Organization
 }
 
 type UpdateOrganizationByIdParams struct {
-	Context      context.Context
 	OrgId        int
 	Organization Organization
 }
 
 type DeleteOrganizationByIdParams struct {
-	Context context.Context
-	OrgId   int
+	OrgId int
 }
