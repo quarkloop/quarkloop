@@ -1,7 +1,6 @@
 package project
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -35,36 +34,30 @@ func (p *Project) GeneratePath() {
 }
 
 type GetProjectListParams struct {
-	Context     context.Context
 	OrgId       []int
 	WorkspaceId []int
 }
 
 type GetProjectByIdParams struct {
-	Context   context.Context
 	ProjectId int
 }
 
 type GetProjectParams struct {
-	Context context.Context
 	OrgId   int
 	Project Project
 }
 
 type CreateProjectParams struct {
-	Context     context.Context
 	OrgId       int
 	WorkspaceId int
 	Project     Project
 }
 
 type UpdateProjectByIdParams struct {
-	Context   context.Context
 	ProjectId int
 	Project   Project
 }
 
 type DeleteProjectByIdParams struct {
-	Context   context.Context
 	ProjectId int
 }
