@@ -13,26 +13,24 @@ type CreateOrganizationRequest struct {
 	org.Organization
 }
 
-func (s *OrganizationApi) CreateOrganization(c *gin.Context) {
+func (s *OrganizationApi) CreateOrganization(ctx *gin.Context) {
 	req := &CreateOrganizationRequest{}
-	if err := c.BindJSON(req); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.BindJSON(req); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query database
-	org, err := s.orgService.CreateOrganization(
-		&org.CreateOrganizationParams{
-			Context:      c,
-			Organization: req.Organization,
-		},
+	org, err := s.orgService.CreateOrganization(ctx, &org.CreateOrganizationParams{
+		Organization: req.Organization,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusCreated, org)
+	ctx.JSON(http.StatusCreated, org)
 }
 
 type UpdateOrganizationByIdUriParams struct {
@@ -43,57 +41,53 @@ type UpdateOrganizationByIdRequest struct {
 	org.Organization
 }
 
-func (s *OrganizationApi) UpdateOrganizationById(c *gin.Context) {
+func (s *OrganizationApi) UpdateOrganizationById(ctx *gin.Context) {
 	uriParams := &UpdateOrganizationByIdUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	req := &UpdateOrganizationByIdRequest{}
-	if err := c.BindJSON(req); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.BindJSON(req); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query database
-	err := s.orgService.UpdateOrganizationById(
-		&org.UpdateOrganizationByIdParams{
-			Context:      c,
-			OrgId:        uriParams.OrgId,
-			Organization: req.Organization,
-		},
+	err := s.orgService.UpdateOrganizationById(ctx, &org.UpdateOrganizationByIdParams{
+		OrgId:        uriParams.OrgId,
+		Organization: req.Organization,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, nil)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 type DeleteOrganizationByIdUriParams struct {
 	OrgId int `uri:"orgId" binding:"required"`
 }
 
-func (s *OrganizationApi) DeleteOrganizationById(c *gin.Context) {
+func (s *OrganizationApi) DeleteOrganizationById(ctx *gin.Context) {
 	uriParams := &DeleteOrganizationByIdUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query database
-	err := s.orgService.DeleteOrganizationById(
-		&org.DeleteOrganizationByIdParams{
-			Context: c,
-			OrgId:   uriParams.OrgId,
-		},
+	err := s.orgService.DeleteOrganizationById(ctx, &org.DeleteOrganizationByIdParams{
+		OrgId: uriParams.OrgId,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusNoContent, nil)
+	ctx.JSON(http.StatusNoContent, nil)
 }
