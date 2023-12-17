@@ -20,8 +20,8 @@ func NewProjectService(ds store.ProjectStore, branchService table_branch.Service
 	}
 }
 
-func (s *projectService) GetProjectList(p *project.GetProjectListParams) ([]project.Project, error) {
-	projectList, err := s.store.ListProjects(p.Context, p.OrgId, p.WorkspaceId)
+func (s *projectService) GetProjectList(ctx context.Context, p *project.GetProjectListParams) ([]project.Project, error) {
+	projectList, err := s.store.ListProjects(ctx, p.OrgId, p.WorkspaceId)
 	if err != nil {
 		return nil, err
 	}
@@ -33,8 +33,8 @@ func (s *projectService) GetProjectList(p *project.GetProjectListParams) ([]proj
 	return projectList, nil
 }
 
-func (s *projectService) GetProjectById(p *project.GetProjectByIdParams) (*project.Project, error) {
-	project, err := s.store.GetProjectById(p.Context, p.ProjectId)
+func (s *projectService) GetProjectById(ctx context.Context, p *project.GetProjectByIdParams) (*project.Project, error) {
+	project, err := s.store.GetProjectById(ctx, p.ProjectId)
 	if err != nil {
 		return nil, err
 	}
@@ -43,8 +43,8 @@ func (s *projectService) GetProjectById(p *project.GetProjectByIdParams) (*proje
 	return project, nil
 }
 
-func (s *projectService) GetProject(p *project.GetProjectParams) (*project.Project, error) {
-	project, err := s.store.GetProject(p.Context, &p.Project)
+func (s *projectService) GetProject(ctx context.Context, p *project.GetProjectParams) (*project.Project, error) {
+	project, err := s.store.GetProject(ctx, &p.Project)
 	if err != nil {
 		return nil, err
 	}
@@ -53,16 +53,15 @@ func (s *projectService) GetProject(p *project.GetProjectParams) (*project.Proje
 	return project, nil
 }
 
-func (s *projectService) CreateProject(p *project.CreateProjectParams) (*project.Project, error) {
-	project, err := s.store.CreateProject(p.Context, p.OrgId, p.WorkspaceId, &p.Project)
+func (s *projectService) CreateProject(ctx context.Context, p *project.CreateProjectParams) (*project.Project, error) {
+	project, err := s.store.CreateProject(ctx, p.OrgId, p.WorkspaceId, &p.Project)
 	if err != nil {
 		return nil, err
 	}
 
 	project.GeneratePath()
 
-	s.branchService.CreateTableBranch(&table_branch.CreateTableBranchParams{
-		Context:   context.Background(),
+	s.branchService.CreateTableBranch(ctx, &table_branch.CreateTableBranchParams{
 		ProjectId: project.Id,
 		Branch: &table_branch.TableBranch{
 			Name:        "main",
@@ -76,12 +75,12 @@ func (s *projectService) CreateProject(p *project.CreateProjectParams) (*project
 	return project, nil
 }
 
-func (s *projectService) UpdateProjectById(p *project.UpdateProjectByIdParams) error {
-	err := s.store.UpdateProjectById(p.Context, p.ProjectId, &p.Project)
+func (s *projectService) UpdateProjectById(ctx context.Context, p *project.UpdateProjectByIdParams) error {
+	err := s.store.UpdateProjectById(ctx, p.ProjectId, &p.Project)
 	return err
 }
 
-func (s *projectService) DeleteProjectById(p *project.DeleteProjectByIdParams) error {
-	err := s.store.DeleteProjectById(p.Context, p.ProjectId)
+func (s *projectService) DeleteProjectById(ctx context.Context, p *project.DeleteProjectByIdParams) error {
+	err := s.store.DeleteProjectById(ctx, p.ProjectId)
 	return err
 }
