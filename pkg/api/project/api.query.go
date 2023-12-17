@@ -13,51 +13,47 @@ type GetProjectListQueryParams struct {
 	WorkspaceId []int `form:"workspaceId"`
 }
 
-func (s *ProjectApi) GetProjectList(c *gin.Context) {
+func (s *ProjectApi) GetProjectList(ctx *gin.Context) {
 	queryParams := &GetProjectListQueryParams{}
-	if err := c.ShouldBindQuery(queryParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindQuery(queryParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	projectList, err := s.projectService.GetProjectList(
-		&project.GetProjectListParams{
-			Context:     c,
-			OrgId:       queryParams.OrgId,
-			WorkspaceId: queryParams.WorkspaceId,
-		},
+	projectList, err := s.projectService.GetProjectList(ctx, &project.GetProjectListParams{
+		OrgId:       queryParams.OrgId,
+		WorkspaceId: queryParams.WorkspaceId,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, &projectList)
+	ctx.JSON(http.StatusOK, &projectList)
 }
 
 type GetProjectByIdUriParams struct {
 	ProjectId int `uri:"projectId" binding:"required"`
 }
 
-func (s *ProjectApi) GetProjectById(c *gin.Context) {
+func (s *ProjectApi) GetProjectById(ctx *gin.Context) {
 	uriParams := &GetProjectByIdUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	project, err := s.projectService.GetProjectById(
-		&project.GetProjectByIdParams{
-			Context:   c,
-			ProjectId: uriParams.ProjectId,
-		},
+	project, err := s.projectService.GetProjectById(ctx, &project.GetProjectByIdParams{
+		ProjectId: uriParams.ProjectId,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, project)
+	ctx.JSON(http.StatusOK, project)
 }
