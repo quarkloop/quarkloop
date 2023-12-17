@@ -6,21 +6,21 @@ import (
 )
 
 type workspaceService struct {
+	store store.WorkspaceStore
+
 	UserService      interface{}
 	WorkspaceService interface{}
 	QuotaService     interface{}
-
-	dataStore store.WorkspaceStore
 }
 
 func NewWorkspaceService(ds store.WorkspaceStore) workspace.Service {
 	return &workspaceService{
-		dataStore: ds,
+		store: ds,
 	}
 }
 
 func (s *workspaceService) GetWorkspaceList(p *workspace.GetWorkspaceListParams) ([]workspace.Workspace, error) {
-	workspaceList, err := s.dataStore.ListWorkspaces(p.Context, p.OrgId)
+	workspaceList, err := s.store.ListWorkspaces(p.Context, p.OrgId)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (s *workspaceService) GetWorkspaceList(p *workspace.GetWorkspaceListParams)
 }
 
 func (s *workspaceService) GetWorkspaceById(p *workspace.GetWorkspaceByIdParams) (*workspace.Workspace, error) {
-	workspace, err := s.dataStore.GetWorkspaceById(p.Context, p.WorkspaceId)
+	workspace, err := s.store.GetWorkspaceById(p.Context, p.WorkspaceId)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (s *workspaceService) GetWorkspaceById(p *workspace.GetWorkspaceByIdParams)
 }
 
 func (s *workspaceService) GetWorkspace(p *workspace.GetWorkspaceParams) (*workspace.Workspace, error) {
-	workspace, err := s.dataStore.GetWorkspace(p.Context, p.OrgId, &p.Workspace)
+	workspace, err := s.store.GetWorkspace(p.Context, p.OrgId, &p.Workspace)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (s *workspaceService) GetWorkspace(p *workspace.GetWorkspaceParams) (*works
 }
 
 func (s *workspaceService) CreateWorkspace(p *workspace.CreateWorkspaceParams) (*workspace.Workspace, error) {
-	workspace, err := s.dataStore.CreateWorkspace(p.Context, p.OrgId, &p.Workspace)
+	workspace, err := s.store.CreateWorkspace(p.Context, p.OrgId, &p.Workspace)
 	if err != nil {
 		return nil, err
 	}
@@ -63,11 +63,11 @@ func (s *workspaceService) CreateWorkspace(p *workspace.CreateWorkspaceParams) (
 }
 
 func (s *workspaceService) UpdateWorkspaceById(p *workspace.UpdateWorkspaceByIdParams) error {
-	err := s.dataStore.UpdateWorkspaceById(p.Context, p.WorkspaceId, &p.Workspace)
+	err := s.store.UpdateWorkspaceById(p.Context, p.WorkspaceId, &p.Workspace)
 	return err
 }
 
 func (s *workspaceService) DeleteWorkspaceById(p *workspace.DeleteWorkspaceByIdParams) error {
-	err := s.dataStore.DeleteWorkspaceById(p.Context, p.WorkspaceId)
+	err := s.store.DeleteWorkspaceById(p.Context, p.WorkspaceId)
 	return err
 }
