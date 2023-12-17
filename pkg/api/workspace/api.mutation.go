@@ -13,27 +13,25 @@ type CreateWorkspaceRequest struct {
 	Workspace workspace.Workspace `json:"workspace" binding:"required"`
 }
 
-func (s *WorkspaceApi) CreateWorkspace(c *gin.Context) {
+func (s *WorkspaceApi) CreateWorkspace(ctx *gin.Context) {
 	req := &CreateWorkspaceRequest{}
-	if err := c.BindJSON(req); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.BindJSON(req); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	ws, err := s.workspaceService.CreateWorkspace(
-		&workspace.CreateWorkspaceParams{
-			Context:   c,
-			OrgId:     req.OrgId,
-			Workspace: req.Workspace,
-		},
+	ws, err := s.workspaceService.CreateWorkspace(ctx, &workspace.CreateWorkspaceParams{
+		OrgId:     req.OrgId,
+		Workspace: req.Workspace,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusCreated, ws)
+	ctx.JSON(http.StatusCreated, ws)
 }
 
 type UpdateWorkspaceByIdUriParams struct {
@@ -44,57 +42,53 @@ type UpdateWorkspaceByIdRequest struct {
 	workspace.Workspace
 }
 
-func (s *WorkspaceApi) UpdateWorkspaceById(c *gin.Context) {
+func (s *WorkspaceApi) UpdateWorkspaceById(ctx *gin.Context) {
 	uriParams := &UpdateWorkspaceByIdUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	req := &UpdateWorkspaceByIdRequest{}
-	if err := c.BindJSON(req); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.BindJSON(req); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	err := s.workspaceService.UpdateWorkspaceById(
-		&workspace.UpdateWorkspaceByIdParams{
-			Context:     c,
-			WorkspaceId: uriParams.WorkspaceId,
-			Workspace:   req.Workspace,
-		},
+	err := s.workspaceService.UpdateWorkspaceById(ctx, &workspace.UpdateWorkspaceByIdParams{
+		WorkspaceId: uriParams.WorkspaceId,
+		Workspace:   req.Workspace,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, nil)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 type DeleteWorkspaceByIdUriParams struct {
 	WorkspaceId int `uri:"workspaceId" binding:"required"`
 }
 
-func (s *WorkspaceApi) DeleteWorkspaceById(c *gin.Context) {
+func (s *WorkspaceApi) DeleteWorkspaceById(ctx *gin.Context) {
 	uriParams := &DeleteWorkspaceByIdUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	err := s.workspaceService.DeleteWorkspaceById(
-		&workspace.DeleteWorkspaceByIdParams{
-			Context:     c,
-			WorkspaceId: uriParams.WorkspaceId,
-		},
+	err := s.workspaceService.DeleteWorkspaceById(ctx, &workspace.DeleteWorkspaceByIdParams{
+		WorkspaceId: uriParams.WorkspaceId,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusNoContent, nil)
+	ctx.JSON(http.StatusNoContent, nil)
 }
