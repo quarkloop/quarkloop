@@ -5,14 +5,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/api"
-	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
 type CreateProjectRequest struct {
-	OrgId       int           `json:"orgId" binding:"required"`
-	WorkspaceId int           `json:"workspaceId" binding:"required"`
-	Project     model.Project `json:"project" binding:"required"`
+	OrgId       int             `json:"orgId" binding:"required"`
+	WorkspaceId int             `json:"workspaceId" binding:"required"`
+	Project     project.Project `json:"project" binding:"required"`
 }
 
 func (s *ProjectApi) CreateProject(c *gin.Context) {
@@ -44,7 +43,7 @@ type UpdateProjectByIdUriParams struct {
 }
 
 type UpdateProjectByIdRequest struct {
-	model.Project
+	project.Project
 }
 
 func (s *ProjectApi) UpdateProjectById(c *gin.Context) {
