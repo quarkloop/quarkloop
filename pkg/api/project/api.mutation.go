@@ -14,28 +14,26 @@ type CreateProjectRequest struct {
 	Project     project.Project `json:"project" binding:"required"`
 }
 
-func (s *ProjectApi) CreateProject(c *gin.Context) {
+func (s *ProjectApi) CreateProject(ctx *gin.Context) {
 	req := &CreateProjectRequest{}
-	if err := c.BindJSON(req); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.BindJSON(req); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	ws, err := s.projectService.CreateProject(
-		&project.CreateProjectParams{
-			Context:     c,
-			OrgId:       req.OrgId,
-			WorkspaceId: req.WorkspaceId,
-			Project:     req.Project,
-		},
+	ws, err := s.projectService.CreateProject(ctx, &project.CreateProjectParams{
+		OrgId:       req.OrgId,
+		WorkspaceId: req.WorkspaceId,
+		Project:     req.Project,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusCreated, ws)
+	ctx.JSON(http.StatusCreated, ws)
 }
 
 type UpdateProjectByIdUriParams struct {
@@ -46,57 +44,53 @@ type UpdateProjectByIdRequest struct {
 	project.Project
 }
 
-func (s *ProjectApi) UpdateProjectById(c *gin.Context) {
+func (s *ProjectApi) UpdateProjectById(ctx *gin.Context) {
 	uriParams := &UpdateProjectByIdUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	req := &UpdateProjectByIdRequest{}
-	if err := c.BindJSON(req); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.BindJSON(req); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	err := s.projectService.UpdateProjectById(
-		&project.UpdateProjectByIdParams{
-			Context:   c,
-			ProjectId: uriParams.ProjectId,
-			Project:   req.Project,
-		},
+	err := s.projectService.UpdateProjectById(ctx, &project.UpdateProjectByIdParams{
+		ProjectId: uriParams.ProjectId,
+		Project:   req.Project,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, nil)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 type DeleteProjectByIdUriParams struct {
 	ProjectId int `uri:"projectId" binding:"required"`
 }
 
-func (s *ProjectApi) DeleteProjectById(c *gin.Context) {
+func (s *ProjectApi) DeleteProjectById(ctx *gin.Context) {
 	uriParams := &DeleteProjectByIdUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	err := s.projectService.DeleteProjectById(
-		&project.DeleteProjectByIdParams{
-			Context:   c,
-			ProjectId: uriParams.ProjectId,
-		},
+	err := s.projectService.DeleteProjectById(ctx, &project.DeleteProjectByIdParams{
+		ProjectId: uriParams.ProjectId,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusNoContent, nil)
+	ctx.JSON(http.StatusNoContent, nil)
 }
