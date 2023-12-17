@@ -69,13 +69,16 @@ func NewDefaultServer(ds *repository.Repository) Server {
 		MaxAge:        12 * time.Hour,
 	}))
 
-	orgService := org_impl.NewOrganizationService(org_store.NewOrgStore(ds.SystemDbConn))
-	workspaceService := ws_impl.NewWorkspaceService(ws_store.NewWorkspaceStore(ds.SystemDbConn))
-	projectTableService := project_impl.NewProjectService(project_store.NewProjectStore(ds.SystemDbConn))
-
 	tableBranchService := table_branch_impl.NewTableBranchService(table_branch_store.NewTableBranchStore(ds.ProjectDbConn))
 	tableSchemaService := table_schema_impl.NewTableSchemaService(table_schema_store.NewTableSchemaStore(ds.ProjectDbConn))
 	tableRecordService := table_record_impl.NewTableRecordService(table_record_store.NewTableRecordStore(ds.ProjectDbConn))
+
+	orgService := org_impl.NewOrganizationService(org_store.NewOrgStore(ds.SystemDbConn))
+	workspaceService := ws_impl.NewWorkspaceService(ws_store.NewWorkspaceStore(ds.SystemDbConn))
+	projectTableService := project_impl.NewProjectService(
+		project_store.NewProjectStore(ds.SystemDbConn),
+		tableBranchService,
+	)
 
 	projectSubmissionService := project_submission_impl.NewAppSubmissionService(ds)
 
