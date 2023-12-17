@@ -1,10 +1,12 @@
 package org
 
+import "context"
+
 type Service interface {
-	GetOrganizationList(*GetOrganizationListParams) ([]Organization, error)
-	GetOrganizationById(*GetOrganizationByIdParams) (*Organization, error)
-	GetOrganization(*GetOrganizationParams) (*Organization, error)
-	CreateOrganization(*CreateOrganizationParams) (*Organization, error)
-	UpdateOrganizationById(*UpdateOrganizationByIdParams) error
-	DeleteOrganizationById(*DeleteOrganizationByIdParams) error
+	GetOrganizationList(context.Context, *GetOrganizationListParams) ([]Organization, error)
+	GetOrganizationById(context.Context, *GetOrganizationByIdParams) (*Organization, error)
+	GetOrganization(context.Context, *GetOrganizationParams) (*Organization, error)
+	CreateOrganization(context.Context, *CreateOrganizationParams) (*Organization, error)
+	UpdateOrganizationById(context.Context, *UpdateOrganizationByIdParams) error
+	DeleteOrganizationById(context.Context, *DeleteOrganizationByIdParams) error
 }
