@@ -12,26 +12,24 @@ type ListTableBranchesUriParams struct {
 	ProjectId int `uri:"projectId" binding:"required"`
 }
 
-func (s *TableBranchApi) ListTableBranches(c *gin.Context) {
+func (s *TableBranchApi) ListTableBranches(ctx *gin.Context) {
 	uriParams := &ListTableBranchesUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	branchList, err := s.tableBranchService.ListTableBranches(
-		&table_branch.GetTableBranchListParams{
-			Context:   c,
-			ProjectId: uriParams.ProjectId,
-		},
+	branchList, err := s.tableBranchService.ListTableBranches(ctx, &table_branch.GetTableBranchListParams{
+		ProjectId: uriParams.ProjectId,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, &branchList)
+	ctx.JSON(http.StatusOK, &branchList)
 }
 
 type GetTableBranchByIdUriParams struct {
@@ -39,25 +37,23 @@ type GetTableBranchByIdUriParams struct {
 	BranchId  int `uri:"branchId" binding:"required"`
 }
 
-func (s *TableBranchApi) GetTableBranchById(c *gin.Context) {
+func (s *TableBranchApi) GetTableBranchById(ctx *gin.Context) {
 	uriParams := &GetTableBranchByIdUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	branch, err := s.tableBranchService.GetTableBranchById(
-		&table_branch.GetTableBranchByIdParams{
-			Context:   c,
-			ProjectId: uriParams.ProjectId,
-			BranchId:  uriParams.BranchId,
-		},
+	branch, err := s.tableBranchService.GetTableBranchById(ctx, &table_branch.GetTableBranchByIdParams{
+		ProjectId: uriParams.ProjectId,
+		BranchId:  uriParams.BranchId,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, branch)
+	ctx.JSON(http.StatusOK, branch)
 }
