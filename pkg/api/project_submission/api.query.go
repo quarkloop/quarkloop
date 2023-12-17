@@ -12,26 +12,24 @@ type GetAppSubmissionListUriParams struct {
 	ProjectId int `uri:"projectId"`
 }
 
-func (s *AppSubmissionApi) GetAppSubmissionList(c *gin.Context) {
+func (s *AppSubmissionApi) GetAppSubmissionList(ctx *gin.Context) {
 	uriParams := &GetAppSubmissionListUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	projectList, err := s.projectSubmission.GetAppSubmissionList(
-		&project_submission.GetAppSubmissionListParams{
-			Context:   c,
-			ProjectId: uriParams.ProjectId,
-		},
+	projectList, err := s.projectSubmission.GetAppSubmissionList(ctx, &project_submission.GetAppSubmissionListParams{
+		ProjectId: uriParams.ProjectId,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, &projectList)
+	ctx.JSON(http.StatusOK, &projectList)
 }
 
 type GetAppSubmissionByIdUriParams struct {
@@ -39,25 +37,23 @@ type GetAppSubmissionByIdUriParams struct {
 	SubmissionId string `uri:"submissionId" binding:"required"`
 }
 
-func (s *AppSubmissionApi) GetAppSubmissionById(c *gin.Context) {
+func (s *AppSubmissionApi) GetAppSubmissionById(ctx *gin.Context) {
 	uriParams := &GetAppSubmissionByIdUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	project_submission, err := s.projectSubmission.GetAppSubmissionById(
-		&project_submission.GetAppSubmissionByIdParams{
-			Context:         c,
-			ProjectId:       uriParams.ProjectId,
-			AppSubmissionId: uriParams.SubmissionId,
-		},
+	project_submission, err := s.projectSubmission.GetAppSubmissionById(ctx, &project_submission.GetAppSubmissionByIdParams{
+		ProjectId:       uriParams.ProjectId,
+		AppSubmissionId: uriParams.SubmissionId,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, project_submission)
+	ctx.JSON(http.StatusOK, project_submission)
 }
