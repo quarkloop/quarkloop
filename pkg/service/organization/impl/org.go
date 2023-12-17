@@ -1,6 +1,8 @@
 package organization_impl
 
 import (
+	"context"
+
 	org "github.com/quarkloop/quarkloop/pkg/service/organization"
 	"github.com/quarkloop/quarkloop/pkg/service/organization/store"
 )
@@ -19,8 +21,8 @@ func NewOrganizationService(ds store.OrgStore) org.Service {
 	}
 }
 
-func (s *orgService) GetOrganizationList(p *org.GetOrganizationListParams) ([]org.Organization, error) {
-	orgList, err := s.store.ListOrganizations(p.Context)
+func (s *orgService) GetOrganizationList(ctx context.Context, p *org.GetOrganizationListParams) ([]org.Organization, error) {
+	orgList, err := s.store.ListOrganizations(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -32,8 +34,8 @@ func (s *orgService) GetOrganizationList(p *org.GetOrganizationListParams) ([]or
 	return orgList, nil
 }
 
-func (s *orgService) GetOrganizationById(p *org.GetOrganizationByIdParams) (*org.Organization, error) {
-	org, err := s.store.GetOrganizationById(p.Context, p.OrgId)
+func (s *orgService) GetOrganizationById(ctx context.Context, p *org.GetOrganizationByIdParams) (*org.Organization, error) {
+	org, err := s.store.GetOrganizationById(ctx, p.OrgId)
 	if err != nil {
 		return nil, err
 	}
@@ -42,8 +44,8 @@ func (s *orgService) GetOrganizationById(p *org.GetOrganizationByIdParams) (*org
 	return org, nil
 }
 
-func (s *orgService) GetOrganization(p *org.GetOrganizationParams) (*org.Organization, error) {
-	org, err := s.store.GetOrganization(p.Context, &p.Organization)
+func (s *orgService) GetOrganization(ctx context.Context, p *org.GetOrganizationParams) (*org.Organization, error) {
+	org, err := s.store.GetOrganization(ctx, &p.Organization)
 	if err != nil {
 		return nil, err
 	}
@@ -52,8 +54,8 @@ func (s *orgService) GetOrganization(p *org.GetOrganizationParams) (*org.Organiz
 	return org, nil
 }
 
-func (s *orgService) CreateOrganization(p *org.CreateOrganizationParams) (*org.Organization, error) {
-	org, err := s.store.CreateOrganization(p.Context, &p.Organization)
+func (s *orgService) CreateOrganization(ctx context.Context, p *org.CreateOrganizationParams) (*org.Organization, error) {
+	org, err := s.store.CreateOrganization(ctx, &p.Organization)
 	if err != nil {
 		return nil, err
 	}
@@ -62,12 +64,12 @@ func (s *orgService) CreateOrganization(p *org.CreateOrganizationParams) (*org.O
 	return org, nil
 }
 
-func (s *orgService) UpdateOrganizationById(p *org.UpdateOrganizationByIdParams) error {
-	err := s.store.UpdateOrganizationById(p.Context, p.OrgId, &p.Organization)
+func (s *orgService) UpdateOrganizationById(ctx context.Context, p *org.UpdateOrganizationByIdParams) error {
+	err := s.store.UpdateOrganizationById(ctx, p.OrgId, &p.Organization)
 	return err
 }
 
-func (s *orgService) DeleteOrganizationById(p *org.DeleteOrganizationByIdParams) error {
-	err := s.store.DeleteOrganizationById(p.Context, p.OrgId)
+func (s *orgService) DeleteOrganizationById(ctx context.Context, p *org.DeleteOrganizationByIdParams) error {
+	err := s.store.DeleteOrganizationById(ctx, p.OrgId)
 	return err
 }
