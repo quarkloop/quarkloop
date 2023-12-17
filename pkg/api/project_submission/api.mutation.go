@@ -19,34 +19,32 @@ type CreateAppSubmissionRequest struct {
 	model.AppSubmission
 }
 
-func (s *AppSubmissionApi) CreateAppSubmission(c *gin.Context) {
+func (s *AppSubmissionApi) CreateAppSubmission(ctx *gin.Context) {
 	uriParams := &CreateAppSubmissionUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	req := &CreateAppSubmissionRequest{}
-	if err := c.BindJSON(req); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.BindJSON(req); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	ws, err := s.projectSubmission.CreateAppSubmission(
-		&project_submission.CreateAppSubmissionParams{
-			Context:       c,
-			UserId:        "req.UserId",
-			ProjectId:     uriParams.ProjectId,
-			AppSubmission: &req.AppSubmission,
-		},
+	ws, err := s.projectSubmission.CreateAppSubmission(ctx, &project_submission.CreateAppSubmissionParams{
+		UserId:        "req.UserId",
+		ProjectId:     uriParams.ProjectId,
+		AppSubmission: &req.AppSubmission,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusCreated, ws)
+	ctx.JSON(http.StatusCreated, ws)
 }
 
 type UpdateAppSubmissionByIdUriParams struct {
@@ -57,57 +55,53 @@ type UpdateAppSubmissionByIdRequest struct {
 	model.AppSubmission
 }
 
-func (s *AppSubmissionApi) UpdateAppSubmissionById(c *gin.Context) {
+func (s *AppSubmissionApi) UpdateAppSubmissionById(ctx *gin.Context) {
 	uriParams := &UpdateAppSubmissionByIdUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	req := &UpdateAppSubmissionByIdRequest{}
-	if err := c.BindJSON(req); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.BindJSON(req); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	err := s.projectSubmission.UpdateAppSubmissionById(
-		&project_submission.UpdateAppSubmissionByIdParams{
-			Context:         c,
-			AppSubmissionId: uriParams.SubmissionId,
-			AppSubmission:   &req.AppSubmission,
-		},
+	err := s.projectSubmission.UpdateAppSubmissionById(ctx, &project_submission.UpdateAppSubmissionByIdParams{
+		AppSubmissionId: uriParams.SubmissionId,
+		AppSubmission:   &req.AppSubmission,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, nil)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 type DeleteAppSubmissionByIdUriParams struct {
 	SubmissionId string `uri:"submissionId" binding:"required"`
 }
 
-func (s *AppSubmissionApi) DeleteAppSubmissionById(c *gin.Context) {
+func (s *AppSubmissionApi) DeleteAppSubmissionById(ctx *gin.Context) {
 	uriParams := &DeleteAppSubmissionByIdUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	err := s.projectSubmission.DeleteAppSubmissionById(
-		&project_submission.DeleteAppSubmissionByIdParams{
-			Context:         c,
-			AppSubmissionId: uriParams.SubmissionId,
-		},
+	err := s.projectSubmission.DeleteAppSubmissionById(ctx, &project_submission.DeleteAppSubmissionByIdParams{
+		AppSubmissionId: uriParams.SubmissionId,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusNoContent, nil)
+	ctx.JSON(http.StatusNoContent, nil)
 }
