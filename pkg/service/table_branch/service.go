@@ -1,9 +1,11 @@
 package table_branch
 
+import "context"
+
 type Service interface {
-	ListTableBranches(*GetTableBranchListParams) ([]TableBranch, error)
-	GetTableBranchById(*GetTableBranchByIdParams) (*TableBranch, error)
-	CreateTableBranch(*CreateTableBranchParams) (*TableBranch, error)
-	UpdateTableBranchById(*UpdateTableBranchByIdParams) error
-	DeleteTableBranchById(*DeleteTableBranchByIdParams) error
+	ListTableBranches(context.Context, *GetTableBranchListParams) ([]TableBranch, error)
+	GetTableBranchById(context.Context, *GetTableBranchByIdParams) (*TableBranch, error)
+	CreateTableBranch(context.Context, *CreateTableBranchParams) (*TableBranch, error)
+	UpdateTableBranchById(context.Context, *UpdateTableBranchByIdParams) error
+	DeleteTableBranchById(context.Context, *DeleteTableBranchByIdParams) error
 }
