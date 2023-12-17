@@ -12,26 +12,24 @@ type ListTableSchemasUriParams struct {
 	ProjectId int `uri:"projectId" binding:"required"`
 }
 
-func (s *TableSchemaApi) ListTableSchemas(c *gin.Context) {
+func (s *TableSchemaApi) ListTableSchemas(ctx *gin.Context) {
 	uriParams := &ListTableSchemasUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	projectList, err := s.tableSchemaService.ListTableSchemas(
-		&table_schema.GetTableSchemaListParams{
-			Context:   c,
-			ProjectId: uriParams.ProjectId,
-		},
+	projectList, err := s.tableSchemaService.ListTableSchemas(ctx, &table_schema.GetTableSchemaListParams{
+		ProjectId: uriParams.ProjectId,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, &projectList)
+	ctx.JSON(http.StatusOK, &projectList)
 }
 
 type GetTableSchemaByIdUriParams struct {
@@ -39,25 +37,23 @@ type GetTableSchemaByIdUriParams struct {
 	SchemaId  string `uri:"schemaId" binding:"required"`
 }
 
-func (s *TableSchemaApi) GetTableSchemaById(c *gin.Context) {
+func (s *TableSchemaApi) GetTableSchemaById(ctx *gin.Context) {
 	uriParams := &GetTableSchemaByIdUriParams{}
-	if err := c.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(c, err)
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	project_table, err := s.tableSchemaService.GetTableSchemaById(
-		&table_schema.GetTableSchemaByIdParams{
-			Context:   c,
-			ProjectId: uriParams.ProjectId,
-			SchemaId:  uriParams.SchemaId,
-		},
+	project_table, err := s.tableSchemaService.GetTableSchemaById(ctx, &table_schema.GetTableSchemaByIdParams{
+		ProjectId: uriParams.ProjectId,
+		SchemaId:  uriParams.SchemaId,
+	},
 	)
 	if err != nil {
-		api.AbortWithInternalServerErrorJSON(c, err)
+		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, project_table)
+	ctx.JSON(http.StatusOK, project_table)
 }
