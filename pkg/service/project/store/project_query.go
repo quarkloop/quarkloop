@@ -15,22 +15,23 @@ import (
 
 const listProjectsQuery = `
 SELECT 
-  "id", "sid", "orgId", "workspaceId",
-  "name", "description", "accessType",
-  "createdAt", "createdBy", "updatedAt", "updatedBy"
-FROM 
-  "system"."Project"
+  p."id", p."sid", p."orgId", p."workspaceId", org."sid", ws."sid",
+  p."name", p."description", p."accessType",
+  p."createdAt", p."createdBy", p."updatedAt", p."updatedBy"
+FROM "system"."Project"         AS p
+LEFT JOIN system."Organization" AS org ON org."id" = p."id"
+LEFT JOIN system."Workspace"    AS ws  ON ws."id"  = p."id"
 WHERE
   %s;
 `
 
 func (store *projectStore) ListProjects(ctx context.Context, orgId []int, workspaceId []int) ([]project.Project, error) {
-	var whereClause string = `"accessType" = 1` // TODO: 1 => public, 2 => private
+	var whereClause string = `p."accessType" = 1` // TODO: 1 => public, 2 => private
 	if len(orgId) != 0 {
-		whereClause = `"orgId" = ANY (@orgId)`
+		whereClause = `p."orgId" = ANY (@orgId)`
 	}
 	if len(workspaceId) != 0 {
-		whereClause = `"workspaceId" = ANY (@workspaceId)`
+		whereClause = `p."workspaceId" = ANY (@workspaceId)`
 	}
 	finalQuery := fmt.Sprintf(listProjectsQuery, whereClause)
 
@@ -53,6 +54,8 @@ func (store *projectStore) ListProjects(ctx context.Context, orgId []int, worksp
 			&project.ScopedId,
 			&project.OrgId,
 			&project.WorkspaceId,
+			&project.OrgScopedId,
+			&project.WorkspaceScopedId,
 			&project.Name,
 			&project.Description,
 			&project.AccessType,
@@ -80,14 +83,15 @@ func (store *projectStore) ListProjects(ctx context.Context, orgId []int, worksp
 /// GetProjectById
 
 const getProjectByIdQuery = `
-SELECT
-  "id", "sid", "orgId", "workspaceId",
-  "name", "description", "accessType",
-  "createdAt", "createdBy", "updatedAt", "updatedBy"
-FROM
-  "system"."Project"
+SELECT 
+  p."id", p."sid", p."orgId", p."workspaceId", org."sid", ws."sid",
+  p."name", p."description", p."accessType",
+  p."createdAt", p."createdBy", p."updatedAt", p."updatedBy"
+FROM "system"."Project"         AS p
+LEFT JOIN system."Organization" AS org ON org."id" = p."id"
+LEFT JOIN system."Workspace"    AS ws  ON ws."id"  = p."id"
 WHERE
-  "id" = @id;
+  p."id" = @id;
 `
 
 func (store *projectStore) GetProjectById(ctx context.Context, projectId int) (*project.Project, error) {
@@ -99,6 +103,8 @@ func (store *projectStore) GetProjectById(ctx context.Context, projectId int) (*
 		&project.ScopedId,
 		&project.OrgId,
 		&project.WorkspaceId,
+		&project.OrgScopedId,
+		&project.WorkspaceScopedId,
 		&project.Name,
 		&project.Description,
 		&project.AccessType,
@@ -118,12 +124,13 @@ func (store *projectStore) GetProjectById(ctx context.Context, projectId int) (*
 /// GetProject
 
 const getProjectQuery = `
-SELECT
-  "id", "sid", "orgId", "workspaceId",
-  "name", "description", "accessType",
-  "createdAt", "createdBy", "updatedAt", "updatedBy"
-FROM
-  "system"."Project"
+SELECT 
+  p."id", p."sid", p."orgId", p."workspaceId", org."sid", ws."sid",
+  p."name", p."description", p."accessType",
+  p."createdAt", p."createdBy", p."updatedAt", p."updatedBy"
+FROM "system"."Project"         AS p
+LEFT JOIN system."Organization" AS org ON org."id" = p."id"
+LEFT JOIN system."Workspace"    AS ws  ON ws."id"  = p."id"
 WHERE 
   %s
 ORDER BY "updatedAt" ASC 
@@ -143,19 +150,19 @@ func (store *projectStore) GetProject(ctx context.Context, p *project.Project) (
 		switch v := value.(type) {
 		case int:
 			if v != 0 {
-				availableFields = append(availableFields, fmt.Sprintf("\"%s\" = '%d'", key, v))
+				availableFields = append(availableFields, fmt.Sprintf("p.\"%s\" = '%d'", key, v))
 			}
 		case float64:
 			if v != 0.0 {
-				availableFields = append(availableFields, fmt.Sprintf("\"%s\" = '%f'", key, v))
+				availableFields = append(availableFields, fmt.Sprintf("p.\"%s\" = '%f'", key, v))
 			}
 		case string:
 			if v != "" {
-				availableFields = append(availableFields, fmt.Sprintf("\"%s\" = '%s'", key, v))
+				availableFields = append(availableFields, fmt.Sprintf("p.\"%s\" = '%s'", key, v))
 			}
 		case *time.Time:
 			if v != nil {
-				availableFields = append(availableFields, fmt.Sprintf("\"%s\" = '%s'", key, v))
+				availableFields = append(availableFields, fmt.Sprintf("p.\"%s\" = '%s'", key, v))
 			}
 		}
 	}
@@ -169,6 +176,8 @@ func (store *projectStore) GetProject(ctx context.Context, p *project.Project) (
 		&project.ScopedId,
 		&project.OrgId,
 		&project.WorkspaceId,
+		&project.OrgScopedId,
+		&project.WorkspaceScopedId,
 		&project.Name,
 		&project.Description,
 		&project.AccessType,
