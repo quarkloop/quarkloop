@@ -18,8 +18,7 @@ SELECT
   ws."id", ws."sid", ws."orgId", org."sid",
   ws."name", ws."description", ws."accessType", 
   ws."createdAt", ws."createdBy", ws."updatedAt", ws."updatedBy"
-FROM 
-  "system"."Workspace" AS ws
+FROM "system"."Workspace" AS ws
 LEFT JOIN system."Organization" AS org ON org."id" = ws."id"
 WHERE
   ws."orgId" = ANY (@orgId);
@@ -73,8 +72,7 @@ SELECT
   ws."id", ws."sid", ws."orgId", org."sid",
   ws."name", ws."description", ws."accessType", 
   ws."createdAt", ws."createdBy", ws."updatedAt", ws."updatedBy"
-FROM 
-  "system"."Workspace" AS ws
+FROM "system"."Workspace" AS ws
 LEFT JOIN system."Organization" AS org ON org."id" = ws."id"
 WHERE 
   ws."id" = @id;
@@ -112,8 +110,7 @@ SELECT
   ws."id", ws."sid", ws."orgId", org."sid",
   ws."name", ws."description", ws."accessType", 
   ws."createdAt", ws."createdBy", ws."updatedAt", ws."updatedBy"
-FROM 
-  "system"."Workspace" AS ws
+FROM "system"."Workspace" AS ws
 LEFT JOIN system."Organization" AS org ON org."id" = ws."id"
 WHERE
 %s
