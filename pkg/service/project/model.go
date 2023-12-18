@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/quarkloop/quarkloop/pkg/service/table_branch"
 )
 
 type Project struct {
@@ -16,11 +18,12 @@ type Project struct {
 	OrgScopedId       string `json:"orgScopedId"`
 
 	// data
-	Name        string          `json:"name,omitempty" form:"name,omitempty"`
-	Description string          `json:"description,omitempty"`
-	AccessType  *int            `json:"accessType,omitempty" form:"accessType,omitempty"`
-	Path        string          `json:"path,omitempty"`
-	Metadata    json.RawMessage `json:"metadata,omitempty"`
+	Name        string                      `json:"name,omitempty" form:"name,omitempty"`
+	Description string                      `json:"description,omitempty"`
+	AccessType  *int                        `json:"accessType,omitempty" form:"accessType,omitempty"`
+	Path        string                      `json:"path,omitempty"`
+	Metadata    json.RawMessage             `json:"metadata,omitempty"`
+	Branches    []*table_branch.TableBranch `json:"branches,omitempty"`
 
 	// history
 	CreatedAt time.Time  `json:"createdAt,omitempty" form:"createdAt,omitempty"`
