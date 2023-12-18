@@ -61,7 +61,7 @@ func (s *projectService) CreateProject(ctx context.Context, p *project.CreatePro
 
 	project.GeneratePath()
 
-	s.branchService.CreateTableBranch(ctx, &table_branch.CreateTableBranchParams{
+	mainBranch, err := s.branchService.CreateTableBranch(ctx, &table_branch.CreateTableBranchParams{
 		ProjectId: project.Id,
 		Branch: &table_branch.TableBranch{
 			Name:        "main",
@@ -71,6 +71,25 @@ func (s *projectService) CreateProject(ctx context.Context, p *project.CreatePro
 			CreatedBy:   "user",
 		},
 	})
+	if err != nil {
+		return nil, err
+	}
+	project.Branches = append(project.Branches, mainBranch)
+
+	submissionBranch, err := s.branchService.CreateTableBranch(ctx, &table_branch.CreateTableBranchParams{
+		ProjectId: project.Id,
+		Branch: &table_branch.TableBranch{
+			Name:        "submission",
+			Type:        "submission",
+			Default:     false,
+			Description: "submission branch",
+			CreatedBy:   "user",
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	project.Branches = append(project.Branches, submissionBranch)
 
 	return project, nil
 }
