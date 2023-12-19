@@ -5,17 +5,20 @@ import (
 
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/project/store"
+	"github.com/quarkloop/quarkloop/pkg/service/quota"
 	"github.com/quarkloop/quarkloop/pkg/service/table_branch"
 )
 
 type projectService struct {
 	store         store.ProjectStore
+	quotaService  quota.Service
 	branchService table_branch.Service
 }
 
-func NewProjectService(ds store.ProjectStore, branchService table_branch.Service) project.Service {
+func NewProjectService(ds store.ProjectStore, quotaService quota.Service, branchService table_branch.Service) project.Service {
 	return &projectService{
 		store:         ds,
+		quotaService:  quotaService,
 		branchService: branchService,
 	}
 }
@@ -54,6 +57,11 @@ func (s *projectService) GetProject(ctx context.Context, p *project.GetProjectPa
 }
 
 func (s *projectService) CreateProject(ctx context.Context, p *project.CreateProjectParams) (*project.Project, error) {
+	_, err := s.quotaService.CheckWorkspaceQuotaReached(ctx, p.WorkspaceId)
+	if err != nil {
+		return nil, err
+	}
+
 	project, err := s.store.CreateProject(ctx, p.OrgId, p.WorkspaceId, &p.Project)
 	if err != nil {
 		return nil, err
