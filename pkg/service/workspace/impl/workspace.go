@@ -3,17 +3,20 @@ package workspace_impl
 import (
 	"context"
 
+	"github.com/quarkloop/quarkloop/pkg/service/quota"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace/store"
 )
 
 type workspaceService struct {
-	store store.WorkspaceStore
+	store        store.WorkspaceStore
+	quotaService quota.Service
 }
 
-func NewWorkspaceService(ds store.WorkspaceStore) workspace.Service {
+func NewWorkspaceService(ds store.WorkspaceStore, quotaService quota.Service) workspace.Service {
 	return &workspaceService{
-		store: ds,
+		store:        ds,
+		quotaService: quotaService,
 	}
 }
 
@@ -51,6 +54,11 @@ func (s *workspaceService) GetWorkspace(ctx context.Context, p *workspace.GetWor
 }
 
 func (s *workspaceService) CreateWorkspace(ctx context.Context, p *workspace.CreateWorkspaceParams) (*workspace.Workspace, error) {
+	_, err := s.quotaService.CheckWorkspaceQuotaReached(ctx, p.OrgId)
+	if err != nil {
+		return nil, err
+	}
+
 	workspace, err := s.store.CreateWorkspace(ctx, p.OrgId, &p.Workspace)
 	if err != nil {
 		return nil, err
