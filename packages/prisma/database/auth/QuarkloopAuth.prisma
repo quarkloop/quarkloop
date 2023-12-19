@@ -27,8 +27,8 @@ model User {
 
     // history
     createdAt DateTime  @default(now())
-    updatedAt DateTime?
     createdBy String?
+    updatedAt DateTime?
     updatedBy String?
 
     // relation
