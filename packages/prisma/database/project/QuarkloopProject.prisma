@@ -22,8 +22,8 @@ model TableBranch {
 
     // history
     createdAt DateTime  @default(now())
-    updatedAt DateTime?
     createdBy String
+    updatedAt DateTime?
     updatedBy String?
 
     // relation
@@ -50,8 +50,8 @@ model TableSchema {
 
     // history
     createdAt DateTime  @default(now())
-    updatedAt DateTime?
     createdBy String
+    updatedAt DateTime?
     updatedBy String?
 
     // relation
@@ -77,8 +77,8 @@ model TableMain {
 
     // history
     createdAt DateTime  @default(now())
-    updatedAt DateTime?
     createdBy String
+    updatedAt DateTime?
     updatedBy String?
 
     // relation
@@ -107,8 +107,8 @@ model TableDocument {
 
     // history
     createdAt DateTime  @default(now())
-    updatedAt DateTime?
     createdBy String
+    updatedAt DateTime?
     updatedBy String?
 
     // relation
@@ -137,8 +137,8 @@ model TablePayment {
 
     // history
     createdAt DateTime  @default(now())
-    updatedAt DateTime?
     createdBy String
+    updatedAt DateTime?
     updatedBy String?
 
     // relation
@@ -167,8 +167,8 @@ model TableForm {
 
     // history
     createdAt DateTime  @default(now())
-    updatedAt DateTime?
     createdBy String
+    updatedAt DateTime?
     updatedBy String?
 
     // relation
@@ -194,8 +194,8 @@ model App {
 
     // history
     createdAt DateTime  @default(now())
-    updatedAt DateTime?
     createdBy String
+    updatedAt DateTime?
     updatedBy String?
 
     @@schema("project")
@@ -216,8 +216,8 @@ model AppSubmission {
 
     // history
     createdAt DateTime  @default(now())
-    updatedAt DateTime?
     createdBy String
+    updatedAt DateTime?
     updatedBy String?
 
     // relation
@@ -239,8 +239,8 @@ model AppDiscussion {
 
     // history
     createdAt DateTime  @default(now())
-    updatedAt DateTime?
     createdBy String
+    updatedAt DateTime?
     updatedBy String?
 
     // relation
