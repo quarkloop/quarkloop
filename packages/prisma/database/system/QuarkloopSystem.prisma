@@ -23,13 +23,14 @@ model Organization {
 
     // history
     createdAt DateTime  @default(now())
-    updatedAt DateTime?
     createdBy String
+    updatedAt DateTime?
     updatedBy String?
 
     // relation
     workspaces Workspace[]
     projects   Project[]
+    users      User[]
 
     @@schema("system")
 }
@@ -48,13 +49,14 @@ model Workspace {
 
     // history
     createdAt DateTime  @default(now())
-    updatedAt DateTime?
     createdBy String
+    updatedAt DateTime?
     updatedBy String?
 
     // relation
     organization Organization @relation(fields: [orgId], references: [id])
     projects     Project[]
+    users        User[]
 
     @@unique([orgId, sid])
     @@index([orgId])
@@ -76,16 +78,39 @@ model Project {
 
     // history
     createdAt DateTime  @default(now())
-    updatedAt DateTime?
     createdBy String
+    updatedAt DateTime?
     updatedBy String?
 
     // relation
     organization Organization @relation(fields: [orgId], references: [id])
     workspace    Workspace    @relation(fields: [workspaceId], references: [id])
+    users        User[]
 
     @@unique([orgId, workspaceId, sid])
     @@index([orgId, workspaceId])
     @@index([orgId])
+    @@schema("system")
+}
+
+model User {
+    // id
+    id          Int  @id @default(autoincrement())
+    userId      Int
+    orgId       Int
+    workspaceId Int?
+    projectId   Int?
+
+    // history
+    createdAt DateTime  @default(now())
+    createdBy String
+    updatedAt DateTime?
+    updatedBy String?
+
+    // relation
+    org       Organization @relation(fields: [orgId], references: [id])
+    workspace Workspace?   @relation(fields: [workspaceId], references: [id])
+    project   Project?     @relation(fields: [projectId], references: [id])
+
     @@schema("system")
 }
