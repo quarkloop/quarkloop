@@ -5,19 +5,18 @@ import (
 
 	org "github.com/quarkloop/quarkloop/pkg/service/organization"
 	"github.com/quarkloop/quarkloop/pkg/service/organization/store"
+	"github.com/quarkloop/quarkloop/pkg/service/quota"
 )
 
 type orgService struct {
-	store store.OrgStore
-
-	UserService      interface{}
-	WorkspaceService interface{}
-	QuotaService     interface{}
+	store        store.OrgStore
+	quotaService quota.Service
 }
 
-func NewOrganizationService(ds store.OrgStore) org.Service {
+func NewOrganizationService(ds store.OrgStore, quota quota.Service) org.Service {
 	return &orgService{
-		store: ds,
+		store:        ds,
+		quotaService: quota,
 	}
 }
 
@@ -55,6 +54,12 @@ func (s *orgService) GetOrganization(ctx context.Context, p *org.GetOrganization
 }
 
 func (s *orgService) CreateOrganization(ctx context.Context, p *org.CreateOrganizationParams) (*org.Organization, error) {
+	userId := ctx.Value("userId").(int)
+	_, err := s.quotaService.CheckOrgQuotaReached(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+
 	org, err := s.store.CreateOrganization(ctx, &p.Organization)
 	if err != nil {
 		return nil, err
