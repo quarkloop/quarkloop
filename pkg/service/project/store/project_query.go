@@ -19,8 +19,8 @@ SELECT
   p."name", p."description", p."accessType",
   p."createdAt", p."createdBy", p."updatedAt", p."updatedBy"
 FROM "system"."Project"         AS p
-LEFT JOIN system."Organization" AS org ON org."id" = p."id"
-LEFT JOIN system."Workspace"    AS ws  ON ws."id"  = p."id"
+LEFT JOIN system."Organization" AS org ON org."id" = p."orgId"
+LEFT JOIN system."Workspace"    AS ws  ON ws."id"  = p."workspaceId"
 WHERE
   %s;
 `
@@ -88,8 +88,8 @@ SELECT
   p."name", p."description", p."accessType",
   p."createdAt", p."createdBy", p."updatedAt", p."updatedBy"
 FROM "system"."Project"         AS p
-LEFT JOIN system."Organization" AS org ON org."id" = p."id"
-LEFT JOIN system."Workspace"    AS ws  ON ws."id"  = p."id"
+LEFT JOIN system."Organization" AS org ON org."id" = p."orgId"
+LEFT JOIN system."Workspace"    AS ws  ON ws."id"  = p."workspaceId"
 WHERE
   p."id" = @id;
 `
@@ -129,8 +129,8 @@ SELECT
   p."name", p."description", p."accessType",
   p."createdAt", p."createdBy", p."updatedAt", p."updatedBy"
 FROM "system"."Project"         AS p
-LEFT JOIN system."Organization" AS org ON org."id" = p."id"
-LEFT JOIN system."Workspace"    AS ws  ON ws."id"  = p."id"
+LEFT JOIN system."Organization" AS org ON org."id" = p."orgId"
+LEFT JOIN system."Workspace"    AS ws  ON ws."id"  = p."workspaceId"
 WHERE 
   %s
 ORDER BY "updatedAt" ASC 
