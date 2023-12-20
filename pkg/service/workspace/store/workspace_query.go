@@ -19,7 +19,7 @@ SELECT
   ws."name", ws."description", ws."accessType", 
   ws."createdAt", ws."createdBy", ws."updatedAt", ws."updatedBy"
 FROM "system"."Workspace" AS ws
-LEFT JOIN system."Organization" AS org ON org."id" = ws."id"
+LEFT JOIN system."Organization" AS org ON org."id" = ws."orgId"
 WHERE
   ws."orgId" = ANY (@orgId);
 `
@@ -73,7 +73,7 @@ SELECT
   ws."name", ws."description", ws."accessType", 
   ws."createdAt", ws."createdBy", ws."updatedAt", ws."updatedBy"
 FROM "system"."Workspace" AS ws
-LEFT JOIN system."Organization" AS org ON org."id" = ws."id"
+LEFT JOIN system."Organization" AS org ON org."id" = ws."orgId"
 WHERE 
   ws."id" = @id;
 `
@@ -111,7 +111,7 @@ SELECT
   ws."name", ws."description", ws."accessType", 
   ws."createdAt", ws."createdBy", ws."updatedAt", ws."updatedBy"
 FROM "system"."Workspace" AS ws
-LEFT JOIN system."Organization" AS org ON org."id" = ws."id"
+LEFT JOIN system."Organization" AS org ON org."id" = ws."orgId"
 WHERE
 %s
 ORDER BY "updatedAt" ASC
