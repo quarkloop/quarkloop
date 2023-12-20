@@ -11,7 +11,6 @@ type QuotaStore interface {
 	// allocation quotas
 	GetQuotasByUserId(context.Context, int) (quota.Quota, error)
 	GetQuotasByOrgId(context.Context, int) ([]quota.Quota, error)
-	GetQuotasByWorkspaceId(context.Context, int) ([]quota.Quota, error)
 
 	// quota overrides
 	UpdateQuotaLimits(context.Context, int, QuoataLimit) error
