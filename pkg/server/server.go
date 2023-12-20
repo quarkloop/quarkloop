@@ -1,6 +1,7 @@
 package server
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -101,6 +102,24 @@ func NewDefaultServer(ds *repository.Repository) Server {
 	return serve
 }
 
+func (s *Server) UserAuth(ctx *gin.Context) {
+	req, _ := http.NewRequest("GET", "http://localhost:3001/api/auth/check", nil)
+	req.Header = ctx.Request.Header.Clone()
+
+	client := http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, err)
+		return
+	}
+	if resp.StatusCode != http.StatusOK {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	ctx.Next()
+}
+
 func (s *Server) BindHandlers(api *api.ServerApi) {
 	router := s.router.Group("/api/v1")
 
@@ -126,6 +145,7 @@ func (s *Server) BindHandlers(api *api.ServerApi) {
 
 	// Projects apis
 	projectGroup := router.Group("/projects")
+	projectGroup.Use(s.UserAuth)
 	projectGroup.GET("", s.projectApi.GetProjectList)
 	projectGroup.POST("", s.projectApi.CreateProject)
 	projectGroup.GET("/:projectId", s.projectApi.GetProjectById)
