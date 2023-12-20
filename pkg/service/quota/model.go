@@ -5,10 +5,10 @@ import "errors"
 type QuotaFeature string
 
 var (
-	OrgQuota       QuotaFeature = "org_quota"
-	OrgUserQuota   QuotaFeature = "org_user_quota"
-	WorkspaceQuota QuotaFeature = "workspace_quota"
-	ProjectQuota   QuotaFeature = "project_quota"
+	OrgCount       QuotaFeature = "org_count"
+	OrgUserCount   QuotaFeature = "org_user_count"
+	WorkspaceCount QuotaFeature = "workspace_count"
+	ProjectCount   QuotaFeature = "project_count"
 )
 
 var (
@@ -22,6 +22,7 @@ var (
 	ErrOrgQuotaReached       error = errors.New("org quota reached")
 	ErrOrgUserQuotaReached   error = errors.New("org user quota reached")
 	ErrWorkspaceQuotaReached error = errors.New("workspace quota reached")
+	ErrProjectQuotaReached   error = errors.New("project quota reached")
 	ErrUnableToFindFeature   error = errors.New("unable to find quota feature")
 )
 
