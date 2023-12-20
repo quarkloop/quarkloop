@@ -144,13 +144,16 @@ const getQuotasByOrgIdQuery = `
 SELECT feature, metric 
 FROM (
 	SELECT 
-	   COUNT(DISTINCT w.id)  AS workspace_count,
-	   COUNT(DISTINCT wu.id) AS org_user_count
+	   COUNT(DISTINCT w.id) AS workspace_count,
+	   COUNT(DISTINCT p.id) AS project_count,
+	   COUNT(DISTINCT u.id) AS org_user_count
 	FROM 
-	  "system"."Workspace"    As w
-	LEFT JOIN "system"."User" AS wu ON wu."orgId" = w."orgId"
+	  "system"."Organization"      As o
+	LEFT JOIN "system"."Workspace" AS w ON w."orgId" = o."id"
+	LEFT JOIN "system"."Project"   AS p ON p."orgId" = o."id"
+	LEFT JOIN "system"."User"      AS u ON u."orgId" = o."id"
 	WHERE
-	  w."orgId" = @orgId
+	  o."id" = @orgId
 ) AS metrics
 CROSS JOIN jsonb_each_text(to_jsonb(metrics)) as cols(feature, metric);
 `
@@ -158,51 +161,6 @@ CROSS JOIN jsonb_each_text(to_jsonb(metrics)) as cols(feature, metric);
 func (store *quotaStore) GetQuotasByOrgId(ctx context.Context, orgId int) ([]quota.Quota, error) {
 	rows, err := store.Conn.Query(ctx, getQuotasByOrgIdQuery, pgx.NamedArgs{
 		"orgId": orgId,
-	})
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
-		return nil, err
-	}
-	defer rows.Close()
-
-	var quotaList []quota.Quota = []quota.Quota{}
-
-	for rows.Next() {
-		var quota quota.Quota
-		if err := rows.Scan(&quota.Feature, &quota.Metric); err != nil {
-			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
-			return nil, err
-		}
-
-		quotaList = append(quotaList, quota)
-	}
-
-	if err := rows.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
-		return nil, err
-	}
-
-	return quotaList, nil
-}
-
-/// GetQuotasByWorkspaceId
-
-const getQuotasByWorkspaceIdQuery = `
-SELECT feature, metric 
-FROM (
-	SELECT 
-	   COUNT(DISTINCT id) AS project_count,
-	FROM 
-	  "system"."Project" 
-	WHERE 
-	  "workspaceId" = @workspaceId
-) AS metrics
-CROSS JOIN jsonb_each_text(to_jsonb(metrics)) as cols(feature, metric);
-`
-
-func (store *quotaStore) GetQuotasByWorkspaceId(ctx context.Context, workspaceId int) ([]quota.Quota, error) {
-	rows, err := store.Conn.Query(ctx, getQuotasByWorkspaceIdQuery, pgx.NamedArgs{
-		"workspaceId": workspaceId,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
