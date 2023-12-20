@@ -6,11 +6,11 @@ type Service interface {
 	// allocation quotas
 	GetQuotasByUserId(context.Context, int) (Quota, error)
 	GetQuotasByOrgId(context.Context, int) ([]Quota, error)
-	GetQuotasByWorkspaceId(context.Context, int) ([]Quota, error)
 
-	CheckOrgQuotaReached(context.Context, int) (bool, error)
-	CheckOrgUserQuotaReached(context.Context, int) (bool, error)
-	CheckWorkspaceQuotaReached(context.Context, int) (bool, error)
+	CheckCreateOrgQuotaReached(ctx context.Context, userId int) error
+	CheckCreateOrgUserQuotaReached(ctx context.Context, orgId int) error
+	CheckCreateWorkspaceQuotaReached(ctx context.Context, orgId int) error
+	CheckCreateProjectQuotaReached(ctx context.Context, orgId int) error
 
 	// overrides
 	// OverrideOrgUserQuotaLimit(context.Context, int) error
