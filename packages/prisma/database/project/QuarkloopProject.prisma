@@ -12,8 +12,8 @@ datasource db {
 
 model TableBranch {
     // id
-    id        Int @id @default(autoincrement())
-    projectId Int
+    id        BigInt @id @default(autoincrement())
+    projectId BigInt
 
     // branch
     name        String
@@ -39,8 +39,8 @@ model TableBranch {
 
 model TableSchema {
     // id
-    id        Int @id @default(autoincrement())
-    projectId Int
+    id        BigInt @id @default(autoincrement())
+    projectId BigInt
 
     // schema
     name        String
@@ -65,9 +65,9 @@ model TableSchema {
 
 model TableMain {
     // id
-    id        Int @id @default(autoincrement())
-    projectId Int
-    branchId  Int
+    id        BigInt @id @default(autoincrement())
+    projectId BigInt
+    branchId  BigInt
 
     // main
     name        String
@@ -93,11 +93,11 @@ model TableMain {
 
 model TableDocument {
     // id
-    id        Int @id @default(autoincrement())
-    projectId Int
-    branchId  Int
-    mainId    Int
-    schemaId  Int
+    id        BigInt @id @default(autoincrement())
+    projectId BigInt
+    branchId  BigInt
+    mainId    BigInt
+    schemaId  BigInt
 
     // document
     name        String
@@ -123,11 +123,11 @@ model TableDocument {
 
 model TablePayment {
     // id
-    id        Int @id @default(autoincrement())
-    projectId Int
-    branchId  Int
-    mainId    Int
-    schemaId  Int
+    id        BigInt @id @default(autoincrement())
+    projectId BigInt
+    branchId  BigInt
+    mainId    BigInt
+    schemaId  BigInt
 
     // payment
     name        String
@@ -153,11 +153,11 @@ model TablePayment {
 
 model TableForm {
     // id
-    id        Int @id @default(autoincrement())
-    projectId Int
-    branchId  Int
-    mainId    Int
-    schemaId  Int
+    id        BigInt @id @default(autoincrement())
+    projectId BigInt
+    branchId  BigInt
+    mainId    BigInt
+    schemaId  BigInt
 
     // form
     name        String
@@ -183,8 +183,8 @@ model TableForm {
 
 model App {
     // id
-    id        Int @id @default(autoincrement())
-    projectId Int
+    id        BigInt @id @default(autoincrement())
+    projectId BigInt
 
     // app
     name        String
@@ -203,8 +203,8 @@ model App {
 
 model AppSubmission {
     // id
-    id        Int @id @default(autoincrement())
-    projectId Int
+    id        BigInt @id @default(autoincrement())
+    projectId BigInt
 
     // submission
     title    String
@@ -228,8 +228,8 @@ model AppSubmission {
 
 model AppDiscussion {
     // id
-    id           Int @id @default(autoincrement())
-    submissionId Int
+    id           BigInt @id @default(autoincrement())
+    submissionId BigInt
 
     // discussion
     name        String
