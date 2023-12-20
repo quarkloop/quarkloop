@@ -12,7 +12,7 @@ datasource db {
 
 model Organization {
     // id
-    id  Int    @id @default(autoincrement())
+    id  BigInt @id @default(autoincrement())
     sid String @unique // scoped id
 
     // organization
@@ -37,8 +37,8 @@ model Organization {
 
 model Workspace {
     // id
-    id    Int    @id @default(autoincrement())
-    orgId Int
+    id    BigInt @id @default(autoincrement())
+    orgId BigInt
     sid   String // scoped id
 
     // workspace
@@ -65,9 +65,9 @@ model Workspace {
 
 model Project {
     // id
-    id          Int    @id @default(autoincrement())
-    orgId       Int
-    workspaceId Int
+    id          BigInt @id @default(autoincrement())
+    orgId       BigInt
+    workspaceId BigInt
     sid         String // scoped id
 
     // project
@@ -95,11 +95,11 @@ model Project {
 
 model User {
     // id
-    id          Int  @id @default(autoincrement())
-    userId      Int
-    orgId       Int
-    workspaceId Int?
-    projectId   Int?
+    id          BigInt  @id @default(autoincrement())
+    userId      BigInt
+    orgId       BigInt
+    workspaceId BigInt?
+    projectId   BigInt?
 
     // history
     createdAt DateTime  @default(now())
