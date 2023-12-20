@@ -35,59 +35,68 @@ func (s *quotaService) GetQuotasByOrgId(ctx context.Context, orgId int) ([]quota
 	return q, nil
 }
 
-func (s *quotaService) GetQuotasByWorkspaceId(ctx context.Context, workspaceId int) ([]quota.Quota, error) {
-	q, err := s.store.GetQuotasByWorkspaceId(ctx, workspaceId)
-	if err != nil {
-		return []quota.Quota{}, err
-	}
-
-	return q, nil
-}
-
-func (s *quotaService) CheckOrgQuotaReached(ctx context.Context, userId int) (bool, error) {
+func (s *quotaService) CheckCreateOrgQuotaReached(ctx context.Context, userId int) error {
 	q, err := s.store.GetQuotasByUserId(ctx, userId)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	if q.CheckQuotaReached() {
-		return true, nil
+		return quota.ErrOrgQuotaReached
 	}
-	return false, quota.ErrOrgQuotaReached
+	return nil
 }
 
-func (s *quotaService) CheckOrgUserQuotaReached(ctx context.Context, orgId int) (bool, error) {
+func (s *quotaService) CheckCreateOrgUserQuotaReached(ctx context.Context, orgId int) error {
 	q, err := s.store.GetQuotasByOrgId(ctx, orgId)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	for _, v := range q {
-		if v.Feature == quota.OrgUserQuota {
+		if v.Feature == quota.OrgUserCount {
 			if v.CheckQuotaReached() {
-				return true, nil
+				return quota.ErrOrgUserQuotaReached
 			}
-			return false, quota.ErrOrgUserQuotaReached
+			return nil
 		}
 	}
 
-	return false, quota.ErrUnableToFindFeature
+	return quota.ErrUnableToFindFeature
 }
 
-func (s *quotaService) CheckWorkspaceQuotaReached(ctx context.Context, workspaceId int) (bool, error) {
-	q, err := s.store.GetQuotasByWorkspaceId(ctx, workspaceId)
+func (s *quotaService) CheckCreateWorkspaceQuotaReached(ctx context.Context, orgId int) error {
+	q, err := s.store.GetQuotasByOrgId(ctx, orgId)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	for _, v := range q {
-		if v.Feature == quota.WorkspaceQuota {
+		if v.Feature == quota.WorkspaceCount {
 			if v.CheckQuotaReached() {
-				return true, nil
+				return quota.ErrWorkspaceQuotaReached
 			}
-			return false, quota.ErrWorkspaceQuotaReached
+			return nil
 		}
 	}
 
-	return false, quota.ErrUnableToFindFeature
+	return quota.ErrUnableToFindFeature
+}
+
+func (s *quotaService) CheckCreateProjectQuotaReached(ctx context.Context, orgId int) error {
+	q, err := s.store.GetQuotasByOrgId(ctx, orgId)
+	if err != nil {
+		return err
+	}
+
+	for _, v := range q {
+		if v.Feature == quota.ProjectCount {
+			if v.CheckQuotaReached() {
+				return quota.ErrProjectQuotaReached
+			}
+			return nil
+		}
+	}
+
+	return quota.ErrUnableToFindFeature
 }
