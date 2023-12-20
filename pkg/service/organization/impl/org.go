@@ -55,7 +55,7 @@ func (s *orgService) GetOrganization(ctx context.Context, p *org.GetOrganization
 
 func (s *orgService) CreateOrganization(ctx context.Context, p *org.CreateOrganizationParams) (*org.Organization, error) {
 	userId := ctx.Value("userId").(int)
-	_, err := s.quotaService.CheckOrgQuotaReached(ctx, userId)
+	err := s.quotaService.CheckCreateOrgQuotaReached(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
