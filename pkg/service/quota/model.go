@@ -19,11 +19,11 @@ var (
 )
 
 var (
-	ErrOrgQuotaReached       error = errors.New("org quota reached")
-	ErrOrgUserQuotaReached   error = errors.New("org user quota reached")
-	ErrWorkspaceQuotaReached error = errors.New("workspace quota reached")
-	ErrProjectQuotaReached   error = errors.New("project quota reached")
-	ErrUnableToFindFeature   error = errors.New("unable to find quota feature")
+	ErrOrgQuotaReached       = errors.New("org quota reached")
+	ErrOrgUserQuotaReached   = errors.New("org user quota reached")
+	ErrWorkspaceQuotaReached = errors.New("workspace quota reached")
+	ErrProjectQuotaReached   = errors.New("project quota reached")
+	ErrUnableToFindFeature   = errors.New("unable to find quota feature")
 )
 
 type Quota struct {
