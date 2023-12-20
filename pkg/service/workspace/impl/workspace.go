@@ -54,7 +54,7 @@ func (s *workspaceService) GetWorkspace(ctx context.Context, p *workspace.GetWor
 }
 
 func (s *workspaceService) CreateWorkspace(ctx context.Context, p *workspace.CreateWorkspaceParams) (*workspace.Workspace, error) {
-	_, err := s.quotaService.CheckWorkspaceQuotaReached(ctx, p.OrgId)
+	err := s.quotaService.CheckCreateWorkspaceQuotaReached(ctx, p.OrgId)
 	if err != nil {
 		return nil, err
 	}
