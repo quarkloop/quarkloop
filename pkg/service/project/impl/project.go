@@ -57,7 +57,7 @@ func (s *projectService) GetProject(ctx context.Context, p *project.GetProjectPa
 }
 
 func (s *projectService) CreateProject(ctx context.Context, p *project.CreateProjectParams) (*project.Project, error) {
-	_, err := s.quotaService.CheckWorkspaceQuotaReached(ctx, p.WorkspaceId)
+	err := s.quotaService.CheckCreateProjectQuotaReached(ctx, p.OrgId)
 	if err != nil {
 		return nil, err
 	}
