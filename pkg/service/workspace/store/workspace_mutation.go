@@ -16,12 +16,12 @@ import (
 
 const createWorkspaceMutation = `
 INSERT INTO
-  "system"."Workspace" ("orgId", "sid", "name", "description", "accessType", "createdBy")
+  "system"."Workspace" ("orgId", "sid", "name", "description", "visibility", "createdBy")
 VALUES
-  (@orgId, @sid, @name, @description, @accessType, @createdBy)
+  (@orgId, @sid, @name, @description, @visibility, @createdBy)
 RETURNING 
   "id", "sid", "orgId",
-  "name", "description", "accessType",
+  "name", "description", "visibility",
   "createdAt", "createdBy", "updatedAt", "updatedBy";
 `
 
@@ -42,7 +42,7 @@ func (store *workspaceStore) CreateWorkspace(ctx context.Context, orgId int, ws 
 			"sid":         ws.ScopedId,
 			"name":        ws.Name,
 			"description": ws.Description,
-			"accessType":  ws.AccessType,
+			"visibility":  ws.Visibility,
 			"createdBy":   ws.CreatedBy,
 		},
 	)
@@ -54,7 +54,7 @@ func (store *workspaceStore) CreateWorkspace(ctx context.Context, orgId int, ws 
 		&workspace.OrgId,
 		&workspace.Name,
 		&workspace.Description,
-		&workspace.AccessType,
+		&workspace.Visibility,
 		&workspace.CreatedAt,
 		&workspace.CreatedBy,
 		&workspace.UpdatedAt,
@@ -77,7 +77,7 @@ SET
   "sid"         = @sid,
   "name"        = @name,
   "description" = @description,
-  "accessType"  = @accessType,
+  "visibility"  = @visibility,
   "updatedAt"   = @updatedAt,
   "updatedBy"   = @updatedBy,
 WHERE
@@ -93,7 +93,7 @@ func (store *workspaceStore) UpdateWorkspaceById(ctx context.Context, workspaceI
 			"sid":         workspace.ScopedId,
 			"name":        workspace.Name,
 			"description": workspace.Description,
-			"accessType":  *workspace.AccessType,
+			"visibility":  *workspace.Visibility,
 			"updatedAt":   time.Now(),
 			"updatedBy":   workspace.UpdatedBy,
 		},
