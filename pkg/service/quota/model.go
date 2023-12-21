@@ -27,9 +27,9 @@ var (
 )
 
 type Quota struct {
-	Feature QuotaFeature `json:"feature,omitempty"`
-	Limit   int          `json:"limit,omitempty"`
-	Metric  int          `json:"metric,omitempty"`
+	Feature QuotaFeature `json:"feature"`
+	Limit   int          `json:"limit"`
+	Metric  int          `json:"metric"`
 }
 
 func (q *Quota) CheckQuotaReached() bool {
