@@ -16,7 +16,7 @@ import (
 const listProjectsQuery = `
 SELECT 
   p."id", p."sid", p."orgId", p."workspaceId", org."sid", ws."sid",
-  p."name", p."description", p."accessType",
+  p."name", p."description", p."visibility",
   p."createdAt", p."createdBy", p."updatedAt", p."updatedBy"
 FROM "system"."Project"         AS p
 LEFT JOIN system."Organization" AS org ON org."id" = p."orgId"
@@ -26,7 +26,7 @@ WHERE
 `
 
 func (store *projectStore) ListProjects(ctx context.Context, orgId []int, workspaceId []int) ([]project.Project, error) {
-	var whereClause string = `p."accessType" = 1` // TODO: 1 => public, 2 => private
+	var whereClause string = `p."visibility" = 1` // TODO: 1 => public, 2 => private
 	if len(orgId) != 0 {
 		whereClause = `p."orgId" = ANY (@orgId)`
 	}
@@ -58,7 +58,7 @@ func (store *projectStore) ListProjects(ctx context.Context, orgId []int, worksp
 			&project.WorkspaceScopedId,
 			&project.Name,
 			&project.Description,
-			&project.AccessType,
+			&project.Visibility,
 			&project.CreatedAt,
 			&project.CreatedBy,
 			&project.UpdatedAt,
@@ -85,7 +85,7 @@ func (store *projectStore) ListProjects(ctx context.Context, orgId []int, worksp
 const getProjectByIdQuery = `
 SELECT 
   p."id", p."sid", p."orgId", p."workspaceId", org."sid", ws."sid",
-  p."name", p."description", p."accessType",
+  p."name", p."description", p."visibility",
   p."createdAt", p."createdBy", p."updatedAt", p."updatedBy"
 FROM "system"."Project"         AS p
 LEFT JOIN system."Organization" AS org ON org."id" = p."orgId"
@@ -107,7 +107,7 @@ func (store *projectStore) GetProjectById(ctx context.Context, projectId int) (*
 		&project.WorkspaceScopedId,
 		&project.Name,
 		&project.Description,
-		&project.AccessType,
+		&project.Visibility,
 		&project.CreatedAt,
 		&project.CreatedBy,
 		&project.UpdatedAt,
@@ -126,7 +126,7 @@ func (store *projectStore) GetProjectById(ctx context.Context, projectId int) (*
 const getProjectQuery = `
 SELECT 
   p."id", p."sid", p."orgId", p."workspaceId", org."sid", ws."sid",
-  p."name", p."description", p."accessType",
+  p."name", p."description", p."visibility",
   p."createdAt", p."createdBy", p."updatedAt", p."updatedBy"
 FROM "system"."Project"         AS p
 LEFT JOIN system."Organization" AS org ON org."id" = p."orgId"
@@ -142,7 +142,7 @@ func (store *projectStore) GetProject(ctx context.Context, p *project.Project) (
 	projectFields := map[string]interface{}{
 		"sid":        p.ScopedId,
 		"name":       p.Name,
-		"accessType": p.AccessType,
+		"visibility": p.Visibility,
 		"createdAt":  p.CreatedAt,
 		"updatedAt":  p.UpdatedAt,
 	}
@@ -180,7 +180,7 @@ func (store *projectStore) GetProject(ctx context.Context, p *project.Project) (
 		&project.WorkspaceScopedId,
 		&project.Name,
 		&project.Description,
-		&project.AccessType,
+		&project.Visibility,
 		&project.CreatedAt,
 		&project.CreatedBy,
 		&project.UpdatedAt,
