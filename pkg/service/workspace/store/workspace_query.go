@@ -16,7 +16,7 @@ import (
 const listWorkspacesQuery = `
 SELECT 
   ws."id", ws."sid", ws."orgId", org."sid",
-  ws."name", ws."description", ws."accessType", 
+  ws."name", ws."description", ws."visibility", 
   ws."createdAt", ws."createdBy", ws."updatedAt", ws."updatedBy"
 FROM "system"."Workspace" AS ws
 LEFT JOIN system."Organization" AS org ON org."id" = ws."orgId"
@@ -43,7 +43,7 @@ func (store *workspaceStore) ListWorkspaces(ctx context.Context, orgId []int) ([
 			&workspace.OrgScopedId,
 			&workspace.Name,
 			&workspace.Description,
-			&workspace.AccessType,
+			&workspace.Visibility,
 			&workspace.CreatedAt,
 			&workspace.CreatedBy,
 			&workspace.UpdatedAt,
@@ -70,7 +70,7 @@ func (store *workspaceStore) ListWorkspaces(ctx context.Context, orgId []int) ([
 const getWorkspaceByIdQuery = `
 SELECT 
   ws."id", ws."sid", ws."orgId", org."sid",
-  ws."name", ws."description", ws."accessType", 
+  ws."name", ws."description", ws."visibility", 
   ws."createdAt", ws."createdBy", ws."updatedAt", ws."updatedBy"
 FROM "system"."Workspace" AS ws
 LEFT JOIN system."Organization" AS org ON org."id" = ws."orgId"
@@ -89,7 +89,7 @@ func (store *workspaceStore) GetWorkspaceById(ctx context.Context, workspaceId i
 		&workspace.OrgScopedId,
 		&workspace.Name,
 		&workspace.Description,
-		&workspace.AccessType,
+		&workspace.Visibility,
 		&workspace.CreatedAt,
 		&workspace.CreatedBy,
 		&workspace.UpdatedAt,
@@ -108,7 +108,7 @@ func (store *workspaceStore) GetWorkspaceById(ctx context.Context, workspaceId i
 const getWorkspaceQuery = `
 SELECT 
   ws."id", ws."sid", ws."orgId", org."sid",
-  ws."name", ws."description", ws."accessType", 
+  ws."name", ws."description", ws."visibility", 
   ws."createdAt", ws."createdBy", ws."updatedAt", ws."updatedBy"
 FROM "system"."Workspace" AS ws
 LEFT JOIN system."Organization" AS org ON org."id" = ws."orgId"
@@ -122,7 +122,7 @@ func (store *workspaceStore) GetWorkspace(ctx context.Context, orgId int, ws *wo
 	availableFields := []string{}
 	workspaceFields := map[string]interface{}{
 		"name":       ws.Name,
-		"accessType": *ws.AccessType,
+		"visibility": *ws.Visibility,
 		"createdAt":  ws.CreatedAt,
 		"updatedAt":  ws.UpdatedAt,
 	}
@@ -158,7 +158,7 @@ func (store *workspaceStore) GetWorkspace(ctx context.Context, orgId int, ws *wo
 		&workspace.OrgScopedId,
 		&workspace.Name,
 		&workspace.Description,
-		&workspace.AccessType,
+		&workspace.Visibility,
 		&workspace.CreatedAt,
 		&workspace.CreatedBy,
 		&workspace.UpdatedAt,
