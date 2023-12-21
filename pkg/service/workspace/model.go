@@ -15,7 +15,7 @@ type Workspace struct {
 	// data
 	Name        string `json:"name,omitempty" form:"name,omitempty"`
 	Description string `json:"description,omitempty"`
-	AccessType  *int   `json:"accessType,omitempty" form:"accessType,omitempty"`
+	Visibility  *int   `json:"visibility,omitempty" form:"visibility,omitempty"`
 	Path        string `json:"path,omitempty"`
 
 	// history
