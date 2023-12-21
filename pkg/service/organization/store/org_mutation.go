@@ -16,11 +16,11 @@ import (
 
 const createOrganizationMutation = `
 INSERT INTO
-  "system"."Organization" ("sid", "name", "description", "accessType", "createdBy")
+  "system"."Organization" ("sid", "name", "description", "visibility", "createdBy")
 VALUES
-  (@sid, @name, @description, @accessType, @createdBy)
+  (@sid, @name, @description, @visibility, @createdBy)
 RETURNING 
-  "id", "sid", "name", "description", "accessType", "createdAt", "createdBy";
+  "id", "sid", "name", "description", "visibility", "createdAt", "createdBy";
 `
 
 func (store *orgStore) CreateOrganization(ctx context.Context, organization *org.Organization) (*org.Organization, error) {
@@ -39,7 +39,7 @@ func (store *orgStore) CreateOrganization(ctx context.Context, organization *org
 			"sid":         organization.ScopedId,
 			"name":        organization.Name,
 			"description": organization.Description,
-			"accessType":  organization.AccessType,
+			"visibility":  organization.Visibility,
 			"createdBy":   organization.CreatedBy,
 		},
 	)
@@ -50,7 +50,7 @@ func (store *orgStore) CreateOrganization(ctx context.Context, organization *org
 		&org.ScopedId,
 		&org.Name,
 		&org.Description,
-		&org.AccessType,
+		&org.Visibility,
 		&org.CreatedAt,
 		&org.CreatedBy,
 	)
@@ -71,7 +71,7 @@ SET
   "sid"         = @sid, 
   "name"        = @name,
   "description" = @description,
-  "accessType"  = @accessType,
+  "visibility"  = @visibility,
   "updatedAt"   = @updatedAt,
   "updatedBy"   = @updatedBy,
 WHERE
@@ -87,7 +87,7 @@ func (store *orgStore) UpdateOrganizationById(ctx context.Context, orgId int, or
 			"sid":         org.ScopedId,
 			"name":        org.Name,
 			"description": org.Description,
-			"accessType":  org.AccessType,
+			"visibility":  org.Visibility,
 			"updatedAt":   time.Now(),
 			"updatedBy":   org.UpdatedBy,
 		},
