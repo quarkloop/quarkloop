@@ -17,7 +17,7 @@ import (
 const listOrganizationsQuery = `
 SELECT 
   "id", "sid",
-  "name", "description", "accessType",
+  "name", "description", "visibility",
   "createdAt", "createdBy", "updatedAt", "updatedBy"
 FROM 
   "system"."Organization";
@@ -40,7 +40,7 @@ func (store *orgStore) ListOrganizations(ctx context.Context) ([]org.Organizatio
 			&org.ScopedId,
 			&org.Name,
 			&org.Description,
-			&org.AccessType,
+			&org.Visibility,
 			&org.CreatedAt,
 			&org.CreatedBy,
 			&org.UpdatedAt,
@@ -67,7 +67,7 @@ func (store *orgStore) ListOrganizations(ctx context.Context) ([]org.Organizatio
 const getOrganizationByIdQuery = `
 SELECT 
   "id", "sid",
-  "name", "description", "accessType",
+  "name", "description", "visibility",
   "createdAt", "createdBy", "updatedAt", "updatedBy"
 FROM 
   "system"."Organization" 
@@ -84,7 +84,7 @@ func (store *orgStore) GetOrganizationById(ctx context.Context, orgId int) (*org
 		&org.ScopedId,
 		&org.Name,
 		&org.Description,
-		&org.AccessType,
+		&org.Visibility,
 		&org.CreatedAt,
 		&org.CreatedBy,
 		&org.UpdatedAt,
@@ -103,7 +103,7 @@ func (store *orgStore) GetOrganizationById(ctx context.Context, orgId int) (*org
 const getOrganizationQuery = `
 SELECT 
   "id", "sid",
-  "name", "description", "accessType",
+  "name", "description", "visibility",
   "createdAt", "createdBy", "updatedAt", "updatedBy"
 FROM 
   "system"."Organization" 
@@ -115,7 +115,7 @@ func (store *orgStore) GetOrganization(ctx context.Context, organization *org.Or
 	organizationFields := map[string]interface{}{
 		"sid":        organization.ScopedId,
 		"name":       organization.Name,
-		"accessType": organization.AccessType,
+		"visibility": organization.Visibility,
 		"createdAt":  organization.CreatedAt,
 		"updatedAt":  organization.UpdatedAt,
 	}
@@ -149,7 +149,7 @@ func (store *orgStore) GetOrganization(ctx context.Context, organization *org.Or
 		&org.ScopedId,
 		&org.Name,
 		&org.Description,
-		&org.AccessType,
+		&org.Visibility,
 		&org.CreatedAt,
 		&org.CreatedBy,
 		&org.UpdatedAt,
