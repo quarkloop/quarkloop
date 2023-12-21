@@ -18,7 +18,7 @@ model Organization {
     // organization
     name        String
     description String
-    accessType  Int
+    visibility  Int
     metadata    Json?
 
     // history
@@ -44,7 +44,7 @@ model Workspace {
     // workspace
     name        String
     description String
-    accessType  Int
+    visibility  Int
     metadata    Json?
 
     // history
@@ -73,7 +73,7 @@ model Project {
     // project
     name        String
     description String
-    accessType  Int
+    visibility  Int
     metadata    Json?
 
     // history
