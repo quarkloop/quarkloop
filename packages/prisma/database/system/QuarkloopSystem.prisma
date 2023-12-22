@@ -18,7 +18,7 @@ model Organization {
     // organization
     name        String
     description String
-    visibility  Int
+    visibility  Int    @default(1)
     metadata    Json?
 
     // history
@@ -30,7 +30,9 @@ model Organization {
     // relation
     workspaces Workspace[]
     projects   Project[]
-    users      User[]
+    userGroups UserGroup[]
+    userRoles  UserRole[]
+    users      UserAssignment[]
 
     @@schema("system")
 }
@@ -44,7 +46,7 @@ model Workspace {
     // workspace
     name        String
     description String
-    visibility  Int
+    visibility  Int    @default(1)
     metadata    Json?
 
     // history
@@ -54,12 +56,11 @@ model Workspace {
     updatedBy String?
 
     // relation
-    organization Organization @relation(fields: [orgId], references: [id])
+    organization Organization     @relation(fields: [orgId], references: [id])
     projects     Project[]
-    users        User[]
+    users        UserAssignment[]
 
     @@unique([orgId, sid])
-    @@index([orgId])
     @@schema("system")
 }
 
@@ -73,7 +74,7 @@ model Project {
     // project
     name        String
     description String
-    visibility  Int
+    visibility  Int    @default(1)
     metadata    Json?
 
     // history
@@ -83,23 +84,23 @@ model Project {
     updatedBy String?
 
     // relation
-    organization Organization @relation(fields: [orgId], references: [id])
-    workspace    Workspace    @relation(fields: [workspaceId], references: [id])
-    users        User[]
+    organization Organization     @relation(fields: [orgId], references: [id])
+    workspace    Workspace        @relation(fields: [workspaceId], references: [id])
+    users        UserAssignment[]
 
     @@unique([orgId, workspaceId, sid])
     @@index([orgId, workspaceId])
-    @@index([orgId])
     @@schema("system")
 }
 
-model User {
+model UserAssignment {
     // id
     id          BigInt  @id @default(autoincrement())
-    userId      BigInt
     orgId       BigInt
     workspaceId BigInt?
     projectId   BigInt?
+    userGroupId BigInt
+    roleId      BigInt
 
     // history
     createdAt DateTime  @default(now())
@@ -111,6 +112,70 @@ model User {
     org       Organization @relation(fields: [orgId], references: [id])
     workspace Workspace?   @relation(fields: [workspaceId], references: [id])
     project   Project?     @relation(fields: [projectId], references: [id])
+    userGroup UserGroup    @relation(fields: [userGroupId], references: [id])
+    role      UserRole     @relation(fields: [roleId], references: [id])
+
+    @@index([orgId, workspaceId])
+    @@index([orgId, workspaceId, projectId])
+    @@index([userGroupId, roleId])
+    @@schema("system")
+}
+
+model UserGroup {
+    // id
+    id     BigInt  @id @default(autoincrement())
+    orgId  BigInt
+    userId BigInt?
+
+    // user group
+    name String
+
+    // history
+    createdAt DateTime  @default(now())
+    createdBy String
+    updatedAt DateTime?
+    updatedBy String?
+
+    // relation
+    assignments UserAssignment[]
+    org         Organization     @relation(fields: [orgId], references: [id])
+
+    @@index([userId])
+    @@schema("system")
+}
+
+model UserRole {
+    // id
+    id    BigInt @id @default(autoincrement())
+    orgId BigInt
+
+    // role
+    name String
+
+    // history
+    createdAt DateTime  @default(now())
+    createdBy String
+    updatedAt DateTime?
+    updatedBy String?
+
+    // relation
+    org         Organization     @relation(fields: [orgId], references: [id])
+    assignments UserAssignment[]
+    permissions Permission[]
+
+    @@schema("system")
+}
+
+model Permission {
+    // id
+    id     BigInt @id @default(autoincrement())
+    roleId BigInt
+
+    // role
+    name String
+
+    // relation
+    role UserRole @relation(fields: [roleId], references: [id])
 
     @@schema("system")
 }
