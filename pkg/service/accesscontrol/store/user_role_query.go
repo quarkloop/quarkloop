@@ -13,7 +13,7 @@ import (
 
 const listUserRolesQuery = `
 SELECT 
-	"id",
+    "id",
     "orgId",
     "name",
     "createdAt",
@@ -21,9 +21,9 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"system"."UserRole"
+    "system"."UserRole"
 WHERE 
-	"orgId" = @orgId;
+    "orgId" = @orgId;
 `
 
 func (store *accessControlStore) ListUserRoles(ctx context.Context, orgId int) ([]accesscontrol.UserRole, error) {
@@ -67,7 +67,7 @@ func (store *accessControlStore) ListUserRoles(ctx context.Context, orgId int) (
 
 const getUserRoleByIdQuery = `
 SELECT 
-	"id",
+    "id",
     "orgId",
     "name",
     "createdAt",
@@ -75,9 +75,9 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"system"."UserRole"
+    "system"."UserRole"
 WHERE 
-	"id" = @id;
+    "id" = @id;
 `
 
 func (store *accessControlStore) GetUserRoleById(ctx context.Context, userRoleId int) (*accesscontrol.UserRole, error) {
