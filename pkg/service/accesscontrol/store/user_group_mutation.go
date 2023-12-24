@@ -15,24 +15,24 @@ import (
 
 const createUserGroupQuery = `
 INSERT INTO "system"."UserGroup" (
-	"orgId", 
-	"name", 
-	"createdBy"
+    "orgId", 
+    "name", 
+    "createdBy"
 )
 VALUES (
-	@orgId, 
-	@name, 
-	@createdBy
+    @orgId, 
+    @name, 
+    @createdBy
 )
 RETURNING 
-	"id",
-	"orgId",
-	"userId",
-	"name",
-	"createdAt",
-	"createdBy",
-	"updatedAt",
-	"updatedBy";
+    "id",
+    "orgId",
+    "userId",
+    "name",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy";
 `
 
 func (store *accessControlStore) CreateUserGroup(ctx context.Context, orgId int, userGroup *accesscontrol.UserGroup) (*accesscontrol.UserGroup, error) {
