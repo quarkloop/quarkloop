@@ -14,12 +14,29 @@ import (
 /// CreateFormRecord
 
 const createFormRecordMutation = `
-INSERT INTO
-  "project"."TableForm" ("projectId", "branchId", "name", "description", "metadata", "data")
-VALUES
-  (@projectId, @branchId, @name, @description, @metadata, @data)
-RETURNING
-  "id", "name", "description", "metadata", "data", "createdAt";
+INSERT INTO "project"."TableForm" (
+        "projectId",
+        "branchId",
+        "name",
+        "description",
+        "metadata",
+        "data"
+    )
+VALUES (
+        @projectId,
+        @branchId,
+        @name,
+        @description,
+        @metadata,
+        @data
+    )
+RETURNING 
+    "id",
+    "name",
+    "description",
+    "metadata",
+    "data",
+    "createdAt";
 `
 
 func (store *tableRecordStore) CreateFormRecord(ctx context.Context, projectId int, branchId int, form *table_record.FormRecord) (*table_record.FormRecord, error) {
