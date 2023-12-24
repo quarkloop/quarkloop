@@ -15,13 +15,23 @@ import (
 
 const listWorkspacesQuery = `
 SELECT 
-  ws."id", ws."sid", ws."orgId", org."sid",
-  ws."name", ws."description", ws."visibility", 
-  ws."createdAt", ws."createdBy", ws."updatedAt", ws."updatedBy"
-FROM "system"."Workspace" AS ws
-LEFT JOIN system."Organization" AS org ON org."id" = ws."orgId"
-WHERE
-  ws."orgId" = ANY (@orgId);
+	ws."id",
+    ws."sid",
+    ws."orgId",
+    org."sid",
+    ws."name",
+    ws."description",
+    ws."visibility",
+    ws."createdAt",
+    ws."createdBy",
+    ws."updatedAt",
+    ws."updatedBy"
+FROM 
+	"system"."Workspace" AS ws
+LEFT JOIN 
+	system."Organization" AS org ON org."id" = ws."orgId"
+WHERE 
+	ws."orgId" = ANY (@orgId);
 `
 
 func (store *workspaceStore) ListWorkspaces(ctx context.Context, orgId []int) ([]workspace.Workspace, error) {
@@ -69,13 +79,23 @@ func (store *workspaceStore) ListWorkspaces(ctx context.Context, orgId []int) ([
 
 const getWorkspaceByIdQuery = `
 SELECT 
-  ws."id", ws."sid", ws."orgId", org."sid",
-  ws."name", ws."description", ws."visibility", 
-  ws."createdAt", ws."createdBy", ws."updatedAt", ws."updatedBy"
-FROM "system"."Workspace" AS ws
-LEFT JOIN system."Organization" AS org ON org."id" = ws."orgId"
+	ws."id",
+    ws."sid",
+    ws."orgId",
+    org."sid",
+    ws."name",
+    ws."description",
+    ws."visibility",
+    ws."createdAt",
+    ws."createdBy",
+    ws."updatedAt",
+    ws."updatedBy"
+FROM 
+	"system"."Workspace" AS ws
+LEFT JOIN 
+	system."Organization" AS org ON org."id" = ws."orgId"
 WHERE 
-  ws."id" = @id;
+	ws."id" = @id;
 `
 
 func (store *workspaceStore) GetWorkspaceById(ctx context.Context, workspaceId int) (*workspace.Workspace, error) {
@@ -107,14 +127,25 @@ func (store *workspaceStore) GetWorkspaceById(ctx context.Context, workspaceId i
 
 const getWorkspaceQuery = `
 SELECT 
-  ws."id", ws."sid", ws."orgId", org."sid",
-  ws."name", ws."description", ws."visibility", 
-  ws."createdAt", ws."createdBy", ws."updatedAt", ws."updatedBy"
-FROM "system"."Workspace" AS ws
-LEFT JOIN system."Organization" AS org ON org."id" = ws."orgId"
-WHERE
-%s
-ORDER BY "updatedAt" ASC
+	ws."id",
+    ws."sid",
+    ws."orgId",
+    org."sid",
+    ws."name",
+    ws."description",
+    ws."visibility",
+    ws."createdAt",
+    ws."createdBy",
+    ws."updatedAt",
+    ws."updatedBy"
+FROM 
+	"system"."Workspace" AS ws
+LEFT JOIN 
+	system."Organization" AS org ON org."id" = ws."orgId"
+WHERE 
+	%s
+ORDER BY 
+	"updatedAt" ASC
 LIMIT 1;
 `
 
