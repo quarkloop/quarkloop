@@ -13,12 +13,20 @@ import (
 
 const listUserAssignmentsQuery = `
 SELECT 
-  "id", "orgId", "workspaceId", "projectId", "userGroupId", "userRoleId",
-  "createdAt", "createdBy", "updatedAt", "updatedBy"
+    "id",
+    "orgId",
+    "workspaceId",
+    "projectId",
+    "userGroupId",
+    "userRoleId",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy"
 FROM 
-  "system"."UserAssignment"
-WHERE
-  "orgId" = @orgId;
+	"system"."UserAssignment"
+WHERE 
+	"orgId" = @orgId;
 `
 
 func (store *accessControlStore) ListUserAssignments(ctx context.Context, orgId int) ([]accesscontrol.UserAssignment, error) {
@@ -65,12 +73,20 @@ func (store *accessControlStore) ListUserAssignments(ctx context.Context, orgId 
 
 const getUserAssignmentByIdQuery = `
 SELECT 
-  "id", "orgId", "workspaceId", "projectId", "userGroupId", "userRoleId",
-  "createdAt", "createdBy", "updatedAt", "updatedBy"
+	"id",
+    "orgId",
+    "workspaceId",
+    "projectId",
+    "userGroupId",
+    "userRoleId",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy"
 FROM 
-  "system"."UserAssignment" 
+	"system"."UserAssignment"
 WHERE 
-  "id" = @id;
+	"id" = @id;
 `
 
 func (store *accessControlStore) GetUserAssignmentById(ctx context.Context, userAssignmentId int) (*accesscontrol.UserAssignment, error) {
