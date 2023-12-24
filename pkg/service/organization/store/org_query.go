@@ -16,11 +16,17 @@ import (
 
 const listOrganizationsQuery = `
 SELECT 
-  "id", "sid",
-  "name", "description", "visibility",
-  "createdAt", "createdBy", "updatedAt", "updatedBy"
+	"id",
+    "sid",
+    "name",
+    "description",
+    "visibility",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy"
 FROM 
-  "system"."Organization";
+	"system"."Organization";
 `
 
 func (store *orgStore) ListOrganizations(ctx context.Context) ([]org.Organization, error) {
@@ -66,13 +72,19 @@ func (store *orgStore) ListOrganizations(ctx context.Context) ([]org.Organizatio
 
 const getOrganizationByIdQuery = `
 SELECT 
-  "id", "sid",
-  "name", "description", "visibility",
-  "createdAt", "createdBy", "updatedAt", "updatedBy"
+	"id",
+    "sid",
+    "name",
+    "description",
+    "visibility",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy"
 FROM 
-  "system"."Organization" 
+	"system"."Organization"
 WHERE 
-  "id" = @id;
+	"id" = @id;
 `
 
 func (store *orgStore) GetOrganizationById(ctx context.Context, orgId int) (*org.Organization, error) {
@@ -102,11 +114,17 @@ func (store *orgStore) GetOrganizationById(ctx context.Context, orgId int) (*org
 
 const getOrganizationQuery = `
 SELECT 
-  "id", "sid",
-  "name", "description", "visibility",
-  "createdAt", "createdBy", "updatedAt", "updatedBy"
+	"id",
+    "sid",
+    "name",
+    "description",
+    "visibility",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy"
 FROM 
-  "system"."Organization" 
+	"system"."Organization"
 WHERE
 `
 
