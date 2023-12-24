@@ -15,7 +15,7 @@ import (
 
 const listProjectsQuery = `
 SELECT 
-	p."id",
+    p."id",
     p."sid",
     p."orgId",
     p."workspaceId",
@@ -29,13 +29,13 @@ SELECT
     p."updatedAt",
     p."updatedBy"
 FROM 
-	"system"."Project" AS p
+    "system"."Project" AS p
 LEFT JOIN 
-	system."Organization" AS org ON org."id" = p."orgId"
+    system."Organization" AS org ON org."id" = p."orgId"
 LEFT JOIN 
-	system."Workspace" AS ws ON ws."id" = p."workspaceId"
+    system."Workspace" AS ws ON ws."id" = p."workspaceId"
 WHERE
-	%s;
+    %s;
 `
 
 func (store *projectStore) ListProjects(ctx context.Context, orgId []int, workspaceId []int) ([]project.Project, error) {
@@ -97,7 +97,7 @@ func (store *projectStore) ListProjects(ctx context.Context, orgId []int, worksp
 
 const getProjectByIdQuery = `
 SELECT 
-	p."id",
+    p."id",
     p."sid",
     p."orgId",
     p."workspaceId",
@@ -111,13 +111,13 @@ SELECT
     p."updatedAt",
     p."updatedBy"
 FROM 
-	"system"."Project" AS p
+    "system"."Project" AS p
 LEFT JOIN 
-	system."Organization" AS org ON org."id" = p."orgId"
+    system."Organization" AS org ON org."id" = p."orgId"
 LEFT JOIN 
-	system."Workspace" AS ws ON ws."id" = p."workspaceId"
+    system."Workspace" AS ws ON ws."id" = p."workspaceId"
 WHERE 
-	p."id" = @id;
+    p."id" = @id;
 `
 
 func (store *projectStore) GetProjectById(ctx context.Context, projectId int) (*project.Project, error) {
@@ -151,7 +151,7 @@ func (store *projectStore) GetProjectById(ctx context.Context, projectId int) (*
 
 const getProjectQuery = `
 SELECT 
-	p."id",
+    p."id",
     p."sid",
     p."orgId",
     p."workspaceId",
@@ -165,13 +165,13 @@ SELECT
     p."updatedAt",
     p."updatedBy"
 FROM 
-	"system"."Project" AS p
+    "system"."Project" AS p
 LEFT JOIN 
-	system."Organization" AS org ON org."id" = p."orgId"
+    system."Organization" AS org ON org."id" = p."orgId"
 LEFT JOIN 
-	system."Workspace" AS ws ON ws."id" = p."workspaceId"
+    system."Workspace" AS ws ON ws."id" = p."workspaceId"
 WHERE 
-	%s
+    %s
 ORDER BY "updatedAt" ASC
 LIMIT 1;
 `
