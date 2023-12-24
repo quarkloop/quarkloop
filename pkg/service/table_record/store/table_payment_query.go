@@ -13,7 +13,7 @@ import (
 
 const listPaymentRecordsQuery = `
 SELECT 
-	"id",
+    "id",
     "name",
     "description",
     "metadata",
@@ -23,11 +23,11 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"project"."TablePayment"
+    "project"."TablePayment"
 WHERE 
-	"projectId" = @projectId
+    "projectId" = @projectId
 AND 
-	"branchId" = @branchId;
+    "branchId" = @branchId;
 `
 
 func (store *tableRecordStore) ListPaymentRecords(ctx context.Context, projectId int, branchId int) ([]table_record.PaymentRecord, error) {
@@ -76,7 +76,7 @@ func (store *tableRecordStore) ListPaymentRecords(ctx context.Context, projectId
 
 const getPaymentRecordByIdQuery = `
 SELECT 
-	"id",
+    "id",
     "name",
     "description",
     "metadata",
@@ -86,13 +86,13 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"project"."TablePayment"
+    "project"."TablePayment"
 WHERE 
-	"projectId" = @projectId
+    "projectId" = @projectId
 AND 
-	"branchId" = @branchId
+    "branchId" = @branchId
 AND 
-	"id" = @id;
+    "id" = @id;
 `
 
 func (store *tableRecordStore) GetPaymentRecordById(ctx context.Context, projectId int, branchId int, paymentId string) (*table_record.PaymentRecord, error) {
