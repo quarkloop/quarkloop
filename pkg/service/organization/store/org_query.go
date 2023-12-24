@@ -16,7 +16,7 @@ import (
 
 const listOrganizationsQuery = `
 SELECT 
-	"id",
+    "id",
     "sid",
     "name",
     "description",
@@ -26,7 +26,7 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"system"."Organization";
+    "system"."Organization";
 `
 
 func (store *orgStore) ListOrganizations(ctx context.Context) ([]org.Organization, error) {
@@ -72,7 +72,7 @@ func (store *orgStore) ListOrganizations(ctx context.Context) ([]org.Organizatio
 
 const getOrganizationByIdQuery = `
 SELECT 
-	"id",
+    "id",
     "sid",
     "name",
     "description",
@@ -82,9 +82,9 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"system"."Organization"
+    "system"."Organization"
 WHERE 
-	"id" = @id;
+    "id" = @id;
 `
 
 func (store *orgStore) GetOrganizationById(ctx context.Context, orgId int) (*org.Organization, error) {
@@ -114,7 +114,7 @@ func (store *orgStore) GetOrganizationById(ctx context.Context, orgId int) (*org
 
 const getOrganizationQuery = `
 SELECT 
-	"id",
+    "id",
     "sid",
     "name",
     "description",
@@ -124,7 +124,7 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"system"."Organization"
+    "system"."Organization"
 WHERE
 `
 
