@@ -15,12 +15,28 @@ import (
 /// CreateOrganization
 
 const createOrganizationMutation = `
-INSERT INTO
-  "system"."Organization" ("sid", "name", "description", "visibility", "createdBy")
-VALUES
-  (@sid, @name, @description, @visibility, @createdBy)
+INSERT INTO "system"."Organization" (
+        "sid",
+        "name",
+        "description",
+        "visibility",
+        "createdBy"
+    )
+VALUES (
+        @sid,
+        @name,
+        @description,
+        @visibility,
+        @createdBy
+    )
 RETURNING 
-  "id", "sid", "name", "description", "visibility", "createdAt", "createdBy";
+    "id",
+    "sid",
+    "name",
+    "description",
+    "visibility",
+    "createdAt",
+    "createdBy";
 `
 
 func (store *orgStore) CreateOrganization(ctx context.Context, organization *org.Organization) (*org.Organization, error) {
@@ -32,17 +48,13 @@ func (store *orgStore) CreateOrganization(ctx context.Context, organization *org
 		organization.ScopedId = sid
 	}
 
-	row := store.Conn.QueryRow(
-		ctx,
-		createOrganizationMutation,
-		pgx.NamedArgs{
-			"sid":         organization.ScopedId,
-			"name":        organization.Name,
-			"description": organization.Description,
-			"visibility":  organization.Visibility,
-			"createdBy":   organization.CreatedBy,
-		},
-	)
+	row := store.Conn.QueryRow(ctx, createOrganizationMutation, pgx.NamedArgs{
+		"sid":         organization.ScopedId,
+		"name":        organization.Name,
+		"description": organization.Description,
+		"visibility":  organization.Visibility,
+		"createdBy":   organization.CreatedBy,
+	})
 
 	var org org.Organization
 	rowErr := row.Scan(
@@ -79,19 +91,15 @@ WHERE
 `
 
 func (store *orgStore) UpdateOrganizationById(ctx context.Context, orgId int, org *org.Organization) error {
-	commandTag, err := store.Conn.Exec(
-		ctx,
-		updateOrganizationByIdMutation,
-		pgx.NamedArgs{
-			"id":          orgId,
-			"sid":         org.ScopedId,
-			"name":        org.Name,
-			"description": org.Description,
-			"visibility":  org.Visibility,
-			"updatedAt":   time.Now(),
-			"updatedBy":   org.UpdatedBy,
-		},
-	)
+	commandTag, err := store.Conn.Exec(ctx, updateOrganizationByIdMutation, pgx.NamedArgs{
+		"id":          orgId,
+		"sid":         org.ScopedId,
+		"name":        org.Name,
+		"description": org.Description,
+		"visibility":  org.Visibility,
+		"updatedAt":   time.Now(),
+		"updatedBy":   org.UpdatedBy,
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", err)
 		return err
