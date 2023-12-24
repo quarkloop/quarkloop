@@ -15,16 +15,16 @@ import (
 
 const createTableBranchMutation = `
 INSERT INTO "project"."TableBranch" (
-	"projectId", 
-	"name", 
-	"description", 
-	"createdBy"
+    "projectId", 
+    "name", 
+    "description", 
+    "createdBy"
 )
 VALUES (
-	@projectId, 
-	@name, 
-	@description, 
-	@createdBy
+    @projectId, 
+    @name, 
+    @description, 
+    @createdBy
 )
 RETURNING 
     "id",
