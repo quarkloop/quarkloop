@@ -14,12 +14,29 @@ import (
 /// CreatePaymentRecord
 
 const createPaymentRecordMutation = `
-INSERT INTO
-  "project"."TablePayment" ("projectId", "branchId", "name", "description", "metadata", "data")
-VALUES
-  (@projectId, @branchId, @name, @description, @metadata, @data)
-RETURNING
-  "id", "name", "description", "metadata", "data", "createdAt";
+INSERT INTO "project"."TablePayment" (
+        "projectId",
+        "branchId",
+        "name",
+        "description",
+        "metadata",
+        "data"
+    )
+VALUES (
+        @projectId,
+        @branchId,
+        @name,
+        @description,
+        @metadata,
+        @data
+    )
+RETURNING 
+    "id",
+    "name",
+    "description",
+    "metadata",
+    "data",
+    "createdAt";
 `
 
 func (store *tableRecordStore) CreatePaymentRecord(ctx context.Context, projectId int, branchId int, payment *table_record.PaymentRecord) (*table_record.PaymentRecord, error) {
