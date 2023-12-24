@@ -13,7 +13,7 @@ import (
 
 const listDocumentRecordsQuery = `
 SELECT 
-	"id",
+    "id",
     "name",
     "description",
     "metadata",
@@ -23,11 +23,11 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"project"."TableDocument"
+    "project"."TableDocument"
 WHERE 
-	"projectId" = @projectId
+    "projectId" = @projectId
 AND 
-	"branchId" = @branchId;
+    "branchId" = @branchId;
 `
 
 func (store *tableRecordStore) ListDocumentRecords(ctx context.Context, projectId int, branchId int) ([]table_record.DocumentRecord, error) {
@@ -76,7 +76,7 @@ func (store *tableRecordStore) ListDocumentRecords(ctx context.Context, projectI
 
 const getDocumentRecordByIdQuery = `
 SELECT 
-	"id",
+    "id",
     "name",
     "description",
     "metadata",
@@ -86,13 +86,13 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"project"."TableDocument"
+    "project"."TableDocument"
 WHERE 
-	"projectId" = @projectId
+    "projectId" = @projectId
 AND 
-	"branchId" = @branchId
+    "branchId" = @branchId
 AND 
-	"id" = @id;
+    "id" = @id;
 `
 
 func (store *tableRecordStore) GetDocumentRecordById(ctx context.Context, projectId int, branchId int, documentId string) (*table_record.DocumentRecord, error) {
