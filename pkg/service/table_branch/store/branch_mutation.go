@@ -14,12 +14,24 @@ import (
 /// CreateTableBranch
 
 const createTableBranchMutation = `
-INSERT INTO
-  "project"."TableBranch" ("projectId", "name", "description", "createdBy")
-VALUES
-  (@projectId, @name, @description, @createdBy)
-RETURNING
-  "id", "name", "description", "createdAt", "createdBy";
+INSERT INTO "project"."TableBranch" (
+	"projectId", 
+	"name", 
+	"description", 
+	"createdBy"
+)
+VALUES (
+	@projectId, 
+	@name, 
+	@description, 
+	@createdBy
+)
+RETURNING 
+    "id",
+    "name",
+    "description",
+    "createdAt",
+    "createdBy";
 `
 
 func (store *tableBranchStore) CreateTableBranch(ctx context.Context, projectId int, branch *table_branch.TableBranch) (*table_branch.TableBranch, error) {
