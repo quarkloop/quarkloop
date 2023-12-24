@@ -71,9 +71,27 @@ var (
 	ActionProjectUserDelete = "project.user:delete"
 )
 
+type UserAssignment struct {
+	// id
+	Id          int `json:"id"`
+	OrgId       int `json:"orgId"`
+	WorkspaceId int `json:"workspaceId"`
+	ProjectId   int `json:"projectId"`
+	UserGroupId int `json:"userGroupId"`
+	UserRoleId  int `json:"userRoleId"`
+
+	// history
+	CreatedAt time.Time  `json:"createdAt,omitempty"`
+	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+	CreatedBy string     `json:"createdBy,omitempty"`
+	UpdatedBy *string    `json:"updatedBy,omitempty"`
+}
+
 type UserGroup struct {
 	// id
-	Id int `json:"id"`
+	Id     int `json:"id"`
+	OrgId  int `json:"orgId"`
+	UserId int `json:"userId"`
 
 	// user
 	Name string `json:"name,omitempty"`
@@ -85,9 +103,10 @@ type UserGroup struct {
 	UpdatedBy *string    `json:"updatedBy,omitempty"`
 }
 
-type Role struct {
+type UserRole struct {
 	// id
-	Id int `json:"id"`
+	Id    int `json:"id"`
+	OrgId int `json:"orgId"`
 
 	// user
 	Name string `json:"name,omitempty"`
