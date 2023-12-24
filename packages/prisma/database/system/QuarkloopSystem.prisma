@@ -100,7 +100,7 @@ model UserAssignment {
     workspaceId BigInt?
     projectId   BigInt?
     userGroupId BigInt
-    roleId      BigInt
+    userRoleId  BigInt
 
     // history
     createdAt DateTime  @default(now())
@@ -113,11 +113,11 @@ model UserAssignment {
     workspace Workspace?   @relation(fields: [workspaceId], references: [id])
     project   Project?     @relation(fields: [projectId], references: [id])
     userGroup UserGroup    @relation(fields: [userGroupId], references: [id])
-    role      UserRole     @relation(fields: [roleId], references: [id])
+    role      UserRole     @relation(fields: [userRoleId], references: [id])
 
     @@index([orgId, workspaceId])
     @@index([orgId, workspaceId, projectId])
-    @@index([userGroupId, roleId])
+    @@index([userGroupId, userRoleId])
     @@schema("system")
 }
 
