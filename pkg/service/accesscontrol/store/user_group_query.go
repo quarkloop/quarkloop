@@ -13,7 +13,7 @@ import (
 
 const listUserGroupsQuery = `
 SELECT 
-	"id",
+    "id",
     "orgId",
     "userId",
     "name",
@@ -22,9 +22,9 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"system"."UserGroup"
+    "system"."UserGroup"
 WHERE 
-	"orgId" = @orgId;
+    "orgId" = @orgId;
 `
 
 func (store *accessControlStore) ListUserGroups(ctx context.Context, orgId int) ([]accesscontrol.UserGroup, error) {
@@ -69,7 +69,7 @@ func (store *accessControlStore) ListUserGroups(ctx context.Context, orgId int) 
 
 const getUserGroupByIdQuery = `
 SELECT 
-	"id",
+    "id",
     "orgId",
     "userId",
     "name",
@@ -78,9 +78,9 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"system"."UserGroup"
+    "system"."UserGroup"
 WHERE 
-	"id" = @id;
+    "id" = @id;
 `
 
 func (store *accessControlStore) GetUserGroupById(ctx context.Context, userGroupId int) (*accesscontrol.UserGroup, error) {
