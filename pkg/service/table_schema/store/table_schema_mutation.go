@@ -14,12 +14,27 @@ import (
 /// CreateTableSchema
 
 const createTableSchemaMutation = `
-INSERT INTO
-  "project"."TableSchema" ("projectId", "name", "description", "metadata", "data")
-VALUES
-  (@projectId, @name, @description, @metadata, @data)
-RETURNING
-  "id", "name", "description", "metadata", "data", "createdAt";
+INSERT INTO "project"."TableSchema" (
+        "projectId",
+        "name",
+        "description",
+        "metadata",
+        "data"
+    )
+VALUES (
+        @projectId,
+        @name,
+        @description,
+        @metadata,
+        @data
+    )
+RETURNING 
+    "id",
+    "name",
+    "description",
+    "metadata",
+    "data",
+    "createdAt";
 `
 
 func (store *tableSchemaStore) CreateTableSchema(ctx context.Context, projectId int, schema *table_schema.TableSchema) (*table_schema.TableSchema, error) {
