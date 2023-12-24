@@ -13,7 +13,7 @@ import (
 
 const listFormRecordsQuery = `
 SELECT 
-	"id",
+    "id",
     "name",
     "description",
     "metadata",
@@ -23,11 +23,11 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"project"."TableForm"
+    "project"."TableForm"
 WHERE 
-	"projectId" = @projectId
+    "projectId" = @projectId
 AND 
-	"branchId" = @branchId;
+    "branchId" = @branchId;
 `
 
 func (store *tableRecordStore) ListFormRecords(ctx context.Context, projectId int, branchId int) ([]table_record.FormRecord, error) {
@@ -76,7 +76,7 @@ func (store *tableRecordStore) ListFormRecords(ctx context.Context, projectId in
 
 const getFormRecordByIdQuery = `
 SELECT 
-	"id",
+    "id",
     "name",
     "description",
     "metadata",
@@ -86,13 +86,13 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"project"."TableForm"
+    "project"."TableForm"
 WHERE 
-	"projectId" = @projectId
+    "projectId" = @projectId
 AND 
-	"branchId" = @branchId
+    "branchId" = @branchId
 AND 
-	"id" = @id;
+    "id" = @id;
 `
 
 func (store *tableRecordStore) GetFormRecordById(ctx context.Context, projectId int, branchId int, formId string) (*table_record.FormRecord, error) {
