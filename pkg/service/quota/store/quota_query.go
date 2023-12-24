@@ -11,21 +11,26 @@ import (
 
 const getOrgQuotaMetricQuery = `
 SELECT 
-   COUNT(DISTINCT o.id)  AS org_count,
-   COUNT(DISTINCT w.id)  AS workspace_count,
-   COUNT(DISTINCT p.id)  AS project_count,
-   COUNT(DISTINCT ou.id) AS org_user_count,
-   COUNT(DISTINCT wu.id) AS workspace_user_count,
-   COUNT(DISTINCT pu.id) AS project_user_count
-FROM
-  "system"."Organization"      As o
-LEFT JOIN "system"."Workspace" AS w  ON w."orgId"  = o."id"
-LEFT JOIN "system"."Project"   AS p  ON p."orgId"  = o."id" AND p."workspaceId" = w."id"
-LEFT JOIN "system"."User"      AS ou ON ou."orgId" = o."id"
-LEFT JOIN "system"."User"      AS wu ON wu."orgId" = o."id" AND wu."workspaceId" = w."id"
-LEFT JOIN "system"."User"      AS pu ON pu."orgId" = o."id" AND pu."workspaceId" = w."id" AND pu."projectId" = p."id"
-WHERE
-  o."id" = 59;
+	COUNT(DISTINCT o.id) AS org_count,
+    COUNT(DISTINCT w.id) AS workspace_count,
+    COUNT(DISTINCT p.id) AS project_count,
+    COUNT(DISTINCT ou.id) AS org_user_count,
+    COUNT(DISTINCT wu.id) AS workspace_user_count,
+    COUNT(DISTINCT pu.id) AS project_user_count
+FROM 
+	"system"."Organization" As o
+LEFT JOIN 
+	"system"."Workspace" AS w ON w."orgId" = o."id"
+LEFT JOIN 
+	"system"."Project" AS p ON p."orgId" = o."id" AND p."workspaceId" = w."id"
+LEFT JOIN 
+	"system"."User" AS ou ON ou."orgId" = o."id"
+LEFT JOIN 
+	"system"."User" AS wu ON wu."orgId" = o."id" AND wu."workspaceId" = w."id"
+LEFT JOIN 
+	"system"."User" AS pu ON pu."orgId" = o."id" AND pu."workspaceId" = w."id" AND pu."projectId" = p."id"
+WHERE 
+	o."id" = 59;
 `
 
 const getOrgUserQuotaMetricQuery = `
@@ -112,7 +117,9 @@ ORDER BY feature;
 /// GetQuotasByUserId
 
 const getQuotasByUserIdQuery = `
-SELECT feature, metric 
+SELECT 
+	feature, 
+	metric 
 FROM (
 	SELECT 
 	   COUNT(DISTINCT id) AS org_count,
@@ -121,7 +128,8 @@ FROM (
 	WHERE
 	  "userId" = @userId
 ) AS metrics
-CROSS JOIN jsonb_each_text(to_jsonb(metrics)) as cols(feature, metric);
+CROSS JOIN 
+	jsonb_each_text(to_jsonb(metrics)) as cols(feature, metric);
 `
 
 func (store *quotaStore) GetQuotasByUserId(ctx context.Context, userId int) (quota.Quota, error) {
@@ -141,21 +149,27 @@ func (store *quotaStore) GetQuotasByUserId(ctx context.Context, userId int) (quo
 /// GetQuotasByOrgId
 
 const getQuotasByOrgIdQuery = `
-SELECT feature, metric 
+SELECT 
+	feature, 
+	metric 
 FROM (
 	SELECT 
 	   COUNT(DISTINCT w.id) AS workspace_count,
 	   COUNT(DISTINCT p.id) AS project_count,
 	   COUNT(DISTINCT u.id) AS org_user_count
 	FROM 
-	  "system"."Organization"      As o
-	LEFT JOIN "system"."Workspace" AS w ON w."orgId" = o."id"
-	LEFT JOIN "system"."Project"   AS p ON p."orgId" = o."id"
-	LEFT JOIN "system"."User"      AS u ON u."orgId" = o."id"
+	  "system"."Organization" As o
+	LEFT JOIN 
+		"system"."Workspace" AS w ON w."orgId" = o."id"
+	LEFT JOIN 
+		"system"."Project" AS p ON p."orgId" = o."id"
+	LEFT JOIN 
+		"system"."User" AS u ON u."orgId" = o."id"
 	WHERE
 	  o."id" = @orgId
 ) AS metrics
-CROSS JOIN jsonb_each_text(to_jsonb(metrics)) as cols(feature, metric);
+CROSS JOIN 
+	jsonb_each_text(to_jsonb(metrics)) as cols(feature, metric);
 `
 
 func (store *quotaStore) GetQuotasByOrgId(ctx context.Context, orgId int) ([]quota.Quota, error) {
