@@ -12,14 +12,22 @@ import (
 /// ListFormRecords
 
 const listFormRecordsQuery = `
-SELECT
-  "id", "name", "description", "metadata", "data", "createdAt", "createdBy", "updatedAt", "updatedBy"
-FROM
-  "project"."TableForm"
-WHERE
-  "projectId" = @projectId
-AND
-  "branchId" = @branchId;
+SELECT 
+	"id",
+    "name",
+    "description",
+    "metadata",
+    "data",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy"
+FROM 
+	"project"."TableForm"
+WHERE 
+	"projectId" = @projectId
+AND 
+	"branchId" = @branchId;
 `
 
 func (store *tableRecordStore) ListFormRecords(ctx context.Context, projectId int, branchId int) ([]table_record.FormRecord, error) {
@@ -67,16 +75,24 @@ func (store *tableRecordStore) ListFormRecords(ctx context.Context, projectId in
 /// GetFormRecordById
 
 const getFormRecordByIdQuery = `
-SELECT
-  "id", "name", "description", "metadata", "data", "createdAt", "createdBy", "updatedAt", "updatedBy"
-FROM
-  "project"."TableForm"
-WHERE
-  "projectId" = @projectId
-AND
-  "branchId" = @branchId
-AND
-  "id" = @id;
+SELECT 
+	"id",
+    "name",
+    "description",
+    "metadata",
+    "data",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy"
+FROM 
+	"project"."TableForm"
+WHERE 
+	"projectId" = @projectId
+AND 
+	"branchId" = @branchId
+AND 
+	"id" = @id;
 `
 
 func (store *tableRecordStore) GetFormRecordById(ctx context.Context, projectId int, branchId int, formId string) (*table_record.FormRecord, error) {
