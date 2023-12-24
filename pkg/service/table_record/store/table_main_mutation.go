@@ -14,12 +14,32 @@ import (
 /// CreateMainRecord
 
 const createMainRecordMutation = `
-INSERT INTO
-  "project"."TableMain" ("projectId", "branchId", "name", "type", "description", "metadata", "data")
-VALUES
-  (@projectId, @branchId, @name, @type, @description, @metadata, @data)
+INSERT INTO "project"."TableMain" (
+        "projectId",
+        "branchId",
+        "name",
+        "type",
+        "description",
+        "metadata",
+        "data"
+    )
+VALUES (
+        @projectId,
+        @branchId,
+        @name,
+        @type,
+        @description,
+        @metadata,
+        @data
+    )
 RETURNING 
-  "id", "name", "type", "description", "metadata", "data", "createdAt";
+    "id",
+    "name",
+    "type",
+    "description",
+    "metadata",
+    "data",
+    "createdAt";
 `
 
 func (store *tableRecordStore) CreateMainRecord(ctx context.Context, projectId int, branchId int, table *table_record.MainRecord) (*table_record.MainRecord, error) {
