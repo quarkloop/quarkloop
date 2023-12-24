@@ -14,12 +14,29 @@ import (
 /// CreateDocumentRecord
 
 const createDocumentRecordMutation = `
-INSERT INTO
-  "project"."TableDocument" ("projectId", "branchId", "name", "description", "metadata", "data")
-VALUES
-  (@projectId, @branchId, @name, @description, @metadata, @data)
-RETURNING
-  "id", "name", "description", "metadata", "data", "createdAt";
+INSERT INTO "project"."TableDocument" (
+        "projectId",
+        "branchId",
+        "name",
+        "description",
+        "metadata",
+        "data"
+    )
+VALUES (
+        @projectId,
+        @branchId,
+        @name,
+        @description,
+        @metadata,
+        @data
+    )
+RETURNING 
+    "id",
+    "name",
+    "description",
+    "metadata",
+    "data",
+    "createdAt";
 `
 
 func (store *tableRecordStore) CreateDocumentRecord(ctx context.Context, projectId int, branchId int, doc *table_record.DocumentRecord) (*table_record.DocumentRecord, error) {
