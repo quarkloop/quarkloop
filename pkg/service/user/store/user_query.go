@@ -14,7 +14,7 @@ import (
 
 const getUserByIdQuery = `
 SELECT 
-	"id",
+    "id",
     "name",
     "email",
     "emailVerified",
@@ -28,9 +28,9 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"auth"."User"
+    "auth"."User"
 WHERE 
-	"id" = @id;
+    "id" = @id;
 `
 
 func (store *orgStore) GetUserById(ctx context.Context, userId int) (*user.User, error) {
@@ -64,7 +64,7 @@ func (store *orgStore) GetUserById(ctx context.Context, userId int) (*user.User,
 
 const getUserByEmailQuery = `
 SELECT 
-	"id",
+    "id",
     "name",
     "email",
     "emailVerified",
@@ -78,9 +78,9 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"auth"."User"
+    "auth"."User"
 WHERE 
-	"email" = @email;
+    "email" = @email;
 `
 
 func (store *orgStore) GetUserByEmail(ctx context.Context, email string) (*user.User, error) {
@@ -114,7 +114,7 @@ func (store *orgStore) GetUserByEmail(ctx context.Context, email string) (*user.
 
 const getUserAccountByUserIdQuery = `
 SELECT 
-	"id",
+    "id",
     "type",
     "provider",
     "providerAccountId",
@@ -126,9 +126,9 @@ SELECT
     "id_token",
     "session_state"
 FROM 
-	"auth"."Account"
+    "auth"."Account"
 WHERE 
-	"userId" = @userId;
+    "userId" = @userId;
 `
 
 func (store *orgStore) GetUserAccountByUserId(ctx context.Context, userId int) (*user.UserAccount, error) {
@@ -160,13 +160,13 @@ func (store *orgStore) GetUserAccountByUserId(ctx context.Context, userId int) (
 
 const getUserSessionByUserIdQuery = `
 SELECT 
-	"id",
+    "id",
     "sessionToken",
     "expires"
 FROM 
-	"auth"."Session"
+    "auth"."Session"
 WHERE 
-	"userId" = @userId;
+    "userId" = @userId;
 `
 
 func (store *orgStore) GetUserSessionByUserId(ctx context.Context, userId int) (*user.UserSession, error) {
