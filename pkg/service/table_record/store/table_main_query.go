@@ -13,19 +13,32 @@ import (
 
 const listMainRecordsQuery = `
 SELECT 
-  tbl."id", tbl."name", tbl."type", tbl."description", tbl."metadata", tbl."data", tbl."createdAt", tbl."createdBy", tbl."updatedAt", tbl."updatedBy"
-  COUNT(doc.id)     AS doc,
-  COUNT(form.id)    AS form,
-  COUNT(payment.id) AS payment
-FROM project."TableMain" AS tbl 
-LEFT JOIN project."TableDocument" AS doc     ON tbl.id = doc."mainId"
-LEFT JOIN project."TableForm"     AS form    ON tbl.id = form."mainId"
-LEFT JOIN project."TablePayment"  AS payment ON tbl.id = payment."mainId"
+	tbl."id",
+    tbl."name",
+    tbl."type",
+    tbl."description",
+    tbl."metadata",
+    tbl."data",
+    tbl."createdAt",
+    tbl."createdBy",
+    tbl."updatedAt",
+    tbl."updatedBy" COUNT(doc.id) AS doc,
+    COUNT(form.id) AS form,
+    COUNT(payment.id) AS payment
+FROM 
+	project."TableMain" AS tbl
+LEFT JOIN 
+	project."TableDocument" AS doc ON tbl.id = doc."mainId"
+LEFT JOIN 
+	project."TableForm" AS form ON tbl.id = form."mainId"
+LEFT JOIN 
+	project."TablePayment" AS payment ON tbl.id = payment."mainId"
 WHERE 
-  tbl."projectId" = @projectId
-AND
-  tbl."branchId" = @branchId  
-GROUP BY tbl.id;
+	tbl."projectId" = @projectId
+AND 
+	tbl."branchId" = @branchId
+GROUP BY 
+	tbl.id;
 `
 
 func (store *tableRecordStore) ListMainRecords(ctx context.Context, projectId int, branchId int) ([]table_record.MainRecordWithRelationCount, error) {
@@ -78,21 +91,34 @@ func (store *tableRecordStore) ListMainRecords(ctx context.Context, projectId in
 
 const getMainRecordByIdQuery = `
 SELECT 
-  tbl."id", tbl."name", tbl."type", tbl."description", tbl."metadata", tbl."data", tbl."createdAt", tbl."createdBy", tbl."updatedAt", tbl."updatedBy"
-  COUNT(doc.id)     AS doc,
-  COUNT(form.id)    AS form,
-  COUNT(payment.id) AS payment
-FROM "project"."TableMain" AS tbl 
-LEFT JOIN "project"."TableDocument" AS doc     ON tbl.id = doc."mainId"
-LEFT JOIN "project"."TableForm"     AS form    ON tbl.id = form."mainId"
-LEFT JOIN "project"."TablePayment"  AS payment ON tbl.id = payment."mainId"
-WHERE
-  tbl."projectId" = @projectId
-AND
-  tbl."branchId" = @branchId
-AND
-  tbl.id = @id
-GROUP BY tbl.id;
+	tbl."id",
+    tbl."name",
+    tbl."type",
+    tbl."description",
+    tbl."metadata",
+    tbl."data",
+    tbl."createdAt",
+    tbl."createdBy",
+    tbl."updatedAt",
+    tbl."updatedBy" COUNT(doc.id) AS doc,
+    COUNT(form.id) AS form,
+    COUNT(payment.id) AS payment
+FROM 
+	"project"."TableMain" AS tbl
+LEFT JOIN 
+	"project"."TableDocument" AS doc ON tbl.id = doc."mainId"
+LEFT JOIN 
+	"project"."TableForm" AS form ON tbl.id = form."mainId"
+LEFT JOIN 
+	"project"."TablePayment" AS payment ON tbl.id = payment."mainId"
+WHERE 
+	tbl."projectId" = @projectId
+AND 
+	tbl."branchId" = @branchId
+AND 
+	tbl.id = @id
+GROUP BY 
+	tbl.id;
 `
 
 func (store *tableRecordStore) GetMainRecordById(ctx context.Context, projectId int, branchId int, mainId string) (*table_record.MainRecordWithRelationCount, error) {
