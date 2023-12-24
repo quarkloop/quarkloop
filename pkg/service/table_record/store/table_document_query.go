@@ -12,14 +12,22 @@ import (
 /// ListDocumentRecords
 
 const listDocumentRecordsQuery = `
-SELECT
-  "id", "name", "description", "metadata", "data", "createdAt", "createdBy", "updatedAt", "updatedBy"
-FROM
-  "project"."TableDocument"
-WHERE
-  "projectId" = @projectId
-AND
-  "branchId" = @branchId;
+SELECT 
+	"id",
+    "name",
+    "description",
+    "metadata",
+    "data",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy"
+FROM 
+	"project"."TableDocument"
+WHERE 
+	"projectId" = @projectId
+AND 
+	"branchId" = @branchId;
 `
 
 func (store *tableRecordStore) ListDocumentRecords(ctx context.Context, projectId int, branchId int) ([]table_record.DocumentRecord, error) {
@@ -67,16 +75,24 @@ func (store *tableRecordStore) ListDocumentRecords(ctx context.Context, projectI
 /// GetDocumentRecordById
 
 const getDocumentRecordByIdQuery = `
-SELECT
-  "id", "name", "description", "metadata", "data", "createdAt", "createdBy", "updatedAt", "updatedBy"
-FROM
-  "project"."TableDocument"
-WHERE
-  "projectId" = @projectId
-AND
-  "branchId" = @branchId
-AND
-  "id" = @id;
+SELECT 
+	"id",
+    "name",
+    "description",
+    "metadata",
+    "data",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy"
+FROM 
+	"project"."TableDocument"
+WHERE 
+	"projectId" = @projectId
+AND 
+	"branchId" = @branchId
+AND 
+	"id" = @id;
 `
 
 func (store *tableRecordStore) GetDocumentRecordById(ctx context.Context, projectId int, branchId int, documentId string) (*table_record.DocumentRecord, error) {
