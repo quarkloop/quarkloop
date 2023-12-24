@@ -15,14 +15,33 @@ import (
 /// CreateWorkspace
 
 const createWorkspaceMutation = `
-INSERT INTO
-  "system"."Workspace" ("orgId", "sid", "name", "description", "visibility", "createdBy")
-VALUES
-  (@orgId, @sid, @name, @description, @visibility, @createdBy)
+INSERT INTO "system"."Workspace" (
+        "orgId",
+        "sid",
+        "name",
+        "description",
+        "visibility",
+        "createdBy"
+    )
+VALUES (
+        @orgId,
+        @sid,
+        @name,
+        @description,
+        @visibility,
+        @createdBy
+    )
 RETURNING 
-  "id", "sid", "orgId",
-  "name", "description", "visibility",
-  "createdAt", "createdBy", "updatedAt", "updatedBy";
+    "id",
+    "sid",
+    "orgId",
+    "name",
+    "description",
+    "visibility",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy";
 `
 
 func (store *workspaceStore) CreateWorkspace(ctx context.Context, orgId int, ws *workspace.Workspace) (*workspace.Workspace, error) {
@@ -34,18 +53,14 @@ func (store *workspaceStore) CreateWorkspace(ctx context.Context, orgId int, ws 
 		ws.ScopedId = sid
 	}
 
-	row := store.Conn.QueryRow(
-		ctx,
-		createWorkspaceMutation,
-		pgx.NamedArgs{
-			"orgId":       orgId,
-			"sid":         ws.ScopedId,
-			"name":        ws.Name,
-			"description": ws.Description,
-			"visibility":  ws.Visibility,
-			"createdBy":   ws.CreatedBy,
-		},
-	)
+	row := store.Conn.QueryRow(ctx, createWorkspaceMutation, pgx.NamedArgs{
+		"orgId":       orgId,
+		"sid":         ws.ScopedId,
+		"name":        ws.Name,
+		"description": ws.Description,
+		"visibility":  ws.Visibility,
+		"createdBy":   ws.CreatedBy,
+	})
 
 	var workspace workspace.Workspace
 	rowErr := row.Scan(
@@ -85,19 +100,15 @@ WHERE
 `
 
 func (store *workspaceStore) UpdateWorkspaceById(ctx context.Context, workspaceId int, workspace *workspace.Workspace) error {
-	commandTag, err := store.Conn.Exec(
-		ctx,
-		updateWorkspaceByIdMutation,
-		pgx.NamedArgs{
-			"id":          workspaceId,
-			"sid":         workspace.ScopedId,
-			"name":        workspace.Name,
-			"description": workspace.Description,
-			"visibility":  *workspace.Visibility,
-			"updatedAt":   time.Now(),
-			"updatedBy":   workspace.UpdatedBy,
-		},
-	)
+	commandTag, err := store.Conn.Exec(ctx, updateWorkspaceByIdMutation, pgx.NamedArgs{
+		"id":          workspaceId,
+		"sid":         workspace.ScopedId,
+		"name":        workspace.Name,
+		"description": workspace.Description,
+		"visibility":  *workspace.Visibility,
+		"updatedAt":   time.Now(),
+		"updatedBy":   workspace.UpdatedBy,
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", err)
 		return err
