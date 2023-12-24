@@ -15,14 +15,14 @@ import (
 
 const createUserRoleQuery = `
 INSERT INTO "system"."UserRole" (
-	"orgId", 
-	"name", 
-	"createdBy"
+    "orgId", 
+    "name", 
+    "createdBy"
 )
 VALUES (
-	@orgId, 
-	@name, 
-	@createdBy
+    @orgId, 
+    @name, 
+    @createdBy
 )
 RETURNING 
     "id",
