@@ -13,7 +13,7 @@ import (
 
 const listTableBranchesQuery = `
 SELECT 
-	"id",
+    "id",
     "name",
     "description",
     "createdAt",
@@ -21,9 +21,9 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"project"."TableBranch"
+    "project"."TableBranch"
 WHERE 
-	"projectId" = @projectId;
+    "projectId" = @projectId;
 `
 
 func (store *tableBranchStore) ListTableBranches(ctx context.Context, projectId int) ([]table_branch.TableBranch, error) {
@@ -67,7 +67,7 @@ func (store *tableBranchStore) ListTableBranches(ctx context.Context, projectId 
 
 const getTableBranchByIdQuery = `
 SELECT 
-	"id",
+    "id",
     "name",
     "description",
     "createdAt",
@@ -75,11 +75,11 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"project"."TableBranch"
+    "project"."TableBranch"
 WHERE 
-	"id" = @id 
+    "id" = @id 
 AND 
-	"projectId" = @projectId;
+    "projectId" = @projectId;
 `
 
 func (store *tableBranchStore) GetTableBranchById(ctx context.Context, projectId int, branchId int) (*table_branch.TableBranch, error) {
