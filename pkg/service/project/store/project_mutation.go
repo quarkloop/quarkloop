@@ -15,14 +15,36 @@ import (
 /// CreateProject
 
 const createProjectMutation = `
-INSERT INTO
-  "system"."Project" ("orgId", "workspaceId", "sid", "name", "description", "visibility", "createdBy")
-VALUES
-  (@orgId, @workspaceId, @sid, @name, @description, @visibility, @createdBy)
+INSERT INTO "system"."Project" (
+        "orgId",
+        "workspaceId",
+        "sid",
+        "name",
+        "description",
+        "visibility",
+        "createdBy"
+    )
+VALUES (
+        @orgId,
+        @workspaceId,
+        @sid,
+        @name,
+        @description,
+        @visibility,
+        @createdBy
+    )
 RETURNING 
-  "id", "sid", "orgId", "workspaceId",
-  "name", "description", "visibility",
-  "createdAt", "createdBy", "updatedAt", "updatedBy";
+    "id",
+    "sid",
+    "orgId",
+    "workspaceId",
+    "name",
+    "description",
+    "visibility",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy";
 `
 
 func (store *projectStore) CreateProject(ctx context.Context, orgId int, workspaceId int, p *project.Project) (*project.Project, error) {
