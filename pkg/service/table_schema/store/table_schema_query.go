@@ -13,7 +13,7 @@ import (
 
 const listTableSchemasQuery = `
 SELECT 
-	"id",
+    "id",
     "name",
     "description",
     "metadata",
@@ -23,9 +23,9 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"project"."TableSchema"
+    "project"."TableSchema"
 WHERE 
-	"projectId" = @projectId;
+    "projectId" = @projectId;
 `
 
 func (store *tableSchemaStore) ListTableSchemas(ctx context.Context, projectId int) ([]table_schema.TableSchema, error) {
@@ -71,7 +71,7 @@ func (store *tableSchemaStore) ListTableSchemas(ctx context.Context, projectId i
 
 const getTableSchemaByIdQuery = `
 SELECT 
-	"id",
+    "id",
     "name",
     "description",
     "metadata",
@@ -81,11 +81,11 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-	"project"."TableSchema"
+    "project"."TableSchema"
 WHERE 
-	"projectId" = @projectId
+    "projectId" = @projectId
 AND 
-	"id" = @id;
+    "id" = @id;
 `
 
 func (store *tableSchemaStore) GetTableSchemaById(ctx context.Context, projectId int, schemaId string) (*table_schema.TableSchema, error) {
