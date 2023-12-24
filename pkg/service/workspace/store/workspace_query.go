@@ -15,7 +15,7 @@ import (
 
 const listWorkspacesQuery = `
 SELECT 
-	ws."id",
+    ws."id",
     ws."sid",
     ws."orgId",
     org."sid",
@@ -27,11 +27,11 @@ SELECT
     ws."updatedAt",
     ws."updatedBy"
 FROM 
-	"system"."Workspace" AS ws
+    "system"."Workspace" AS ws
 LEFT JOIN 
-	system."Organization" AS org ON org."id" = ws."orgId"
+    system."Organization" AS org ON org."id" = ws."orgId"
 WHERE 
-	ws."orgId" = ANY (@orgId);
+    ws."orgId" = ANY (@orgId);
 `
 
 func (store *workspaceStore) ListWorkspaces(ctx context.Context, orgId []int) ([]workspace.Workspace, error) {
@@ -79,7 +79,7 @@ func (store *workspaceStore) ListWorkspaces(ctx context.Context, orgId []int) ([
 
 const getWorkspaceByIdQuery = `
 SELECT 
-	ws."id",
+    ws."id",
     ws."sid",
     ws."orgId",
     org."sid",
@@ -91,11 +91,11 @@ SELECT
     ws."updatedAt",
     ws."updatedBy"
 FROM 
-	"system"."Workspace" AS ws
+    "system"."Workspace" AS ws
 LEFT JOIN 
-	system."Organization" AS org ON org."id" = ws."orgId"
+    system."Organization" AS org ON org."id" = ws."orgId"
 WHERE 
-	ws."id" = @id;
+    ws."id" = @id;
 `
 
 func (store *workspaceStore) GetWorkspaceById(ctx context.Context, workspaceId int) (*workspace.Workspace, error) {
@@ -127,7 +127,7 @@ func (store *workspaceStore) GetWorkspaceById(ctx context.Context, workspaceId i
 
 const getWorkspaceQuery = `
 SELECT 
-	ws."id",
+    ws."id",
     ws."sid",
     ws."orgId",
     org."sid",
@@ -139,13 +139,13 @@ SELECT
     ws."updatedAt",
     ws."updatedBy"
 FROM 
-	"system"."Workspace" AS ws
+    "system"."Workspace" AS ws
 LEFT JOIN 
-	system."Organization" AS org ON org."id" = ws."orgId"
+    system."Organization" AS org ON org."id" = ws."orgId"
 WHERE 
-	%s
+    %s
 ORDER BY 
-	"updatedAt" ASC
+    "updatedAt" ASC
 LIMIT 1;
 `
 
