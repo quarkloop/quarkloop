@@ -63,13 +63,13 @@ func (store *accessControlStore) CreateUserRole(ctx context.Context, orgId int, 
 
 const updateUserRoleByIdQuery = `
 UPDATE
-  "system"."UserRole"
+    "system"."UserRole"
 SET
-  "name"        = @name,
-  "updatedAt"   = @updatedAt,
-  "updatedBy"   = @updatedBy,
+    "name"        = @name,
+    "updatedAt"   = @updatedAt,
+    "updatedBy"   = @updatedBy,
 WHERE
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *accessControlStore) UpdateUserRoleById(ctx context.Context, userRoleId int, userRole *accesscontrol.UserRole) error {
@@ -97,11 +97,11 @@ func (store *accessControlStore) UpdateUserRoleById(ctx context.Context, userRol
 
 const deleteUserRoleByIdQuery = `
 DELETE FROM
-  "system"."UserRole"
+    "system"."UserRole"
 WHERE
-  "orgId" = @orgId
+    "orgId" = @orgId
 AND
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *accessControlStore) DeleteUserRoleById(ctx context.Context, orgId int, userRoleId int) error {
