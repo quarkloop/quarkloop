@@ -15,21 +15,21 @@ import (
 
 const createFormRecordMutation = `
 INSERT INTO "project"."TableForm" (
-        "projectId",
-        "branchId",
-        "name",
-        "description",
-        "metadata",
-        "data"
-    )
+    "projectId",
+    "branchId",
+    "name",
+    "description",
+    "metadata",
+    "data"
+)
 VALUES (
-        @projectId,
-        @branchId,
-        @name,
-        @description,
-        @metadata,
-        @data
-    )
+    @projectId,
+    @branchId,
+    @name,
+    @description,
+    @metadata,
+    @data
+)
 RETURNING 
     "id",
     "name",
@@ -70,19 +70,19 @@ func (store *tableRecordStore) CreateFormRecord(ctx context.Context, projectId i
 
 const updateFormRecordByIdMutation = `
 UPDATE
-  "project"."TableForm"
+    "project"."TableForm"
 SET
-  "name"        = @name,
-  "description" = @description,
-  "metadata"    = @metadata,
-  "data"        = @data,
-  "updatedAt"   = @updatedAt
+    "name"        = @name,
+    "description" = @description,
+    "metadata"    = @metadata,
+    "data"        = @data,
+    "updatedAt"   = @updatedAt
 WHERE
-  "projectId" = @projectId
+    "projectId" = @projectId
 AND
-  "branchId" = @branchId
+    "branchId" = @branchId
 AND
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *tableRecordStore) UpdateFormRecordById(ctx context.Context, projectId int, branchId int, formId string, form *table_record.FormRecord) error {
@@ -118,13 +118,13 @@ func (store *tableRecordStore) UpdateFormRecordById(ctx context.Context, project
 
 const deleteFormRecordByIdMutation = `
 DELETE FROM
-  "project"."TableForm"
+    "project"."TableForm"
 WHERE
-  "projectId" = @projectId
+    "projectId" = @projectId
 AND
-  "branchId" = @branchId
+    "branchId" = @branchId
 AND
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *tableRecordStore) DeleteFormRecordById(ctx context.Context, projectId int, branchId int, formId string) error {
