@@ -15,19 +15,19 @@ import (
 
 const createTableSchemaMutation = `
 INSERT INTO "project"."TableSchema" (
-        "projectId",
-        "name",
-        "description",
-        "metadata",
-        "data"
-    )
+    "projectId",
+    "name",
+    "description",
+    "metadata",
+    "data"
+)
 VALUES (
-        @projectId,
-        @name,
-        @description,
-        @metadata,
-        @data
-    )
+    @projectId,
+    @name,
+    @description,
+    @metadata,
+    @data
+)
 RETURNING 
     "id",
     "name",
@@ -67,17 +67,17 @@ func (store *tableSchemaStore) CreateTableSchema(ctx context.Context, projectId 
 
 const updateTableSchemaByIdMutation = `
 UPDATE
-  "project"."TableSchema"
+    "project"."TableSchema"
 SET
-  "name"        = @name,
-  "description" = @description,
-  "metadata"    = @metadata,
-  "data"        = @data,
-  "updatedAt"   = @updatedAt
+    "name"        = @name,
+    "description" = @description,
+    "metadata"    = @metadata,
+    "data"        = @data,
+    "updatedAt"   = @updatedAt
 WHERE
-  "id" = @id
+    "id" = @id
 AND
-  "projectId" = @projectId;
+    "projectId" = @projectId;
 `
 
 func (store *tableSchemaStore) UpdateTableSchemaById(ctx context.Context, projectId int, schemaId string, schema *table_schema.TableSchema) error {
@@ -112,11 +112,11 @@ func (store *tableSchemaStore) UpdateTableSchemaById(ctx context.Context, projec
 
 const deleteTableSchemaByIdMutation = `
 DELETE FROM
-  "project"."TableSchema"
+    "project"."TableSchema"
 WHERE
-  "id" = @id
+    "id" = @id
 AND
-  "projectId" = @projectId;
+    "projectId" = @projectId;
 `
 
 func (store *tableSchemaStore) DeleteTableSchemaById(ctx context.Context, projectId int, schemaId string) error {
