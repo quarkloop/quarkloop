@@ -13,7 +13,8 @@ import (
 /// UpdateQuotaLimit
 
 const updateQuotaLimitMutation = `
-UPDATE "system"."Quota" AS q
+UPDATE 
+    "system"."Quota" AS q
 SET 
     "orgLimit" = CASE
         WHEN @orgLimit > 0 THEN @orgLimit
@@ -33,7 +34,8 @@ SET
     END,
     "updatedAt" = @updatedAt,
     "updatedBy" = @updatedBy
-WHERE "userId" = @userId;
+WHERE 
+    "userId" = @userId;
 `
 
 func (store *quotaStore) UpdateQuotaLimits(ctx context.Context, userId int, limit QuoataLimit) error {
