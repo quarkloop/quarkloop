@@ -16,23 +16,23 @@ import (
 
 const createProjectMutation = `
 INSERT INTO "system"."Project" (
-        "orgId",
-        "workspaceId",
-        "sid",
-        "name",
-        "description",
-        "visibility",
-        "createdBy"
-    )
+    "orgId",
+    "workspaceId",
+    "sid",
+    "name",
+    "description",
+    "visibility",
+    "createdBy"
+)
 VALUES (
-        @orgId,
-        @workspaceId,
-        @sid,
-        @name,
-        @description,
-        @visibility,
-        @createdBy
-    )
+    @orgId,
+    @workspaceId,
+    @sid,
+    @name,
+    @description,
+    @visibility,
+    @createdBy
+)
 RETURNING 
     "id",
     "sid",
@@ -94,15 +94,15 @@ func (store *projectStore) CreateProject(ctx context.Context, orgId int, workspa
 
 const updateProjectByIdMutation = `
 UPDATE
-  "system"."Project"
+    "system"."Project"
 SET
-  "sid"         = @sid,
-  "name"        = @name,
-  "description" = @description,
-  "updatedAt"   = @updatedAt,
-  "updatedBy"   = @updatedBy,
+    "sid"         = @sid,
+    "name"        = @name,
+    "description" = @description,
+    "updatedAt"   = @updatedAt,
+    "updatedBy"   = @updatedBy,
 WHERE
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *projectStore) UpdateProjectById(ctx context.Context, projectId int, project *project.Project) error {
@@ -136,9 +136,9 @@ func (store *projectStore) UpdateProjectById(ctx context.Context, projectId int,
 
 const deleteProjectByIdMutation = `
 DELETE FROM
-  "system"."Project"
+    "system"."Project"
 WHERE
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *projectStore) DeleteProjectById(ctx context.Context, projectId int) error {
