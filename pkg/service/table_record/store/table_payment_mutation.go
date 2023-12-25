@@ -15,21 +15,21 @@ import (
 
 const createPaymentRecordMutation = `
 INSERT INTO "project"."TablePayment" (
-        "projectId",
-        "branchId",
-        "name",
-        "description",
-        "metadata",
-        "data"
-    )
+    "projectId",
+    "branchId",
+    "name",
+    "description",
+    "metadata",
+    "data"
+)
 VALUES (
-        @projectId,
-        @branchId,
-        @name,
-        @description,
-        @metadata,
-        @data
-    )
+    @projectId,
+    @branchId,
+    @name,
+    @description,
+    @metadata,
+    @data
+)
 RETURNING 
     "id",
     "name",
@@ -70,19 +70,19 @@ func (store *tableRecordStore) CreatePaymentRecord(ctx context.Context, projectI
 
 const updatePaymentRecordByIdMutation = `
 UPDATE
-  "project"."TablePayment"
+    "project"."TablePayment"
 SET
-  "name"        = @name,
-  "description" = @description,
-  "metadata"    = @metadata,
-  "data"        = @data,
-  "updatedAt"   = @updatedAt
+    "name"        = @name,
+    "description" = @description,
+    "metadata"    = @metadata,
+    "data"        = @data,
+    "updatedAt"   = @updatedAt
 WHERE
-  "projectId" = @projectId
+    "projectId" = @projectId
 AND
-  "branchId" = @branchId
+    "branchId" = @branchId
 AND
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *tableRecordStore) UpdatePaymentRecordById(ctx context.Context, projectId int, branchId int, paymentId string, payment *table_record.PaymentRecord) error {
@@ -118,13 +118,13 @@ func (store *tableRecordStore) UpdatePaymentRecordById(ctx context.Context, proj
 
 const deletePaymentRecordByIdMutation = `
 DELETE FROM
-  "project"."TablePayment"
+    "project"."TablePayment"
 WHERE
-  "projectId" = @projectId
+    "projectId" = @projectId
 AND
-  "branchId" = @branchId
+    "branchId" = @branchId
 AND
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *tableRecordStore) DeletePaymentRecordById(ctx context.Context, projectId int, branchId int, paymentId string) error {
