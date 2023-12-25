@@ -16,19 +16,19 @@ import (
 
 const createOrganizationMutation = `
 INSERT INTO "system"."Organization" (
-        "sid",
-        "name",
-        "description",
-        "visibility",
-        "createdBy"
-    )
+    "sid",
+    "name",
+    "description",
+    "visibility",
+    "createdBy"
+)
 VALUES (
-        @sid,
-        @name,
-        @description,
-        @visibility,
-        @createdBy
-    )
+    @sid,
+    @name,
+    @description,
+    @visibility,
+    @createdBy
+)
 RETURNING 
     "id",
     "sid",
@@ -78,16 +78,16 @@ func (store *orgStore) CreateOrganization(ctx context.Context, organization *org
 
 const updateOrganizationByIdMutation = `
 UPDATE
-  "system"."Organization"
+    "system"."Organization"
 SET
-  "sid"         = @sid, 
-  "name"        = @name,
-  "description" = @description,
-  "visibility"  = @visibility,
-  "updatedAt"   = @updatedAt,
-  "updatedBy"   = @updatedBy,
+    "sid"         = @sid, 
+    "name"        = @name,
+    "description" = @description,
+    "visibility"  = @visibility,
+    "updatedAt"   = @updatedAt,
+    "updatedBy"   = @updatedBy,
 WHERE
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *orgStore) UpdateOrganizationById(ctx context.Context, orgId int, org *org.Organization) error {
@@ -118,9 +118,9 @@ func (store *orgStore) UpdateOrganizationById(ctx context.Context, orgId int, or
 
 const deleteOrganizationByIdMutation = `
 DELETE FROM
-  "system"."Organization"
+    "system"."Organization"
 WHERE
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *orgStore) DeleteOrganizationById(ctx context.Context, orgId int) error {
