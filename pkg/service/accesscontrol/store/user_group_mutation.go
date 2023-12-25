@@ -65,13 +65,13 @@ func (store *accessControlStore) CreateUserGroup(ctx context.Context, orgId int,
 
 const updateUserGroupByIdQuery = `
 UPDATE
-  "system"."UserGroup"
+    "system"."UserGroup"
 SET
-  "name"        = @name,
-  "updatedAt"   = @updatedAt,
-  "updatedBy"   = @updatedBy,
+    "name"        = @name,
+    "updatedAt"   = @updatedAt,
+    "updatedBy"   = @updatedBy,
 WHERE
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *accessControlStore) UpdateUserGroupById(ctx context.Context, userGroupId int, userGroup *accesscontrol.UserGroup) error {
@@ -99,11 +99,11 @@ func (store *accessControlStore) UpdateUserGroupById(ctx context.Context, userGr
 
 const deleteUserGroupByIdQuery = `
 DELETE FROM
-  "system"."UserGroup"
+    "system"."UserGroup"
 WHERE
-  "orgId" = @orgId
+    "orgId" = @orgId
 AND
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *accessControlStore) DeleteUserGroupById(ctx context.Context, orgId int, userGroupId int) error {
