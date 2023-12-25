@@ -63,16 +63,16 @@ func (store *tableBranchStore) CreateTableBranch(ctx context.Context, projectId 
 
 const updateTableBranchByIdMutation = `
 UPDATE
-  "project"."TableBranch"
+    "project"."TableBranch"
 set
-  "name"        = @name,
-  "description" = @description,
-  "updatedAt"   = @updatedAt,
-  "updatedBy"   = @updatedBy,
+    "name"        = @name,
+    "description" = @description,
+    "updatedAt"   = @updatedAt,
+    "updatedBy"   = @updatedBy,
 WHERE
-  "id" = @id
+    "id" = @id
 AND
-  "projectId" = @projectId;
+    "projectId" = @projectId;
 `
 
 func (store *tableBranchStore) UpdateTableBranchById(ctx context.Context, projectId int, branchId int, branch *table_branch.TableBranch) error {
@@ -106,11 +106,11 @@ func (store *tableBranchStore) UpdateTableBranchById(ctx context.Context, projec
 
 const deleteTableBranchByIdMutation = `
 DELETE FROM
-  "project"."TableBranch"
+    "project"."TableBranch"
 WHERE
-  "id" = @id
+    "id" = @id
 AND
-  "projectId" = @projectId;
+    "projectId" = @projectId;
 `
 
 func (store *tableBranchStore) DeleteTableBranchById(ctx context.Context, projectId int, branchId int) error {
