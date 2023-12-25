@@ -15,23 +15,23 @@ import (
 
 const createMainRecordMutation = `
 INSERT INTO "project"."TableMain" (
-        "projectId",
-        "branchId",
-        "name",
-        "type",
-        "description",
-        "metadata",
-        "data"
-    )
+    "projectId",
+    "branchId",
+    "name",
+    "type",
+    "description",
+    "metadata",
+    "data"
+)
 VALUES (
-        @projectId,
-        @branchId,
-        @name,
-        @type,
-        @description,
-        @metadata,
-        @data
-    )
+    @projectId,
+    @branchId,
+    @name,
+    @type,
+    @description,
+    @metadata,
+    @data
+)
 RETURNING 
     "id",
     "name",
@@ -113,20 +113,20 @@ func (store *tableRecordStore) CreateBulkMainRecords(ctx context.Context, projec
 
 const updateMainRecordByIdMutation = `
 UPDATE
-  "project"."TableMain"
+    "project"."TableMain"
 SET
-  "name"        = @name,
-  "type"        = @type,
-  "description" = @description,
-  "metadata"    = @metadata,
-  "data"        = @data,
-  "updatedAt"   = @updatedAt
+    "name"        = @name,
+    "type"        = @type,
+    "description" = @description,
+    "metadata"    = @metadata,
+    "data"        = @data,
+    "updatedAt"   = @updatedAt
 WHERE
-  "projectId" = @projectId
+    "projectId" = @projectId
 AND
-  "branchId" = @branchId
+    "branchId" = @branchId
 AND
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *tableRecordStore) UpdateMainRecordById(ctx context.Context, projectId int, branchId int, mainId string, table *table_record.MainRecord) error {
@@ -163,13 +163,13 @@ func (store *tableRecordStore) UpdateMainRecordById(ctx context.Context, project
 
 const deleteMainRecordByIdMutation = `
 DELETE FROM
-  "project"."TableMain"
+    "project"."TableMain"
 WHERE
-  "projectId" = @projectId
+    "projectId" = @projectId
 AND
-  "branchId" = @branchId
+    "branchId" = @branchId
 AND
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *tableRecordStore) DeleteMainRecordById(ctx context.Context, projectId int, branchId int, mainId string) error {
