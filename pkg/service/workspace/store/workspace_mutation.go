@@ -16,21 +16,21 @@ import (
 
 const createWorkspaceMutation = `
 INSERT INTO "system"."Workspace" (
-        "orgId",
-        "sid",
-        "name",
-        "description",
-        "visibility",
-        "createdBy"
-    )
+    "orgId",
+    "sid",
+    "name",
+    "description",
+    "visibility",
+    "createdBy"
+)
 VALUES (
-        @orgId,
-        @sid,
-        @name,
-        @description,
-        @visibility,
-        @createdBy
-    )
+    @orgId,
+    @sid,
+    @name,
+    @description,
+    @visibility,
+    @createdBy
+)
 RETURNING 
     "id",
     "sid",
@@ -87,16 +87,16 @@ func (store *workspaceStore) CreateWorkspace(ctx context.Context, orgId int, ws 
 
 const updateWorkspaceByIdMutation = `
 UPDATE
-  "system"."Workspace"
+    "system"."Workspace"
 SET
-  "sid"         = @sid,
-  "name"        = @name,
-  "description" = @description,
-  "visibility"  = @visibility,
-  "updatedAt"   = @updatedAt,
-  "updatedBy"   = @updatedBy,
+    "sid"         = @sid,
+    "name"        = @name,
+    "description" = @description,
+    "visibility"  = @visibility,
+    "updatedAt"   = @updatedAt,
+    "updatedBy"   = @updatedBy,
 WHERE
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *workspaceStore) UpdateWorkspaceById(ctx context.Context, workspaceId int, workspace *workspace.Workspace) error {
@@ -127,9 +127,9 @@ func (store *workspaceStore) UpdateWorkspaceById(ctx context.Context, workspaceI
 
 const deleteWorkspaceByIdMutation = `
 DELETE FROM
-  "system"."Workspace"
+    "system"."Workspace"
 WHERE
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *workspaceStore) DeleteWorkspaceById(ctx context.Context, workspaceId int) error {
