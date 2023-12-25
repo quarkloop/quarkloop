@@ -15,20 +15,20 @@ import (
 
 const updateUserByIdMutation = `
 UPDATE
-  "auth"."User"
+    "auth"."User"
 SET
-  "email"         = @email,
-  "emailVerified" = @emailVerified,
-  "password"      = @password,
-  "name"          = @name,
-  "birthdate"     = @birthdate,
-  "country"       = @country,
-  "image"         = @image,
-  "status"        = @status,
-  "updatedAt"     = @updatedAt,
-  "updatedBy"     = @updatedBy,
+    "email"         = @email,
+    "emailVerified" = @emailVerified,
+    "password"      = @password,
+    "name"          = @name,
+    "birthdate"     = @birthdate,
+    "country"       = @country,
+    "image"         = @image,
+    "status"        = @status,
+    "updatedAt"     = @updatedAt,
+    "updatedBy"     = @updatedBy,
 WHERE
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *orgStore) UpdateUserById(ctx context.Context, userId int, user *user.User) error {
@@ -64,9 +64,9 @@ func (store *orgStore) UpdateUserById(ctx context.Context, userId int, user *use
 
 const deleteUserByIdMutation = `
 DELETE FROM
-  "auth"."User"
+    "auth"."User"
 WHERE
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *orgStore) DeleteUserById(ctx context.Context, userId int) error {
