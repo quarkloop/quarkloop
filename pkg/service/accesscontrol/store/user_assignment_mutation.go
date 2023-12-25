@@ -15,20 +15,20 @@ import (
 
 const createUserAssignmentQuery = `
 INSERT INTO "system"."UserAssignment" (
-        "orgId",
-        "workspaceId",
-        "projectId",
-        "userGroupId",
-        "userRoleId",
-        "createdBy"
+    "orgId",
+    "workspaceId",
+    "projectId",
+    "userGroupId",
+    "userRoleId",
+    "createdBy"
 )
 VALUES (
-        @orgId,
-        NULLIF(@workspaceId, 0),
-        NULLIF(@projectId, 0),
-        @userGroupId,
-        @userRoleId,
-        @createdBy
+    @orgId,
+    NULLIF(@workspaceId, 0),
+    NULLIF(@projectId, 0),
+    @userGroupId,
+    @userRoleId,
+    @createdBy
 )
 RETURNING 
     "id",
@@ -78,13 +78,13 @@ func (store *accessControlStore) CreateUserAssignment(ctx context.Context, orgId
 
 const updateUserAssignmentByIdQuery = `
 UPDATE
-  "system"."UserAssignment"
+    "system"."UserAssignment"
 SET
-  "userRoleId"  = @userRoleId,
-  "updatedAt"   = @updatedAt,
-  "updatedBy"   = @updatedBy,
+    "userRoleId"  = @userRoleId,
+    "updatedAt"   = @updatedAt,
+    "updatedBy"   = @updatedBy,
 WHERE
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *accessControlStore) UpdateUserAssignmentById(ctx context.Context, userAssignmentId int, userRole *accesscontrol.UserAssignment) error {
@@ -112,11 +112,11 @@ func (store *accessControlStore) UpdateUserAssignmentById(ctx context.Context, u
 
 const deleteUserAssignmentByIdQuery = `
 DELETE FROM
-  "system"."UserAssignment"
+    "system"."UserAssignment"
 WHERE
-  "orgId" = @orgId
+    "orgId" = @orgId
 AND
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *accessControlStore) DeleteUserAssignmentById(ctx context.Context, orgId int, userAssignmentId int) error {
