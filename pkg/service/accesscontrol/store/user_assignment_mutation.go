@@ -80,9 +80,9 @@ const updateUserAssignmentByIdQuery = `
 UPDATE
     "system"."UserAssignment"
 SET
-    "userRoleId"  = @userRoleId,
-    "updatedAt"   = @updatedAt,
-    "updatedBy"   = @updatedBy,
+    "userRoleId" = @userRoleId,
+    "updatedAt"  = @updatedAt,
+    "updatedBy"  = @updatedBy,
 WHERE
     "id" = @id;
 `
