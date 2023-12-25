@@ -15,21 +15,21 @@ import (
 
 const createDocumentRecordMutation = `
 INSERT INTO "project"."TableDocument" (
-        "projectId",
-        "branchId",
-        "name",
-        "description",
-        "metadata",
-        "data"
-    )
+    "projectId",
+    "branchId",
+    "name",
+    "description",
+    "metadata",
+    "data"
+)
 VALUES (
-        @projectId,
-        @branchId,
-        @name,
-        @description,
-        @metadata,
-        @data
-    )
+    @projectId,
+    @branchId,
+    @name,
+    @description,
+    @metadata,
+    @data
+)
 RETURNING 
     "id",
     "name",
@@ -70,19 +70,19 @@ func (store *tableRecordStore) CreateDocumentRecord(ctx context.Context, project
 
 const updateDocumentRecordByIdMutation = `
 UPDATE
-  "project"."TableDocument"
+    "project"."TableDocument"
 SET
-  "name"        = @name,
-  "description" = @description,
-  "metadata"    = @metadata,
-  "data"        = @data,
-  "updatedAt"   = @updatedAt
+    "name"        = @name,
+    "description" = @description,
+    "metadata"    = @metadata,
+    "data"        = @data,
+    "updatedAt"   = @updatedAt
 WHERE
-  "projectId" = @projectId
+    "projectId" = @projectId
 AND
-  "branchId" = @branchId
+    "branchId" = @branchId
 AND
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *tableRecordStore) UpdateDocumentRecordById(ctx context.Context, projectId int, branchId int, documentId string, doc *table_record.DocumentRecord) error {
@@ -118,13 +118,13 @@ func (store *tableRecordStore) UpdateDocumentRecordById(ctx context.Context, pro
 
 const deleteDocumentRecordByIdMutation = `
 DELETE FROM
-  "project"."TableDocument"
+    "project"."TableDocument"
 WHERE
-  "projectId" = @projectId
+    "projectId" = @projectId
 AND
-  "branchId" = @branchId
+    "branchId" = @branchId
 AND
-  "id" = @id;
+    "id" = @id;
 `
 
 func (store *tableRecordStore) DeleteDocumentRecordById(ctx context.Context, projectId int, branchId int, documentId string) error {
