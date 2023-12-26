@@ -10,9 +10,12 @@ var (
 	ErrUserGroupNotFound  = errors.New("user group not found")
 	ErrRoleNotFound       = errors.New("role not found")
 	ErrPermissionNotFound = errors.New("permission not found")
+	ErrPermissionDenied   = errors.New("permission denied")
 )
 
 var (
+	GlobalOrgId = 0
+
 	// org actions
 	ActionOrgRead   = "org:read"
 	ActionOrgCreate = "org:create"
@@ -130,4 +133,8 @@ type Permission struct {
 	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
 	CreatedBy string     `json:"createdBy,omitempty"`
 	UpdatedBy *string    `json:"updatedBy,omitempty"`
+}
+
+type EvaluateFilterParams struct {
+	OrgId, WorkspaceId, ProjectId, UserId int
 }
