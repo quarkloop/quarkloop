@@ -96,10 +96,11 @@ model Project {
 model UserAssignment {
     // id
     id          BigInt  @id @default(autoincrement())
-    orgId       BigInt
+    orgId       BigInt?
     workspaceId BigInt?
     projectId   BigInt?
-    userGroupId BigInt
+    userId      BigInt? // CHECK constraint
+    userGroupId BigInt? // CHECK constraint
     userRoleId  BigInt
 
     // history
@@ -109,26 +110,25 @@ model UserAssignment {
     updatedBy String?
 
     // relation
-    org       Organization @relation(fields: [orgId], references: [id])
-    workspace Workspace?   @relation(fields: [workspaceId], references: [id])
-    project   Project?     @relation(fields: [projectId], references: [id])
-    userGroup UserGroup    @relation(fields: [userGroupId], references: [id])
-    role      UserRole     @relation(fields: [userRoleId], references: [id])
+    org       Organization? @relation(fields: [orgId], references: [id])
+    workspace Workspace?    @relation(fields: [workspaceId], references: [id])
+    project   Project?      @relation(fields: [projectId], references: [id])
+    userGroup UserGroup?    @relation(fields: [userGroupId], references: [id])
+    role      UserRole      @relation(fields: [userRoleId], references: [id])
 
     @@index([orgId, workspaceId])
     @@index([orgId, workspaceId, projectId])
-    @@index([userGroupId, userRoleId])
     @@schema("system")
 }
 
 model UserGroup {
     // id
-    id     BigInt  @id @default(autoincrement())
-    orgId  BigInt
-    userId BigInt?
+    id    BigInt @id @default(autoincrement())
+    orgId BigInt
 
     // user group
-    name String
+    name  String
+    users Json   @default(dbgenerated("[]")) @db.JsonB
 
     // history
     createdAt DateTime  @default(now())
@@ -140,7 +140,6 @@ model UserGroup {
     assignments UserAssignment[]
     org         Organization     @relation(fields: [orgId], references: [id])
 
-    @@index([userId])
     @@schema("system")
 }
 
