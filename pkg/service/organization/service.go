@@ -1,6 +1,8 @@
 package org
 
-import "context"
+import (
+	"context"
+)
 
 type Service interface {
 	GetOrganizationList(context.Context, *GetOrganizationListParams) ([]Organization, error)
