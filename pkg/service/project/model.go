@@ -2,6 +2,7 @@ package project
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -13,6 +14,11 @@ type ScopeVisibility int
 var (
 	Public  ScopeVisibility = 1
 	Private ScopeVisibility = 2
+	All     ScopeVisibility = 3
+)
+
+var (
+	ErrProjectNotFound = errors.New("project not found")
 )
 
 type Project struct {
