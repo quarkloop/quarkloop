@@ -38,19 +38,24 @@ WHERE
     %s;
 `
 
-func (store *projectStore) ListProjects(ctx context.Context, orgId []int, workspaceId []int) ([]project.Project, error) {
-	var whereClause string = `p."visibility" = 1` // TODO: 1 => public, 2 => private
+func (store *projectStore) ListProjects(ctx context.Context, visibility project.ScopeVisibility, orgId []int, workspaceId []int) ([]project.Project, error) {
+	whereClause := []string{}
 	if len(orgId) != 0 {
-		whereClause = `p."orgId" = ANY (@orgId)`
+		whereClause = append(whereClause, `p."orgId" = ANY (@orgId)`)
 	}
 	if len(workspaceId) != 0 {
-		whereClause = `p."workspaceId" = ANY (@workspaceId)`
+		whereClause = append(whereClause, `p."workspaceId" = ANY (@workspaceId)`)
 	}
-	finalQuery := fmt.Sprintf(listProjectsQuery, whereClause)
+	if visibility == project.Public || visibility == project.Private {
+		whereClause = append(whereClause, `p."visibility" = @visibility`)
+	}
+
+	finalQuery := fmt.Sprintf(listProjectsQuery, strings.Join(whereClause[:], " AND "))
 
 	rows, err := store.Conn.Query(ctx, finalQuery, pgx.NamedArgs{
 		"orgId":       orgId,
 		"workspaceId": workspaceId,
+		"visibility":  visibility,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
