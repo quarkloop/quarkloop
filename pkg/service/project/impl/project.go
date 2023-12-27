@@ -2,7 +2,10 @@ package project_impl
 
 import (
 	"context"
+	"errors"
 
+	"github.com/quarkloop/quarkloop/pkg/contextdata"
+	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/project/store"
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
@@ -11,103 +14,240 @@ import (
 
 type projectService struct {
 	store         store.ProjectStore
+	aclService    accesscontrol.Service
 	quotaService  quota.Service
 	branchService table_branch.Service
 }
 
-func NewProjectService(ds store.ProjectStore, quotaService quota.Service, branchService table_branch.Service) project.Service {
+func NewProjectService(
+	ds store.ProjectStore,
+	aclService accesscontrol.Service,
+	quotaService quota.Service,
+	branchService table_branch.Service,
+) project.Service {
 	return &projectService{
 		store:         ds,
+		aclService:    aclService,
 		quotaService:  quotaService,
 		branchService: branchService,
 	}
 }
 
-func (s *projectService) GetProjectList(ctx context.Context, p *project.GetProjectListParams) ([]project.Project, error) {
-	projectList, err := s.store.ListProjects(ctx, p.OrgId, p.WorkspaceId)
+func (s *projectService) GetProjectList(ctx context.Context, params *project.GetProjectListParams) ([]project.Project, error) {
+	if contextdata.IsUserAnonymous(ctx) {
+		// anonymous user => return public projects
+		projectList, err := s.getProjectList(ctx, project.Public, params)
+		return projectList, err
+	}
+
+	userId := contextdata.GetUserId(ctx)
+	permission, err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
+		OrgId:       0, // TODO
+		WorkspaceId: 0, // TODO
+		UserId:      userId,
+	})
 	if err != nil {
 		return nil, err
 	}
+	if !permission {
+		// unauthorized user (permission denied) => return public projects
+		projectList, err := s.getProjectList(ctx, project.Public, params)
+		return projectList, err
+	}
 
+	// authorized user => return public + private projects
+	projectList, err := s.getProjectList(ctx, project.All, params)
+	return projectList, err
+}
+
+func (s *projectService) getProjectList(ctx context.Context, visibility project.ScopeVisibility, params *project.GetProjectListParams) ([]project.Project, error) {
+	projectList, err := s.store.ListProjects(ctx, visibility, params.OrgId, params.WorkspaceId)
+	if err != nil {
+		return nil, err
+	}
 	for i := range projectList {
-		project := &projectList[i]
-		project.GeneratePath()
+		p := &projectList[i]
+		p.GeneratePath()
 	}
 	return projectList, nil
 }
 
-func (s *projectService) GetProjectById(ctx context.Context, p *project.GetProjectByIdParams) (*project.Project, error) {
-	project, err := s.store.GetProjectById(ctx, p.ProjectId)
+func (s *projectService) GetProjectById(ctx context.Context, params *project.GetProjectByIdParams) (*project.Project, error) {
+	p, err := s.store.GetProjectById(ctx, params.ProjectId)
 	if err != nil {
 		return nil, err
 	}
 
-	project.GeneratePath()
-	return project, nil
+	isPrivate := *p.Visibility == project.Private
+
+	// anonymous user => return project not found error
+	if isPrivate && contextdata.IsUserAnonymous(ctx) {
+		return nil, project.ErrProjectNotFound
+	}
+
+	if isPrivate {
+		// authorize signed-in user
+		userId := contextdata.GetUserId(ctx)
+		permission, err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
+			OrgId:       params.ProjectId,
+			WorkspaceId: params.ProjectId,
+			ProjectId:   params.ProjectId,
+			UserId:      userId, // TODO
+		})
+		if err != nil {
+			return nil, err
+		}
+		if !permission {
+			// unauthorized user (permission denied) => return project not found error
+			return nil, project.ErrProjectNotFound
+		}
+	}
+
+	// anonymous and unauthorized user => return public project
+	// authorized user => return public or private project
+	p.GeneratePath()
+	return p, nil
 }
 
-func (s *projectService) GetProject(ctx context.Context, p *project.GetProjectParams) (*project.Project, error) {
-	project, err := s.store.GetProject(ctx, &p.Project)
+// TODO
+// func (s *projectService) GetProject(ctx context.Context, params *project.GetProjectParams) (*project.Project, error) {
+// 	p, err := s.store.GetProject(ctx, &params.Project)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	isPrivate := *p.Visibility == project.Private
+
+// 	// anonymous user => return project not found error
+// 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
+// 		return nil, project.ErrProjectNotFound
+// 	}
+
+// 	if isPrivate {
+// 		// authorize signed-in user
+// 		userId := contextdata.GetUserId(ctx)
+// 		permission, err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
+// 			OrgId:       params.OrgId,
+// 			WorkspaceId: params.Project.WorkspaceId,
+// 			ProjectId:   params.Project.Id,
+// 			UserId:      userId, // TODO
+// 		})
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		if !permission {
+// 			// unauthorized user (permission denied) => return project not found error
+// 			return nil, project.ErrProjectNotFound
+// 		}
+// 	}
+
+// 	// anonymous and unauthorized user => return public project
+// 	// authorized user => return public or private project
+// 	p.GeneratePath()
+// 	return p, nil
+// }
+
+func (s *projectService) CreateProject(ctx context.Context, params *project.CreateProjectParams) (*project.Project, error) {
+	if contextdata.IsUserAnonymous(ctx) {
+		return nil, errors.New("not authorized")
+	}
+
+	userId := contextdata.GetUserId(ctx)
+	permission, err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectCreate, &accesscontrol.EvaluateFilterParams{
+		OrgId:       params.OrgId,
+		WorkspaceId: params.WorkspaceId,
+		UserId:      userId, // TODO
+	})
 	if err != nil {
 		return nil, err
 	}
+	if !permission {
+		return nil, accesscontrol.ErrPermissionDenied
+	}
 
-	project.GeneratePath()
-	return project, nil
-}
-
-func (s *projectService) CreateProject(ctx context.Context, p *project.CreateProjectParams) (*project.Project, error) {
-	err := s.quotaService.CheckCreateProjectQuotaReached(ctx, p.OrgId)
-	if err != nil {
+	if err := s.quotaService.CheckCreateProjectQuotaReached(ctx, params.OrgId); err != nil {
 		return nil, err
 	}
 
-	project, err := s.store.CreateProject(ctx, p.OrgId, p.WorkspaceId, &p.Project)
+	p, err := s.store.CreateProject(ctx, params.OrgId, params.WorkspaceId, &params.Project)
 	if err != nil {
 		return nil, err
 	}
-
-	project.GeneratePath()
+	p.GeneratePath()
 
 	mainBranch, err := s.branchService.CreateTableBranch(ctx, &table_branch.CreateTableBranchParams{
-		ProjectId: project.Id,
+		ProjectId: p.Id,
 		Branch: &table_branch.TableBranch{
 			Name:        "main",
 			Type:        "main",
 			Default:     true,
 			Description: "main branch",
-			CreatedBy:   "user",
+			CreatedBy:   "user", // TODO
 		},
 	})
 	if err != nil {
 		return nil, err
 	}
-	project.Branches = append(project.Branches, mainBranch)
+	p.Branches = append(p.Branches, mainBranch)
 
 	submissionBranch, err := s.branchService.CreateTableBranch(ctx, &table_branch.CreateTableBranchParams{
-		ProjectId: project.Id,
+		ProjectId: p.Id,
 		Branch: &table_branch.TableBranch{
 			Name:        "submission",
 			Type:        "submission",
 			Default:     false,
 			Description: "submission branch",
-			CreatedBy:   "user",
+			CreatedBy:   "user", // TODO
 		},
 	})
 	if err != nil {
 		return nil, err
 	}
-	project.Branches = append(project.Branches, submissionBranch)
+	p.Branches = append(p.Branches, submissionBranch)
 
-	return project, nil
+	return p, nil
 }
 
-func (s *projectService) UpdateProjectById(ctx context.Context, p *project.UpdateProjectByIdParams) error {
-	err := s.store.UpdateProjectById(ctx, p.ProjectId, &p.Project)
-	return err
+func (s *projectService) UpdateProjectById(ctx context.Context, params *project.UpdateProjectByIdParams) error {
+	if contextdata.IsUserAnonymous(ctx) {
+		return errors.New("not authorized")
+	}
+
+	userId := contextdata.GetUserId(ctx)
+	permission, err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectUpdate, &accesscontrol.EvaluateFilterParams{
+		OrgId:       params.ProjectId,
+		WorkspaceId: params.ProjectId,
+		ProjectId:   params.ProjectId,
+		UserId:      userId, // TODO
+	})
+	if err != nil {
+		return err
+	}
+	if !permission {
+		return accesscontrol.ErrPermissionDenied
+	}
+
+	return s.store.UpdateProjectById(ctx, params.ProjectId, &params.Project)
 }
 
-func (s *projectService) DeleteProjectById(ctx context.Context, p *project.DeleteProjectByIdParams) error {
-	err := s.store.DeleteProjectById(ctx, p.ProjectId)
-	return err
+func (s *projectService) DeleteProjectById(ctx context.Context, params *project.DeleteProjectByIdParams) error {
+	if contextdata.IsUserAnonymous(ctx) {
+		return errors.New("not authorized")
+	}
+
+	userId := contextdata.GetUserId(ctx)
+	permission, err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectDelete, &accesscontrol.EvaluateFilterParams{
+		OrgId:       params.ProjectId,
+		WorkspaceId: params.ProjectId,
+		ProjectId:   params.ProjectId,
+		UserId:      userId, // TODO
+	})
+	if err != nil {
+		return err
+	}
+	if !permission {
+		return accesscontrol.ErrPermissionDenied
+	}
+
+	return s.store.DeleteProjectById(ctx, params.ProjectId)
 }
