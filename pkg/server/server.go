@@ -14,6 +14,8 @@ import (
 	table_record "github.com/quarkloop/quarkloop/pkg/api/table_record"
 	table_schema "github.com/quarkloop/quarkloop/pkg/api/table_schema"
 	"github.com/quarkloop/quarkloop/pkg/api/workspace"
+	acl_impl "github.com/quarkloop/quarkloop/pkg/service/accesscontrol/impl"
+	acl_store "github.com/quarkloop/quarkloop/pkg/service/accesscontrol/store"
 	org_impl "github.com/quarkloop/quarkloop/pkg/service/organization/impl"
 	org_store "github.com/quarkloop/quarkloop/pkg/service/organization/store"
 	project_impl "github.com/quarkloop/quarkloop/pkg/service/project/impl"
@@ -72,15 +74,16 @@ func NewDefaultServer(ds *repository.Repository) Server {
 		MaxAge:        12 * time.Hour,
 	}))
 
+	aclService := acl_impl.NewAccessControlService(acl_store.NewAccessControlStore(ds.SystemDbConn))
 	quotaService := quota_impl.NewQuotaService(quota_store.NewQuotaStore(ds.SystemDbConn))
 
 	tableBranchService := table_branch_impl.NewTableBranchService(table_branch_store.NewTableBranchStore(ds.ProjectDbConn))
 	tableSchemaService := table_schema_impl.NewTableSchemaService(table_schema_store.NewTableSchemaStore(ds.ProjectDbConn))
 	tableRecordService := table_record_impl.NewTableRecordService(table_record_store.NewTableRecordStore(ds.ProjectDbConn))
 
-	orgService := org_impl.NewOrganizationService(org_store.NewOrgStore(ds.SystemDbConn), quotaService)
-	workspaceService := ws_impl.NewWorkspaceService(ws_store.NewWorkspaceStore(ds.SystemDbConn), quotaService)
-	projectTableService := project_impl.NewProjectService(project_store.NewProjectStore(ds.SystemDbConn), quotaService, tableBranchService)
+	orgService := org_impl.NewOrganizationService(org_store.NewOrgStore(ds.SystemDbConn), aclService, quotaService)
+	workspaceService := ws_impl.NewWorkspaceService(ws_store.NewWorkspaceStore(ds.SystemDbConn), aclService, quotaService)
+	projectTableService := project_impl.NewProjectService(project_store.NewProjectStore(ds.SystemDbConn), aclService, quotaService, tableBranchService)
 
 	projectSubmissionService := project_submission_impl.NewAppSubmissionService(ds)
 
