@@ -3,78 +3,46 @@ package organization_impl
 import (
 	"context"
 
-	org "github.com/quarkloop/quarkloop/pkg/service/organization"
-	"github.com/quarkloop/quarkloop/pkg/service/organization/store"
-	"github.com/quarkloop/quarkloop/pkg/service/quota"
+	"github.com/quarkloop/quarkloop/pkg/service/user"
+	"github.com/quarkloop/quarkloop/pkg/service/user/store"
 )
 
-type orgService struct {
-	store        store.OrgStore
-	quotaService quota.Service
+type userService struct {
+	store store.OrgStore
 }
 
-func NewOrganizationService(ds store.OrgStore, quota quota.Service) org.Service {
-	return &orgService{
-		store:        ds,
-		quotaService: quota,
+func NewOrganizationService(ds store.OrgStore) user.Service {
+	return &userService{
+		store: ds,
 	}
 }
 
-func (s *orgService) GetOrganizationList(ctx context.Context, p *org.GetOrganizationListParams) ([]org.Organization, error) {
-	orgList, err := s.store.ListOrganizations(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	for i := range orgList {
-		org := &orgList[i]
-		org.GeneratePath()
-	}
-	return orgList, nil
+func (s *userService) GetUserById(ctx context.Context, params *user.GetUserByIdParams) (*user.User, error) {
+	u, err := s.store.GetUserById(ctx, params.UserId)
+	return u, err
 }
 
-func (s *orgService) GetOrganizationById(ctx context.Context, p *org.GetOrganizationByIdParams) (*org.Organization, error) {
-	org, err := s.store.GetOrganizationById(ctx, p.OrgId)
-	if err != nil {
-		return nil, err
-	}
-
-	org.GeneratePath()
-	return org, nil
+func (s *userService) GetUserByEmail(ctx context.Context, params *user.GetUserByEmailParams) (*user.User, error) {
+	u, err := s.store.GetUserByEmail(ctx, params.Email)
+	return u, err
 }
 
-func (s *orgService) GetOrganization(ctx context.Context, p *org.GetOrganizationParams) (*org.Organization, error) {
-	org, err := s.store.GetOrganization(ctx, &p.Organization)
-	if err != nil {
-		return nil, err
-	}
-
-	org.GeneratePath()
-	return org, nil
+func (s *userService) GetUserAccountByUserId(ctx context.Context, params *user.GetUserAccountByUserIdParams) (*user.UserAccount, error) {
+	u, err := s.store.GetUserAccountByUserId(ctx, params.UserId)
+	return u, err
 }
 
-func (s *orgService) CreateOrganization(ctx context.Context, p *org.CreateOrganizationParams) (*org.Organization, error) {
-	userId := ctx.Value("userId").(int)
-	err := s.quotaService.CheckCreateOrgQuotaReached(ctx, userId)
-	if err != nil {
-		return nil, err
-	}
-
-	org, err := s.store.CreateOrganization(ctx, &p.Organization)
-	if err != nil {
-		return nil, err
-	}
-
-	org.GeneratePath()
-	return org, nil
+func (s *userService) GetUserSessionByUserId(ctx context.Context, params *user.GetUserSessionByUserIdParams) (*user.UserSession, error) {
+	u, err := s.store.GetUserSessionByUserId(ctx, params.UserId)
+	return u, err
 }
 
-func (s *orgService) UpdateOrganizationById(ctx context.Context, p *org.UpdateOrganizationByIdParams) error {
-	err := s.store.UpdateOrganizationById(ctx, p.OrgId, &p.Organization)
+func (s *userService) UpdateUserById(ctx context.Context, params *user.UpdateUserByIdParams) error {
+	err := s.store.UpdateUserById(ctx, params.UserId, &params.User)
 	return err
 }
 
-func (s *orgService) DeleteOrganizationById(ctx context.Context, p *org.DeleteOrganizationByIdParams) error {
-	err := s.store.DeleteOrganizationById(ctx, p.OrgId)
+func (s *userService) DeleteUserById(ctx context.Context, params *user.DeleteUserByIdParams) error {
+	err := s.store.DeleteUserById(ctx, params.UserId)
 	return err
 }
