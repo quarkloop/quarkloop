@@ -16,7 +16,7 @@ type CreateProjectRequest struct {
 
 func (s *ProjectApi) CreateProject(ctx *gin.Context) {
 	req := &CreateProjectRequest{}
-	if err := ctx.BindJSON(req); err != nil {
+	if err := ctx.ShouldBindJSON(req); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
@@ -52,7 +52,7 @@ func (s *ProjectApi) UpdateProjectById(ctx *gin.Context) {
 	}
 
 	req := &UpdateProjectByIdRequest{}
-	if err := ctx.BindJSON(req); err != nil {
+	if err := ctx.ShouldBindJSON(req); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
