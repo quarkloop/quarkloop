@@ -1,13 +1,13 @@
 package project
 
-import "context"
+import "github.com/gin-gonic/gin"
 
 type Service interface {
-	GetProjectList(context.Context, *GetProjectListParams) ([]Project, error)
-	GetProjectById(context.Context, *GetProjectByIdParams) (*Project, error)
+	GetProjectList(*gin.Context, *GetProjectListParams) ([]Project, error)
+	GetProjectById(*gin.Context, *GetProjectByIdParams) (*Project, error)
 	// TODO: rewrite
 	//GetProject(context.Context, *GetProjectParams) (*Project, error)
-	CreateProject(context.Context, *CreateProjectParams) (*Project, error)
-	UpdateProjectById(context.Context, *UpdateProjectByIdParams) error
-	DeleteProjectById(context.Context, *DeleteProjectByIdParams) error
+	CreateProject(*gin.Context, *CreateProjectParams) (*Project, error)
+	UpdateProjectById(*gin.Context, *UpdateProjectByIdParams) error
+	DeleteProjectById(*gin.Context, *DeleteProjectByIdParams) error
 }
