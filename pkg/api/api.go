@@ -23,7 +23,7 @@ type ErrorResponse struct {
 	ErrorString  string `json:"errorString,omitempty"`
 }
 
-func AbortWithBadRequestJSON(c *gin.Context, err error) {
+func AbortWithBadRequestJSON(ctx *gin.Context, err error) {
 	response := ErrorResponse{
 		Status:       http.StatusBadRequest,
 		StatusString: "BadRequest",
@@ -31,10 +31,10 @@ func AbortWithBadRequestJSON(c *gin.Context, err error) {
 		ErrorString:  fmt.Sprintf("[BindJSON] %s", err.Error()),
 	}
 
-	c.AbortWithStatusJSON(http.StatusBadRequest, response)
+	ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 }
 
-func AbortWithInternalServerErrorJSON(c *gin.Context, err error) {
+func AbortWithInternalServerErrorJSON(ctx *gin.Context, err error) {
 	response := ErrorResponse{
 		Status:       http.StatusInternalServerError,
 		StatusString: "InternalServerError",
@@ -42,5 +42,5 @@ func AbortWithInternalServerErrorJSON(c *gin.Context, err error) {
 		ErrorString:  fmt.Sprintf("[BindJSON] %s", err.Error()),
 	}
 
-	c.AbortWithStatusJSON(http.StatusInternalServerError, response)
+	ctx.AbortWithStatusJSON(http.StatusInternalServerError, response)
 }
