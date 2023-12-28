@@ -27,8 +27,12 @@ type User struct {
 	UpdatedBy *string    `json:"updatedBy,omitempty"`
 }
 
-func (o *User) GeneratePath() {
-	o.Path = fmt.Sprintf("/users/%d", o.Id)
+func (u *User) GetId() int {
+	return u.Id
+}
+
+func (u *User) GeneratePath() {
+	u.Path = fmt.Sprintf("/users/%d", u.GetId())
 }
 
 type UserAccount struct {
