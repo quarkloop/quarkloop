@@ -1,8 +1,15 @@
 package workspace
 
 import (
+	"errors"
 	"fmt"
 	"time"
+
+	"github.com/quarkloop/quarkloop/pkg/model"
+)
+
+var (
+	ErrWorkspaceNotFound = errors.New("workspace not found")
 )
 
 type Workspace struct {
@@ -13,10 +20,10 @@ type Workspace struct {
 	OrgScopedId string `json:"orgScopedId"`
 
 	// data
-	Name        string `json:"name,omitempty" form:"name,omitempty"`
-	Description string `json:"description,omitempty"`
-	Visibility  *int   `json:"visibility,omitempty" form:"visibility,omitempty"`
-	Path        string `json:"path,omitempty"`
+	Name        string                 `json:"name,omitempty" form:"name,omitempty"`
+	Description string                 `json:"description,omitempty"`
+	Visibility  *model.ScopeVisibility `json:"visibility,omitempty" form:"visibility,omitempty"`
+	Path        string                 `json:"path,omitempty"`
 
 	// history
 	CreatedAt time.Time  `json:"createdAt,omitempty" form:"createdAt,omitempty"`
