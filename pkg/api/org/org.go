@@ -8,7 +8,8 @@ import (
 type Api interface {
 	GetOrganizationList(c *gin.Context)
 	GetOrganizationById(c *gin.Context)
-	GetOrganization(c *gin.Context)
+	// TODO: rewrite
+	// GetOrganization(c *gin.Context)
 	CreateOrganization(c *gin.Context)
 	UpdateOrganizationById(c *gin.Context)
 	DeleteOrganizationById(c *gin.Context)
