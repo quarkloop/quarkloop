@@ -2,7 +2,9 @@ package organization_impl
 
 import (
 	"context"
+	"errors"
 
+	"github.com/quarkloop/quarkloop/pkg/contextdata"
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	org "github.com/quarkloop/quarkloop/pkg/service/organization"
 	"github.com/quarkloop/quarkloop/pkg/service/organization/store"
@@ -23,7 +25,7 @@ func NewOrganizationService(ds store.OrgStore, aclService accesscontrol.Service,
 	}
 }
 
-func (s *orgService) GetOrganizationList(ctx context.Context, p *org.GetOrganizationListParams) ([]org.Organization, error) {
+func (s *orgService) GetOrganizationList(ctx context.Context, params *org.GetOrganizationListParams) ([]org.Organization, error) {
 	orgList, err := s.store.ListOrganizations(ctx)
 	if err != nil {
 		return nil, err
@@ -36,8 +38,8 @@ func (s *orgService) GetOrganizationList(ctx context.Context, p *org.GetOrganiza
 	return orgList, nil
 }
 
-func (s *orgService) GetOrganizationById(ctx context.Context, p *org.GetOrganizationByIdParams) (*org.Organization, error) {
-	org, err := s.store.GetOrganizationById(ctx, p.OrgId)
+func (s *orgService) GetOrganizationById(ctx context.Context, params *org.GetOrganizationByIdParams) (*org.Organization, error) {
+	org, err := s.store.GetOrganizationById(ctx, params.OrgId)
 	if err != nil {
 		return nil, err
 	}
@@ -46,34 +48,40 @@ func (s *orgService) GetOrganizationById(ctx context.Context, p *org.GetOrganiza
 	return org, nil
 }
 
-func (s *orgService) GetOrganization(ctx context.Context, p *org.GetOrganizationParams) (*org.Organization, error) {
-	org, err := s.store.GetOrganization(ctx, &p.Organization)
-	if err != nil {
-		return nil, err
+// func (s *orgService) GetOrganization(ctx context.Context, params *org.GetOrganizationParams) (*org.Organization, error) {
+// 	org, err := s.store.GetOrganization(ctx, &params.Organization)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	org.GeneratePath()
+// 	return org, nil
+// }
+
+func (s *orgService) CreateOrganization(ctx context.Context, params *org.CreateOrganizationParams) (*org.Organization, error) {
+	if contextdata.IsUserAnonymous(ctx) {
+		return nil, errors.New("not authorized")
 	}
 
-	org.GeneratePath()
-	return org, nil
-}
+	user := contextdata.GetUser(ctx)
 
-func (s *orgService) CreateOrganization(ctx context.Context, p *org.CreateOrganizationParams) (*org.Organization, error) {
-	permission, err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgCreate, &accesscontrol.EvaluateFilterParams{
-		OrgId:  accesscontrol.GlobalOrgId,
-		UserId: 0,
+	// check permissions
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgCreate, &accesscontrol.EvaluateFilterParams{
+		OrgId:  accesscontrol.GlobalOrgId, // TODO: move to contextdata
+		UserId: user.GetId(),
 	})
 	if err != nil {
 		return nil, err
 	}
-	if !permission {
-		return nil, accesscontrol.ErrPermissionDenied
-	}
 
 	userId := ctx.Value("userId").(int)
+
+	// check quotas
 	if err := s.quotaService.CheckCreateOrgQuotaReached(ctx, userId); err != nil {
 		return nil, err
 	}
 
-	org, err := s.store.CreateOrganization(ctx, &p.Organization)
+	org, err := s.store.CreateOrganization(ctx, &params.Organization)
 	if err != nil {
 		return nil, err
 	}
@@ -82,32 +90,40 @@ func (s *orgService) CreateOrganization(ctx context.Context, p *org.CreateOrgani
 	return org, nil
 }
 
-func (s *orgService) UpdateOrganizationById(ctx context.Context, p *org.UpdateOrganizationByIdParams) error {
-	permission, err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgUpdate, &accesscontrol.EvaluateFilterParams{
-		OrgId:  p.OrgId,
-		UserId: 0,
+func (s *orgService) UpdateOrganizationById(ctx context.Context, params *org.UpdateOrganizationByIdParams) error {
+	if contextdata.IsUserAnonymous(ctx) {
+		return errors.New("not authorized")
+	}
+
+	user := contextdata.GetUser(ctx)
+
+	// check permissions
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgUpdate, &accesscontrol.EvaluateFilterParams{
+		OrgId:  params.OrgId,
+		UserId: user.GetId(),
 	})
 	if err != nil {
 		return err
 	}
-	if !permission {
-		return accesscontrol.ErrPermissionDenied
-	}
 
-	return s.store.UpdateOrganizationById(ctx, p.OrgId, &p.Organization)
+	return s.store.UpdateOrganizationById(ctx, params.OrgId, &params.Organization)
 }
 
-func (s *orgService) DeleteOrganizationById(ctx context.Context, p *org.DeleteOrganizationByIdParams) error {
-	permission, err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgDelete, &accesscontrol.EvaluateFilterParams{
-		OrgId:  p.OrgId,
-		UserId: 0,
+func (s *orgService) DeleteOrganizationById(ctx context.Context, params *org.DeleteOrganizationByIdParams) error {
+	if contextdata.IsUserAnonymous(ctx) {
+		return errors.New("not authorized")
+	}
+
+	user := contextdata.GetUser(ctx)
+
+	// check permissions
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgDelete, &accesscontrol.EvaluateFilterParams{
+		OrgId:  params.OrgId,
+		UserId: user.GetId(),
 	})
 	if err != nil {
 		return err
 	}
-	if !permission {
-		return accesscontrol.ErrPermissionDenied
-	}
 
-	return s.store.DeleteOrganizationById(ctx, p.OrgId)
+	return s.store.DeleteOrganizationById(ctx, params.OrgId)
 }
