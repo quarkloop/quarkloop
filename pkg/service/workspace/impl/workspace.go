@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 
+	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/contextdata"
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
@@ -25,8 +27,34 @@ func NewWorkspaceService(ds store.WorkspaceStore, aclService accesscontrol.Servi
 	}
 }
 
-func (s *workspaceService) GetWorkspaceList(ctx context.Context, params *workspace.GetWorkspaceListParams) ([]workspace.Workspace, error) {
-	workspaceList, err := s.store.ListWorkspaces(ctx, params.OrgId)
+func (s *workspaceService) GetWorkspaceList(ctx *gin.Context, params *workspace.GetWorkspaceListParams) ([]workspace.Workspace, error) {
+	if contextdata.IsUserAnonymous(ctx) {
+		// anonymous user => return public workspaces
+		return s.getWorkspaceList(ctx, model.PublicVisibility, params)
+	}
+
+	user := contextdata.GetUser(ctx)
+	scope := contextdata.GetScope(ctx)
+
+	// check permissions
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
+		UserId: user.GetId(),
+		OrgId:  scope.OrgId(),
+	})
+	if err != nil {
+		if err == accesscontrol.ErrPermissionDenied {
+			// unauthorized user (permission denied) => return public workspaces
+			return s.getWorkspaceList(ctx, model.PublicVisibility, params)
+		}
+		return nil, err
+	}
+
+	// authorized user => return public + private workspaces
+	return s.getWorkspaceList(ctx, model.AllVisibility, params)
+}
+
+func (s *workspaceService) getWorkspaceList(ctx context.Context, visibility model.ScopeVisibility, params *workspace.GetWorkspaceListParams) ([]workspace.Workspace, error) {
+	workspaceList, err := s.store.ListWorkspaces(ctx, visibility, params.OrgId)
 	if err != nil {
 		return nil, err
 	}
@@ -38,14 +66,41 @@ func (s *workspaceService) GetWorkspaceList(ctx context.Context, params *workspa
 	return workspaceList, nil
 }
 
-func (s *workspaceService) GetWorkspaceById(ctx context.Context, params *workspace.GetWorkspaceByIdParams) (*workspace.Workspace, error) {
-	workspace, err := s.store.GetWorkspaceById(ctx, params.WorkspaceId)
+func (s *workspaceService) GetWorkspaceById(ctx *gin.Context, params *workspace.GetWorkspaceByIdParams) (*workspace.Workspace, error) {
+	ws, err := s.store.GetWorkspaceById(ctx, params.WorkspaceId)
 	if err != nil {
 		return nil, err
 	}
 
-	workspace.GeneratePath()
-	return workspace, nil
+	isPrivate := *ws.Visibility == model.PrivateVisibility
+
+	// anonymous user => return workspace not found error
+	if isPrivate && contextdata.IsUserAnonymous(ctx) {
+		return nil, workspace.ErrWorkspaceNotFound
+	}
+	if isPrivate {
+		user := contextdata.GetUser(ctx)
+		scope := contextdata.GetScope(ctx)
+
+		// check permissions
+		err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
+			UserId:      user.GetId(),
+			OrgId:       scope.OrgId(),
+			WorkspaceId: params.WorkspaceId,
+		})
+		if err != nil {
+			if err == accesscontrol.ErrPermissionDenied {
+				// unauthorized user (permission denied) => return workspace not found error
+				return nil, workspace.ErrWorkspaceNotFound
+			}
+			return nil, err
+		}
+	}
+
+	// anonymous and unauthorized user => return public workspace
+	// authorized user => return public or private workspace
+	ws.GeneratePath()
+	return ws, nil
 }
 
 // func (s *workspaceService) GetWorkspace(ctx context.Context, params *workspace.GetWorkspaceParams) (*workspace.Workspace, error) {
@@ -58,7 +113,7 @@ func (s *workspaceService) GetWorkspaceById(ctx context.Context, params *workspa
 // 	return workspace, nil
 // }
 
-func (s *workspaceService) CreateWorkspace(ctx context.Context, params *workspace.CreateWorkspaceParams) (*workspace.Workspace, error) {
+func (s *workspaceService) CreateWorkspace(ctx *gin.Context, params *workspace.CreateWorkspaceParams) (*workspace.Workspace, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		return nil, errors.New("not authorized")
 	}
@@ -79,16 +134,16 @@ func (s *workspaceService) CreateWorkspace(ctx context.Context, params *workspac
 		return nil, err
 	}
 
-	workspace, err := s.store.CreateWorkspace(ctx, params.OrgId, &params.Workspace)
+	ws, err := s.store.CreateWorkspace(ctx, params.OrgId, &params.Workspace)
 	if err != nil {
 		return nil, err
 	}
-	workspace.GeneratePath()
+	ws.GeneratePath()
 
-	return workspace, nil
+	return ws, nil
 }
 
-func (s *workspaceService) UpdateWorkspaceById(ctx context.Context, params *workspace.UpdateWorkspaceByIdParams) error {
+func (s *workspaceService) UpdateWorkspaceById(ctx *gin.Context, params *workspace.UpdateWorkspaceByIdParams) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
@@ -109,7 +164,7 @@ func (s *workspaceService) UpdateWorkspaceById(ctx context.Context, params *work
 	return s.store.UpdateWorkspaceById(ctx, params.WorkspaceId, &params.Workspace)
 }
 
-func (s *workspaceService) DeleteWorkspaceById(ctx context.Context, params *workspace.DeleteWorkspaceByIdParams) error {
+func (s *workspaceService) DeleteWorkspaceById(ctx *gin.Context, params *workspace.DeleteWorkspaceByIdParams) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
