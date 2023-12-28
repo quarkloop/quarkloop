@@ -8,7 +8,8 @@ import (
 type Api interface {
 	GetWorkspaceList(c *gin.Context)
 	GetWorkspaceById(c *gin.Context)
-	GetWorkspace(c *gin.Context)
+	// TODO: rewrite
+	// GetWorkspace(c *gin.Context)
 	CreateWorkspace(c *gin.Context)
 	UpdateWorkspaceById(c *gin.Context)
 	DeleteWorkspaceById(c *gin.Context)
