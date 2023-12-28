@@ -1,6 +1,8 @@
 package contextdata
 
-import "context"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type Scope interface {
 	OrgId() int
@@ -8,22 +10,28 @@ type Scope interface {
 	ProjectId() int
 }
 
-func GetScope(ctx context.Context) Scope {
-	scope, ok := ctx.Value(scopeKey).(*scopeData)
-	if !ok || scope == nil {
+func GetScope(ctx *gin.Context) Scope {
+	val, exists := ctx.Get(scopeKey)
+	if !exists || val == nil {
 		panic("scope must be available")
+	}
+
+	scope, ok := val.(*scopeData)
+	if !ok {
+		panic("*scopeData type assertion failed")
 	}
 
 	return scope
 }
 
-func SetScope(ctx context.Context, params *ScopeParams) context.Context {
+func SetScope(ctx *gin.Context, params *ScopeParams) {
 	scope := &scopeData{
 		orgId:       params.OrgId,
 		workspaceId: params.WorkspaceId,
 		projectId:   params.ProjectId,
 	}
-	return context.WithValue(ctx, scopeKey, scope)
+
+	ctx.Set(userKey, scope)
 }
 
 type ScopeParams struct {
