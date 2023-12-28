@@ -9,6 +9,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
+	"github.com/quarkloop/quarkloop/pkg/model"
 	org "github.com/quarkloop/quarkloop/pkg/service/organization"
 )
 
@@ -26,11 +27,19 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-    "system"."Organization";
+    "system"."Organization"
+%s	
 `
 
-func (store *orgStore) ListOrganizations(ctx context.Context) ([]org.Organization, error) {
-	rows, err := store.Conn.Query(ctx, listOrganizationsQuery)
+func (store *orgStore) ListOrganizations(ctx context.Context, visibility model.ScopeVisibility) ([]org.Organization, error) {
+	var finalQuery strings.Builder
+	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
+		finalQuery.WriteString(fmt.Sprintf(listOrganizationsQuery, `WHERE "visibility" = @visibility;`))
+	} else {
+		finalQuery.WriteString(fmt.Sprintf(listOrganizationsQuery, ";"))
+	}
+
+	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{"visibility": visibility})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
 		return nil, err
