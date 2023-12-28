@@ -1,8 +1,15 @@
 package org
 
 import (
+	"errors"
 	"fmt"
 	"time"
+
+	"github.com/quarkloop/quarkloop/pkg/model"
+)
+
+var (
+	ErrOrgNotFound = errors.New("org not found")
 )
 
 type Organization struct {
@@ -11,10 +18,10 @@ type Organization struct {
 	ScopedId string `json:"sid"`
 
 	// data
-	Name        string `json:"name,omitempty" form:"name,omitempty"`
-	Description string `json:"description,omitempty"`
-	Visibility  *int   `json:"visibility,omitempty" form:"visibility,omitempty"`
-	Path        string `json:"path,omitempty"`
+	Name        string                 `json:"name,omitempty" form:"name,omitempty"`
+	Description string                 `json:"description,omitempty"`
+	Visibility  *model.ScopeVisibility `json:"visibility,omitempty" form:"visibility,omitempty"`
+	Path        string                 `json:"path,omitempty"`
 
 	// history
 	CreatedAt time.Time  `json:"createdAt,omitempty" form:"createdAt,omitempty"`
@@ -26,8 +33,6 @@ type Organization struct {
 func (o *Organization) GeneratePath() {
 	o.Path = fmt.Sprintf("/org/%s", o.ScopedId)
 }
-
-type GetOrganizationListParams struct{}
 
 type GetOrganizationByIdParams struct {
 	OrgId int
