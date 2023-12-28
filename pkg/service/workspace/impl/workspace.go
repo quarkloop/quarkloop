@@ -2,7 +2,9 @@ package workspace_impl
 
 import (
 	"context"
+	"errors"
 
+	"github.com/quarkloop/quarkloop/pkg/contextdata"
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
@@ -23,8 +25,8 @@ func NewWorkspaceService(ds store.WorkspaceStore, aclService accesscontrol.Servi
 	}
 }
 
-func (s *workspaceService) GetWorkspaceList(ctx context.Context, p *workspace.GetWorkspaceListParams) ([]workspace.Workspace, error) {
-	workspaceList, err := s.store.ListWorkspaces(ctx, p.OrgId)
+func (s *workspaceService) GetWorkspaceList(ctx context.Context, params *workspace.GetWorkspaceListParams) ([]workspace.Workspace, error) {
+	workspaceList, err := s.store.ListWorkspaces(ctx, params.OrgId)
 	if err != nil {
 		return nil, err
 	}
@@ -36,8 +38,8 @@ func (s *workspaceService) GetWorkspaceList(ctx context.Context, p *workspace.Ge
 	return workspaceList, nil
 }
 
-func (s *workspaceService) GetWorkspaceById(ctx context.Context, p *workspace.GetWorkspaceByIdParams) (*workspace.Workspace, error) {
-	workspace, err := s.store.GetWorkspaceById(ctx, p.WorkspaceId)
+func (s *workspaceService) GetWorkspaceById(ctx context.Context, params *workspace.GetWorkspaceByIdParams) (*workspace.Workspace, error) {
+	workspace, err := s.store.GetWorkspaceById(ctx, params.WorkspaceId)
 	if err != nil {
 		return nil, err
 	}
@@ -46,33 +48,38 @@ func (s *workspaceService) GetWorkspaceById(ctx context.Context, p *workspace.Ge
 	return workspace, nil
 }
 
-func (s *workspaceService) GetWorkspace(ctx context.Context, p *workspace.GetWorkspaceParams) (*workspace.Workspace, error) {
-	workspace, err := s.store.GetWorkspace(ctx, p.OrgId, &p.Workspace)
-	if err != nil {
-		return nil, err
+// func (s *workspaceService) GetWorkspace(ctx context.Context, params *workspace.GetWorkspaceParams) (*workspace.Workspace, error) {
+// 	workspace, err := s.store.GetWorkspace(ctx, params.OrgId, &params.Workspace)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	workspace.GeneratePath()
+// 	return workspace, nil
+// }
+
+func (s *workspaceService) CreateWorkspace(ctx context.Context, params *workspace.CreateWorkspaceParams) (*workspace.Workspace, error) {
+	if contextdata.IsUserAnonymous(ctx) {
+		return nil, errors.New("not authorized")
 	}
 
-	workspace.GeneratePath()
-	return workspace, nil
-}
+	user := contextdata.GetUser(ctx)
 
-func (s *workspaceService) CreateWorkspace(ctx context.Context, p *workspace.CreateWorkspaceParams) (*workspace.Workspace, error) {
-	permission, err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceCreate, &accesscontrol.EvaluateFilterParams{
-		OrgId:  p.OrgId,
-		UserId: 0,
+	// check permissions
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceCreate, &accesscontrol.EvaluateFilterParams{
+		OrgId:  params.OrgId,
+		UserId: user.GetId(),
 	})
 	if err != nil {
 		return nil, err
 	}
-	if !permission {
-		return nil, accesscontrol.ErrPermissionDenied
-	}
 
-	if err := s.quotaService.CheckCreateWorkspaceQuotaReached(ctx, p.OrgId); err != nil {
+	// check quotas
+	if err := s.quotaService.CheckCreateWorkspaceQuotaReached(ctx, params.OrgId); err != nil {
 		return nil, err
 	}
 
-	workspace, err := s.store.CreateWorkspace(ctx, p.OrgId, &p.Workspace)
+	workspace, err := s.store.CreateWorkspace(ctx, params.OrgId, &params.Workspace)
 	if err != nil {
 		return nil, err
 	}
@@ -81,34 +88,44 @@ func (s *workspaceService) CreateWorkspace(ctx context.Context, p *workspace.Cre
 	return workspace, nil
 }
 
-func (s *workspaceService) UpdateWorkspaceById(ctx context.Context, p *workspace.UpdateWorkspaceByIdParams) error {
-	permission, err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceUpdate, &accesscontrol.EvaluateFilterParams{
-		OrgId:       p.WorkspaceId,
-		WorkspaceId: p.WorkspaceId,
-		UserId:      0,
-	})
-	if err != nil {
-		return err
-	}
-	if !permission {
-		return accesscontrol.ErrPermissionDenied
+func (s *workspaceService) UpdateWorkspaceById(ctx context.Context, params *workspace.UpdateWorkspaceByIdParams) error {
+	if contextdata.IsUserAnonymous(ctx) {
+		return errors.New("not authorized")
 	}
 
-	return s.store.UpdateWorkspaceById(ctx, p.WorkspaceId, &p.Workspace)
-}
+	user := contextdata.GetUser(ctx)
+	scope := contextdata.GetScope(ctx)
 
-func (s *workspaceService) DeleteWorkspaceById(ctx context.Context, p *workspace.DeleteWorkspaceByIdParams) error {
-	permission, err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceDelete, &accesscontrol.EvaluateFilterParams{
-		OrgId:       p.WorkspaceId,
-		WorkspaceId: p.WorkspaceId,
-		UserId:      0,
+	// check permissions
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceUpdate, &accesscontrol.EvaluateFilterParams{
+		UserId:      user.GetId(),
+		OrgId:       scope.OrgId(),
+		WorkspaceId: params.WorkspaceId,
 	})
 	if err != nil {
 		return err
 	}
-	if !permission {
-		return accesscontrol.ErrPermissionDenied
+
+	return s.store.UpdateWorkspaceById(ctx, params.WorkspaceId, &params.Workspace)
+}
+
+func (s *workspaceService) DeleteWorkspaceById(ctx context.Context, params *workspace.DeleteWorkspaceByIdParams) error {
+	if contextdata.IsUserAnonymous(ctx) {
+		return errors.New("not authorized")
 	}
 
-	return s.store.DeleteWorkspaceById(ctx, p.WorkspaceId)
+	user := contextdata.GetUser(ctx)
+	scope := contextdata.GetScope(ctx)
+
+	// check permissions
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceDelete, &accesscontrol.EvaluateFilterParams{
+		UserId:      user.GetId(),
+		OrgId:       scope.OrgId(),
+		WorkspaceId: params.WorkspaceId,
+	})
+	if err != nil {
+		return err
+	}
+
+	return s.store.DeleteWorkspaceById(ctx, params.WorkspaceId)
 }
