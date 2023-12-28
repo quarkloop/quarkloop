@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
@@ -31,11 +32,22 @@ FROM
 LEFT JOIN 
     system."Organization" AS org ON org."id" = ws."orgId"
 WHERE 
-    ws."orgId" = ANY (@orgId);
+    ws."orgId" = ANY (@orgId)
+%s	
 `
 
-func (store *workspaceStore) ListWorkspaces(ctx context.Context, orgId []int) ([]workspace.Workspace, error) {
-	rows, err := store.Conn.Query(ctx, listWorkspacesQuery, pgx.NamedArgs{"orgId": orgId})
+func (store *workspaceStore) ListWorkspaces(ctx context.Context, visibility model.ScopeVisibility, orgId []int) ([]workspace.Workspace, error) {
+	var finalQuery strings.Builder
+	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
+		finalQuery.WriteString(fmt.Sprintf(listWorkspacesQuery, `AND ws."visibility" = @visibility;`))
+	} else {
+		finalQuery.WriteString(fmt.Sprintf(listWorkspacesQuery, ";"))
+	}
+
+	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{
+		"orgId":      orgId,
+		"visibility": visibility,
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
 		return nil, err
