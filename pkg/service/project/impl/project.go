@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 
+	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/contextdata"
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/project/store"
@@ -34,10 +36,10 @@ func NewProjectService(
 	}
 }
 
-func (s *projectService) GetProjectList(ctx context.Context, params *project.GetProjectListParams) ([]project.Project, error) {
+func (s *projectService) GetProjectList(ctx *gin.Context, params *project.GetProjectListParams) ([]project.Project, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		// anonymous user => return public projects
-		return s.getProjectList(ctx, project.Public, params)
+		return s.getProjectList(ctx, model.PublicVisibility, params)
 	}
 
 	user := contextdata.GetUser(ctx)
@@ -52,16 +54,16 @@ func (s *projectService) GetProjectList(ctx context.Context, params *project.Get
 	if err != nil {
 		if err == accesscontrol.ErrPermissionDenied {
 			// unauthorized user (permission denied) => return public projects
-			return s.getProjectList(ctx, project.Public, params)
+			return s.getProjectList(ctx, model.PublicVisibility, params)
 		}
 		return nil, err
 	}
 
 	// authorized user => return public + private projects
-	return s.getProjectList(ctx, project.All, params)
+	return s.getProjectList(ctx, model.AllVisibility, params)
 }
 
-func (s *projectService) getProjectList(ctx context.Context, visibility project.ScopeVisibility, params *project.GetProjectListParams) ([]project.Project, error) {
+func (s *projectService) getProjectList(ctx context.Context, visibility model.ScopeVisibility, params *project.GetProjectListParams) ([]project.Project, error) {
 	projectList, err := s.store.ListProjects(ctx, visibility, params.OrgId, params.WorkspaceId)
 	if err != nil {
 		return nil, err
@@ -73,13 +75,13 @@ func (s *projectService) getProjectList(ctx context.Context, visibility project.
 	return projectList, nil
 }
 
-func (s *projectService) GetProjectById(ctx context.Context, params *project.GetProjectByIdParams) (*project.Project, error) {
+func (s *projectService) GetProjectById(ctx *gin.Context, params *project.GetProjectByIdParams) (*project.Project, error) {
 	p, err := s.store.GetProjectById(ctx, params.ProjectId)
 	if err != nil {
 		return nil, err
 	}
 
-	isPrivate := *p.Visibility == project.Private
+	isPrivate := *p.Visibility == model.PrivateVisibility
 
 	// anonymous user => return project not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
@@ -145,7 +147,7 @@ func (s *projectService) GetProjectById(ctx context.Context, params *project.Get
 // 	return p, nil
 // }
 
-func (s *projectService) CreateProject(ctx context.Context, params *project.CreateProjectParams) (*project.Project, error) {
+func (s *projectService) CreateProject(ctx *gin.Context, params *project.CreateProjectParams) (*project.Project, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		return nil, errors.New("not authorized")
 	}
@@ -207,7 +209,7 @@ func (s *projectService) CreateProject(ctx context.Context, params *project.Crea
 	return p, nil
 }
 
-func (s *projectService) UpdateProjectById(ctx context.Context, params *project.UpdateProjectByIdParams) error {
+func (s *projectService) UpdateProjectById(ctx *gin.Context, params *project.UpdateProjectByIdParams) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
@@ -229,7 +231,7 @@ func (s *projectService) UpdateProjectById(ctx context.Context, params *project.
 	return s.store.UpdateProjectById(ctx, params.ProjectId, &params.Project)
 }
 
-func (s *projectService) DeleteProjectById(ctx context.Context, params *project.DeleteProjectByIdParams) error {
+func (s *projectService) DeleteProjectById(ctx *gin.Context, params *project.DeleteProjectByIdParams) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
