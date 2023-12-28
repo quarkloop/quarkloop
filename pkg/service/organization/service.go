@@ -1,15 +1,15 @@
 package org
 
 import (
-	"context"
+	"github.com/gin-gonic/gin"
 )
 
 type Service interface {
-	GetOrganizationList(context.Context, *GetOrganizationListParams) ([]Organization, error)
-	GetOrganizationById(context.Context, *GetOrganizationByIdParams) (*Organization, error)
+	GetOrganizationList(*gin.Context) ([]Organization, error)
+	GetOrganizationById(*gin.Context, *GetOrganizationByIdParams) (*Organization, error)
 	// TODO: rewrite
 	// GetOrganization(context.Context, *GetOrganizationParams) (*Organization, error)
-	CreateOrganization(context.Context, *CreateOrganizationParams) (*Organization, error)
-	UpdateOrganizationById(context.Context, *UpdateOrganizationByIdParams) error
-	DeleteOrganizationById(context.Context, *DeleteOrganizationByIdParams) error
+	CreateOrganization(*gin.Context, *CreateOrganizationParams) (*Organization, error)
+	UpdateOrganizationById(*gin.Context, *UpdateOrganizationByIdParams) error
+	DeleteOrganizationById(*gin.Context, *DeleteOrganizationByIdParams) error
 }
