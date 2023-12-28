@@ -15,7 +15,7 @@ type CreateWorkspaceRequest struct {
 
 func (s *WorkspaceApi) CreateWorkspace(ctx *gin.Context) {
 	req := &CreateWorkspaceRequest{}
-	if err := ctx.BindJSON(req); err != nil {
+	if err := ctx.ShouldBindJSON(req); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
@@ -50,7 +50,7 @@ func (s *WorkspaceApi) UpdateWorkspaceById(ctx *gin.Context) {
 	}
 
 	req := &UpdateWorkspaceByIdRequest{}
-	if err := ctx.BindJSON(req); err != nil {
+	if err := ctx.ShouldBindJSON(req); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
