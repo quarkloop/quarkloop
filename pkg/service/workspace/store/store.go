@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
 type WorkspaceStore interface {
-	ListWorkspaces(ctx context.Context, orgId []int) ([]workspace.Workspace, error)
+	ListWorkspaces(ctx context.Context, visibility model.ScopeVisibility, orgId []int) ([]workspace.Workspace, error)
 	GetWorkspaceById(ctx context.Context, workspaceId int) (*workspace.Workspace, error)
 	GetWorkspace(ctx context.Context, orgId int, workspace *workspace.Workspace) (*workspace.Workspace, error)
 	CreateWorkspace(ctx context.Context, orgId int, workspace *workspace.Workspace) (*workspace.Workspace, error)
