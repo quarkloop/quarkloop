@@ -6,15 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/table_branch"
-)
-
-type ScopeVisibility int
-
-var (
-	Public  ScopeVisibility = 1
-	Private ScopeVisibility = 2
-	All     ScopeVisibility = 3
 )
 
 var (
@@ -33,7 +26,7 @@ type Project struct {
 	// data
 	Name        string                      `json:"name,omitempty" form:"name,omitempty"`
 	Description string                      `json:"description,omitempty"`
-	Visibility  *ScopeVisibility            `json:"visibility,omitempty" form:"visibility,omitempty"`
+	Visibility  *model.ScopeVisibility      `json:"visibility,omitempty" form:"visibility,omitempty"`
 	Path        string                      `json:"path,omitempty"`
 	Metadata    json.RawMessage             `json:"metadata,omitempty"`
 	Branches    []*table_branch.TableBranch `json:"branches,omitempty"`
