@@ -15,7 +15,7 @@ type CreateOrganizationRequest struct {
 
 func (s *OrganizationApi) CreateOrganization(ctx *gin.Context) {
 	req := &CreateOrganizationRequest{}
-	if err := ctx.BindJSON(req); err != nil {
+	if err := ctx.ShouldBindJSON(req); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
@@ -49,7 +49,7 @@ func (s *OrganizationApi) UpdateOrganizationById(ctx *gin.Context) {
 	}
 
 	req := &UpdateOrganizationByIdRequest{}
-	if err := ctx.BindJSON(req); err != nil {
+	if err := ctx.ShouldBindJSON(req); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
