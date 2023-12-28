@@ -24,7 +24,7 @@ func (s *TableSchemaApi) CreateTableSchema(ctx *gin.Context) {
 	}
 
 	req := &CreateTableSchemaRequest{}
-	if err := ctx.BindJSON(req); err != nil {
+	if err := ctx.ShouldBindJSON(req); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
@@ -60,7 +60,7 @@ func (s *TableSchemaApi) UpdateTableSchemaById(ctx *gin.Context) {
 	}
 
 	req := &UpdateTableSchemaByIdRequest{}
-	if err := ctx.BindJSON(req); err != nil {
+	if err := ctx.ShouldBindJSON(req); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
