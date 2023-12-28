@@ -25,13 +25,13 @@ func (s *TableRecordApi) CreateTableRecord(ctx *gin.Context) {
 	var req interface{}
 	if uriParams.TableType == "main" {
 		req = table_record.MainRecordWithRelationCount{}
-		if err := ctx.BindJSON(req); err != nil {
+		if err := ctx.ShouldBindJSON(req); err != nil {
 			api.AbortWithBadRequestJSON(ctx, err)
 			return
 		}
 	} else if uriParams.TableType == "document" {
 		req = table_record.DocumentRecord{}
-		if err := ctx.BindJSON(req); err != nil {
+		if err := ctx.ShouldBindJSON(req); err != nil {
 			api.AbortWithBadRequestJSON(ctx, err)
 			return
 		}
@@ -70,13 +70,13 @@ func (s *TableRecordApi) UpdateTableRecordById(ctx *gin.Context) {
 	var req interface{}
 	if uriParams.TableType == "main" {
 		req = table_record.MainRecordWithRelationCount{}
-		if err := ctx.BindJSON(req); err != nil {
+		if err := ctx.ShouldBindJSON(req); err != nil {
 			api.AbortWithBadRequestJSON(ctx, err)
 			return
 		}
 	} else if uriParams.TableType == "document" {
 		req = table_record.DocumentRecord{}
-		if err := ctx.BindJSON(req); err != nil {
+		if err := ctx.ShouldBindJSON(req); err != nil {
 			api.AbortWithBadRequestJSON(ctx, err)
 			return
 		}
