@@ -11,7 +11,7 @@ import (
 
 func (s *OrganizationApi) GetOrganizationList(ctx *gin.Context) {
 	// query service
-	orgList, err := s.orgService.GetOrganizationList(ctx, &org.GetOrganizationListParams{})
+	orgList, err := s.orgService.GetOrganizationList(ctx)
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
@@ -44,26 +44,26 @@ func (s *OrganizationApi) GetOrganizationById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, org)
 }
 
-type GetOrganizationQueryParams struct {
-	org.Organization
-}
+// type GetOrganizationQueryParams struct {
+// 	org.Organization
+// }
 
-func (s *OrganizationApi) GetOrganization(ctx *gin.Context) {
-	queryParams := &GetOrganizationQueryParams{}
-	if err := ctx.ShouldBindQuery(queryParams); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
-		return
-	}
+// func (s *OrganizationApi) GetOrganization(ctx *gin.Context) {
+// 	queryParams := &GetOrganizationQueryParams{}
+// 	if err := ctx.ShouldBindQuery(queryParams); err != nil {
+// 		api.AbortWithBadRequestJSON(ctx, err)
+// 		return
+// 	}
 
-	// query service
-	org, err := s.orgService.GetOrganization(ctx, &org.GetOrganizationParams{
-		Organization: queryParams.Organization,
-	},
-	)
-	if err != nil {
-		api.AbortWithInternalServerErrorJSON(ctx, err)
-		return
-	}
+// 	// query service
+// 	org, err := s.orgService.GetOrganization(ctx, &org.GetOrganizationParams{
+// 		Organization: queryParams.Organization,
+// 	},
+// 	)
+// 	if err != nil {
+// 		api.AbortWithInternalServerErrorJSON(ctx, err)
+// 		return
+// 	}
 
-	ctx.JSON(http.StatusOK, org)
-}
+// 	ctx.JSON(http.StatusOK, org)
+// }
