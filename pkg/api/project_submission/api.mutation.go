@@ -27,7 +27,7 @@ func (s *AppSubmissionApi) CreateAppSubmission(ctx *gin.Context) {
 	}
 
 	req := &CreateAppSubmissionRequest{}
-	if err := ctx.BindJSON(req); err != nil {
+	if err := ctx.ShouldBindJSON(req); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
@@ -63,7 +63,7 @@ func (s *AppSubmissionApi) UpdateAppSubmissionById(ctx *gin.Context) {
 	}
 
 	req := &UpdateAppSubmissionByIdRequest{}
-	if err := ctx.BindJSON(req); err != nil {
+	if err := ctx.ShouldBindJSON(req); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
