@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
 type ProjectStore interface {
-	ListProjects(ctx context.Context, visibility project.ScopeVisibility, orgId []int, workspaceId []int) ([]project.Project, error)
+	ListProjects(ctx context.Context, visibility model.ScopeVisibility, orgId []int, workspaceId []int) ([]project.Project, error)
 	GetProjectById(ctx context.Context, projectId int) (*project.Project, error)
 	GetProject(ctx context.Context, p *project.Project) (*project.Project, error)
 	CreateProject(ctx context.Context, orgId int, workspaceId int, p *project.Project) (*project.Project, error)
