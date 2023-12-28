@@ -1,8 +1,6 @@
 package contextdata
 
-type contextKey string
-
 const (
-	userKey  contextKey = "context.keys.user"
-	scopeKey contextKey = "context.keys.scope"
+	userKey  string = "context.keys.user"
+	scopeKey string = "context.keys.scope"
 )
