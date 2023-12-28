@@ -7,7 +7,7 @@ import (
 
 type User struct {
 	// id
-	Id int `json:"id" form:"id"`
+	Id int `json:"id,omitempty"`
 
 	// user
 	Name          string     `json:"name,omitempty"`
@@ -37,7 +37,7 @@ func (u *User) GeneratePath() {
 
 type UserAccount struct {
 	// id
-	Id                int    `json:"id" form:"id"`
+	Id                int    `json:"id,omitempty"`
 	TokenId           string `json:"idToken,omitempty"`
 	ProviderAccountId string `json:"providerAccountId,omitempty"`
 
@@ -54,7 +54,7 @@ type UserAccount struct {
 
 type UserSession struct {
 	// id
-	Id int `json:"id" form:"id"`
+	Id int `json:"id,omitempty"`
 
 	// saession
 	SessionToken string `json:"sessionToken,omitempty"`
@@ -62,22 +62,26 @@ type UserSession struct {
 }
 
 type GetUserByIdParams struct {
-	OrgId int
+	UserId int
+}
+
+type GetUserByEmailParams struct {
+	Email string
 }
 
 type UpdateUserByIdParams struct {
-	OrgId int
-	User  User
+	UserId int
+	User   User
 }
 
 type DeleteUserByIdParams struct {
-	OrgId int
+	UserId int
 }
 
-type GetUserAccountByIdParams struct {
-	OrgId int
+type GetUserAccountByUserIdParams struct {
+	UserId int
 }
 
-type GetUserSessionByIdParams struct {
-	OrgId int
+type GetUserSessionByUserIdParams struct {
+	UserId int
 }
