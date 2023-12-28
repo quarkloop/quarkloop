@@ -17,9 +17,17 @@ func NewAccessControlService(ds store.AccessControlStore) accesscontrol.Service 
 	}
 }
 
-func (s *aclService) Evaluate(ctx context.Context, permission string, p *accesscontrol.EvaluateFilterParams) (bool, error) {
-	exists, err := s.store.Evaluate(ctx, permission, p.OrgId, p.WorkspaceId, p.ProjectId, p.UserId)
-	return exists, err
+func (s *aclService) Evaluate(ctx context.Context, permission string, p *accesscontrol.EvaluateFilterParams) error {
+	hasPermission, err := s.store.Evaluate(ctx, permission, p.OrgId, p.WorkspaceId, p.ProjectId, p.UserId)
+	if err != nil {
+		return err
+	}
+
+	if !hasPermission {
+		return accesscontrol.ErrPermissionDenied
+	}
+
+	return nil
 }
 
 func (s *aclService) ListUserAccesses(ctx context.Context, orgId int) ([]accesscontrol.UserAssignment, error) {
