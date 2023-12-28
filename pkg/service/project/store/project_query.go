@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
@@ -38,7 +39,7 @@ WHERE
     %s;
 `
 
-func (store *projectStore) ListProjects(ctx context.Context, visibility project.ScopeVisibility, orgId []int, workspaceId []int) ([]project.Project, error) {
+func (store *projectStore) ListProjects(ctx context.Context, visibility model.ScopeVisibility, orgId []int, workspaceId []int) ([]project.Project, error) {
 	whereClause := []string{}
 	if len(orgId) != 0 {
 		whereClause = append(whereClause, `p."orgId" = ANY (@orgId)`)
@@ -46,7 +47,7 @@ func (store *projectStore) ListProjects(ctx context.Context, visibility project.
 	if len(workspaceId) != 0 {
 		whereClause = append(whereClause, `p."workspaceId" = ANY (@workspaceId)`)
 	}
-	if visibility == project.Public || visibility == project.Private {
+	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
 		whereClause = append(whereClause, `p."visibility" = @visibility`)
 	}
 
