@@ -57,28 +57,28 @@ func (s *WorkspaceApi) GetWorkspaceById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, ws)
 }
 
-type GetWorkspaceQueryParams struct {
-	OrgId int `form:"orgId" binding:"required"`
-	workspace.Workspace
-}
+// type GetWorkspaceQueryParams struct {
+// 	OrgId int `form:"orgId" binding:"required"`
+// 	workspace.Workspace
+// }
 
-func (s *WorkspaceApi) GetWorkspace(ctx *gin.Context) {
-	queryParams := &GetWorkspaceQueryParams{}
-	if err := ctx.ShouldBindQuery(queryParams); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
-		return
-	}
+// func (s *WorkspaceApi) GetWorkspace(ctx *gin.Context) {
+// 	queryParams := &GetWorkspaceQueryParams{}
+// 	if err := ctx.ShouldBindQuery(queryParams); err != nil {
+// 		api.AbortWithBadRequestJSON(ctx, err)
+// 		return
+// 	}
 
-	// query service
-	ws, err := s.workspaceService.GetWorkspace(ctx, &workspace.GetWorkspaceParams{
-		OrgId:     queryParams.OrgId,
-		Workspace: queryParams.Workspace,
-	},
-	)
-	if err != nil {
-		api.AbortWithInternalServerErrorJSON(ctx, err)
-		return
-	}
+// 	// query service
+// 	ws, err := s.workspaceService.GetWorkspace(ctx, &workspace.GetWorkspaceParams{
+// 		OrgId:     queryParams.OrgId,
+// 		Workspace: queryParams.Workspace,
+// 	},
+// 	)
+// 	if err != nil {
+// 		api.AbortWithInternalServerErrorJSON(ctx, err)
+// 		return
+// 	}
 
-	ctx.JSON(http.StatusOK, ws)
-}
+// 	ctx.JSON(http.StatusOK, ws)
+// }
