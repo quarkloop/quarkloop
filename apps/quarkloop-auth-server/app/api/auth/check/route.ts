@@ -5,11 +5,9 @@ import { authOptions } from "@/auth";
 
 export async function GET(request: Request, params: { params: any }) {
     const session = await getServerSession(authOptions);
-    return NextResponse.json(
-        {},
-        {
-            status: session ? 200 : 401,
-            statusText: session ? "OK" : "Unauthorized",
-        }
-    );
+    const body = session?.user ?? {};
+
+    return NextResponse.json(body, {
+        status: session ? 200 : 401,
+    });
 }
