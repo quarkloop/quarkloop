@@ -10,7 +10,9 @@ const nextConfig = withBundleAnalyzer({
         esmExternals: true,
     },
     transpilePackages: [
+        "@quarkloop/components",
         "@quarkloop/lib",
+        "@quarkloop/types"
     ],
 });
 
