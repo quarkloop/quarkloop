@@ -13,7 +13,9 @@
     "typescript": "5.1.6"
   },
   "dependencies": {
+    "@quarkloop/components": "workspace:*",
     "@quarkloop/prisma": "workspace:*",
+    "@quarkloop/types": "workspace:*",
     "@next/bundle-analyzer": "^13.4.5",
     "@next-auth/prisma-adapter": "^1.0.7",
     "@types/node": "20.3.1",
