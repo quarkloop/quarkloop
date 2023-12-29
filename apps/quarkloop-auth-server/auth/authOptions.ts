@@ -49,28 +49,44 @@ export const authOptions: NextAuthOptions = {
         //credentialProvider,
         googleProvider,
     ],
-    // callbacks: {
-    // async signIn({ user, account, profile, email, credentials }) {
-    //   console.log("signIn", { user, account, profile, email, credentials });
-    //   return true;
-    // },
-    // async redirect({ url, baseUrl }) {
-    //   console.log("redirectEventt", { url, baseUrl });
-    //   return "http://localhost:3000";
-    // },
-    // async session({ session, user, token }) {
-    //   console.log("session", { session, user, token });
-    //   return session;
-    // },
-    // async jwt({ token, user, account, profile }) {
-    //     console.log("jwt", { token, user, account, profile });
-    //     token.access_token = account?.access_token;
-    //     return token;
-    // }
-    // },
+    callbacks: {
+        // async signIn({ user, account, profile, email, credentials }) {
+        //   console.log("signIn", { user, account, profile, email, credentials });
+        //   return true;
+        // },
+
+        // async redirect({ url, baseUrl }) {
+        //   console.log("redirectEventt", { url, baseUrl });
+        //   return "http://localhost:3000";
+        // },
+
+        async session({ session, user, token }) {
+            // TODO: this check remains here until the problem with
+            // type augmentation in next-auth.d.s is resolved
+            if (typeof user.id !== "bigint") {
+                throw new Error(`user.id has unknown type: ${typeof user.id}`);
+            }
+
+            if (session.user) {
+                const userId: bigint = BigInt(user.id);
+
+                const { id, password, passwordSalt, ...u } = user;
+                session.user = { id: userId, ...u };
+            }
+
+            //console.log("session", { session, user, token });
+            return session;
+        },
+
+        // async jwt({ token, user, account, profile }) {
+        //     console.log("jwt", { token, user, account, profile });
+        //     token.access_token = account?.access_token;
+        //     return token;
+        // },
+    },
     session: {
         strategy: "database",
-        //maxAge: 30 * 24 * 60 * 60, // 30 days
-        //updateAge: 24 * 60 * 60, // 24 hours
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+        updateAge: 24 * 60 * 60, // 24 hours
     },
 };
