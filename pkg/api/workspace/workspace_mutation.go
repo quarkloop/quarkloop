@@ -8,7 +8,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
-// POST /workspaces
+// POST /orgs/:orgId/workspaces
 //
 // Create workspace.
 //
@@ -33,7 +33,7 @@ func (s *WorkspaceApi) CreateWorkspace(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, ws)
 }
 
-// PUT /workspaces/:workspaceId
+// PUT /orgs/:orgId/workspaces/:workspaceId
 //
 // Update workspace by id.
 //
@@ -67,7 +67,7 @@ func (s *WorkspaceApi) UpdateWorkspaceById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, nil)
 }
 
-// DELETE /workspaces/:workspaceId
+// DELETE /orgs/:orgId/workspaces/:workspaceId
 //
 // Delete workspace by id.
 //
