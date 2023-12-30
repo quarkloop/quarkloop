@@ -7,7 +7,8 @@ import (
 
 type User struct {
 	// id
-	Id int `json:"id,omitempty"`
+	// string: type bigint from javascript is encoded into string
+	Id int `json:"id,string,omitempty"`
 
 	// user
 	Name          string     `json:"name,omitempty"`
