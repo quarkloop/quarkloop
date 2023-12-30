@@ -63,8 +63,8 @@ func (s *orgService) getOrganizationList(ctx *gin.Context, visibility model.Scop
 	return orgList, nil
 }
 
-func (s *orgService) GetOrganizationById(ctx *gin.Context, params *org.GetOrganizationByIdQuery) (*org.Organization, error) {
-	o, err := s.store.GetOrganizationById(ctx, params.OrgId)
+func (s *orgService) GetOrganizationById(ctx *gin.Context, query *org.GetOrganizationByIdQuery) (*org.Organization, error) {
+	o, err := s.store.GetOrganizationById(ctx, query.OrgId)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (s *orgService) GetOrganizationById(ctx *gin.Context, params *org.GetOrgani
 		// check permissions
 		err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgRead, &accesscontrol.EvaluateFilterParams{
 			UserId: user.GetId(),
-			OrgId:  params.OrgId,
+			OrgId:  query.OrgId,
 		})
 		if err != nil {
 			if err == accesscontrol.ErrPermissionDenied {
@@ -98,8 +98,8 @@ func (s *orgService) GetOrganizationById(ctx *gin.Context, params *org.GetOrgani
 	return o, nil
 }
 
-// func (s *orgService) GetOrganization(ctx *gin.Context, params *org.GetOrganizationParams) (*org.Organization, error) {
-// 	org, err := s.store.GetOrganization(ctx, &params.Organization)
+// func (s *orgService) GetOrganization(ctx *gin.Context, query *org.GetOrganizationQuery) (*org.Organization, error) {
+// 	org, err := s.store.GetOrganization(ctx, &query.Organization)
 // 	if err != nil {
 // 		return nil, err
 // 	}
@@ -108,7 +108,7 @@ func (s *orgService) GetOrganizationById(ctx *gin.Context, params *org.GetOrgani
 // 	return org, nil
 // }
 
-func (s *orgService) CreateOrganization(ctx *gin.Context, params *org.CreateOrganizationCommand) (*org.Organization, error) {
+func (s *orgService) CreateOrganization(ctx *gin.Context, cmd *org.CreateOrganizationCommand) (*org.Organization, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		return nil, errors.New("not authorized")
 	}
@@ -130,7 +130,7 @@ func (s *orgService) CreateOrganization(ctx *gin.Context, params *org.CreateOrga
 		return nil, err
 	}
 
-	o, err := s.store.CreateOrganization(ctx, &params.Organization)
+	o, err := s.store.CreateOrganization(ctx, &cmd.Organization)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +139,7 @@ func (s *orgService) CreateOrganization(ctx *gin.Context, params *org.CreateOrga
 	return o, nil
 }
 
-func (s *orgService) UpdateOrganizationById(ctx *gin.Context, params *org.UpdateOrganizationByIdCommand) error {
+func (s *orgService) UpdateOrganizationById(ctx *gin.Context, cmd *org.UpdateOrganizationByIdCommand) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
@@ -148,17 +148,17 @@ func (s *orgService) UpdateOrganizationById(ctx *gin.Context, params *org.Update
 
 	// check permissions
 	err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgUpdate, &accesscontrol.EvaluateFilterParams{
-		OrgId:  params.OrgId,
+		OrgId:  cmd.OrgId,
 		UserId: user.GetId(),
 	})
 	if err != nil {
 		return err
 	}
 
-	return s.store.UpdateOrganizationById(ctx, params.OrgId, &params.Organization)
+	return s.store.UpdateOrganizationById(ctx, cmd.OrgId, &cmd.Organization)
 }
 
-func (s *orgService) DeleteOrganizationById(ctx *gin.Context, params *org.DeleteOrganizationByIdCommand) error {
+func (s *orgService) DeleteOrganizationById(ctx *gin.Context, cmd *org.DeleteOrganizationByIdCommand) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
@@ -167,12 +167,12 @@ func (s *orgService) DeleteOrganizationById(ctx *gin.Context, params *org.Delete
 
 	// check permissions
 	err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgDelete, &accesscontrol.EvaluateFilterParams{
-		OrgId:  params.OrgId,
+		OrgId:  cmd.OrgId,
 		UserId: user.GetId(),
 	})
 	if err != nil {
 		return err
 	}
 
-	return s.store.DeleteOrganizationById(ctx, params.OrgId)
+	return s.store.DeleteOrganizationById(ctx, cmd.OrgId)
 }
