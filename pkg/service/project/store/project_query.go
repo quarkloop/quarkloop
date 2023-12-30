@@ -39,7 +39,7 @@ WHERE
     %s;
 `
 
-func (store *projectStore) ListProjects(ctx context.Context, visibility model.ScopeVisibility, orgId []int, workspaceId []int) ([]project.Project, error) {
+func (store *projectStore) ListProjects(ctx context.Context, visibility model.ScopeVisibility, orgId []int, workspaceId []int) ([]*project.Project, error) {
 	whereClause := []string{}
 	if len(orgId) != 0 {
 		whereClause = append(whereClause, `p."orgId" = ANY (@orgId)`)
@@ -64,7 +64,7 @@ func (store *projectStore) ListProjects(ctx context.Context, visibility model.Sc
 	}
 	defer rows.Close()
 
-	var projectList []project.Project = []project.Project{}
+	var projectList []*project.Project = []*project.Project{}
 
 	for rows.Next() {
 		var project project.Project
@@ -88,7 +88,7 @@ func (store *projectStore) ListProjects(ctx context.Context, visibility model.Sc
 			return nil, err
 		}
 
-		projectList = append(projectList, project)
+		projectList = append(projectList, &project)
 	}
 
 	if err := rows.Err(); err != nil {
