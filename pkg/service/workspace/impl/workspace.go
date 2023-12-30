@@ -8,6 +8,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/contextdata"
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
+	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace/store"
@@ -54,7 +55,7 @@ func (s *workspaceService) GetWorkspaceList(ctx *gin.Context, query *workspace.G
 }
 
 func (s *workspaceService) getWorkspaceList(ctx context.Context, visibility model.ScopeVisibility, query *workspace.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
-	workspaceList, err := s.store.ListWorkspaces(ctx, visibility, query.OrgId)
+	workspaceList, err := s.store.GetWorkspaceList(ctx, visibility, query.OrgId)
 	if err != nil {
 		return nil, err
 	}
@@ -183,4 +184,43 @@ func (s *workspaceService) DeleteWorkspaceById(ctx *gin.Context, cmd *workspace.
 	}
 
 	return s.store.DeleteWorkspaceById(ctx, cmd.WorkspaceId)
+}
+
+func (s *workspaceService) GetProjectList(ctx *gin.Context, query *workspace.GetProjectListQuery) ([]*project.Project, error) {
+	if contextdata.IsUserAnonymous(ctx) {
+		// anonymous user => return public projects
+		return s.getProjectList(ctx, model.PublicVisibility, query)
+	}
+
+	user := contextdata.GetUser(ctx)
+	scope := contextdata.GetScope(ctx)
+
+	// check permissions
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
+		UserId:      user.GetId(),
+		OrgId:       scope.OrgId(),
+		WorkspaceId: scope.WorkspaceId(),
+	})
+	if err != nil {
+		if err == accesscontrol.ErrPermissionDenied {
+			// unauthorized user (permission denied) => return public projects
+			return s.getProjectList(ctx, model.PublicVisibility, query)
+		}
+		return nil, err
+	}
+
+	// authorized user => return public + private projects
+	return s.getProjectList(ctx, model.AllVisibility, query)
+}
+
+func (s *workspaceService) getProjectList(ctx context.Context, visibility model.ScopeVisibility, query *workspace.GetProjectListQuery) ([]*project.Project, error) {
+	projectList, err := s.store.GetProjectList(ctx, visibility, query.OrgId, query.WorkspaceId)
+	if err != nil {
+		return nil, err
+	}
+	for i := range projectList {
+		p := projectList[i]
+		p.GeneratePath()
+	}
+	return projectList, nil
 }
