@@ -138,3 +138,119 @@ type Permission struct {
 type EvaluateFilterParams struct {
 	OrgId, WorkspaceId, ProjectId, UserId int
 }
+
+// ListUserGroups
+
+type ListUserGroupsUriParams struct {
+	OrgId int `uri:"orgId" binding:"required"`
+}
+
+type ListUserGroupsQuery struct {
+	OrgId int
+}
+
+// GetUserGroupById
+
+type GetUserGroupByIdUriParams struct {
+	OrgId       int `uri:"orgId" binding:"required"`
+	UserGroupId int `uri:"groupId" binding:"required"`
+}
+
+type GetUserGroupByIdQuery struct {
+	OrgId       int
+	UserGroupId int
+}
+
+// CreateUserGroup
+
+type CreateUserGroupUriParams struct {
+	OrgId int `uri:"orgId" binding:"required"`
+}
+
+type CreateUserGroupCommand struct {
+	OrgId     int
+	UserGroup *UserGroup
+}
+
+// UpdateUserGroupById
+
+type UpdateUserGroupByIdUriParams struct {
+	OrgId       int `uri:"orgId" binding:"required"`
+	UserGroupId int `uri:"groupId" binding:"required"`
+}
+
+type UpdateUserGroupByIdCommand struct {
+	OrgId       int
+	UserGroupId int
+	UserGroup   *UserGroup
+}
+
+// DeleteUserGroupById
+
+type DeleteUserGroupByIdUriParams struct {
+	OrgId       int `uri:"orgId" binding:"required"`
+	UserGroupId int `uri:"groupId" binding:"required"`
+}
+
+type DeleteUserGroupByIdCommand struct {
+	OrgId       int
+	UserGroupId int
+}
+
+// ListUserRoles
+
+type ListUserRolesUriParams struct {
+	OrgId int `uri:"orgId" binding:"required"`
+}
+
+type ListUserRolesQuery struct {
+	OrgId int
+}
+
+// GetUserRoleById
+
+type GetUserRoleByIdUriParams struct {
+	OrgId      int `uri:"orgId" binding:"required"`
+	UserRoleId int `uri:"roleId" binding:"required"`
+}
+
+type GetUserRoleByIdQuery struct {
+	OrgId      int
+	UserRoleId int
+}
+
+// CreateUserRole
+
+type CreateUserRoleUriParams struct {
+	OrgId int `uri:"orgId" binding:"required"`
+}
+
+type CreateUserRoleCommand struct {
+	OrgId    int
+	UserRole *UserRole
+}
+
+// UpdateUserRoleById
+
+type UpdateUserRoleByIdUriParams struct {
+	OrgId      int `uri:"orgId" binding:"required"`
+	UserRoleId int `uri:"roleId" binding:"required"`
+}
+
+type UpdateUserRoleByIdCommand struct {
+	OrgId      int
+	UserRoleId int
+	UserRole   *UserRole
+}
+
+// DeleteUserRoleById
+
+type DeleteUserRoleByIdUriParams struct {
+	OrgId      int `uri:"orgId" binding:"required"`
+	UserRoleId int `uri:"roleId" binding:"required"`
+}
+
+type DeleteUserRoleByIdCommand struct {
+	OrgId      int
+	UserRoleId int
+}
