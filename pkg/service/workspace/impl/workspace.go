@@ -27,7 +27,7 @@ func NewWorkspaceService(ds store.WorkspaceStore, aclService accesscontrol.Servi
 	}
 }
 
-func (s *workspaceService) GetWorkspaceList(ctx *gin.Context, params *workspace.GetWorkspaceListParams) ([]workspace.Workspace, error) {
+func (s *workspaceService) GetWorkspaceList(ctx *gin.Context, params *workspace.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		// anonymous user => return public workspaces
 		return s.getWorkspaceList(ctx, model.PublicVisibility, params)
@@ -53,20 +53,20 @@ func (s *workspaceService) GetWorkspaceList(ctx *gin.Context, params *workspace.
 	return s.getWorkspaceList(ctx, model.AllVisibility, params)
 }
 
-func (s *workspaceService) getWorkspaceList(ctx context.Context, visibility model.ScopeVisibility, params *workspace.GetWorkspaceListParams) ([]workspace.Workspace, error) {
+func (s *workspaceService) getWorkspaceList(ctx context.Context, visibility model.ScopeVisibility, params *workspace.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
 	workspaceList, err := s.store.ListWorkspaces(ctx, visibility, params.OrgId)
 	if err != nil {
 		return nil, err
 	}
 
 	for i := range workspaceList {
-		workspace := &workspaceList[i]
+		workspace := workspaceList[i]
 		workspace.GeneratePath()
 	}
 	return workspaceList, nil
 }
 
-func (s *workspaceService) GetWorkspaceById(ctx *gin.Context, params *workspace.GetWorkspaceByIdParams) (*workspace.Workspace, error) {
+func (s *workspaceService) GetWorkspaceById(ctx *gin.Context, params *workspace.GetWorkspaceByIdQuery) (*workspace.Workspace, error) {
 	ws, err := s.store.GetWorkspaceById(ctx, params.WorkspaceId)
 	if err != nil {
 		return nil, err
@@ -103,7 +103,7 @@ func (s *workspaceService) GetWorkspaceById(ctx *gin.Context, params *workspace.
 	return ws, nil
 }
 
-// func (s *workspaceService) GetWorkspace(ctx context.Context, params *workspace.GetWorkspaceParams) (*workspace.Workspace, error) {
+// func (s *workspaceService) GetWorkspace(ctx context.Context, params *workspace.GetWorkspaceQuery) (*workspace.Workspace, error) {
 // 	workspace, err := s.store.GetWorkspace(ctx, params.OrgId, &params.Workspace)
 // 	if err != nil {
 // 		return nil, err
@@ -113,7 +113,7 @@ func (s *workspaceService) GetWorkspaceById(ctx *gin.Context, params *workspace.
 // 	return workspace, nil
 // }
 
-func (s *workspaceService) CreateWorkspace(ctx *gin.Context, params *workspace.CreateWorkspaceParams) (*workspace.Workspace, error) {
+func (s *workspaceService) CreateWorkspace(ctx *gin.Context, params *workspace.CreateWorkspaceCommand) (*workspace.Workspace, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		return nil, errors.New("not authorized")
 	}
@@ -143,7 +143,7 @@ func (s *workspaceService) CreateWorkspace(ctx *gin.Context, params *workspace.C
 	return ws, nil
 }
 
-func (s *workspaceService) UpdateWorkspaceById(ctx *gin.Context, params *workspace.UpdateWorkspaceByIdParams) error {
+func (s *workspaceService) UpdateWorkspaceById(ctx *gin.Context, params *workspace.UpdateWorkspaceByIdCommand) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
@@ -164,7 +164,7 @@ func (s *workspaceService) UpdateWorkspaceById(ctx *gin.Context, params *workspa
 	return s.store.UpdateWorkspaceById(ctx, params.WorkspaceId, &params.Workspace)
 }
 
-func (s *workspaceService) DeleteWorkspaceById(ctx *gin.Context, params *workspace.DeleteWorkspaceByIdParams) error {
+func (s *workspaceService) DeleteWorkspaceById(ctx *gin.Context, params *workspace.DeleteWorkspaceByIdCommand) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
