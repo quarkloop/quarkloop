@@ -126,7 +126,7 @@ func (s *orgService) CreateOrganization(ctx *gin.Context, cmd *org.CreateOrganiz
 	}
 
 	// check quotas
-	if err := s.quotaService.CheckCreateOrgQuotaReached(ctx, user.GetId()); err != nil {
+	if err := s.quotaService.CheckCreateOrgQuotaReached(ctx, &quota.CheckCreateOrgQuotaReachedQuery{UserId: user.GetId()}); err != nil {
 		return nil, err
 	}
 
