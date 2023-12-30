@@ -8,26 +8,23 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
-type CreateProjectRequest struct {
-	OrgId       int             `json:"orgId" binding:"required"`
-	WorkspaceId int             `json:"workspaceId" binding:"required"`
-	Project     project.Project `json:"project" binding:"required"`
-}
+// POST /projects
+//
+// Create project.
+//
+// Response status:
+// 201: StatusCreated
+// 500: StatusInternalServerError
 
 func (s *ProjectApi) CreateProject(ctx *gin.Context) {
-	req := &CreateProjectRequest{}
-	if err := ctx.ShouldBindJSON(req); err != nil {
+	cmd := &project.CreateProjectCommand{}
+	if err := ctx.ShouldBindJSON(cmd); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	ws, err := s.projectService.CreateProject(ctx, &project.CreateProjectParams{
-		OrgId:       req.OrgId,
-		WorkspaceId: req.WorkspaceId,
-		Project:     req.Project,
-	},
-	)
+	ws, err := s.projectService.CreateProject(ctx, cmd)
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
@@ -36,33 +33,32 @@ func (s *ProjectApi) CreateProject(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, ws)
 }
 
-type UpdateProjectByIdUriParams struct {
-	ProjectId int `uri:"projectId" binding:"required"`
-}
-
-type UpdateProjectByIdRequest struct {
-	project.Project
-}
+// PUT /projects/:projectId
+//
+// Update project by id.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
 
 func (s *ProjectApi) UpdateProjectById(ctx *gin.Context) {
-	uriParams := &UpdateProjectByIdUriParams{}
+	uriParams := &project.UpdateProjectByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
-	req := &UpdateProjectByIdRequest{}
-	if err := ctx.ShouldBindJSON(req); err != nil {
+	cmd := &project.UpdateProjectByIdCommand{}
+	if err := ctx.ShouldBindJSON(cmd); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	err := s.projectService.UpdateProjectById(ctx, &project.UpdateProjectByIdParams{
+	err := s.projectService.UpdateProjectById(ctx, &project.UpdateProjectByIdCommand{
 		ProjectId: uriParams.ProjectId,
-		Project:   req.Project,
-	},
-	)
+		Project:   cmd.Project,
+	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
@@ -71,22 +67,25 @@ func (s *ProjectApi) UpdateProjectById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, nil)
 }
 
-type DeleteProjectByIdUriParams struct {
-	ProjectId int `uri:"projectId" binding:"required"`
-}
+// DELETE /projects/:projectId
+//
+// Delete project by id.
+//
+// Response status:
+// 204: StatusNoContent
+// 500: StatusInternalServerError
 
 func (s *ProjectApi) DeleteProjectById(ctx *gin.Context) {
-	uriParams := &DeleteProjectByIdUriParams{}
+	uriParams := &project.DeleteProjectByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	err := s.projectService.DeleteProjectById(ctx, &project.DeleteProjectByIdParams{
+	err := s.projectService.DeleteProjectById(ctx, &project.DeleteProjectByIdCommand{
 		ProjectId: uriParams.ProjectId,
-	},
-	)
+	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
