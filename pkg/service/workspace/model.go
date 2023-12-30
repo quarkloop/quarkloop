@@ -90,3 +90,15 @@ type DeleteWorkspaceByIdUriParams struct {
 type DeleteWorkspaceByIdCommand struct {
 	WorkspaceId int
 }
+
+// GetProjectList
+
+type GetProjectListUriParams struct {
+	OrgId       int `uri:"orgId" binding:"required"`
+	WorkspaceId int `uri:"workspaceId" binding:"required"`
+}
+
+type GetProjectListQuery struct {
+	OrgId       int
+	WorkspaceId int
+}
