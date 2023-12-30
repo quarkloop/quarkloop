@@ -7,13 +7,13 @@ import (
 
 type Service interface {
 	// org
-	GetOrganizationList(*gin.Context) ([]*Organization, error)
-	GetOrganizationById(*gin.Context, *GetOrganizationByIdQuery) (*Organization, error)
+	GetOrgList(*gin.Context) ([]*Org, error)
+	GetOrgById(*gin.Context, *GetOrgByIdQuery) (*Org, error)
 	// TODO: rewrite
-	// GetOrganization(context.Context, *GetOrganizationQuery) (*Organization, error)
-	CreateOrganization(*gin.Context, *CreateOrganizationCommand) (*Organization, error)
-	UpdateOrganizationById(*gin.Context, *UpdateOrganizationByIdCommand) error
-	DeleteOrganizationById(*gin.Context, *DeleteOrganizationByIdCommand) error
+	// GetOrg(context.Context, *GetOrgQuery) (*Org, error)
+	CreateOrg(*gin.Context, *CreateOrgCommand) (*Org, error)
+	UpdateOrgById(*gin.Context, *UpdateOrgByIdCommand) error
+	DeleteOrgById(*gin.Context, *DeleteOrgByIdCommand) error
 
 	// project
 	GetProjectList(*gin.Context, *GetProjectListQuery) ([]*project.Project, error)
