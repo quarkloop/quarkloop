@@ -37,7 +37,8 @@ WHERE
 %s	
 `
 
-func (store *workspaceStore) GetWorkspaceList(ctx context.Context, visibility model.ScopeVisibility, orgId []int) ([]*workspace.Workspace, error) {
+// TODO: rewrite query
+func (store *workspaceStore) GetWorkspaceList(ctx context.Context, visibility model.ScopeVisibility, userId int) ([]*workspace.Workspace, error) {
 	var finalQuery strings.Builder
 	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
 		finalQuery.WriteString(fmt.Sprintf(listWorkspacesQuery, `AND ws."visibility" = @visibility;`))
@@ -46,7 +47,7 @@ func (store *workspaceStore) GetWorkspaceList(ctx context.Context, visibility mo
 	}
 
 	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{
-		"orgId":      orgId,
+		"userId":     userId,
 		"visibility": visibility,
 	})
 	if err != nil {
