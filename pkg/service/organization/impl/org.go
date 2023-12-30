@@ -26,7 +26,7 @@ func NewOrganizationService(ds store.OrgStore, aclService accesscontrol.Service,
 	}
 }
 
-func (s *orgService) GetOrganizationList(ctx *gin.Context) ([]org.Organization, error) {
+func (s *orgService) GetOrganizationList(ctx *gin.Context) ([]*org.Organization, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		// anonymous user => return public orgs
 		return s.getOrganizationList(ctx, model.PublicVisibility)
@@ -50,20 +50,20 @@ func (s *orgService) GetOrganizationList(ctx *gin.Context) ([]org.Organization, 
 	return s.getOrganizationList(ctx, model.AllVisibility)
 }
 
-func (s *orgService) getOrganizationList(ctx *gin.Context, visibility model.ScopeVisibility) ([]org.Organization, error) {
+func (s *orgService) getOrganizationList(ctx *gin.Context, visibility model.ScopeVisibility) ([]*org.Organization, error) {
 	orgList, err := s.store.ListOrganizations(ctx, visibility)
 	if err != nil {
 		return nil, err
 	}
 
 	for i := range orgList {
-		org := &orgList[i]
+		org := orgList[i]
 		org.GeneratePath()
 	}
 	return orgList, nil
 }
 
-func (s *orgService) GetOrganizationById(ctx *gin.Context, params *org.GetOrganizationByIdParams) (*org.Organization, error) {
+func (s *orgService) GetOrganizationById(ctx *gin.Context, params *org.GetOrganizationByIdQuery) (*org.Organization, error) {
 	o, err := s.store.GetOrganizationById(ctx, params.OrgId)
 	if err != nil {
 		return nil, err
@@ -108,7 +108,7 @@ func (s *orgService) GetOrganizationById(ctx *gin.Context, params *org.GetOrgani
 // 	return org, nil
 // }
 
-func (s *orgService) CreateOrganization(ctx *gin.Context, params *org.CreateOrganizationParams) (*org.Organization, error) {
+func (s *orgService) CreateOrganization(ctx *gin.Context, params *org.CreateOrganizationCommand) (*org.Organization, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		return nil, errors.New("not authorized")
 	}
@@ -139,7 +139,7 @@ func (s *orgService) CreateOrganization(ctx *gin.Context, params *org.CreateOrga
 	return o, nil
 }
 
-func (s *orgService) UpdateOrganizationById(ctx *gin.Context, params *org.UpdateOrganizationByIdParams) error {
+func (s *orgService) UpdateOrganizationById(ctx *gin.Context, params *org.UpdateOrganizationByIdCommand) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
@@ -158,7 +158,7 @@ func (s *orgService) UpdateOrganizationById(ctx *gin.Context, params *org.Update
 	return s.store.UpdateOrganizationById(ctx, params.OrgId, &params.Organization)
 }
 
-func (s *orgService) DeleteOrganizationById(ctx *gin.Context, params *org.DeleteOrganizationByIdParams) error {
+func (s *orgService) DeleteOrganizationById(ctx *gin.Context, params *org.DeleteOrganizationByIdCommand) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
