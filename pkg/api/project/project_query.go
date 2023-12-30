@@ -5,8 +5,32 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/api"
+	"github.com/quarkloop/quarkloop/pkg/contextdata"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
+
+// GET /projects
+//
+// Get global project list.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
+
+func (s *ProjectApi) GetProjectList(ctx *gin.Context) {
+	user := contextdata.GetUser(ctx)
+
+	// query service
+	wsList, err := s.projectService.GetProjectList(ctx, &project.GetProjectListQuery{
+		UserId: user.GetId(),
+	})
+	if err != nil {
+		api.AbortWithInternalServerErrorJSON(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, &wsList)
+}
 
 // GET /orgs/:orgId/workspaces/:workspaceId/projects/:projectId
 //
