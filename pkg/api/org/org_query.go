@@ -17,9 +17,9 @@ import (
 // 200: StatusOK
 // 500: StatusInternalServerError
 
-func (s *OrganizationApi) GetOrganizationList(ctx *gin.Context) {
+func (s *OrgApi) GetOrgList(ctx *gin.Context) {
 	// query service
-	orgList, err := s.orgService.GetOrganizationList(ctx)
+	orgList, err := s.orgService.GetOrgList(ctx)
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
@@ -36,15 +36,15 @@ func (s *OrganizationApi) GetOrganizationList(ctx *gin.Context) {
 // 200: StatusOK
 // 500: StatusInternalServerError
 
-func (s *OrganizationApi) GetOrganizationById(ctx *gin.Context) {
-	uriParams := &org.GetOrganizationByIdUriParams{}
+func (s *OrgApi) GetOrgById(ctx *gin.Context) {
+	uriParams := &org.GetOrgByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	org, err := s.orgService.GetOrganizationById(ctx, &org.GetOrganizationByIdQuery{
+	org, err := s.orgService.GetOrgById(ctx, &org.GetOrgByIdQuery{
 		OrgId: uriParams.OrgId,
 	})
 	if err != nil {
@@ -55,20 +55,20 @@ func (s *OrganizationApi) GetOrganizationById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, org)
 }
 
-// type GetOrganizationQueryParams struct {
-// 	org.Organization
+// type GetOrgQueryParams struct {
+// 	org.Org
 // }
 
-// func (s *OrganizationApi) GetOrganization(ctx *gin.Context) {
-// 	queryParams := &GetOrganizationQueryParams{}
+// func (s *OrgApi) GetOrg(ctx *gin.Context) {
+// 	queryParams := &GetOrgQueryParams{}
 // 	if err := ctx.ShouldBindQuery(queryParams); err != nil {
 // 		api.AbortWithBadRequestJSON(ctx, err)
 // 		return
 // 	}
 
 // 	// query service
-// 	org, err := s.orgService.GetOrganization(ctx, &org.GetOrganizationQuery{
-// 		Organization: queryParams.Organization,
+// 	org, err := s.orgService.GetOrg(ctx, &org.GetOrgQuery{
+// 		Org: queryParams.Org,
 // 	})
 // 	if err != nil {
 // 		api.AbortWithInternalServerErrorJSON(ctx, err)
@@ -86,7 +86,7 @@ func (s *OrganizationApi) GetOrganizationById(ctx *gin.Context) {
 // 200: StatusOK
 // 500: StatusInternalServerError
 
-func (s *OrganizationApi) GetProjectList(ctx *gin.Context) {
+func (s *OrgApi) GetProjectList(ctx *gin.Context) {
 	uriParams := &org.GetProjectListUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
