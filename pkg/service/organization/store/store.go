@@ -9,7 +9,7 @@ import (
 )
 
 type OrgStore interface {
-	ListOrganizations(ctx context.Context, visibility model.ScopeVisibility) ([]org.Organization, error)
+	ListOrganizations(ctx context.Context, visibility model.ScopeVisibility) ([]*org.Organization, error)
 	GetOrganizationById(ctx context.Context, orgId int) (*org.Organization, error)
 	GetOrganization(ctx context.Context, org *org.Organization) (*org.Organization, error)
 	CreateOrganization(ctx context.Context, org *org.Organization) (*org.Organization, error)
