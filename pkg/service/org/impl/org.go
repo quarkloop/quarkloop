@@ -1,14 +1,16 @@
-package organization_impl
+package org_impl
 
 import (
+	"context"
 	"errors"
 
 	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/contextdata"
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
-	org "github.com/quarkloop/quarkloop/pkg/service/organization"
-	"github.com/quarkloop/quarkloop/pkg/service/organization/store"
+	"github.com/quarkloop/quarkloop/pkg/service/org"
+	"github.com/quarkloop/quarkloop/pkg/service/org/store"
+	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
 )
 
@@ -18,7 +20,7 @@ type orgService struct {
 	quotaService quota.Service
 }
 
-func NewOrganizationService(ds store.OrgStore, aclService accesscontrol.Service, quotaService quota.Service) org.Service {
+func NewOrgService(ds store.OrgStore, aclService accesscontrol.Service, quotaService quota.Service) org.Service {
 	return &orgService{
 		store:        ds,
 		aclService:   aclService,
@@ -26,10 +28,10 @@ func NewOrganizationService(ds store.OrgStore, aclService accesscontrol.Service,
 	}
 }
 
-func (s *orgService) GetOrganizationList(ctx *gin.Context) ([]*org.Organization, error) {
+func (s *orgService) GetOrgList(ctx *gin.Context) ([]*org.Org, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		// anonymous user => return public orgs
-		return s.getOrganizationList(ctx, model.PublicVisibility)
+		return s.getOrgList(ctx, model.PublicVisibility)
 	}
 
 	user := contextdata.GetUser(ctx)
@@ -41,17 +43,17 @@ func (s *orgService) GetOrganizationList(ctx *gin.Context) ([]*org.Organization,
 	if err != nil {
 		if err == accesscontrol.ErrPermissionDenied {
 			// unauthorized user (permission denied) => return public orgs
-			return s.getOrganizationList(ctx, model.PublicVisibility)
+			return s.getOrgList(ctx, model.PublicVisibility)
 		}
 		return nil, err
 	}
 
 	// authorized user => return public + private orgs
-	return s.getOrganizationList(ctx, model.AllVisibility)
+	return s.getOrgList(ctx, model.AllVisibility)
 }
 
-func (s *orgService) getOrganizationList(ctx *gin.Context, visibility model.ScopeVisibility) ([]*org.Organization, error) {
-	orgList, err := s.store.ListOrganizations(ctx, visibility)
+func (s *orgService) getOrgList(ctx *gin.Context, visibility model.ScopeVisibility) ([]*org.Org, error) {
+	orgList, err := s.store.GetOrgList(ctx, visibility)
 	if err != nil {
 		return nil, err
 	}
@@ -63,8 +65,8 @@ func (s *orgService) getOrganizationList(ctx *gin.Context, visibility model.Scop
 	return orgList, nil
 }
 
-func (s *orgService) GetOrganizationById(ctx *gin.Context, query *org.GetOrganizationByIdQuery) (*org.Organization, error) {
-	o, err := s.store.GetOrganizationById(ctx, query.OrgId)
+func (s *orgService) GetOrgById(ctx *gin.Context, query *org.GetOrgByIdQuery) (*org.Org, error) {
+	o, err := s.store.GetOrgById(ctx, query.OrgId)
 	if err != nil {
 		return nil, err
 	}
@@ -98,8 +100,8 @@ func (s *orgService) GetOrganizationById(ctx *gin.Context, query *org.GetOrganiz
 	return o, nil
 }
 
-// func (s *orgService) GetOrganization(ctx *gin.Context, query *org.GetOrganizationQuery) (*org.Organization, error) {
-// 	org, err := s.store.GetOrganization(ctx, &query.Organization)
+// func (s *orgService) GetOrg(ctx *gin.Context, query *org.GetOrgQuery) (*org.Org, error) {
+// 	org, err := s.store.GetOrg(ctx, &query.Org)
 // 	if err != nil {
 // 		return nil, err
 // 	}
@@ -108,7 +110,7 @@ func (s *orgService) GetOrganizationById(ctx *gin.Context, query *org.GetOrganiz
 // 	return org, nil
 // }
 
-func (s *orgService) CreateOrganization(ctx *gin.Context, cmd *org.CreateOrganizationCommand) (*org.Organization, error) {
+func (s *orgService) CreateOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) (*org.Org, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		return nil, errors.New("not authorized")
 	}
@@ -130,7 +132,7 @@ func (s *orgService) CreateOrganization(ctx *gin.Context, cmd *org.CreateOrganiz
 		return nil, err
 	}
 
-	o, err := s.store.CreateOrganization(ctx, &cmd.Organization)
+	o, err := s.store.CreateOrg(ctx, &cmd.Org)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +141,7 @@ func (s *orgService) CreateOrganization(ctx *gin.Context, cmd *org.CreateOrganiz
 	return o, nil
 }
 
-func (s *orgService) UpdateOrganizationById(ctx *gin.Context, cmd *org.UpdateOrganizationByIdCommand) error {
+func (s *orgService) UpdateOrgById(ctx *gin.Context, cmd *org.UpdateOrgByIdCommand) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
@@ -155,10 +157,10 @@ func (s *orgService) UpdateOrganizationById(ctx *gin.Context, cmd *org.UpdateOrg
 		return err
 	}
 
-	return s.store.UpdateOrganizationById(ctx, cmd.OrgId, &cmd.Organization)
+	return s.store.UpdateOrgById(ctx, cmd.OrgId, &cmd.Org)
 }
 
-func (s *orgService) DeleteOrganizationById(ctx *gin.Context, cmd *org.DeleteOrganizationByIdCommand) error {
+func (s *orgService) DeleteOrgById(ctx *gin.Context, cmd *org.DeleteOrgByIdCommand) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
@@ -174,5 +176,44 @@ func (s *orgService) DeleteOrganizationById(ctx *gin.Context, cmd *org.DeleteOrg
 		return err
 	}
 
-	return s.store.DeleteOrganizationById(ctx, cmd.OrgId)
+	return s.store.DeleteOrgById(ctx, cmd.OrgId)
+}
+
+func (s *orgService) GetProjectList(ctx *gin.Context, query *org.GetProjectListQuery) ([]*project.Project, error) {
+	if contextdata.IsUserAnonymous(ctx) {
+		// anonymous user => return public projects
+		return s.getProjectList(ctx, model.PublicVisibility, query)
+	}
+
+	user := contextdata.GetUser(ctx)
+	scope := contextdata.GetScope(ctx)
+
+	// check permissions
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
+		UserId:      user.GetId(),
+		OrgId:       scope.OrgId(),
+		WorkspaceId: scope.WorkspaceId(),
+	})
+	if err != nil {
+		if err == accesscontrol.ErrPermissionDenied {
+			// unauthorized user (permission denied) => return public projects
+			return s.getProjectList(ctx, model.PublicVisibility, query)
+		}
+		return nil, err
+	}
+
+	// authorized user => return public + private projects
+	return s.getProjectList(ctx, model.AllVisibility, query)
+}
+
+func (s *orgService) getProjectList(ctx context.Context, visibility model.ScopeVisibility, query *org.GetProjectListQuery) ([]*project.Project, error) {
+	projectList, err := s.store.GetProjectList(ctx, visibility, query.OrgId)
+	if err != nil {
+		return nil, err
+	}
+	for i := range projectList {
+		p := projectList[i]
+		p.GeneratePath()
+	}
+	return projectList, nil
 }
