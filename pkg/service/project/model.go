@@ -42,26 +42,18 @@ func (p *Project) GeneratePath() {
 	p.Path = fmt.Sprintf("/org/%s/%s/%s", p.OrgScopedId, p.WorkspaceScopedId, p.ScopedId)
 }
 
-// GetProjectList
-
-type GetProjectListQueryParams struct {
-	OrgId       []int `form:"orgId"`
-	WorkspaceId []int `form:"workspaceId"`
-}
-
-type GetProjectListQuery struct {
-	OrgId       []int
-	WorkspaceId []int
-}
-
 // GetProjectById
 
 type GetProjectByIdUriParams struct {
-	ProjectId int `uri:"projectId" binding:"required"`
+	OrgId       int `uri:"orgId" binding:"required"`
+	WorkspaceId int `uri:"workspaceId" binding:"required"`
+	ProjectId   int `uri:"projectId" binding:"required"`
 }
 
 type GetProjectByIdQuery struct {
-	ProjectId int
+	OrgId       int
+	WorkspaceId int
+	ProjectId   int
 }
 
 // type GetProjectQuery struct {
@@ -71,29 +63,42 @@ type GetProjectByIdQuery struct {
 
 //  CreateProject
 
+type CreateProjectUriParams struct {
+	OrgId       int `uri:"orgId" binding:"required"`
+	WorkspaceId int `uri:"workspaceId" binding:"required"`
+}
+
 type CreateProjectCommand struct {
-	OrgId       int     `json:"orgId" binding:"required"`
-	WorkspaceId int     `json:"workspaceId" binding:"required"`
-	Project     Project `json:"project" binding:"required"`
+	OrgId       int
+	WorkspaceId int
+	Project
 }
 
 // UpdateProjectById
 
 type UpdateProjectByIdUriParams struct {
-	ProjectId int `uri:"projectId" binding:"required"`
+	OrgId       int `uri:"orgId" binding:"required"`
+	WorkspaceId int `uri:"workspaceId" binding:"required"`
+	ProjectId   int `uri:"projectId" binding:"required"`
 }
 
 type UpdateProjectByIdCommand struct {
-	ProjectId int `json:"projectId" binding:"required"`
-	Project   Project
+	OrgId       int
+	WorkspaceId int
+	ProjectId   int
+	Project
 }
 
 // DeleteProjectById
 
 type DeleteProjectByIdUriParams struct {
-	ProjectId int `uri:"projectId" binding:"required"`
+	OrgId       int `uri:"orgId" binding:"required"`
+	WorkspaceId int `uri:"workspaceId" binding:"required"`
+	ProjectId   int `uri:"projectId" binding:"required"`
 }
 
 type DeleteProjectByIdCommand struct {
-	ProjectId int
+	OrgId       int
+	WorkspaceId int
+	ProjectId   int
 }
