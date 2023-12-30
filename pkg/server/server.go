@@ -19,8 +19,8 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/contextdata"
 	acl_impl "github.com/quarkloop/quarkloop/pkg/service/accesscontrol/impl"
 	acl_store "github.com/quarkloop/quarkloop/pkg/service/accesscontrol/store"
-	org_impl "github.com/quarkloop/quarkloop/pkg/service/organization/impl"
-	org_store "github.com/quarkloop/quarkloop/pkg/service/organization/store"
+	org_impl "github.com/quarkloop/quarkloop/pkg/service/org/impl"
+	org_store "github.com/quarkloop/quarkloop/pkg/service/org/store"
 	project_impl "github.com/quarkloop/quarkloop/pkg/service/project/impl"
 	project_store "github.com/quarkloop/quarkloop/pkg/service/project/store"
 	project_submission_impl "github.com/quarkloop/quarkloop/pkg/service/project_submission/impl"
@@ -85,7 +85,7 @@ func NewDefaultServer(ds *repository.Repository) Server {
 	tableSchemaService := table_schema_impl.NewTableSchemaService(table_schema_store.NewTableSchemaStore(ds.ProjectDbConn))
 	tableRecordService := table_record_impl.NewTableRecordService(table_record_store.NewTableRecordStore(ds.ProjectDbConn))
 
-	orgService := org_impl.NewOrganizationService(org_store.NewOrgStore(ds.SystemDbConn), aclService, quotaService)
+	orgService := org_impl.NewOrgService(org_store.NewOrgStore(ds.SystemDbConn), aclService, quotaService)
 	workspaceService := ws_impl.NewWorkspaceService(ws_store.NewWorkspaceStore(ds.SystemDbConn), aclService, quotaService)
 	projectTableService := project_impl.NewProjectService(project_store.NewProjectStore(ds.SystemDbConn), aclService, quotaService, tableBranchService)
 
@@ -95,7 +95,7 @@ func NewDefaultServer(ds *repository.Repository) Server {
 		router:    router,
 		dataStore: ds,
 
-		orgApi:       org.NewOrganizationApi(orgService),
+		orgApi:       org.NewOrgApi(orgService),
 		workspaceApi: workspace.NewWorkspaceApi(workspaceService),
 		projectApi:   project.NewProjectApi(projectTableService),
 
@@ -164,19 +164,19 @@ func (s *Server) BindHandlers(api *api.ServerApi) {
 	orgGroup := router.Group("/orgs")
 	orgGroup.Use(s.UserAuth)
 	{
-		orgGroup.GET("", s.orgApi.GetOrganizationList)
-		orgGroup.GET("/:orgId", s.orgApi.GetOrganizationById)
+		orgGroup.GET("", s.orgApi.GetOrgList)
+		orgGroup.GET("/:orgId", s.orgApi.GetOrgById)
 		// TODO: first must be a reserved name
 		// TODO: rewrite
-		// orgGroup.GET("/first", s.orgApi.GetOrganization)
+		// orgGroup.GET("/first", s.orgApi.GetOrg)
 	}
 	// org mutation
 	orgMutationGroup := orgGroup.Group("")
 	orgMutationGroup.Use(s.AbortAnonymousUserRequest)
 	{
-		orgMutationGroup.POST("", s.orgApi.CreateOrganization)
-		orgMutationGroup.PUT("/:orgId", s.orgApi.UpdateOrganizationById)
-		orgMutationGroup.DELETE("/:orgId", s.orgApi.DeleteOrganizationById)
+		orgMutationGroup.POST("", s.orgApi.CreateOrg)
+		orgMutationGroup.PUT("/:orgId", s.orgApi.UpdateOrgById)
+		orgMutationGroup.DELETE("/:orgId", s.orgApi.DeleteOrgById)
 	}
 
 	// workspace apis
