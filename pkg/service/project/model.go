@@ -42,31 +42,58 @@ func (p *Project) GeneratePath() {
 	p.Path = fmt.Sprintf("/org/%s/%s/%s", p.OrgScopedId, p.WorkspaceScopedId, p.ScopedId)
 }
 
-type GetProjectListParams struct {
+// GetProjectList
+
+type GetProjectListQueryParams struct {
+	OrgId       []int `form:"orgId"`
+	WorkspaceId []int `form:"workspaceId"`
+}
+
+type GetProjectListQuery struct {
 	OrgId       []int
 	WorkspaceId []int
 }
 
-type GetProjectByIdParams struct {
+// GetProjectById
+
+type GetProjectByIdUriParams struct {
+	ProjectId int `uri:"projectId" binding:"required"`
+}
+
+type GetProjectByIdQuery struct {
 	ProjectId int
 }
 
-type GetProjectParams struct {
-	OrgId   int
-	Project Project
+// type GetProjectQuery struct {
+// 	OrgId   int
+// 	Project Project
+// }
+
+//  CreateProject
+
+type CreateProjectCommand struct {
+	OrgId       int     `json:"orgId" binding:"required"`
+	WorkspaceId int     `json:"workspaceId" binding:"required"`
+	Project     Project `json:"project" binding:"required"`
 }
 
-type CreateProjectParams struct {
-	OrgId       int
-	WorkspaceId int
-	Project     Project
+// UpdateProjectById
+
+type UpdateProjectByIdUriParams struct {
+	ProjectId int `uri:"projectId" binding:"required"`
 }
 
-type UpdateProjectByIdParams struct {
-	ProjectId int
+type UpdateProjectByIdCommand struct {
+	ProjectId int `json:"projectId" binding:"required"`
 	Project   Project
 }
 
-type DeleteProjectByIdParams struct {
+// DeleteProjectById
+
+type DeleteProjectByIdUriParams struct {
+	ProjectId int `uri:"projectId" binding:"required"`
+}
+
+type DeleteProjectByIdCommand struct {
 	ProjectId int
 }
