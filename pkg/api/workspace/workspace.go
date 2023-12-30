@@ -6,13 +6,17 @@ import (
 )
 
 type Api interface {
-	GetWorkspaceList(c *gin.Context)
-	GetWorkspaceById(c *gin.Context)
+	// workspace
+	GetWorkspaceList(*gin.Context)
+	GetWorkspaceById(*gin.Context)
 	// TODO: rewrite
-	// GetWorkspace(c *gin.Context)
-	CreateWorkspace(c *gin.Context)
-	UpdateWorkspaceById(c *gin.Context)
-	DeleteWorkspaceById(c *gin.Context)
+	// GetWorkspace(*gin.Context)
+	CreateWorkspace(*gin.Context)
+	UpdateWorkspaceById(*gin.Context)
+	DeleteWorkspaceById(*gin.Context)
+
+	// project
+	GetProjectList(*gin.Context)
 }
 
 type WorkspaceApi struct {
