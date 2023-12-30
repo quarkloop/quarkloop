@@ -55,7 +55,7 @@ func (s *workspaceService) GetWorkspaceList(ctx *gin.Context, query *workspace.G
 }
 
 func (s *workspaceService) getWorkspaceList(ctx context.Context, visibility model.ScopeVisibility, query *workspace.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
-	workspaceList, err := s.store.GetWorkspaceList(ctx, visibility, query.OrgId)
+	workspaceList, err := s.store.GetWorkspaceList(ctx, visibility, query.UserId)
 	if err != nil {
 		return nil, err
 	}
