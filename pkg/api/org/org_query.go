@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/quarkloop/quarkloop/pkg/api"
-	org "github.com/quarkloop/quarkloop/pkg/service/organization"
+	"github.com/quarkloop/quarkloop/pkg/service/org"
 )
 
 // GET /orgs
@@ -77,3 +77,30 @@ func (s *OrganizationApi) GetOrganizationById(ctx *gin.Context) {
 
 // 	ctx.JSON(http.StatusOK, org)
 // }
+
+// GET /orgs/:orgId/projects
+//
+// Get organization project list.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
+
+func (s *OrganizationApi) GetProjectList(ctx *gin.Context) {
+	uriParams := &org.GetProjectListUriParams{}
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
+		return
+	}
+
+	// query service
+	projectList, err := s.orgService.GetProjectList(ctx, &org.GetProjectListQuery{
+		OrgId: uriParams.OrgId,
+	})
+	if err != nil {
+		api.AbortWithInternalServerErrorJSON(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, &projectList)
+}
