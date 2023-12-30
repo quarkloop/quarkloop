@@ -12,6 +12,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/org/store"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
+	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
 type orgService struct {
@@ -28,10 +29,10 @@ func NewOrgService(ds store.OrgStore, aclService accesscontrol.Service, quotaSer
 	}
 }
 
-func (s *orgService) GetOrgList(ctx *gin.Context) ([]*org.Org, error) {
+func (s *orgService) GetOrgList(ctx *gin.Context, query *org.GetOrgListQuery) ([]*org.Org, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		// anonymous user => return public orgs
-		return s.getOrgList(ctx, model.PublicVisibility)
+		return s.getOrgList(ctx, model.PublicVisibility, query)
 	}
 
 	user := contextdata.GetUser(ctx)
@@ -43,17 +44,17 @@ func (s *orgService) GetOrgList(ctx *gin.Context) ([]*org.Org, error) {
 	if err != nil {
 		if err == accesscontrol.ErrPermissionDenied {
 			// unauthorized user (permission denied) => return public orgs
-			return s.getOrgList(ctx, model.PublicVisibility)
+			return s.getOrgList(ctx, model.PublicVisibility, query)
 		}
 		return nil, err
 	}
 
 	// authorized user => return public + private orgs
-	return s.getOrgList(ctx, model.AllVisibility)
+	return s.getOrgList(ctx, model.AllVisibility, query)
 }
 
-func (s *orgService) getOrgList(ctx *gin.Context, visibility model.ScopeVisibility) ([]*org.Org, error) {
-	orgList, err := s.store.GetOrgList(ctx, visibility)
+func (s *orgService) getOrgList(ctx *gin.Context, visibility model.ScopeVisibility, query *org.GetOrgListQuery) ([]*org.Org, error) {
+	orgList, err := s.store.GetOrgList(ctx, visibility, query.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -177,6 +178,44 @@ func (s *orgService) DeleteOrgById(ctx *gin.Context, cmd *org.DeleteOrgByIdComma
 	}
 
 	return s.store.DeleteOrgById(ctx, cmd.OrgId)
+}
+
+func (s *orgService) GetWorkspaceList(ctx *gin.Context, query *org.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
+	if contextdata.IsUserAnonymous(ctx) {
+		// anonymous user => return public workspaces
+		return s.getWorkspaceList(ctx, model.PublicVisibility, query)
+	}
+
+	user := contextdata.GetUser(ctx)
+	scope := contextdata.GetScope(ctx)
+
+	// check permissions
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceRead, &accesscontrol.EvaluateFilterParams{
+		UserId: user.GetId(),
+		OrgId:  scope.OrgId(),
+	})
+	if err != nil {
+		if err == accesscontrol.ErrPermissionDenied {
+			// unauthorized user (permission denied) => return public workspaces
+			return s.getWorkspaceList(ctx, model.PublicVisibility, query)
+		}
+		return nil, err
+	}
+
+	// authorized user => return public + private workspaces
+	return s.getWorkspaceList(ctx, model.AllVisibility, query)
+}
+
+func (s *orgService) getWorkspaceList(ctx context.Context, visibility model.ScopeVisibility, query *org.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
+	workspaceList, err := s.store.GetWorkspaceList(ctx, visibility, query.OrgId)
+	if err != nil {
+		return nil, err
+	}
+	for i := range workspaceList {
+		p := workspaceList[i]
+		p.GeneratePath()
+	}
+	return workspaceList, nil
 }
 
 func (s *orgService) GetProjectList(ctx *gin.Context, query *org.GetProjectListQuery) ([]*project.Project, error) {
