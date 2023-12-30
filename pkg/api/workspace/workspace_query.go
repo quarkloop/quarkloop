@@ -6,27 +6,24 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/quarkloop/quarkloop/pkg/api"
+	"github.com/quarkloop/quarkloop/pkg/contextdata"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
 // GET /workspaces
 //
-// Get workspace list.
+// Get global workspace list.
 //
 // Response status:
 // 200: StatusOK
 // 500: StatusInternalServerError
 
 func (s *WorkspaceApi) GetWorkspaceList(ctx *gin.Context) {
-	queryParams := &workspace.GetWorkspaceListQueryParams{}
-	if err := ctx.ShouldBindQuery(queryParams); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
-		return
-	}
+	user := contextdata.GetUser(ctx)
 
 	// query service
 	wsList, err := s.workspaceService.GetWorkspaceList(ctx, &workspace.GetWorkspaceListQuery{
-		OrgId: queryParams.OrgId,
+		UserId: user.GetId(),
 	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
@@ -36,7 +33,7 @@ func (s *WorkspaceApi) GetWorkspaceList(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &wsList)
 }
 
-// GET /workspaces/:workspaceId
+// GET /orgs/:orgId/workspaces/:workspaceId
 //
 // Get workspace by id.
 //
