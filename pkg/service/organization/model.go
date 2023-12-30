@@ -34,23 +34,45 @@ func (o *Organization) GeneratePath() {
 	o.Path = fmt.Sprintf("/org/%s", o.ScopedId)
 }
 
-type GetOrganizationByIdParams struct {
+// GetOrganizationById
+
+type GetOrganizationByIdUriParams struct {
+	OrgId int `uri:"orgId" binding:"required"`
+}
+
+type GetOrganizationByIdQuery struct {
 	OrgId int
 }
 
-type GetOrganizationParams struct {
-	Organization Organization
+// GetOrganization
+
+// type GetOrganizationParams struct {
+// 	Organization Organization
+// }
+
+// CreateOrganization
+
+type CreateOrganizationCommand struct {
+	Organization
 }
 
-type CreateOrganizationParams struct {
-	Organization Organization
+// UpdateOrganizationById
+
+type UpdateOrganizationByIdUriParams struct {
+	OrgId int `uri:"orgId" binding:"required"`
 }
 
-type UpdateOrganizationByIdParams struct {
-	OrgId        int
-	Organization Organization
+type UpdateOrganizationByIdCommand struct {
+	OrgId int
+	Organization
 }
 
-type DeleteOrganizationByIdParams struct {
+// DeleteOrganizationById
+
+type DeleteOrganizationByIdUriParams struct {
+	OrgId int `uri:"orgId" binding:"required"`
+}
+
+type DeleteOrganizationByIdCommand struct {
 	OrgId int
 }
