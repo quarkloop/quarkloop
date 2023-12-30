@@ -36,7 +36,7 @@ WHERE
 %s	
 `
 
-func (store *workspaceStore) ListWorkspaces(ctx context.Context, visibility model.ScopeVisibility, orgId []int) ([]workspace.Workspace, error) {
+func (store *workspaceStore) ListWorkspaces(ctx context.Context, visibility model.ScopeVisibility, orgId []int) ([]*workspace.Workspace, error) {
 	var finalQuery strings.Builder
 	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
 		finalQuery.WriteString(fmt.Sprintf(listWorkspacesQuery, `AND ws."visibility" = @visibility;`))
@@ -54,7 +54,7 @@ func (store *workspaceStore) ListWorkspaces(ctx context.Context, visibility mode
 	}
 	defer rows.Close()
 
-	var wsList []workspace.Workspace = []workspace.Workspace{}
+	var wsList []*workspace.Workspace = []*workspace.Workspace{}
 
 	for rows.Next() {
 		var workspace workspace.Workspace
@@ -76,7 +76,7 @@ func (store *workspaceStore) ListWorkspaces(ctx context.Context, visibility mode
 			return nil, err
 		}
 
-		wsList = append(wsList, workspace)
+		wsList = append(wsList, &workspace)
 	}
 
 	if err := rows.Err(); err != nil {
