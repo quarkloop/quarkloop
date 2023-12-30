@@ -12,16 +12,16 @@ type Service interface {
 	RevokeUserAccessById(ctx context.Context, orgId int, userAssignmentId int) error
 
 	// user groups
-	ListUserGroups(ctx context.Context, orgId int) ([]UserGroup, error)
-	GetUserGroupById(ctx context.Context, userGroupId int) (*UserGroup, error)
-	CreateUserGroup(ctx context.Context, orgId int, userGroup *UserGroup) (*UserGroup, error)
-	UpdateUserGroupById(ctx context.Context, userGroupId int, userGroup *UserGroup) error
-	DeleteUserGroupById(ctx context.Context, orgId int, userGroupId int) error
+	GetUserGroupList(context.Context, *GetUserGroupListQuery) ([]UserGroup, error)
+	GetUserGroupById(context.Context, *GetUserGroupByIdQuery) (*UserGroup, error)
+	CreateUserGroup(context.Context, *CreateUserGroupCommand) (*UserGroup, error)
+	UpdateUserGroupById(context.Context, *UpdateUserGroupByIdCommand) error
+	DeleteUserGroupById(context.Context, *DeleteUserGroupByIdCommand) error
 
 	// role
-	ListUserRoles(ctx context.Context, orgId int) ([]UserRole, error)
-	GetUserRoleById(ctx context.Context, userRoleId int) (*UserRole, error)
-	CreateUserRole(ctx context.Context, orgId int, userRole *UserRole) (*UserRole, error)
-	UpdateUserRoleById(ctx context.Context, userRoleId int, userRole *UserRole) error
-	DeleteUserRoleById(ctx context.Context, orgId int, userRoleId int) error
+	ListUserRoles(context.Context, *ListUserRolesQuery) ([]UserRole, error)
+	GetUserRoleById(context.Context, *GetUserRoleByIdQuery) (*UserRole, error)
+	CreateUserRole(context.Context, *CreateUserRoleCommand) (*UserRole, error)
+	UpdateUserRoleById(context.Context, *UpdateUserRoleByIdCommand) error
+	DeleteUserRoleById(context.Context, *DeleteUserRoleByIdCommand) error
 }
