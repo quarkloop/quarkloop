@@ -35,3 +35,33 @@ type Quota struct {
 func (q *Quota) CheckQuotaReached() bool {
 	return q.Metric >= q.Limit
 }
+
+// GetQuotasByUserId
+type GetQuotasByUserIdQuery struct {
+	UserId int
+}
+
+// GetQuotasByOrgId
+type GetQuotasByOrgIdQuery struct {
+	OrgId int
+}
+
+// CheckCreateOrgQuotaReached
+type CheckCreateOrgQuotaReachedQuery struct {
+	UserId int
+}
+
+// CheckCreateOrgUserQuotaReached
+type CheckCreateOrgUserQuotaReachedQuery struct {
+	OrgId int
+}
+
+// CheckCreateWorkspaceQuotaReached
+type CheckCreateWorkspaceQuotaReachedQuery struct {
+	OrgId int
+}
+
+// CheckCreateProjectQuotaReached
+type CheckCreateProjectQuotaReachedQuery struct {
+	OrgId int
+}
