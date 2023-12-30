@@ -9,6 +9,14 @@ import (
 	org "github.com/quarkloop/quarkloop/pkg/service/organization"
 )
 
+// GET /orgs
+//
+// Get organization list.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
+
 func (s *OrganizationApi) GetOrganizationList(ctx *gin.Context) {
 	// query service
 	orgList, err := s.orgService.GetOrganizationList(ctx)
@@ -20,22 +28,25 @@ func (s *OrganizationApi) GetOrganizationList(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &orgList)
 }
 
-type GetOrganizationByIdUriParams struct {
-	OrgId int `uri:"orgId" binding:"required"`
-}
+// GET /orgs/:orgId
+//
+// Get organization by id.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
 
 func (s *OrganizationApi) GetOrganizationById(ctx *gin.Context) {
-	uriParams := &GetOrganizationByIdUriParams{}
+	uriParams := &org.GetOrganizationByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	org, err := s.orgService.GetOrganizationById(ctx, &org.GetOrganizationByIdParams{
+	org, err := s.orgService.GetOrganizationById(ctx, &org.GetOrganizationByIdQuery{
 		OrgId: uriParams.OrgId,
-	},
-	)
+	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
@@ -56,10 +67,9 @@ func (s *OrganizationApi) GetOrganizationById(ctx *gin.Context) {
 // 	}
 
 // 	// query service
-// 	org, err := s.orgService.GetOrganization(ctx, &org.GetOrganizationParams{
+// 	org, err := s.orgService.GetOrganization(ctx, &org.GetOrganizationQuery{
 // 		Organization: queryParams.Organization,
-// 	},
-// 	)
+// 	})
 // 	if err != nil {
 // 		api.AbortWithInternalServerErrorJSON(ctx, err)
 // 		return
