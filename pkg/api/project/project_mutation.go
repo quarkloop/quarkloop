@@ -8,7 +8,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
-// POST /projects
+// POST /orgs/:orgId/workspaces/:workspaceId/projects
 //
 // Create project.
 //
@@ -17,6 +17,12 @@ import (
 // 500: StatusInternalServerError
 
 func (s *ProjectApi) CreateProject(ctx *gin.Context) {
+	uriParams := &project.CreateProjectUriParams{}
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
+		return
+	}
+
 	cmd := &project.CreateProjectCommand{}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
@@ -24,7 +30,11 @@ func (s *ProjectApi) CreateProject(ctx *gin.Context) {
 	}
 
 	// query service
-	ws, err := s.projectService.CreateProject(ctx, cmd)
+	ws, err := s.projectService.CreateProject(ctx, &project.CreateProjectCommand{
+		OrgId:       uriParams.OrgId,
+		WorkspaceId: uriParams.WorkspaceId,
+		Project:     cmd.Project,
+	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
@@ -33,7 +43,7 @@ func (s *ProjectApi) CreateProject(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, ws)
 }
 
-// PUT /projects/:projectId
+// PUT /orgs/:orgId/workspaces/:workspaceId/projects/:projectId
 //
 // Update project by id.
 //
@@ -56,8 +66,10 @@ func (s *ProjectApi) UpdateProjectById(ctx *gin.Context) {
 
 	// query service
 	err := s.projectService.UpdateProjectById(ctx, &project.UpdateProjectByIdCommand{
-		ProjectId: uriParams.ProjectId,
-		Project:   cmd.Project,
+		OrgId:       uriParams.OrgId,
+		WorkspaceId: uriParams.WorkspaceId,
+		ProjectId:   uriParams.ProjectId,
+		Project:     cmd.Project,
 	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
@@ -67,7 +79,7 @@ func (s *ProjectApi) UpdateProjectById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, nil)
 }
 
-// DELETE /projects/:projectId
+// DELETE /orgs/:orgId/workspaces/:workspaceId/projects/:projectId
 //
 // Delete project by id.
 //
@@ -84,7 +96,9 @@ func (s *ProjectApi) DeleteProjectById(ctx *gin.Context) {
 
 	// query service
 	err := s.projectService.DeleteProjectById(ctx, &project.DeleteProjectByIdCommand{
-		ProjectId: uriParams.ProjectId,
+		OrgId:       uriParams.OrgId,
+		WorkspaceId: uriParams.WorkspaceId,
+		ProjectId:   uriParams.ProjectId,
 	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
