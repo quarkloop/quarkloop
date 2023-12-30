@@ -5,16 +5,21 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/quarkloop/quarkloop/pkg/model"
-	org "github.com/quarkloop/quarkloop/pkg/service/organization"
+	"github.com/quarkloop/quarkloop/pkg/service/org"
+	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
 type OrgStore interface {
-	ListOrganizations(ctx context.Context, visibility model.ScopeVisibility) ([]*org.Organization, error)
-	GetOrganizationById(ctx context.Context, orgId int) (*org.Organization, error)
-	GetOrganization(ctx context.Context, org *org.Organization) (*org.Organization, error)
-	CreateOrganization(ctx context.Context, org *org.Organization) (*org.Organization, error)
-	UpdateOrganizationById(ctx context.Context, orgId int, org *org.Organization) error
-	DeleteOrganizationById(ctx context.Context, orgId int) error
+	// org
+	GetOrgList(ctx context.Context, visibility model.ScopeVisibility) ([]*org.Org, error)
+	GetOrgById(ctx context.Context, orgId int) (*org.Org, error)
+	GetOrg(ctx context.Context, org *org.Org) (*org.Org, error)
+	CreateOrg(ctx context.Context, org *org.Org) (*org.Org, error)
+	UpdateOrgById(ctx context.Context, orgId int, org *org.Org) error
+	DeleteOrgById(ctx context.Context, orgId int) error
+
+	// project
+	GetProjectList(ctx context.Context, visibility model.ScopeVisibility, orgId int) ([]*project.Project, error)
 }
 
 type orgStore struct {
