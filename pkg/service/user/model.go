@@ -57,32 +57,44 @@ type UserSession struct {
 	// id
 	Id int `json:"id,omitempty"`
 
-	// saession
+	// session
 	SessionToken string `json:"sessionToken,omitempty"`
 	ExpiresAt    string `json:"expires,omitempty"`
 }
 
-type GetUserByIdParams struct {
+// GetUserById
+
+type GetUserByIdQuery struct {
 	UserId int
 }
 
-type GetUserByEmailParams struct {
+// GetUserByEmail
+
+type GetUserByEmailQuery struct {
 	Email string
 }
 
-type UpdateUserByIdParams struct {
+// UpdateUserById
+
+type UpdateUserByIdCommand struct {
 	UserId int
-	User   User
+	User
 }
 
-type DeleteUserByIdParams struct {
+// DeleteUserById
+
+type DeleteUserByIdCommand struct {
 	UserId int
 }
 
-type GetUserAccountByUserIdParams struct {
+// GetUserAccountByUserId
+
+type GetUserAccountByUserIdQuery struct {
 	UserId int
 }
 
-type GetUserSessionByUserIdParams struct {
+//  GetUserSessionByUserId
+
+type GetUserSessionByUserIdQuery struct {
 	UserId int
 }
