@@ -166,7 +166,7 @@ func (s *projectService) CreateProject(ctx *gin.Context, cmd *project.CreateProj
 	}
 
 	// check quotas
-	if err := s.quotaService.CheckCreateProjectQuotaReached(ctx, cmd.OrgId); err != nil {
+	if err := s.quotaService.CheckCreateProjectQuotaReached(ctx, &quota.CheckCreateProjectQuotaReachedQuery{OrgId: cmd.OrgId}); err != nil {
 		return nil, err
 	}
 
