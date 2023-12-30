@@ -17,32 +17,32 @@ func NewOrganizationService(ds store.OrgStore) user.Service {
 	}
 }
 
-func (s *userService) GetUserById(ctx context.Context, params *user.GetUserByIdParams) (*user.User, error) {
-	u, err := s.store.GetUserById(ctx, params.UserId)
+func (s *userService) GetUserById(ctx context.Context, query *user.GetUserByIdQuery) (*user.User, error) {
+	u, err := s.store.GetUserById(ctx, query.UserId)
 	return u, err
 }
 
-func (s *userService) GetUserByEmail(ctx context.Context, params *user.GetUserByEmailParams) (*user.User, error) {
-	u, err := s.store.GetUserByEmail(ctx, params.Email)
+func (s *userService) GetUserByEmail(ctx context.Context, query *user.GetUserByEmailQuery) (*user.User, error) {
+	u, err := s.store.GetUserByEmail(ctx, query.Email)
 	return u, err
 }
 
-func (s *userService) GetUserAccountByUserId(ctx context.Context, params *user.GetUserAccountByUserIdParams) (*user.UserAccount, error) {
-	u, err := s.store.GetUserAccountByUserId(ctx, params.UserId)
+func (s *userService) GetUserAccountByUserId(ctx context.Context, query *user.GetUserAccountByUserIdQuery) (*user.UserAccount, error) {
+	u, err := s.store.GetUserAccountByUserId(ctx, query.UserId)
 	return u, err
 }
 
-func (s *userService) GetUserSessionByUserId(ctx context.Context, params *user.GetUserSessionByUserIdParams) (*user.UserSession, error) {
-	u, err := s.store.GetUserSessionByUserId(ctx, params.UserId)
+func (s *userService) GetUserSessionByUserId(ctx context.Context, query *user.GetUserSessionByUserIdQuery) (*user.UserSession, error) {
+	u, err := s.store.GetUserSessionByUserId(ctx, query.UserId)
 	return u, err
 }
 
-func (s *userService) UpdateUserById(ctx context.Context, params *user.UpdateUserByIdParams) error {
-	err := s.store.UpdateUserById(ctx, params.UserId, &params.User)
+func (s *userService) UpdateUserById(ctx context.Context, cmd *user.UpdateUserByIdCommand) error {
+	err := s.store.UpdateUserById(ctx, cmd.UserId, &cmd.User)
 	return err
 }
 
-func (s *userService) DeleteUserById(ctx context.Context, params *user.DeleteUserByIdParams) error {
-	err := s.store.DeleteUserById(ctx, params.UserId)
+func (s *userService) DeleteUserById(ctx context.Context, cmd *user.DeleteUserByIdCommand) error {
+	err := s.store.DeleteUserById(ctx, cmd.UserId)
 	return err
 }
