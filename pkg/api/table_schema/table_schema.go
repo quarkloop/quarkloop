@@ -6,11 +6,11 @@ import (
 )
 
 type Api interface {
-	ListTableSchemas(c *gin.Context)
-	GetTableSchemaById(c *gin.Context)
-	CreateTableSchema(c *gin.Context)
-	UpdateTableSchemaById(c *gin.Context)
-	DeleteTableSchemaById(c *gin.Context)
+	ListTableSchemas(*gin.Context)
+	GetTableSchemaById(*gin.Context)
+	CreateTableSchema(*gin.Context)
+	UpdateTableSchemaById(*gin.Context)
+	DeleteTableSchemaById(*gin.Context)
 }
 
 type TableSchemaApi struct {
