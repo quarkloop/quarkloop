@@ -19,7 +19,7 @@ type Service interface {
 	DeleteUserGroupById(context.Context, *DeleteUserGroupByIdCommand) error
 
 	// role
-	ListUserRoles(context.Context, *ListUserRolesQuery) ([]UserRole, error)
+	GetUserRoleList(context.Context, *GetUserRoleListQuery) ([]UserRole, error)
 	GetUserRoleById(context.Context, *GetUserRoleByIdQuery) (*UserRole, error)
 	CreateUserRole(context.Context, *CreateUserRoleCommand) (*UserRole, error)
 	UpdateUserRoleById(context.Context, *UpdateUserRoleByIdCommand) error
