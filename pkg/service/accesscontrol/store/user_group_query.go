@@ -9,7 +9,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 )
 
-/// ListUserGroups
+/// GetUserGroupList
 
 const listUserGroupsQuery = `
 SELECT 
@@ -27,7 +27,7 @@ WHERE
     "orgId" = @orgId;
 `
 
-func (store *accessControlStore) ListUserGroups(ctx context.Context, orgId int) ([]accesscontrol.UserGroup, error) {
+func (store *accessControlStore) GetUserGroupList(ctx context.Context, orgId int) ([]accesscontrol.UserGroup, error) {
 	rows, err := store.Conn.Query(ctx, listUserGroupsQuery, pgx.NamedArgs{"orgId": orgId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
