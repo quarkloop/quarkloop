@@ -9,22 +9,23 @@ import (
 	org "github.com/quarkloop/quarkloop/pkg/service/organization"
 )
 
-type CreateOrganizationRequest struct {
-	org.Organization
-}
+// POST /orgs
+//
+// Create organization.
+//
+// Response status:
+// 201: StatusCreated
+// 500: StatusInternalServerError
 
 func (s *OrganizationApi) CreateOrganization(ctx *gin.Context) {
-	req := &CreateOrganizationRequest{}
-	if err := ctx.ShouldBindJSON(req); err != nil {
+	cmd := &org.CreateOrganizationCommand{}
+	if err := ctx.ShouldBindJSON(cmd); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query database
-	org, err := s.orgService.CreateOrganization(ctx, &org.CreateOrganizationParams{
-		Organization: req.Organization,
-	},
-	)
+	org, err := s.orgService.CreateOrganization(ctx, cmd)
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
@@ -33,33 +34,32 @@ func (s *OrganizationApi) CreateOrganization(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, org)
 }
 
-type UpdateOrganizationByIdUriParams struct {
-	OrgId int `uri:"orgId" binding:"required"`
-}
-
-type UpdateOrganizationByIdRequest struct {
-	org.Organization
-}
+// PUT /orgs/:orgId
+//
+// Update organization by id.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
 
 func (s *OrganizationApi) UpdateOrganizationById(ctx *gin.Context) {
-	uriParams := &UpdateOrganizationByIdUriParams{}
+	uriParams := &org.UpdateOrganizationByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
-	req := &UpdateOrganizationByIdRequest{}
-	if err := ctx.ShouldBindJSON(req); err != nil {
+	cmd := &org.UpdateOrganizationByIdCommand{}
+	if err := ctx.ShouldBindJSON(cmd); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query database
-	err := s.orgService.UpdateOrganizationById(ctx, &org.UpdateOrganizationByIdParams{
+	err := s.orgService.UpdateOrganizationById(ctx, &org.UpdateOrganizationByIdCommand{
 		OrgId:        uriParams.OrgId,
-		Organization: req.Organization,
-	},
-	)
+		Organization: cmd.Organization,
+	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
@@ -68,22 +68,25 @@ func (s *OrganizationApi) UpdateOrganizationById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, nil)
 }
 
-type DeleteOrganizationByIdUriParams struct {
-	OrgId int `uri:"orgId" binding:"required"`
-}
+// DELETE /orgs/:orgId
+//
+// Delete organization by id.
+//
+// Response status:
+// 204: StatusNoContent
+// 500: StatusInternalServerError
 
 func (s *OrganizationApi) DeleteOrganizationById(ctx *gin.Context) {
-	uriParams := &DeleteOrganizationByIdUriParams{}
+	uriParams := &org.DeleteOrganizationByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query database
-	err := s.orgService.DeleteOrganizationById(ctx, &org.DeleteOrganizationByIdParams{
+	err := s.orgService.DeleteOrganizationById(ctx, &org.DeleteOrganizationByIdCommand{
 		OrgId: uriParams.OrgId,
-	},
-	)
+	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
