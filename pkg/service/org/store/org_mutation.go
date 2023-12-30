@@ -9,12 +9,12 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	gonanoid "github.com/matoous/go-nanoid/v2"
-	org "github.com/quarkloop/quarkloop/pkg/service/organization"
+	"github.com/quarkloop/quarkloop/pkg/service/org"
 )
 
-/// CreateOrganization
+/// CreateOrg
 
-const createOrganizationMutation = `
+const createOrgMutation = `
 INSERT INTO "system"."Organization" (
     "sid",
     "name",
@@ -39,7 +39,7 @@ RETURNING
     "createdBy";
 `
 
-func (store *orgStore) CreateOrganization(ctx context.Context, organization *org.Organization) (*org.Organization, error) {
+func (store *orgStore) CreateOrg(ctx context.Context, organization *org.Org) (*org.Org, error) {
 	if organization.ScopedId == "" {
 		sid, err := gonanoid.New()
 		if err != nil {
@@ -48,7 +48,7 @@ func (store *orgStore) CreateOrganization(ctx context.Context, organization *org
 		organization.ScopedId = sid
 	}
 
-	row := store.Conn.QueryRow(ctx, createOrganizationMutation, pgx.NamedArgs{
+	row := store.Conn.QueryRow(ctx, createOrgMutation, pgx.NamedArgs{
 		"sid":         organization.ScopedId,
 		"name":        organization.Name,
 		"description": organization.Description,
@@ -56,7 +56,7 @@ func (store *orgStore) CreateOrganization(ctx context.Context, organization *org
 		"createdBy":   organization.CreatedBy,
 	})
 
-	var org org.Organization
+	var org org.Org
 	rowErr := row.Scan(
 		&org.Id,
 		&org.ScopedId,
@@ -74,9 +74,9 @@ func (store *orgStore) CreateOrganization(ctx context.Context, organization *org
 	return &org, nil
 }
 
-/// UpdateOrganizationById
+/// UpdateOrgById
 
-const updateOrganizationByIdMutation = `
+const updateOrgByIdMutation = `
 UPDATE
     "system"."Organization"
 SET
@@ -90,8 +90,8 @@ WHERE
     "id" = @id;
 `
 
-func (store *orgStore) UpdateOrganizationById(ctx context.Context, orgId int, org *org.Organization) error {
-	commandTag, err := store.Conn.Exec(ctx, updateOrganizationByIdMutation, pgx.NamedArgs{
+func (store *orgStore) UpdateOrgById(ctx context.Context, orgId int, org *org.Org) error {
+	commandTag, err := store.Conn.Exec(ctx, updateOrgByIdMutation, pgx.NamedArgs{
 		"id":          orgId,
 		"sid":         org.ScopedId,
 		"name":        org.Name,
@@ -114,17 +114,17 @@ func (store *orgStore) UpdateOrganizationById(ctx context.Context, orgId int, or
 	return nil
 }
 
-/// DeleteOrganizationById
+/// DeleteOrgById
 
-const deleteOrganizationByIdMutation = `
+const deleteOrgByIdMutation = `
 DELETE FROM
     "system"."Organization"
 WHERE
     "id" = @id;
 `
 
-func (store *orgStore) DeleteOrganizationById(ctx context.Context, orgId int) error {
-	commandTag, err := store.Conn.Exec(ctx, deleteOrganizationByIdMutation, pgx.NamedArgs{"id": orgId})
+func (store *orgStore) DeleteOrgById(ctx context.Context, orgId int) error {
+	commandTag, err := store.Conn.Exec(ctx, deleteOrgByIdMutation, pgx.NamedArgs{"id": orgId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
 		return err
