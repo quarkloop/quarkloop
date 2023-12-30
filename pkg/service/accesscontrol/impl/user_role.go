@@ -6,7 +6,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 )
 
-func (s *aclService) ListUserRoles(ctx context.Context, query *accesscontrol.ListUserRolesQuery) ([]accesscontrol.UserRole, error) {
+func (s *aclService) GetUserRoleList(ctx context.Context, query *accesscontrol.GetUserRoleListQuery) ([]accesscontrol.UserRole, error) {
 	urList, err := s.store.ListUserRoles(ctx, query.OrgId)
 	return urList, err
 }
