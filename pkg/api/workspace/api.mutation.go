@@ -8,24 +8,23 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
-type CreateWorkspaceRequest struct {
-	OrgId     int                 `json:"orgId" binding:"required"`
-	Workspace workspace.Workspace `json:"workspace" binding:"required"`
-}
+// POST /workspaces
+//
+// Create workspace.
+//
+// Response status:
+// 201: StatusCreated
+// 500: StatusInternalServerError
 
 func (s *WorkspaceApi) CreateWorkspace(ctx *gin.Context) {
-	req := &CreateWorkspaceRequest{}
-	if err := ctx.ShouldBindJSON(req); err != nil {
+	cmd := &workspace.CreateWorkspaceCommand{}
+	if err := ctx.ShouldBindJSON(cmd); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	ws, err := s.workspaceService.CreateWorkspace(ctx, &workspace.CreateWorkspaceParams{
-		OrgId:     req.OrgId,
-		Workspace: req.Workspace,
-	},
-	)
+	ws, err := s.workspaceService.CreateWorkspace(ctx, cmd)
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
@@ -34,33 +33,32 @@ func (s *WorkspaceApi) CreateWorkspace(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, ws)
 }
 
-type UpdateWorkspaceByIdUriParams struct {
-	WorkspaceId int `uri:"workspaceId" binding:"required"`
-}
-
-type UpdateWorkspaceByIdRequest struct {
-	workspace.Workspace
-}
+// PUT /workspaces/:workspaceId
+//
+// Update workspace by id.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
 
 func (s *WorkspaceApi) UpdateWorkspaceById(ctx *gin.Context) {
-	uriParams := &UpdateWorkspaceByIdUriParams{}
+	uriParams := &workspace.UpdateWorkspaceByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
-	req := &UpdateWorkspaceByIdRequest{}
-	if err := ctx.ShouldBindJSON(req); err != nil {
+	cmd := &workspace.UpdateWorkspaceByIdCommand{}
+	if err := ctx.ShouldBindJSON(cmd); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	err := s.workspaceService.UpdateWorkspaceById(ctx, &workspace.UpdateWorkspaceByIdParams{
+	err := s.workspaceService.UpdateWorkspaceById(ctx, &workspace.UpdateWorkspaceByIdCommand{
 		WorkspaceId: uriParams.WorkspaceId,
-		Workspace:   req.Workspace,
-	},
-	)
+		Workspace:   cmd.Workspace,
+	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
@@ -69,22 +67,25 @@ func (s *WorkspaceApi) UpdateWorkspaceById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, nil)
 }
 
-type DeleteWorkspaceByIdUriParams struct {
-	WorkspaceId int `uri:"workspaceId" binding:"required"`
-}
+// DELETE /workspaces/:workspaceId
+//
+// Delete workspace by id.
+//
+// Response status:
+// 204: StatusNoContent
+// 500: StatusInternalServerError
 
 func (s *WorkspaceApi) DeleteWorkspaceById(ctx *gin.Context) {
-	uriParams := &DeleteWorkspaceByIdUriParams{}
+	uriParams := &workspace.DeleteWorkspaceByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	err := s.workspaceService.DeleteWorkspaceById(ctx, &workspace.DeleteWorkspaceByIdParams{
+	err := s.workspaceService.DeleteWorkspaceById(ctx, &workspace.DeleteWorkspaceByIdCommand{
 		WorkspaceId: uriParams.WorkspaceId,
-	},
-	)
+	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
