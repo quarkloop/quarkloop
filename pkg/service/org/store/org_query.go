@@ -10,12 +10,13 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"github.com/quarkloop/quarkloop/pkg/model"
-	org "github.com/quarkloop/quarkloop/pkg/service/organization"
+	"github.com/quarkloop/quarkloop/pkg/service/org"
+	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
-/// ListOrganizations
+/// GetOrgList
 
-const listOrganizationsQuery = `
+const listOrgsQuery = `
 SELECT 
     "id",
     "sid",
@@ -31,12 +32,12 @@ FROM
 %s	
 `
 
-func (store *orgStore) ListOrganizations(ctx context.Context, visibility model.ScopeVisibility) ([]*org.Organization, error) {
+func (store *orgStore) GetOrgList(ctx context.Context, visibility model.ScopeVisibility) ([]*org.Org, error) {
 	var finalQuery strings.Builder
 	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
-		finalQuery.WriteString(fmt.Sprintf(listOrganizationsQuery, `WHERE "visibility" = @visibility;`))
+		finalQuery.WriteString(fmt.Sprintf(listOrgsQuery, `WHERE "visibility" = @visibility;`))
 	} else {
-		finalQuery.WriteString(fmt.Sprintf(listOrganizationsQuery, ";"))
+		finalQuery.WriteString(fmt.Sprintf(listOrgsQuery, ";"))
 	}
 
 	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{"visibility": visibility})
@@ -46,10 +47,10 @@ func (store *orgStore) ListOrganizations(ctx context.Context, visibility model.S
 	}
 	defer rows.Close()
 
-	var orgList []*org.Organization = []*org.Organization{}
+	var orgList []*org.Org = []*org.Org{}
 
 	for rows.Next() {
-		var org org.Organization
+		var org org.Org
 		err := rows.Scan(
 			&org.Id,
 			&org.ScopedId,
@@ -77,9 +78,9 @@ func (store *orgStore) ListOrganizations(ctx context.Context, visibility model.S
 	return orgList, nil
 }
 
-/// GetOrganizationById
+/// GetOrgById
 
-const getOrganizationByIdQuery = `
+const getOrgByIdQuery = `
 SELECT 
     "id",
     "sid",
@@ -96,10 +97,10 @@ WHERE
     "id" = @id;
 `
 
-func (store *orgStore) GetOrganizationById(ctx context.Context, orgId int) (*org.Organization, error) {
-	row := store.Conn.QueryRow(ctx, getOrganizationByIdQuery, pgx.NamedArgs{"id": orgId})
+func (store *orgStore) GetOrgById(ctx context.Context, orgId int) (*org.Org, error) {
+	row := store.Conn.QueryRow(ctx, getOrgByIdQuery, pgx.NamedArgs{"id": orgId})
 
-	var org org.Organization
+	var org org.Org
 	err := row.Scan(
 		&org.Id,
 		&org.ScopedId,
@@ -119,9 +120,9 @@ func (store *orgStore) GetOrganizationById(ctx context.Context, orgId int) (*org
 	return &org, nil
 }
 
-/// GetOrganization
+/// GetOrg
 
-const getOrganizationQuery = `
+const getOrgQuery = `
 SELECT 
     "id",
     "sid",
@@ -137,7 +138,7 @@ FROM
 WHERE
 `
 
-func (store *orgStore) GetOrganization(ctx context.Context, organization *org.Organization) (*org.Organization, error) {
+func (store *orgStore) GetOrg(ctx context.Context, organization *org.Org) (*org.Org, error) {
 	availableFields := []string{}
 	organizationFields := map[string]interface{}{
 		"sid":        organization.ScopedId,
@@ -166,11 +167,11 @@ func (store *orgStore) GetOrganization(ctx context.Context, organization *org.Or
 			}
 		}
 	}
-	finalQuery := getOrganizationQuery + strings.Join(availableFields, " AND ")
+	finalQuery := getOrgQuery + strings.Join(availableFields, " AND ")
 
 	row := store.Conn.QueryRow(ctx, finalQuery)
 
-	var org org.Organization
+	var org org.Org
 	err := row.Scan(
 		&org.Id,
 		&org.ScopedId,
@@ -188,4 +189,83 @@ func (store *orgStore) GetOrganization(ctx context.Context, organization *org.Or
 	}
 
 	return &org, nil
+}
+
+/// GetProjectList
+
+const listProjectsQuery = `
+SELECT 
+    p."id",
+    p."sid",
+    p."orgId",
+    p."workspaceId",
+    org."sid",
+    ws."sid",
+    p."name",
+    p."description",
+    p."visibility",
+    p."createdAt",
+    p."createdBy",
+    p."updatedAt",
+    p."updatedBy"
+FROM 
+    "system"."Project" AS p
+LEFT JOIN 
+    "system"."Organization" AS org ON org."id" = p."orgId"
+WHERE
+    p."orgId" = @orgId
+%s
+`
+
+func (store *orgStore) GetProjectList(ctx context.Context, visibility model.ScopeVisibility, orgId int) ([]*project.Project, error) {
+	whereClause := ";"
+	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
+		whereClause = `AND p."visibility" = @visibility;`
+	}
+
+	finalQuery := fmt.Sprintf(listProjectsQuery, whereClause)
+
+	rows, err := store.Conn.Query(ctx, finalQuery, pgx.NamedArgs{
+		"orgId":      orgId,
+		"visibility": visibility,
+	})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var projectList []*project.Project = []*project.Project{}
+
+	for rows.Next() {
+		var project project.Project
+		err := rows.Scan(
+			&project.Id,
+			&project.ScopedId,
+			&project.OrgId,
+			&project.WorkspaceId,
+			&project.OrgScopedId,
+			&project.WorkspaceScopedId,
+			&project.Name,
+			&project.Description,
+			&project.Visibility,
+			&project.CreatedAt,
+			&project.CreatedBy,
+			&project.UpdatedAt,
+			&project.UpdatedBy,
+		)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+			return nil, err
+		}
+
+		projectList = append(projectList, &project)
+	}
+
+	if err := rows.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+		return nil, err
+	}
+
+	return projectList, nil
 }
