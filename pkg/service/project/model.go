@@ -42,6 +42,12 @@ func (p *Project) GeneratePath() {
 	p.Path = fmt.Sprintf("/org/%s/%s/%s", p.OrgScopedId, p.WorkspaceScopedId, p.ScopedId)
 }
 
+// GetProjectList
+
+type GetProjectListQuery struct {
+	UserId int
+}
+
 // GetProjectById
 
 type GetProjectByIdUriParams struct {
