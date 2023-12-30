@@ -1,4 +1,4 @@
-package organization_impl
+package user_impl
 
 import (
 	"context"
@@ -11,7 +11,7 @@ type userService struct {
 	store store.OrgStore
 }
 
-func NewOrganizationService(ds store.OrgStore) user.Service {
+func NewUserService(ds store.OrgStore) user.Service {
 	return &userService{
 		store: ds,
 	}
