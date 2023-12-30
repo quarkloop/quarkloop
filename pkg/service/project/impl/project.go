@@ -1,6 +1,7 @@
 package project_impl
 
 import (
+	"context"
 	"errors"
 
 	"github.com/gin-gonic/gin"
@@ -33,6 +34,45 @@ func NewProjectService(
 		quotaService:  quotaService,
 		branchService: branchService,
 	}
+}
+
+func (s *projectService) GetProjectList(ctx *gin.Context, query *project.GetProjectListQuery) ([]*project.Project, error) {
+	if contextdata.IsUserAnonymous(ctx) {
+		// anonymous user => return public projects
+		return s.getProjectList(ctx, model.PublicVisibility, query)
+	}
+
+	user := contextdata.GetUser(ctx)
+	scope := contextdata.GetScope(ctx)
+
+	// check permissions
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
+		UserId: user.GetId(),
+		OrgId:  scope.OrgId(),
+	})
+	if err != nil {
+		if err == accesscontrol.ErrPermissionDenied {
+			// unauthorized user (permission denied) => return public projects
+			return s.getProjectList(ctx, model.PublicVisibility, query)
+		}
+		return nil, err
+	}
+
+	// authorized user => return public + private projects
+	return s.getProjectList(ctx, model.AllVisibility, query)
+}
+
+func (s *projectService) getProjectList(ctx context.Context, visibility model.ScopeVisibility, query *project.GetProjectListQuery) ([]*project.Project, error) {
+	projectList, err := s.store.GetProjectList(ctx, visibility, query.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range projectList {
+		project := projectList[i]
+		project.GeneratePath()
+	}
+	return projectList, nil
 }
 
 func (s *projectService) GetProjectById(ctx *gin.Context, query *project.GetProjectByIdQuery) (*project.Project, error) {
