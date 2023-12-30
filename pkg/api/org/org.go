@@ -7,24 +7,24 @@ import (
 
 type Api interface {
 	// org
-	GetOrganizationList(*gin.Context)
-	GetOrganizationById(*gin.Context)
+	GetOrgList(*gin.Context)
+	GetOrgById(*gin.Context)
 	// TODO: rewrite
-	// GetOrganization(*gin.Context)
-	CreateOrganization(*gin.Context)
-	UpdateOrganizationById(*gin.Context)
-	DeleteOrganizationById(*gin.Context)
+	// GetOrg(*gin.Context)
+	CreateOrg(*gin.Context)
+	UpdateOrgById(*gin.Context)
+	DeleteOrgById(*gin.Context)
 
 	// project
 	GetProjectList(*gin.Context)
 }
 
-type OrganizationApi struct {
+type OrgApi struct {
 	orgService org.Service
 }
 
-func NewOrganizationApi(service org.Service) *OrganizationApi {
-	return &OrganizationApi{
+func NewOrgApi(service org.Service) *OrgApi {
+	return &OrgApi{
 		orgService: service,
 	}
 }
