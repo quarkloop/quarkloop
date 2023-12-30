@@ -39,7 +39,8 @@ WHERE
     %s;
 `
 
-func (store *projectStore) GetProjectList(ctx context.Context, visibility model.ScopeVisibility, orgId []int, workspaceId []int) ([]*project.Project, error) {
+// TODO: rewrite query
+func (store *projectStore) GetProjectList(ctx context.Context, visibility model.ScopeVisibility, userId int) ([]*project.Project, error) {
 	whereClause := []string{}
 	if len(orgId) != 0 {
 		whereClause = append(whereClause, `p."orgId" = ANY (@orgId)`)
@@ -54,9 +55,8 @@ func (store *projectStore) GetProjectList(ctx context.Context, visibility model.
 	finalQuery := fmt.Sprintf(listProjectsQuery, strings.Join(whereClause[:], " AND "))
 
 	rows, err := store.Conn.Query(ctx, finalQuery, pgx.NamedArgs{
-		"orgId":       orgId,
-		"workspaceId": workspaceId,
-		"visibility":  visibility,
+		"userId":     userId,
+		"visibility": visibility,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
