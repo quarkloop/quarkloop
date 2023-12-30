@@ -17,7 +17,7 @@ type AccessControlStore interface {
 	DeleteUserAssignmentById(ctx context.Context, orgId int, userAssignmentId int) error
 
 	// user groups
-	ListUserGroups(ctx context.Context, orgId int) ([]accesscontrol.UserGroup, error)
+	GetUserGroupList(ctx context.Context, orgId int) ([]accesscontrol.UserGroup, error)
 	GetUserGroupById(ctx context.Context, userGroupId int) (*accesscontrol.UserGroup, error)
 	CreateUserGroup(ctx context.Context, orgId int, userGroup *accesscontrol.UserGroup) (*accesscontrol.UserGroup, error)
 	UpdateUserGroupById(ctx context.Context, userGroupId int, userGroup *accesscontrol.UserGroup) error
