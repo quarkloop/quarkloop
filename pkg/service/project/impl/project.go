@@ -36,7 +36,7 @@ func NewProjectService(
 	}
 }
 
-func (s *projectService) GetProjectList(ctx *gin.Context, params *project.GetProjectListParams) ([]project.Project, error) {
+func (s *projectService) GetProjectList(ctx *gin.Context, params *project.GetProjectListQuery) ([]*project.Project, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		// anonymous user => return public projects
 		return s.getProjectList(ctx, model.PublicVisibility, params)
@@ -63,19 +63,19 @@ func (s *projectService) GetProjectList(ctx *gin.Context, params *project.GetPro
 	return s.getProjectList(ctx, model.AllVisibility, params)
 }
 
-func (s *projectService) getProjectList(ctx context.Context, visibility model.ScopeVisibility, params *project.GetProjectListParams) ([]project.Project, error) {
+func (s *projectService) getProjectList(ctx context.Context, visibility model.ScopeVisibility, params *project.GetProjectListQuery) ([]*project.Project, error) {
 	projectList, err := s.store.ListProjects(ctx, visibility, params.OrgId, params.WorkspaceId)
 	if err != nil {
 		return nil, err
 	}
 	for i := range projectList {
-		p := &projectList[i]
+		p := projectList[i]
 		p.GeneratePath()
 	}
 	return projectList, nil
 }
 
-func (s *projectService) GetProjectById(ctx *gin.Context, params *project.GetProjectByIdParams) (*project.Project, error) {
+func (s *projectService) GetProjectById(ctx *gin.Context, params *project.GetProjectByIdQuery) (*project.Project, error) {
 	p, err := s.store.GetProjectById(ctx, params.ProjectId)
 	if err != nil {
 		return nil, err
@@ -114,7 +114,7 @@ func (s *projectService) GetProjectById(ctx *gin.Context, params *project.GetPro
 }
 
 // TODO
-// func (s *projectService) GetProject(ctx context.Context, params *project.GetProjectParams) (*project.Project, error) {
+// func (s *projectService) GetProject(ctx context.Context, params *project.GetProjectQuery) (*project.Project, error) {
 // 	p, err := s.store.GetProject(ctx, &params.Project)
 // 	if err != nil {
 // 		return nil, err
@@ -147,7 +147,7 @@ func (s *projectService) GetProjectById(ctx *gin.Context, params *project.GetPro
 // 	return p, nil
 // }
 
-func (s *projectService) CreateProject(ctx *gin.Context, params *project.CreateProjectParams) (*project.Project, error) {
+func (s *projectService) CreateProject(ctx *gin.Context, params *project.CreateProjectCommand) (*project.Project, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		return nil, errors.New("not authorized")
 	}
@@ -209,7 +209,7 @@ func (s *projectService) CreateProject(ctx *gin.Context, params *project.CreateP
 	return p, nil
 }
 
-func (s *projectService) UpdateProjectById(ctx *gin.Context, params *project.UpdateProjectByIdParams) error {
+func (s *projectService) UpdateProjectById(ctx *gin.Context, params *project.UpdateProjectByIdCommand) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
@@ -231,7 +231,7 @@ func (s *projectService) UpdateProjectById(ctx *gin.Context, params *project.Upd
 	return s.store.UpdateProjectById(ctx, params.ProjectId, &params.Project)
 }
 
-func (s *projectService) DeleteProjectById(ctx *gin.Context, params *project.DeleteProjectByIdParams) error {
+func (s *projectService) DeleteProjectById(ctx *gin.Context, params *project.DeleteProjectByIdCommand) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
