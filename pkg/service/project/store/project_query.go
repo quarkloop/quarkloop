@@ -12,7 +12,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
-/// ListProjects
+/// GetProjectList
 
 const listProjectsQuery = `
 SELECT 
@@ -39,7 +39,7 @@ WHERE
     %s;
 `
 
-func (store *projectStore) ListProjects(ctx context.Context, visibility model.ScopeVisibility, orgId []int, workspaceId []int) ([]*project.Project, error) {
+func (store *projectStore) GetProjectList(ctx context.Context, visibility model.ScopeVisibility, orgId []int, workspaceId []int) ([]*project.Project, error) {
 	whereClause := []string{}
 	if len(orgId) != 0 {
 		whereClause = append(whereClause, `p."orgId" = ANY (@orgId)`)
