@@ -36,29 +36,57 @@ func (w *Workspace) GeneratePath() {
 	w.Path = fmt.Sprintf("/org/%s/%s", w.OrgScopedId, w.ScopedId)
 }
 
-type GetWorkspaceListParams struct {
+// GetWorkspaceList
+
+type GetWorkspaceListQueryParams struct {
+	OrgId []int `form:"orgId"`
+}
+
+type GetWorkspaceListQuery struct {
 	OrgId []int
 }
 
-type GetWorkspaceByIdParams struct {
+// GetWorkspaceById
+
+type GetWorkspaceByIdUriParams struct {
+	WorkspaceId int `uri:"workspaceId" binding:"required"`
+}
+
+type GetWorkspaceByIdQuery struct {
 	WorkspaceId int
 }
 
-type GetWorkspaceParams struct {
-	OrgId     int
-	Workspace Workspace
+// GetWorkspace
+
+// type GetWorkspaceQuery struct {
+// 	OrgId     int
+// 	Workspace Workspace
+// }
+
+// CreateWorkspace
+
+type CreateWorkspaceCommand struct {
+	OrgId     int       `json:"orgId" binding:"required"`
+	Workspace Workspace `json:"workspace" binding:"required"`
 }
 
-type CreateWorkspaceParams struct {
-	OrgId     int
-	Workspace Workspace
+// UpdateWorkspaceById
+
+type UpdateWorkspaceByIdUriParams struct {
+	WorkspaceId int `uri:"workspaceId" binding:"required"`
 }
 
-type UpdateWorkspaceByIdParams struct {
-	WorkspaceId int
-	Workspace   Workspace
+type UpdateWorkspaceByIdCommand struct {
+	WorkspaceId int `json:"workspaceId" binding:"required"`
+	Workspace
 }
 
-type DeleteWorkspaceByIdParams struct {
+// DeleteWorkspaceById
+
+type DeleteWorkspaceByIdUriParams struct {
+	WorkspaceId int `uri:"workspaceId" binding:"required"`
+}
+
+type DeleteWorkspaceByIdCommand struct {
 	WorkspaceId int
 }
