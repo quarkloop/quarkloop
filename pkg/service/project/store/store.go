@@ -9,7 +9,7 @@ import (
 )
 
 type ProjectStore interface {
-	GetProjectList(ctx context.Context, visibility model.ScopeVisibility, orgId []int, workspaceId []int) ([]*project.Project, error)
+	GetProjectList(ctx context.Context, visibility model.ScopeVisibility, userId int) ([]*project.Project, error)
 	GetProjectById(ctx context.Context, projectId int) (*project.Project, error)
 	GetProject(ctx context.Context, p *project.Project) (*project.Project, error)
 	CreateProject(ctx context.Context, orgId int, workspaceId int, p *project.Project) (*project.Project, error)
