@@ -12,7 +12,7 @@ var (
 	ErrOrgNotFound = errors.New("org not found")
 )
 
-type Organization struct {
+type Org struct {
 	// id
 	Id       int    `json:"id" form:"id"`
 	ScopedId string `json:"sid"`
@@ -30,50 +30,50 @@ type Organization struct {
 	UpdatedBy *string    `json:"updatedBy,omitempty"`
 }
 
-func (o *Organization) GeneratePath() {
+func (o *Org) GeneratePath() {
 	o.Path = fmt.Sprintf("/org/%s", o.ScopedId)
 }
 
-// GetOrganizationById
+// GetOrgById
 
-type GetOrganizationByIdUriParams struct {
+type GetOrgByIdUriParams struct {
 	OrgId int `uri:"orgId" binding:"required"`
 }
 
-type GetOrganizationByIdQuery struct {
+type GetOrgByIdQuery struct {
 	OrgId int
 }
 
-// GetOrganization
+// GetOrg
 
-// type GetOrganizationParams struct {
-// 	Organization Organization
+// type GetOrgParams struct {
+// 	Org Org
 // }
 
-// CreateOrganization
+// CreateOrg
 
-type CreateOrganizationCommand struct {
-	Organization
+type CreateOrgCommand struct {
+	Org
 }
 
-// UpdateOrganizationById
+// UpdateOrgById
 
-type UpdateOrganizationByIdUriParams struct {
+type UpdateOrgByIdUriParams struct {
 	OrgId int `uri:"orgId" binding:"required"`
 }
 
-type UpdateOrganizationByIdCommand struct {
+type UpdateOrgByIdCommand struct {
 	OrgId int
-	Organization
+	Org
 }
 
-// DeleteOrganizationById
+// DeleteOrgById
 
-type DeleteOrganizationByIdUriParams struct {
+type DeleteOrgByIdUriParams struct {
 	OrgId int `uri:"orgId" binding:"required"`
 }
 
-type DeleteOrganizationByIdCommand struct {
+type DeleteOrgByIdCommand struct {
 	OrgId int
 }
 
