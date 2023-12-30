@@ -8,24 +8,26 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
-type GetProjectListQueryParams struct {
-	OrgId       []int `form:"orgId"`
-	WorkspaceId []int `form:"workspaceId"`
-}
+// GET /projects
+//
+// Get project list.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
 
 func (s *ProjectApi) GetProjectList(ctx *gin.Context) {
-	queryParams := &GetProjectListQueryParams{}
+	queryParams := &project.GetProjectListQueryParams{}
 	if err := ctx.ShouldBindQuery(queryParams); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	projectList, err := s.projectService.GetProjectList(ctx, &project.GetProjectListParams{
+	projectList, err := s.projectService.GetProjectList(ctx, &project.GetProjectListQuery{
 		OrgId:       queryParams.OrgId,
 		WorkspaceId: queryParams.WorkspaceId,
-	},
-	)
+	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
@@ -34,22 +36,25 @@ func (s *ProjectApi) GetProjectList(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &projectList)
 }
 
-type GetProjectByIdUriParams struct {
-	ProjectId int `uri:"projectId" binding:"required"`
-}
+// GET /projects/:projectId
+//
+// Get project by id.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
 
 func (s *ProjectApi) GetProjectById(ctx *gin.Context) {
-	uriParams := &GetProjectByIdUriParams{}
+	uriParams := &project.GetProjectByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	project, err := s.projectService.GetProjectById(ctx, &project.GetProjectByIdParams{
+	project, err := s.projectService.GetProjectById(ctx, &project.GetProjectByIdQuery{
 		ProjectId: uriParams.ProjectId,
-	},
-	)
+	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
