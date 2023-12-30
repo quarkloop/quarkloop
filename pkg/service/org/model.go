@@ -34,6 +34,12 @@ func (o *Org) GeneratePath() {
 	o.Path = fmt.Sprintf("/org/%s", o.ScopedId)
 }
 
+// GetOrgList
+
+type GetOrgListQuery struct {
+	UserId int
+}
+
 // GetOrgById
 
 type GetOrgByIdUriParams struct {
@@ -74,6 +80,16 @@ type DeleteOrgByIdUriParams struct {
 }
 
 type DeleteOrgByIdCommand struct {
+	OrgId int
+}
+
+// GetWorkspaceList
+
+type GetWorkspaceListUriParams struct {
+	OrgId int `uri:"orgId" binding:"required"`
+}
+
+type GetWorkspaceListQuery struct {
 	OrgId int
 }
 
