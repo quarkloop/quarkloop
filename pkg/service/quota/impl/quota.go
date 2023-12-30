@@ -17,8 +17,8 @@ func NewQuotaService(ds store.QuotaStore) quota.Service {
 	}
 }
 
-func (s *quotaService) GetQuotasByUserId(ctx context.Context, userId int) (quota.Quota, error) {
-	q, err := s.store.GetQuotasByUserId(ctx, userId)
+func (s *quotaService) GetQuotasByUserId(ctx context.Context, query *quota.GetQuotasByUserIdQuery) (quota.Quota, error) {
+	q, err := s.store.GetQuotasByUserId(ctx, query.UserId)
 	if err != nil {
 		return quota.Quota{}, err
 	}
@@ -26,8 +26,8 @@ func (s *quotaService) GetQuotasByUserId(ctx context.Context, userId int) (quota
 	return q, nil
 }
 
-func (s *quotaService) GetQuotasByOrgId(ctx context.Context, orgId int) ([]quota.Quota, error) {
-	q, err := s.store.GetQuotasByOrgId(ctx, orgId)
+func (s *quotaService) GetQuotasByOrgId(ctx context.Context, query *quota.GetQuotasByOrgIdQuery) ([]quota.Quota, error) {
+	q, err := s.store.GetQuotasByOrgId(ctx, query.OrgId)
 	if err != nil {
 		return []quota.Quota{}, err
 	}
@@ -35,8 +35,8 @@ func (s *quotaService) GetQuotasByOrgId(ctx context.Context, orgId int) ([]quota
 	return q, nil
 }
 
-func (s *quotaService) CheckCreateOrgQuotaReached(ctx context.Context, userId int) error {
-	q, err := s.store.GetQuotasByUserId(ctx, userId)
+func (s *quotaService) CheckCreateOrgQuotaReached(ctx context.Context, query *quota.CheckCreateOrgQuotaReachedQuery) error {
+	q, err := s.store.GetQuotasByUserId(ctx, query.UserId)
 	if err != nil {
 		return err
 	}
@@ -47,8 +47,8 @@ func (s *quotaService) CheckCreateOrgQuotaReached(ctx context.Context, userId in
 	return nil
 }
 
-func (s *quotaService) CheckCreateOrgUserQuotaReached(ctx context.Context, orgId int) error {
-	q, err := s.store.GetQuotasByOrgId(ctx, orgId)
+func (s *quotaService) CheckCreateOrgUserQuotaReached(ctx context.Context, query *quota.CheckCreateOrgUserQuotaReachedQuery) error {
+	q, err := s.store.GetQuotasByOrgId(ctx, query.OrgId)
 	if err != nil {
 		return err
 	}
@@ -65,8 +65,8 @@ func (s *quotaService) CheckCreateOrgUserQuotaReached(ctx context.Context, orgId
 	return quota.ErrUnableToFindFeature
 }
 
-func (s *quotaService) CheckCreateWorkspaceQuotaReached(ctx context.Context, orgId int) error {
-	q, err := s.store.GetQuotasByOrgId(ctx, orgId)
+func (s *quotaService) CheckCreateWorkspaceQuotaReached(ctx context.Context, query *quota.CheckCreateWorkspaceQuotaReachedQuery) error {
+	q, err := s.store.GetQuotasByOrgId(ctx, query.OrgId)
 	if err != nil {
 		return err
 	}
@@ -83,8 +83,8 @@ func (s *quotaService) CheckCreateWorkspaceQuotaReached(ctx context.Context, org
 	return quota.ErrUnableToFindFeature
 }
 
-func (s *quotaService) CheckCreateProjectQuotaReached(ctx context.Context, orgId int) error {
-	q, err := s.store.GetQuotasByOrgId(ctx, orgId)
+func (s *quotaService) CheckCreateProjectQuotaReached(ctx context.Context, query *quota.CheckCreateProjectQuotaReachedQuery) error {
+	q, err := s.store.GetQuotasByOrgId(ctx, query.OrgId)
 	if err != nil {
 		return err
 	}
