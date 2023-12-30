@@ -9,22 +9,25 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
-type GetWorkspaceListQueryParams struct {
-	OrgId []int `form:"orgId"`
-}
+// GET /workspaces
+//
+// Get workspace list.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
 
 func (s *WorkspaceApi) GetWorkspaceList(ctx *gin.Context) {
-	queryParams := &GetWorkspaceListQueryParams{}
+	queryParams := &workspace.GetWorkspaceListQueryParams{}
 	if err := ctx.ShouldBindQuery(queryParams); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	wsList, err := s.workspaceService.GetWorkspaceList(ctx, &workspace.GetWorkspaceListParams{
+	wsList, err := s.workspaceService.GetWorkspaceList(ctx, &workspace.GetWorkspaceListQuery{
 		OrgId: queryParams.OrgId,
-	},
-	)
+	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
@@ -33,22 +36,25 @@ func (s *WorkspaceApi) GetWorkspaceList(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &wsList)
 }
 
-type GetWorkspaceByIdUriParams struct {
-	WorkspaceId int `uri:"workspaceId" binding:"required"`
-}
+// GET /workspaces/:workspaceId
+//
+// Get workspace by id.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
 
 func (s *WorkspaceApi) GetWorkspaceById(ctx *gin.Context) {
-	uriParams := &GetWorkspaceByIdUriParams{}
+	uriParams := &workspace.GetWorkspaceByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	ws, err := s.workspaceService.GetWorkspaceById(ctx, &workspace.GetWorkspaceByIdParams{
+	ws, err := s.workspaceService.GetWorkspaceById(ctx, &workspace.GetWorkspaceByIdQuery{
 		WorkspaceId: uriParams.WorkspaceId,
-	},
-	)
+	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
@@ -70,11 +76,10 @@ func (s *WorkspaceApi) GetWorkspaceById(ctx *gin.Context) {
 // 	}
 
 // 	// query service
-// 	ws, err := s.workspaceService.GetWorkspace(ctx, &workspace.GetWorkspaceParams{
+// 	ws, err := s.workspaceService.GetWorkspace(ctx, &workspace.GetWorkspaceQuery{
 // 		OrgId:     queryParams.OrgId,
 // 		Workspace: queryParams.Workspace,
-// 	},
-// 	)
+// 	})
 // 	if err != nil {
 // 		api.AbortWithInternalServerErrorJSON(ctx, err)
 // 		return
