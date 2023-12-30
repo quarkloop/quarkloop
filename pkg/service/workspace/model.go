@@ -38,21 +38,19 @@ func (w *Workspace) GeneratePath() {
 
 // GetWorkspaceList
 
-type GetWorkspaceListQueryParams struct {
-	OrgId []int `form:"orgId"`
-}
-
 type GetWorkspaceListQuery struct {
-	OrgId []int
+	UserId int
 }
 
 // GetWorkspaceById
 
 type GetWorkspaceByIdUriParams struct {
+	OrgId       int `uri:"orgId" binding:"required"`
 	WorkspaceId int `uri:"workspaceId" binding:"required"`
 }
 
 type GetWorkspaceByIdQuery struct {
+	OrgId       int
 	WorkspaceId int
 }
 
@@ -65,29 +63,37 @@ type GetWorkspaceByIdQuery struct {
 
 // CreateWorkspace
 
+type CreateWorkspaceUriParams struct {
+	OrgId int `uri:"orgId" binding:"required"`
+}
+
 type CreateWorkspaceCommand struct {
-	OrgId     int       `json:"orgId" binding:"required"`
-	Workspace Workspace `json:"workspace" binding:"required"`
+	OrgId int
+	Workspace
 }
 
 // UpdateWorkspaceById
 
 type UpdateWorkspaceByIdUriParams struct {
+	OrgId       int `uri:"orgId" binding:"required"`
 	WorkspaceId int `uri:"workspaceId" binding:"required"`
 }
 
 type UpdateWorkspaceByIdCommand struct {
-	WorkspaceId int `json:"workspaceId" binding:"required"`
+	OrgId       int
+	WorkspaceId int
 	Workspace
 }
 
 // DeleteWorkspaceById
 
 type DeleteWorkspaceByIdUriParams struct {
+	OrgId       int `uri:"orgId" binding:"required"`
 	WorkspaceId int `uri:"workspaceId" binding:"required"`
 }
 
 type DeleteWorkspaceByIdCommand struct {
+	OrgId       int
 	WorkspaceId int
 }
 
