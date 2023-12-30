@@ -6,11 +6,11 @@ import (
 )
 
 type Api interface {
-	GetAppSubmissionList(c *gin.Context)
-	GetAppSubmissionById(c *gin.Context)
-	CreateAppSubmission(c *gin.Context)
-	UpdateAppSubmissionById(c *gin.Context)
-	DeleteAppSubmissionById(c *gin.Context)
+	GetAppSubmissionList(*gin.Context)
+	GetAppSubmissionById(*gin.Context)
+	CreateAppSubmission(*gin.Context)
+	UpdateAppSubmissionById(*gin.Context)
+	DeleteAppSubmissionById(*gin.Context)
 }
 
 type AppSubmissionApi struct {
