@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/quarkloop/quarkloop/pkg/api"
-	org "github.com/quarkloop/quarkloop/pkg/service/organization"
+	"github.com/quarkloop/quarkloop/pkg/service/org"
 )
 
 // POST /orgs
@@ -24,7 +24,7 @@ func (s *OrganizationApi) CreateOrganization(ctx *gin.Context) {
 		return
 	}
 
-	// query database
+	// query service
 	org, err := s.orgService.CreateOrganization(ctx, cmd)
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
@@ -55,7 +55,7 @@ func (s *OrganizationApi) UpdateOrganizationById(ctx *gin.Context) {
 		return
 	}
 
-	// query database
+	// query service
 	err := s.orgService.UpdateOrganizationById(ctx, &org.UpdateOrganizationByIdCommand{
 		OrgId:        uriParams.OrgId,
 		Organization: cmd.Organization,
@@ -83,7 +83,7 @@ func (s *OrganizationApi) DeleteOrganizationById(ctx *gin.Context) {
 		return
 	}
 
-	// query database
+	// query service
 	err := s.orgService.DeleteOrganizationById(ctx, &org.DeleteOrganizationByIdCommand{
 		OrgId: uriParams.OrgId,
 	})
