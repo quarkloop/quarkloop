@@ -31,7 +31,7 @@ FROM
 %s	
 `
 
-func (store *orgStore) ListOrganizations(ctx context.Context, visibility model.ScopeVisibility) ([]org.Organization, error) {
+func (store *orgStore) ListOrganizations(ctx context.Context, visibility model.ScopeVisibility) ([]*org.Organization, error) {
 	var finalQuery strings.Builder
 	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
 		finalQuery.WriteString(fmt.Sprintf(listOrganizationsQuery, `WHERE "visibility" = @visibility;`))
@@ -46,7 +46,7 @@ func (store *orgStore) ListOrganizations(ctx context.Context, visibility model.S
 	}
 	defer rows.Close()
 
-	var orgList []org.Organization = []org.Organization{}
+	var orgList []*org.Organization = []*org.Organization{}
 
 	for rows.Next() {
 		var org org.Organization
@@ -66,7 +66,7 @@ func (store *orgStore) ListOrganizations(ctx context.Context, visibility model.S
 			return nil, err
 		}
 
-		orgList = append(orgList, org)
+		orgList = append(orgList, &org)
 	}
 
 	if err := rows.Err(); err != nil {
