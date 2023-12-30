@@ -17,15 +17,15 @@ import (
 // 201: StatusCreated
 // 500: StatusInternalServerError
 
-func (s *OrganizationApi) CreateOrganization(ctx *gin.Context) {
-	cmd := &org.CreateOrganizationCommand{}
+func (s *OrgApi) CreateOrg(ctx *gin.Context) {
+	cmd := &org.CreateOrgCommand{}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	org, err := s.orgService.CreateOrganization(ctx, cmd)
+	org, err := s.orgService.CreateOrg(ctx, cmd)
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
@@ -42,23 +42,23 @@ func (s *OrganizationApi) CreateOrganization(ctx *gin.Context) {
 // 200: StatusOK
 // 500: StatusInternalServerError
 
-func (s *OrganizationApi) UpdateOrganizationById(ctx *gin.Context) {
-	uriParams := &org.UpdateOrganizationByIdUriParams{}
+func (s *OrgApi) UpdateOrgById(ctx *gin.Context) {
+	uriParams := &org.UpdateOrgByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
-	cmd := &org.UpdateOrganizationByIdCommand{}
+	cmd := &org.UpdateOrgByIdCommand{}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	err := s.orgService.UpdateOrganizationById(ctx, &org.UpdateOrganizationByIdCommand{
-		OrgId:        uriParams.OrgId,
-		Organization: cmd.Organization,
+	err := s.orgService.UpdateOrgById(ctx, &org.UpdateOrgByIdCommand{
+		OrgId: uriParams.OrgId,
+		Org:   cmd.Org,
 	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
@@ -76,15 +76,15 @@ func (s *OrganizationApi) UpdateOrganizationById(ctx *gin.Context) {
 // 204: StatusNoContent
 // 500: StatusInternalServerError
 
-func (s *OrganizationApi) DeleteOrganizationById(ctx *gin.Context) {
-	uriParams := &org.DeleteOrganizationByIdUriParams{}
+func (s *OrgApi) DeleteOrgById(ctx *gin.Context) {
+	uriParams := &org.DeleteOrgByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
 		api.AbortWithBadRequestJSON(ctx, err)
 		return
 	}
 
 	// query service
-	err := s.orgService.DeleteOrganizationById(ctx, &org.DeleteOrganizationByIdCommand{
+	err := s.orgService.DeleteOrgById(ctx, &org.DeleteOrgByIdCommand{
 		OrgId: uriParams.OrgId,
 	})
 	if err != nil {
