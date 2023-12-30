@@ -6,27 +6,27 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 )
 
-func (s *aclService) ListUserRoles(ctx context.Context, orgId int) ([]accesscontrol.UserRole, error) {
-	urList, err := s.store.ListUserRoles(ctx, orgId)
+func (s *aclService) ListUserRoles(ctx context.Context, query *accesscontrol.ListUserRolesQuery) ([]accesscontrol.UserRole, error) {
+	urList, err := s.store.ListUserRoles(ctx, query.OrgId)
 	return urList, err
 }
 
-func (s *aclService) GetUserRoleById(ctx context.Context, userRoleId int) (*accesscontrol.UserRole, error) {
-	ur, err := s.store.GetUserRoleById(ctx, userRoleId)
+func (s *aclService) GetUserRoleById(ctx context.Context, query *accesscontrol.GetUserRoleByIdQuery) (*accesscontrol.UserRole, error) {
+	ur, err := s.store.GetUserRoleById(ctx, query.UserRoleId)
 	return ur, err
 }
 
-func (s *aclService) CreateUserRole(ctx context.Context, orgId int, userRole *accesscontrol.UserRole) (*accesscontrol.UserRole, error) {
-	ur, err := s.store.CreateUserRole(ctx, orgId, userRole)
+func (s *aclService) CreateUserRole(ctx context.Context, cmd *accesscontrol.CreateUserRoleCommand) (*accesscontrol.UserRole, error) {
+	ur, err := s.store.CreateUserRole(ctx, cmd.OrgId, cmd.UserRole)
 	return ur, err
 }
 
-func (s *aclService) UpdateUserRoleById(ctx context.Context, userRoleId int, userRole *accesscontrol.UserRole) error {
-	err := s.store.UpdateUserRoleById(ctx, userRoleId, userRole)
+func (s *aclService) UpdateUserRoleById(ctx context.Context, cmd *accesscontrol.UpdateUserRoleByIdCommand) error {
+	err := s.store.UpdateUserRoleById(ctx, cmd.UserRoleId, cmd.UserRole)
 	return err
 }
 
-func (s *aclService) DeleteUserRoleById(ctx context.Context, orgId int, userRoleId int) error {
-	err := s.store.DeleteUserRoleById(ctx, orgId, userRoleId)
+func (s *aclService) DeleteUserRoleById(ctx context.Context, cmd *accesscontrol.DeleteUserRoleByIdCommand) error {
+	err := s.store.DeleteUserRoleById(ctx, cmd.OrgId, cmd.UserRoleId)
 	return err
 }
