@@ -12,6 +12,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
+	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
 /// GetOrgList
@@ -32,7 +33,8 @@ FROM
 %s	
 `
 
-func (store *orgStore) GetOrgList(ctx context.Context, visibility model.ScopeVisibility) ([]*org.Org, error) {
+// TODO: rewrite query
+func (store *orgStore) GetOrgList(ctx context.Context, visibility model.ScopeVisibility, userId int) ([]*org.Org, error) {
 	var finalQuery strings.Builder
 	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
 		finalQuery.WriteString(fmt.Sprintf(listOrgsQuery, `WHERE "visibility" = @visibility;`))
@@ -191,6 +193,81 @@ func (store *orgStore) GetOrg(ctx context.Context, organization *org.Org) (*org.
 	return &org, nil
 }
 
+/// GetWorkspaceList
+
+const listWorkspacesQuery = `
+SELECT 
+    ws."id",
+    ws."sid",
+    ws."orgId",
+    org."sid",
+    ws."name",
+    ws."description",
+    ws."visibility",
+    ws."createdAt",
+    ws."createdBy",
+    ws."updatedAt",
+    ws."updatedBy"
+FROM 
+    "system"."Workspace" AS ws
+LEFT JOIN 
+    system."Organization" AS org ON org."id" = ws."orgId"
+WHERE 
+    ws."orgId" = @orgId
+%s	
+`
+
+func (store *orgStore) GetWorkspaceList(ctx context.Context, visibility model.ScopeVisibility, orgId int) ([]*workspace.Workspace, error) {
+	var finalQuery strings.Builder
+	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
+		finalQuery.WriteString(fmt.Sprintf(listWorkspacesQuery, `AND ws."visibility" = @visibility;`))
+	} else {
+		finalQuery.WriteString(fmt.Sprintf(listWorkspacesQuery, ";"))
+	}
+
+	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{
+		"orgId":      orgId,
+		"visibility": visibility,
+	})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var wsList []*workspace.Workspace = []*workspace.Workspace{}
+
+	for rows.Next() {
+		var workspace workspace.Workspace
+		err := rows.Scan(
+			&workspace.Id,
+			&workspace.ScopedId,
+			&workspace.OrgId,
+			&workspace.OrgScopedId,
+			&workspace.Name,
+			&workspace.Description,
+			&workspace.Visibility,
+			&workspace.CreatedAt,
+			&workspace.CreatedBy,
+			&workspace.UpdatedAt,
+			&workspace.UpdatedBy,
+		)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+			return nil, err
+		}
+
+		wsList = append(wsList, &workspace)
+	}
+
+	if err := rows.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+		return nil, err
+	}
+
+	return wsList, nil
+}
+
 /// GetProjectList
 
 const listProjectsQuery = `
@@ -218,14 +295,14 @@ WHERE
 `
 
 func (store *orgStore) GetProjectList(ctx context.Context, visibility model.ScopeVisibility, orgId int) ([]*project.Project, error) {
-	whereClause := ";"
+	var finalQuery strings.Builder
 	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
-		whereClause = `AND p."visibility" = @visibility;`
+		finalQuery.WriteString(fmt.Sprintf(listProjectsQuery, `AND p."visibility" = @visibility;`))
+	} else {
+		finalQuery.WriteString(fmt.Sprintf(listProjectsQuery, ";"))
 	}
 
-	finalQuery := fmt.Sprintf(listProjectsQuery, whereClause)
-
-	rows, err := store.Conn.Query(ctx, finalQuery, pgx.NamedArgs{
+	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{
 		"orgId":      orgId,
 		"visibility": visibility,
 	})
