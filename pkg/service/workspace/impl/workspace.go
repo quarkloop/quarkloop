@@ -27,10 +27,10 @@ func NewWorkspaceService(ds store.WorkspaceStore, aclService accesscontrol.Servi
 	}
 }
 
-func (s *workspaceService) GetWorkspaceList(ctx *gin.Context, params *workspace.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
+func (s *workspaceService) GetWorkspaceList(ctx *gin.Context, query *workspace.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		// anonymous user => return public workspaces
-		return s.getWorkspaceList(ctx, model.PublicVisibility, params)
+		return s.getWorkspaceList(ctx, model.PublicVisibility, query)
 	}
 
 	user := contextdata.GetUser(ctx)
@@ -44,17 +44,17 @@ func (s *workspaceService) GetWorkspaceList(ctx *gin.Context, params *workspace.
 	if err != nil {
 		if err == accesscontrol.ErrPermissionDenied {
 			// unauthorized user (permission denied) => return public workspaces
-			return s.getWorkspaceList(ctx, model.PublicVisibility, params)
+			return s.getWorkspaceList(ctx, model.PublicVisibility, query)
 		}
 		return nil, err
 	}
 
 	// authorized user => return public + private workspaces
-	return s.getWorkspaceList(ctx, model.AllVisibility, params)
+	return s.getWorkspaceList(ctx, model.AllVisibility, query)
 }
 
-func (s *workspaceService) getWorkspaceList(ctx context.Context, visibility model.ScopeVisibility, params *workspace.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
-	workspaceList, err := s.store.ListWorkspaces(ctx, visibility, params.OrgId)
+func (s *workspaceService) getWorkspaceList(ctx context.Context, visibility model.ScopeVisibility, query *workspace.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
+	workspaceList, err := s.store.ListWorkspaces(ctx, visibility, query.OrgId)
 	if err != nil {
 		return nil, err
 	}
@@ -66,8 +66,8 @@ func (s *workspaceService) getWorkspaceList(ctx context.Context, visibility mode
 	return workspaceList, nil
 }
 
-func (s *workspaceService) GetWorkspaceById(ctx *gin.Context, params *workspace.GetWorkspaceByIdQuery) (*workspace.Workspace, error) {
-	ws, err := s.store.GetWorkspaceById(ctx, params.WorkspaceId)
+func (s *workspaceService) GetWorkspaceById(ctx *gin.Context, query *workspace.GetWorkspaceByIdQuery) (*workspace.Workspace, error) {
+	ws, err := s.store.GetWorkspaceById(ctx, query.WorkspaceId)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (s *workspaceService) GetWorkspaceById(ctx *gin.Context, params *workspace.
 		err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
 			UserId:      user.GetId(),
 			OrgId:       scope.OrgId(),
-			WorkspaceId: params.WorkspaceId,
+			WorkspaceId: query.WorkspaceId,
 		})
 		if err != nil {
 			if err == accesscontrol.ErrPermissionDenied {
@@ -103,8 +103,8 @@ func (s *workspaceService) GetWorkspaceById(ctx *gin.Context, params *workspace.
 	return ws, nil
 }
 
-// func (s *workspaceService) GetWorkspace(ctx context.Context, params *workspace.GetWorkspaceQuery) (*workspace.Workspace, error) {
-// 	workspace, err := s.store.GetWorkspace(ctx, params.OrgId, &params.Workspace)
+// func (s *workspaceService) GetWorkspace(ctx context.Context, query *workspace.GetWorkspaceQuery) (*workspace.Workspace, error) {
+// 	workspace, err := s.store.GetWorkspace(ctx, query.OrgId, &query.Workspace)
 // 	if err != nil {
 // 		return nil, err
 // 	}
@@ -113,7 +113,7 @@ func (s *workspaceService) GetWorkspaceById(ctx *gin.Context, params *workspace.
 // 	return workspace, nil
 // }
 
-func (s *workspaceService) CreateWorkspace(ctx *gin.Context, params *workspace.CreateWorkspaceCommand) (*workspace.Workspace, error) {
+func (s *workspaceService) CreateWorkspace(ctx *gin.Context, cmd *workspace.CreateWorkspaceCommand) (*workspace.Workspace, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		return nil, errors.New("not authorized")
 	}
@@ -122,7 +122,7 @@ func (s *workspaceService) CreateWorkspace(ctx *gin.Context, params *workspace.C
 
 	// check permissions
 	err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceCreate, &accesscontrol.EvaluateFilterParams{
-		OrgId:  params.OrgId,
+		OrgId:  cmd.OrgId,
 		UserId: user.GetId(),
 	})
 	if err != nil {
@@ -130,11 +130,11 @@ func (s *workspaceService) CreateWorkspace(ctx *gin.Context, params *workspace.C
 	}
 
 	// check quotas
-	if err := s.quotaService.CheckCreateWorkspaceQuotaReached(ctx, params.OrgId); err != nil {
+	if err := s.quotaService.CheckCreateWorkspaceQuotaReached(ctx, cmd.OrgId); err != nil {
 		return nil, err
 	}
 
-	ws, err := s.store.CreateWorkspace(ctx, params.OrgId, &params.Workspace)
+	ws, err := s.store.CreateWorkspace(ctx, cmd.OrgId, &cmd.Workspace)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +143,7 @@ func (s *workspaceService) CreateWorkspace(ctx *gin.Context, params *workspace.C
 	return ws, nil
 }
 
-func (s *workspaceService) UpdateWorkspaceById(ctx *gin.Context, params *workspace.UpdateWorkspaceByIdCommand) error {
+func (s *workspaceService) UpdateWorkspaceById(ctx *gin.Context, cmd *workspace.UpdateWorkspaceByIdCommand) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
@@ -155,16 +155,16 @@ func (s *workspaceService) UpdateWorkspaceById(ctx *gin.Context, params *workspa
 	err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceUpdate, &accesscontrol.EvaluateFilterParams{
 		UserId:      user.GetId(),
 		OrgId:       scope.OrgId(),
-		WorkspaceId: params.WorkspaceId,
+		WorkspaceId: cmd.WorkspaceId,
 	})
 	if err != nil {
 		return err
 	}
 
-	return s.store.UpdateWorkspaceById(ctx, params.WorkspaceId, &params.Workspace)
+	return s.store.UpdateWorkspaceById(ctx, cmd.WorkspaceId, &cmd.Workspace)
 }
 
-func (s *workspaceService) DeleteWorkspaceById(ctx *gin.Context, params *workspace.DeleteWorkspaceByIdCommand) error {
+func (s *workspaceService) DeleteWorkspaceById(ctx *gin.Context, cmd *workspace.DeleteWorkspaceByIdCommand) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
@@ -176,11 +176,11 @@ func (s *workspaceService) DeleteWorkspaceById(ctx *gin.Context, params *workspa
 	err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceDelete, &accesscontrol.EvaluateFilterParams{
 		UserId:      user.GetId(),
 		OrgId:       scope.OrgId(),
-		WorkspaceId: params.WorkspaceId,
+		WorkspaceId: cmd.WorkspaceId,
 	})
 	if err != nil {
 		return err
 	}
 
-	return s.store.DeleteWorkspaceById(ctx, params.WorkspaceId)
+	return s.store.DeleteWorkspaceById(ctx, cmd.WorkspaceId)
 }
