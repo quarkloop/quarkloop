@@ -3,11 +3,11 @@ package workspace
 import "github.com/gin-gonic/gin"
 
 type Service interface {
-	GetWorkspaceList(*gin.Context, *GetWorkspaceListParams) ([]Workspace, error)
-	GetWorkspaceById(*gin.Context, *GetWorkspaceByIdParams) (*Workspace, error)
+	GetWorkspaceList(*gin.Context, *GetWorkspaceListQuery) ([]*Workspace, error)
+	GetWorkspaceById(*gin.Context, *GetWorkspaceByIdQuery) (*Workspace, error)
 	// TODO: rewrite
-	// GetWorkspace(context.Context, *GetWorkspaceParams) (*Workspace, error)
-	CreateWorkspace(*gin.Context, *CreateWorkspaceParams) (*Workspace, error)
-	UpdateWorkspaceById(*gin.Context, *UpdateWorkspaceByIdParams) error
-	DeleteWorkspaceById(*gin.Context, *DeleteWorkspaceByIdParams) error
+	// GetWorkspace(context.Context, *GetWorkspaceQuery) (*Workspace, error)
+	CreateWorkspace(*gin.Context, *CreateWorkspaceCommand) (*Workspace, error)
+	UpdateWorkspaceById(*gin.Context, *UpdateWorkspaceByIdCommand) error
+	DeleteWorkspaceById(*gin.Context, *DeleteWorkspaceByIdCommand) error
 }
