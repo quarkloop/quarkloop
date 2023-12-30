@@ -6,11 +6,10 @@ import (
 )
 
 type Api interface {
-	GetProjectList(c *gin.Context)
-	GetProjectById(c *gin.Context)
-	CreateProject(c *gin.Context)
-	UpdateProjectById(c *gin.Context)
-	DeleteProjectById(c *gin.Context)
+	GetProjectById(*gin.Context)
+	CreateProject(*gin.Context)
+	UpdateProjectById(*gin.Context)
+	DeleteProjectById(*gin.Context)
 }
 
 type ProjectApi struct {
