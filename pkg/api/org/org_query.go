@@ -6,20 +6,25 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/quarkloop/quarkloop/pkg/api"
+	"github.com/quarkloop/quarkloop/pkg/contextdata"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 )
 
 // GET /orgs
 //
-// Get organization list.
+// Get global organization list.
 //
 // Response status:
 // 200: StatusOK
 // 500: StatusInternalServerError
 
 func (s *OrgApi) GetOrgList(ctx *gin.Context) {
+	user := contextdata.GetUser(ctx)
+
 	// query service
-	orgList, err := s.orgService.GetOrgList(ctx)
+	orgList, err := s.orgService.GetOrgList(ctx, &org.GetOrgListQuery{
+		UserId: user.GetId(), // TODO
+	})
 	if err != nil {
 		api.AbortWithInternalServerErrorJSON(ctx, err)
 		return
