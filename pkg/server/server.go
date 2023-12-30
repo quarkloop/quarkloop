@@ -1,6 +1,8 @@
 package server
 
 import (
+	"encoding/json"
+	"errors"
 	"net/http"
 	"time"
 
@@ -14,6 +16,7 @@ import (
 	table_record "github.com/quarkloop/quarkloop/pkg/api/table_record"
 	table_schema "github.com/quarkloop/quarkloop/pkg/api/table_schema"
 	"github.com/quarkloop/quarkloop/pkg/api/workspace"
+	"github.com/quarkloop/quarkloop/pkg/contextdata"
 	acl_impl "github.com/quarkloop/quarkloop/pkg/service/accesscontrol/impl"
 	acl_store "github.com/quarkloop/quarkloop/pkg/service/accesscontrol/store"
 	org_impl "github.com/quarkloop/quarkloop/pkg/service/organization/impl"
@@ -29,6 +32,7 @@ import (
 	table_record_store "github.com/quarkloop/quarkloop/pkg/service/table_record/store"
 	table_schema_impl "github.com/quarkloop/quarkloop/pkg/service/table_schema/impl"
 	table_schema_store "github.com/quarkloop/quarkloop/pkg/service/table_schema/store"
+	"github.com/quarkloop/quarkloop/pkg/service/user"
 	ws_impl "github.com/quarkloop/quarkloop/pkg/service/workspace/impl"
 	ws_store "github.com/quarkloop/quarkloop/pkg/service/workspace/store"
 	"github.com/quarkloop/quarkloop/pkg/store/repository"
@@ -112,48 +116,105 @@ func (s *Server) UserAuth(ctx *gin.Context) {
 	client := http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, err)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+	defer resp.Body.Close()
+
 	if resp.StatusCode != http.StatusOK {
-		ctx.AbortWithStatus(http.StatusUnauthorized)
+		ctx.AbortWithError(resp.StatusCode, errors.New(resp.Status))
+		return
+	}
+
+	u := &user.User{}
+	err = json.NewDecoder(resp.Body).Decode(u)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	// set user context data
+	contextdata.SetUser(ctx, u)
+	ctx.Next()
+}
+
+func (s *Server) AbortAnonymousUserRequest(ctx *gin.Context) {
+	if contextdata.IsUserAnonymous(ctx) {
+		ctx.AbortWithError(http.StatusUnauthorized, errors.New("Unauthorized"))
 		return
 	}
 
 	ctx.Next()
 }
 
+func (s *Server) TestApi(ctx *gin.Context) {
+	u := contextdata.GetUser(ctx)
+	ctx.JSON(http.StatusOK, u)
+}
+
 func (s *Server) BindHandlers(api *api.ServerApi) {
 	router := s.router.Group("/api/v1")
 
-	// Organizations apis
+	testGroup := router.Group("/test")
+	testGroup.Use(s.UserAuth)
+	testGroup.GET("", s.TestApi)
+
+	// org apis
+	// org query
 	orgGroup := router.Group("/orgs")
-	orgGroup.GET("", s.orgApi.GetOrganizationList)
-	orgGroup.POST("", s.orgApi.CreateOrganization)
-	// TODO: first must be a reserved name
-	orgGroup.GET("/first", s.orgApi.GetOrganization)
-	orgGroup.GET("/:orgId", s.orgApi.GetOrganizationById)
-	orgGroup.PUT("/:orgId", s.orgApi.UpdateOrganizationById)
-	orgGroup.DELETE("/:orgId", s.orgApi.DeleteOrganizationById)
+	orgGroup.Use(s.UserAuth)
+	{
+		orgGroup.GET("", s.orgApi.GetOrganizationList)
+		orgGroup.GET("/:orgId", s.orgApi.GetOrganizationById)
+		// TODO: first must be a reserved name
+		// TODO: rewrite
+		// orgGroup.GET("/first", s.orgApi.GetOrganization)
+	}
+	// org mutation
+	orgMutationGroup := orgGroup.Group("")
+	orgMutationGroup.Use(s.AbortAnonymousUserRequest)
+	{
+		orgMutationGroup.POST("", s.orgApi.CreateOrganization)
+		orgMutationGroup.PUT("/:orgId", s.orgApi.UpdateOrganizationById)
+		orgMutationGroup.DELETE("/:orgId", s.orgApi.DeleteOrganizationById)
+	}
 
-	// Workspaces apis
+	// workspace apis
+	// workspace query
 	wsGroup := router.Group("/workspaces")
-	wsGroup.GET("", s.workspaceApi.GetWorkspaceList)
-	wsGroup.POST("", s.workspaceApi.CreateWorkspace)
-	// TODO: first must be a reserved name
-	wsGroup.GET("/first", s.workspaceApi.GetWorkspace)
-	wsGroup.GET("/:workspaceId", s.workspaceApi.GetWorkspaceById)
-	wsGroup.PUT("/:workspaceId", s.workspaceApi.UpdateWorkspaceById)
-	wsGroup.DELETE("/:workspaceId", s.workspaceApi.DeleteWorkspaceById)
+	wsGroup.Use(s.UserAuth)
+	{
+		wsGroup.GET("", s.workspaceApi.GetWorkspaceList)
+		wsGroup.GET("/:workspaceId", s.workspaceApi.GetWorkspaceById)
+		// TODO: first must be a reserved name
+		// TODO: rewrite
+		// wsGroup.GET("/first", s.workspaceApi.GetWorkspace)
+	}
+	// workspace mutation
+	workspaceMutationGroup := wsGroup.Group("")
+	workspaceMutationGroup.Use(s.AbortAnonymousUserRequest)
+	{
+		workspaceMutationGroup.POST("", s.workspaceApi.CreateWorkspace)
+		workspaceMutationGroup.PUT("/:workspaceId", s.workspaceApi.UpdateWorkspaceById)
+		workspaceMutationGroup.DELETE("/:workspaceId", s.workspaceApi.DeleteWorkspaceById)
+	}
 
-	// Projects apis
+	// project apis
+	// project query
 	projectGroup := router.Group("/projects")
 	projectGroup.Use(s.UserAuth)
-	projectGroup.GET("", s.projectApi.GetProjectList)
-	projectGroup.POST("", s.projectApi.CreateProject)
-	projectGroup.GET("/:projectId", s.projectApi.GetProjectById)
-	projectGroup.PUT("/:projectId", s.projectApi.UpdateProjectById)
-	projectGroup.DELETE("/:projectId", s.projectApi.DeleteProjectById)
+	{
+		projectGroup.GET("", s.projectApi.GetProjectList)
+		projectGroup.GET("/:projectId", s.projectApi.GetProjectById)
+	}
+	// project mutation
+	projectMutationGroup := projectGroup.Group("")
+	projectMutationGroup.Use(s.AbortAnonymousUserRequest)
+	{
+		projectMutationGroup.POST("", s.projectApi.CreateProject)
+		projectMutationGroup.PUT("/:projectId", s.projectApi.UpdateProjectById)
+		projectMutationGroup.DELETE("/:projectId", s.projectApi.DeleteProjectById)
+	}
 
 	// // Tables apis
 	// projectGroup.GET("/:projectId/tables", s.projectTableApi.ListTableRecords)
