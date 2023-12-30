@@ -139,13 +139,13 @@ type EvaluateFilterParams struct {
 	OrgId, WorkspaceId, ProjectId, UserId int
 }
 
-// ListUserGroups
+// GetUserGroupList
 
-type ListUserGroupsUriParams struct {
+type GetUserGroupListUriParams struct {
 	OrgId int `uri:"orgId" binding:"required"`
 }
 
-type ListUserGroupsQuery struct {
+type GetUserGroupListQuery struct {
 	OrgId int
 }
 
@@ -197,13 +197,13 @@ type DeleteUserGroupByIdCommand struct {
 	UserGroupId int
 }
 
-// ListUserRoles
+// GetUserRoleList
 
-type ListUserRolesUriParams struct {
+type GetUserRoleListUriParams struct {
 	OrgId int `uri:"orgId" binding:"required"`
 }
 
-type ListUserRolesQuery struct {
+type GetUserRoleListQuery struct {
 	OrgId int
 }
 
