@@ -130,7 +130,7 @@ func (s *workspaceService) CreateWorkspace(ctx *gin.Context, cmd *workspace.Crea
 	}
 
 	// check quotas
-	if err := s.quotaService.CheckCreateWorkspaceQuotaReached(ctx, cmd.OrgId); err != nil {
+	if err := s.quotaService.CheckCreateWorkspaceQuotaReached(ctx, &quota.CheckCreateWorkspaceQuotaReachedQuery{OrgId: cmd.OrgId}); err != nil {
 		return nil, err
 	}
 
