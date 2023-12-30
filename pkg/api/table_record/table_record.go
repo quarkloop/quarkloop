@@ -6,11 +6,11 @@ import (
 )
 
 type Api interface {
-	ListTableRecords(c *gin.Context)
-	GetTableRecordById(c *gin.Context)
-	CreateTableRecord(c *gin.Context)
-	UpdateTableRecordById(c *gin.Context)
-	DeleteTableRecordById(c *gin.Context)
+	ListTableRecords(*gin.Context)
+	GetTableRecordById(*gin.Context)
+	CreateTableRecord(*gin.Context)
+	UpdateTableRecordById(*gin.Context)
+	DeleteTableRecordById(*gin.Context)
 }
 
 type TableRecordApi struct {
