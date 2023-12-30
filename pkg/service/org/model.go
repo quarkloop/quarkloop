@@ -76,3 +76,13 @@ type DeleteOrganizationByIdUriParams struct {
 type DeleteOrganizationByIdCommand struct {
 	OrgId int
 }
+
+// GetProjectList
+
+type GetProjectListUriParams struct {
+	OrgId int `uri:"orgId" binding:"required"`
+}
+
+type GetProjectListQuery struct {
+	OrgId int
+}
