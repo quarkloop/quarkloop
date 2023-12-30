@@ -36,10 +36,10 @@ func NewProjectService(
 	}
 }
 
-func (s *projectService) GetProjectList(ctx *gin.Context, params *project.GetProjectListQuery) ([]*project.Project, error) {
+func (s *projectService) GetProjectList(ctx *gin.Context, query *project.GetProjectListQuery) ([]*project.Project, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		// anonymous user => return public projects
-		return s.getProjectList(ctx, model.PublicVisibility, params)
+		return s.getProjectList(ctx, model.PublicVisibility, query)
 	}
 
 	user := contextdata.GetUser(ctx)
@@ -54,17 +54,17 @@ func (s *projectService) GetProjectList(ctx *gin.Context, params *project.GetPro
 	if err != nil {
 		if err == accesscontrol.ErrPermissionDenied {
 			// unauthorized user (permission denied) => return public projects
-			return s.getProjectList(ctx, model.PublicVisibility, params)
+			return s.getProjectList(ctx, model.PublicVisibility, query)
 		}
 		return nil, err
 	}
 
 	// authorized user => return public + private projects
-	return s.getProjectList(ctx, model.AllVisibility, params)
+	return s.getProjectList(ctx, model.AllVisibility, query)
 }
 
-func (s *projectService) getProjectList(ctx context.Context, visibility model.ScopeVisibility, params *project.GetProjectListQuery) ([]*project.Project, error) {
-	projectList, err := s.store.ListProjects(ctx, visibility, params.OrgId, params.WorkspaceId)
+func (s *projectService) getProjectList(ctx context.Context, visibility model.ScopeVisibility, query *project.GetProjectListQuery) ([]*project.Project, error) {
+	projectList, err := s.store.ListProjects(ctx, visibility, query.OrgId, query.WorkspaceId)
 	if err != nil {
 		return nil, err
 	}
@@ -75,8 +75,8 @@ func (s *projectService) getProjectList(ctx context.Context, visibility model.Sc
 	return projectList, nil
 }
 
-func (s *projectService) GetProjectById(ctx *gin.Context, params *project.GetProjectByIdQuery) (*project.Project, error) {
-	p, err := s.store.GetProjectById(ctx, params.ProjectId)
+func (s *projectService) GetProjectById(ctx *gin.Context, query *project.GetProjectByIdQuery) (*project.Project, error) {
+	p, err := s.store.GetProjectById(ctx, query.ProjectId)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (s *projectService) GetProjectById(ctx *gin.Context, params *project.GetPro
 			UserId:      user.GetId(),
 			OrgId:       scope.OrgId(),
 			WorkspaceId: scope.WorkspaceId(),
-			ProjectId:   params.ProjectId,
+			ProjectId:   query.ProjectId,
 		})
 		if err != nil {
 			if err == accesscontrol.ErrPermissionDenied {
@@ -114,8 +114,8 @@ func (s *projectService) GetProjectById(ctx *gin.Context, params *project.GetPro
 }
 
 // TODO
-// func (s *projectService) GetProject(ctx context.Context, params *project.GetProjectQuery) (*project.Project, error) {
-// 	p, err := s.store.GetProject(ctx, &params.Project)
+// func (s *projectService) GetProject(ctx context.Context, cmd *project.GetProjectQuery) (*project.Project, error) {
+// 	p, err := s.store.GetProject(ctx, &cmd.Project)
 // 	if err != nil {
 // 		return nil, err
 // 	}
@@ -131,9 +131,9 @@ func (s *projectService) GetProjectById(ctx *gin.Context, params *project.GetPro
 // 		// authorize signed-in user
 // 		user := contextdata.GetUser(ctx)
 // 		err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
-// 			OrgId:       params.OrgId,
-// 			WorkspaceId: params.Project.WorkspaceId,
-// 			ProjectId:   params.Project.Id,
+// 			OrgId:       cmd.OrgId,
+// 			WorkspaceId: cmd.Project.WorkspaceId,
+// 			ProjectId:   cmd.Project.Id,
 // 			UserId:      user.Id, // TODO
 // 		})
 // 		if err != nil {
@@ -147,7 +147,7 @@ func (s *projectService) GetProjectById(ctx *gin.Context, params *project.GetPro
 // 	return p, nil
 // }
 
-func (s *projectService) CreateProject(ctx *gin.Context, params *project.CreateProjectCommand) (*project.Project, error) {
+func (s *projectService) CreateProject(ctx *gin.Context, cmd *project.CreateProjectCommand) (*project.Project, error) {
 	if contextdata.IsUserAnonymous(ctx) {
 		return nil, errors.New("not authorized")
 	}
@@ -166,11 +166,11 @@ func (s *projectService) CreateProject(ctx *gin.Context, params *project.CreateP
 	}
 
 	// check quotas
-	if err := s.quotaService.CheckCreateProjectQuotaReached(ctx, params.OrgId); err != nil {
+	if err := s.quotaService.CheckCreateProjectQuotaReached(ctx, cmd.OrgId); err != nil {
 		return nil, err
 	}
 
-	p, err := s.store.CreateProject(ctx, params.OrgId, params.WorkspaceId, &params.Project)
+	p, err := s.store.CreateProject(ctx, cmd.OrgId, cmd.WorkspaceId, &cmd.Project)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +209,7 @@ func (s *projectService) CreateProject(ctx *gin.Context, params *project.CreateP
 	return p, nil
 }
 
-func (s *projectService) UpdateProjectById(ctx *gin.Context, params *project.UpdateProjectByIdCommand) error {
+func (s *projectService) UpdateProjectById(ctx *gin.Context, cmd *project.UpdateProjectByIdCommand) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
@@ -222,16 +222,16 @@ func (s *projectService) UpdateProjectById(ctx *gin.Context, params *project.Upd
 		UserId:      user.GetId(),
 		OrgId:       scope.OrgId(),
 		WorkspaceId: scope.WorkspaceId(),
-		ProjectId:   params.ProjectId,
+		ProjectId:   cmd.ProjectId,
 	})
 	if err != nil {
 		return err
 	}
 
-	return s.store.UpdateProjectById(ctx, params.ProjectId, &params.Project)
+	return s.store.UpdateProjectById(ctx, cmd.ProjectId, &cmd.Project)
 }
 
-func (s *projectService) DeleteProjectById(ctx *gin.Context, params *project.DeleteProjectByIdCommand) error {
+func (s *projectService) DeleteProjectById(ctx *gin.Context, cmd *project.DeleteProjectByIdCommand) error {
 	if contextdata.IsUserAnonymous(ctx) {
 		return errors.New("not authorized")
 	}
@@ -244,11 +244,11 @@ func (s *projectService) DeleteProjectById(ctx *gin.Context, params *project.Del
 		UserId:      user.GetId(),
 		OrgId:       scope.OrgId(),
 		WorkspaceId: scope.WorkspaceId(),
-		ProjectId:   params.ProjectId,
+		ProjectId:   cmd.ProjectId,
 	})
 	if err != nil {
 		return err
 	}
 
-	return s.store.DeleteProjectById(ctx, params.ProjectId)
+	return s.store.DeleteProjectById(ctx, cmd.ProjectId)
 }
