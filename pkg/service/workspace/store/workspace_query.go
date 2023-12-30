@@ -9,10 +9,11 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/quarkloop/quarkloop/pkg/model"
+	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
-/// ListWorkspaces
+/// GetWorkspaceList
 
 const listWorkspacesQuery = `
 SELECT 
@@ -36,7 +37,7 @@ WHERE
 %s	
 `
 
-func (store *workspaceStore) ListWorkspaces(ctx context.Context, visibility model.ScopeVisibility, orgId []int) ([]*workspace.Workspace, error) {
+func (store *workspaceStore) GetWorkspaceList(ctx context.Context, visibility model.ScopeVisibility, orgId []int) ([]*workspace.Workspace, error) {
 	var finalQuery strings.Builder
 	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
 		finalQuery.WriteString(fmt.Sprintf(listWorkspacesQuery, `AND ws."visibility" = @visibility;`))
@@ -213,4 +214,88 @@ func (store *workspaceStore) GetWorkspace(ctx context.Context, orgId int, ws *wo
 	}
 
 	return &workspace, nil
+}
+
+/// GetProjectList
+
+const listProjectsQuery = `
+SELECT 
+    p."id",
+    p."sid",
+    p."orgId",
+    p."workspaceId",
+    org."sid",
+    ws."sid",
+    p."name",
+    p."description",
+    p."visibility",
+    p."createdAt",
+    p."createdBy",
+    p."updatedAt",
+    p."updatedBy"
+FROM 
+    "system"."Project" AS p
+LEFT JOIN 
+    system."Organization" AS org ON org."id" = p."orgId"
+LEFT JOIN 
+    system."Workspace" AS ws ON ws."id" = p."workspaceId"
+WHERE
+    p."orgId" = @orgId
+AND
+    p."workspaceId" = @workspaceId	
+%s
+`
+
+func (store *workspaceStore) GetProjectList(ctx context.Context, visibility model.ScopeVisibility, orgId int, workspaceId int) ([]*project.Project, error) {
+	whereClause := ";"
+	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
+		whereClause = `AND p."visibility" = @visibility;`
+	}
+
+	finalQuery := fmt.Sprintf(listProjectsQuery, whereClause)
+
+	rows, err := store.Conn.Query(ctx, finalQuery, pgx.NamedArgs{
+		"orgId":       orgId,
+		"workspaceId": workspaceId,
+		"visibility":  visibility,
+	})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var projectList []*project.Project = []*project.Project{}
+
+	for rows.Next() {
+		var project project.Project
+		err := rows.Scan(
+			&project.Id,
+			&project.ScopedId,
+			&project.OrgId,
+			&project.WorkspaceId,
+			&project.OrgScopedId,
+			&project.WorkspaceScopedId,
+			&project.Name,
+			&project.Description,
+			&project.Visibility,
+			&project.CreatedAt,
+			&project.CreatedBy,
+			&project.UpdatedAt,
+			&project.UpdatedBy,
+		)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+			return nil, err
+		}
+
+		projectList = append(projectList, &project)
+	}
+
+	if err := rows.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+		return nil, err
+	}
+
+	return projectList, nil
 }
