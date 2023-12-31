@@ -2,10 +2,14 @@ package project
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
+	"github.com/quarkloop/quarkloop/pkg/service/quota"
+	"github.com/quarkloop/quarkloop/pkg/service/table_branch"
 )
 
 type Api interface {
+	GetProjectList(ctx *gin.Context)
 	GetProjectById(*gin.Context)
 	CreateProject(*gin.Context)
 	UpdateProjectById(*gin.Context)
@@ -14,10 +18,22 @@ type Api interface {
 
 type ProjectApi struct {
 	projectService project.Service
+
+	aclService    accesscontrol.Service
+	quotaService  quota.Service
+	branchService table_branch.Service
 }
 
-func NewProjectApi(service project.Service) *ProjectApi {
+func NewProjectApi(
+	service project.Service,
+	aclService accesscontrol.Service,
+	quotaService quota.Service,
+	branchService table_branch.Service,
+) *ProjectApi {
 	return &ProjectApi{
 		projectService: service,
+		aclService:     aclService,
+		quotaService:   quotaService,
+		branchService:  branchService,
 	}
 }
