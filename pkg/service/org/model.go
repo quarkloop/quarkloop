@@ -102,3 +102,13 @@ type GetProjectListUriParams struct {
 type GetProjectListQuery struct {
 	OrgId int
 }
+
+// GetUserList
+
+type GetUserListUriParams struct {
+	OrgId int `uri:"orgId" binding:"required"`
+}
+
+type GetUserListQuery struct {
+	OrgId int
+}
