@@ -108,3 +108,17 @@ type DeleteProjectByIdCommand struct {
 	WorkspaceId int
 	ProjectId   int
 }
+
+// GetUserList
+
+type GetUserListUriParams struct {
+	OrgId       int `uri:"orgId" binding:"required"`
+	WorkspaceId int `uri:"workspaceId" binding:"required"`
+	ProjectId   int `uri:"projectId" binding:"required"`
+}
+
+type GetUserListQuery struct {
+	OrgId       int
+	WorkspaceId int
+	ProjectId   int
+}
