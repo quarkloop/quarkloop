@@ -29,8 +29,7 @@ func (s *ProjectApi) CreateProject(ctx *gin.Context) {
 		return
 	}
 
-	// query service
-	ws, err := s.projectService.CreateProject(ctx, &project.CreateProjectCommand{
+	project, err := s.createProject(ctx, &project.CreateProjectCommand{
 		OrgId:       uriParams.OrgId,
 		WorkspaceId: uriParams.WorkspaceId,
 		Project:     cmd.Project,
@@ -40,7 +39,7 @@ func (s *ProjectApi) CreateProject(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, ws)
+	ctx.JSON(http.StatusCreated, project)
 }
 
 // PUT /orgs/:orgId/workspaces/:workspaceId/projects/:projectId
