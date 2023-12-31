@@ -112,3 +112,31 @@ func (s *WorkspaceApi) GetProjectList(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, &projectList)
 }
+
+// GET /orgs/:orgId/workspaces/:workspaceId/users
+//
+// Get workspace user list.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
+
+func (s *WorkspaceApi) GetUserList(ctx *gin.Context) {
+	uriParams := &workspace.GetUserListUriParams{}
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
+		return
+	}
+
+	// query service
+	userList, err := s.workspaceService.GetUserList(ctx, &workspace.GetUserListQuery{
+		OrgId:       uriParams.OrgId,
+		WorkspaceId: uriParams.WorkspaceId,
+	})
+	if err != nil {
+		api.AbortWithInternalServerErrorJSON(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, &userList)
+}
