@@ -109,3 +109,30 @@ func (s *OrgApi) GetProjectList(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, &projectList)
 }
+
+// GET /orgs/:orgId/users
+//
+// Get organization user list.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
+
+func (s *OrgApi) GetUserList(ctx *gin.Context) {
+	uriParams := &org.GetUserListUriParams{}
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		api.AbortWithBadRequestJSON(ctx, err)
+		return
+	}
+
+	// query service
+	userList, err := s.orgService.GetUserList(ctx, &org.GetUserListQuery{
+		OrgId: uriParams.OrgId,
+	})
+	if err != nil {
+		api.AbortWithInternalServerErrorJSON(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, &userList)
+}
