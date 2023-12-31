@@ -17,6 +17,9 @@ type Api interface {
 
 	// project
 	GetProjectList(*gin.Context)
+
+	// user
+	GetUserList(*gin.Context)
 }
 
 type WorkspaceApi struct {
