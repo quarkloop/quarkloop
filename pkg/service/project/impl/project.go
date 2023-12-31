@@ -148,63 +148,11 @@ func (s *projectService) GetProjectById(ctx *gin.Context, query *project.GetProj
 // }
 
 func (s *projectService) CreateProject(ctx *gin.Context, cmd *project.CreateProjectCommand) (*project.Project, error) {
-	if contextdata.IsUserAnonymous(ctx) {
-		return nil, errors.New("not authorized")
-	}
-
-	user := contextdata.GetUser(ctx)
-	scope := contextdata.GetScope(ctx)
-
-	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectCreate, &accesscontrol.EvaluateFilterParams{
-		UserId:      user.GetId(),
-		OrgId:       scope.OrgId(),
-		WorkspaceId: scope.WorkspaceId(),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	// check quotas
-	if err := s.quotaService.CheckCreateProjectQuotaReached(ctx, &quota.CheckCreateProjectQuotaReachedQuery{OrgId: cmd.OrgId}); err != nil {
-		return nil, err
-	}
-
 	p, err := s.store.CreateProject(ctx, cmd.OrgId, cmd.WorkspaceId, &cmd.Project)
 	if err != nil {
 		return nil, err
 	}
 	p.GeneratePath()
-
-	mainBranch, err := s.branchService.CreateTableBranch(ctx, &table_branch.CreateTableBranchParams{
-		ProjectId: p.Id,
-		Branch: &table_branch.TableBranch{
-			Name:        "main",
-			Type:        "main",
-			Default:     true,
-			Description: "main branch",
-			CreatedBy:   user.Name, // TODO
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-	p.Branches = append(p.Branches, mainBranch)
-
-	submissionBranch, err := s.branchService.CreateTableBranch(ctx, &table_branch.CreateTableBranchParams{
-		ProjectId: p.Id,
-		Branch: &table_branch.TableBranch{
-			Name:        "submission",
-			Type:        "submission",
-			Default:     false,
-			Description: "submission branch",
-			CreatedBy:   "user", // TODO
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-	p.Branches = append(p.Branches, submissionBranch)
 
 	return p, nil
 }
