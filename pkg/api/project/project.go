@@ -9,8 +9,12 @@ import (
 )
 
 type Api interface {
-	GetProjectList(ctx *gin.Context)
+	// query
 	GetProjectById(*gin.Context)
+	GetProjectList(*gin.Context)
+	GetUserList(*gin.Context)
+
+	// mutation
 	CreateProject(*gin.Context)
 	UpdateProjectById(*gin.Context)
 	DeleteProjectById(*gin.Context)
