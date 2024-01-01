@@ -9,6 +9,37 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
+// GET /orgs/:orgId/workspaces/:workspaceId/projects/:projectId
+//
+// Get project by id.
+//
+// Response status:
+// 200: StatusOK
+// 400: StatusBadRequest
+// 500: StatusInternalServerError
+
+func (s *ProjectApi) GetProjectById(ctx *gin.Context) {
+	uriParams := &project.GetProjectByIdUriParams{}
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	// query service
+	project, err := s.projectService.GetProjectById(ctx, &project.GetProjectByIdQuery{
+		OrgId:       uriParams.OrgId,
+		WorkspaceId: uriParams.WorkspaceId,
+		ProjectId:   uriParams.ProjectId,
+	})
+	if err != nil {
+		api.AbortWithInternalServerErrorJSON(ctx, err)
+		return
+	}
+
+	res := s.GetProjectById(ctx, query)
+	ctx.JSON(res.Status(), res.Body())
+}
+
 // GET /projects
 //
 // Get global project list.
@@ -29,36 +60,8 @@ func (s *ProjectApi) GetProjectList(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, &wsList)
-}
-
-// GET /orgs/:orgId/workspaces/:workspaceId/projects/:projectId
-//
-// Get project by id.
-//
-// Response status:
-// 200: StatusOK
-// 500: StatusInternalServerError
-
-func (s *ProjectApi) GetProjectById(ctx *gin.Context) {
-	uriParams := &project.GetProjectByIdUriParams{}
-	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
-		return
-	}
-
-	// query service
-	project, err := s.projectService.GetProjectById(ctx, &project.GetProjectByIdQuery{
-		OrgId:       uriParams.OrgId,
-		WorkspaceId: uriParams.WorkspaceId,
-		ProjectId:   uriParams.ProjectId,
-	})
-	if err != nil {
-		api.AbortWithInternalServerErrorJSON(ctx, err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, project)
+	res := s.GetProjectList(ctx, query)
+	ctx.JSON(res.Status(), res.Body())
 }
 
 // GET /orgs/:orgId/workspaces/:workspaceId/projects/:projectId/users
@@ -67,12 +70,13 @@ func (s *ProjectApi) GetProjectById(ctx *gin.Context) {
 //
 // Response status:
 // 200: StatusOK
+// 400: StatusBadRequest
 // 500: StatusInternalServerError
 
 func (s *ProjectApi) GetUserList(ctx *gin.Context) {
 	uriParams := &project.GetUserListUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
@@ -87,5 +91,6 @@ func (s *ProjectApi) GetUserList(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, &userList)
+	res := s.GetUserList(ctx, query)
+	ctx.JSON(res.Status(), res.Body())
 }
