@@ -3,6 +3,7 @@ package workspace
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
+	"github.com/quarkloop/quarkloop/pkg/service/user"
 )
 
 type Service interface {
@@ -17,4 +18,7 @@ type Service interface {
 
 	// project
 	GetProjectList(*gin.Context, *GetProjectListQuery) ([]*project.Project, error)
+
+	// user
+	GetUserList(*gin.Context, *GetUserListQuery) ([]*user.User, error)
 }
