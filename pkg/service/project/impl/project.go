@@ -46,7 +46,7 @@ func (s *projectService) GetProjectList(ctx *gin.Context, query *project.GetProj
 	scope := contextdata.GetScope(ctx)
 
 	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterQuery{
 		UserId: user.GetId(),
 		OrgId:  scope.OrgId(),
 	})
@@ -92,7 +92,7 @@ func (s *projectService) GetProjectById(ctx *gin.Context, query *project.GetProj
 		scope := contextdata.GetScope(ctx)
 
 		// check permissions
-		err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
+		err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterQuery{
 			UserId:      user.GetId(),
 			OrgId:       scope.OrgId(),
 			WorkspaceId: scope.WorkspaceId(),
@@ -130,7 +130,7 @@ func (s *projectService) GetProjectById(ctx *gin.Context, query *project.GetProj
 // 	if isPrivate {
 // 		// authorize signed-in user
 // 		user := contextdata.GetUser(ctx)
-// 		err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
+// 		err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterQuery{
 // 			OrgId:       cmd.OrgId,
 // 			WorkspaceId: cmd.Project.WorkspaceId,
 // 			ProjectId:   cmd.Project.Id,
@@ -166,7 +166,7 @@ func (s *projectService) UpdateProjectById(ctx *gin.Context, cmd *project.Update
 	scope := contextdata.GetScope(ctx)
 
 	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectUpdate, &accesscontrol.EvaluateFilterParams{
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectUpdate, &accesscontrol.EvaluateFilterQuery{
 		UserId:      user.GetId(),
 		OrgId:       scope.OrgId(),
 		WorkspaceId: scope.WorkspaceId(),
@@ -188,7 +188,7 @@ func (s *projectService) DeleteProjectById(ctx *gin.Context, cmd *project.Delete
 	scope := contextdata.GetScope(ctx)
 
 	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectDelete, &accesscontrol.EvaluateFilterParams{
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectDelete, &accesscontrol.EvaluateFilterQuery{
 		UserId:      user.GetId(),
 		OrgId:       scope.OrgId(),
 		WorkspaceId: scope.WorkspaceId(),
