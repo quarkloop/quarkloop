@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/quarkloop/quarkloop/pkg/api"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 )
 
@@ -15,23 +14,18 @@ import (
 //
 // Response status:
 // 201: StatusCreated
+// 400: StatusBadRequest
 // 500: StatusInternalServerError
 
 func (s *OrgApi) CreateOrg(ctx *gin.Context) {
 	cmd := &org.CreateOrgCommand{}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	// query service
-	org, err := s.orgService.CreateOrg(ctx, cmd)
-	if err != nil {
-		api.AbortWithInternalServerErrorJSON(ctx, err)
-		return
-	}
-
-	ctx.JSON(http.StatusCreated, org)
+	res := s.createOrg(ctx, cmd)
+	ctx.JSON(res.Status(), res.Body())
 }
 
 // PUT /orgs/:orgId
@@ -40,32 +34,24 @@ func (s *OrgApi) CreateOrg(ctx *gin.Context) {
 //
 // Response status:
 // 200: StatusOK
+// 400: StatusBadRequest
 // 500: StatusInternalServerError
 
 func (s *OrgApi) UpdateOrgById(ctx *gin.Context) {
 	uriParams := &org.UpdateOrgByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	cmd := &org.UpdateOrgByIdCommand{}
+	cmd := &org.UpdateOrgByIdCommand{OrgId: uriParams.OrgId}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	// query service
-	err := s.orgService.UpdateOrgById(ctx, &org.UpdateOrgByIdCommand{
-		OrgId: uriParams.OrgId,
-		Org:   cmd.Org,
-	})
-	if err != nil {
-		api.AbortWithInternalServerErrorJSON(ctx, err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, nil)
+	res := s.updateOrgById(ctx, cmd)
+	ctx.JSON(res.Status(), res.Body())
 }
 
 // DELETE /orgs/:orgId
@@ -74,23 +60,16 @@ func (s *OrgApi) UpdateOrgById(ctx *gin.Context) {
 //
 // Response status:
 // 204: StatusNoContent
+// 400: StatusBadRequest
 // 500: StatusInternalServerError
 
 func (s *OrgApi) DeleteOrgById(ctx *gin.Context) {
 	uriParams := &org.DeleteOrgByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	// query service
-	err := s.orgService.DeleteOrgById(ctx, &org.DeleteOrgByIdCommand{
-		OrgId: uriParams.OrgId,
-	})
-	if err != nil {
-		api.AbortWithInternalServerErrorJSON(ctx, err)
-		return
-	}
-
-	ctx.JSON(http.StatusNoContent, nil)
+	res := s.deleteOrgById(ctx, uriParams.OrgId)
+	ctx.JSON(res.Status(), res.Body())
 }
