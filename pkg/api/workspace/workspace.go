@@ -6,20 +6,16 @@ import (
 )
 
 type Api interface {
-	// workspace
-	GetWorkspaceList(*gin.Context)
+	// query
 	GetWorkspaceById(*gin.Context)
-	// TODO: rewrite
-	// GetWorkspace(*gin.Context)
+	GetWorkspaceList(*gin.Context)
+	GetProjectList(*gin.Context)
+	GetUserList(*gin.Context)
+
+	// mutation
 	CreateWorkspace(*gin.Context)
 	UpdateWorkspaceById(*gin.Context)
 	DeleteWorkspaceById(*gin.Context)
-
-	// project
-	GetProjectList(*gin.Context)
-
-	// user
-	GetUserList(*gin.Context)
 }
 
 type WorkspaceApi struct {
