@@ -4,7 +4,7 @@ import "context"
 
 type Service interface {
 	// access control
-	Evaluate(ctx context.Context, permission string, p *EvaluateFilterParams) error
+	Evaluate(ctx context.Context, permission string, p *EvaluateFilterQuery) error
 	ListUserAccesses(ctx context.Context, orgId int) ([]UserAssignment, error)
 	GetUserAccessById(ctx context.Context, userAssignmentId int) (*UserAssignment, error)
 	GrantUserAccess(ctx context.Context, orgId int, userRole *UserAssignment) (*UserAssignment, error)
