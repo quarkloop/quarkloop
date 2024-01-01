@@ -38,7 +38,7 @@ func (s *workspaceService) GetWorkspaceList(ctx *gin.Context, query *workspace.G
 	scope := contextdata.GetScope(ctx)
 
 	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterQuery{
 		UserId: user.GetId(),
 		OrgId:  scope.OrgId(),
 	})
@@ -84,7 +84,7 @@ func (s *workspaceService) GetWorkspaceById(ctx *gin.Context, query *workspace.G
 		scope := contextdata.GetScope(ctx)
 
 		// check permissions
-		err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
+		err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterQuery{
 			UserId:      user.GetId(),
 			OrgId:       scope.OrgId(),
 			WorkspaceId: query.WorkspaceId,
@@ -122,7 +122,7 @@ func (s *workspaceService) CreateWorkspace(ctx *gin.Context, cmd *workspace.Crea
 	user := contextdata.GetUser(ctx)
 
 	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceCreate, &accesscontrol.EvaluateFilterParams{
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceCreate, &accesscontrol.EvaluateFilterQuery{
 		OrgId:  cmd.OrgId,
 		UserId: user.GetId(),
 	})
@@ -153,7 +153,7 @@ func (s *workspaceService) UpdateWorkspaceById(ctx *gin.Context, cmd *workspace.
 	scope := contextdata.GetScope(ctx)
 
 	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceUpdate, &accesscontrol.EvaluateFilterParams{
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceUpdate, &accesscontrol.EvaluateFilterQuery{
 		UserId:      user.GetId(),
 		OrgId:       scope.OrgId(),
 		WorkspaceId: cmd.WorkspaceId,
@@ -174,7 +174,7 @@ func (s *workspaceService) DeleteWorkspaceById(ctx *gin.Context, cmd *workspace.
 	scope := contextdata.GetScope(ctx)
 
 	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceDelete, &accesscontrol.EvaluateFilterParams{
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceDelete, &accesscontrol.EvaluateFilterQuery{
 		UserId:      user.GetId(),
 		OrgId:       scope.OrgId(),
 		WorkspaceId: cmd.WorkspaceId,
@@ -196,7 +196,7 @@ func (s *workspaceService) GetProjectList(ctx *gin.Context, query *workspace.Get
 	scope := contextdata.GetScope(ctx)
 
 	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterQuery{
 		UserId:      user.GetId(),
 		OrgId:       scope.OrgId(),
 		WorkspaceId: scope.WorkspaceId(),
