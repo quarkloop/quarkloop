@@ -135,7 +135,7 @@ type Permission struct {
 	UpdatedBy *string    `json:"updatedBy,omitempty"`
 }
 
-type EvaluateFilterParams struct {
+type EvaluateFilterQuery struct {
 	OrgId, WorkspaceId, ProjectId, UserId int
 }
 
