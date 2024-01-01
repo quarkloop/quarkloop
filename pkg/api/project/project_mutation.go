@@ -14,18 +14,19 @@ import (
 //
 // Response status:
 // 201: StatusCreated
+// 400: StatusBadRequest
 // 500: StatusInternalServerError
 
 func (s *ProjectApi) CreateProject(ctx *gin.Context) {
 	uriParams := &project.CreateProjectUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
 	cmd := &project.CreateProjectCommand{}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
@@ -39,7 +40,8 @@ func (s *ProjectApi) CreateProject(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, project)
+	res := s.CreateProject(ctx, cmd)
+	ctx.JSON(res.Status(), res.Body())
 }
 
 // PUT /orgs/:orgId/workspaces/:workspaceId/projects/:projectId
@@ -48,18 +50,19 @@ func (s *ProjectApi) CreateProject(ctx *gin.Context) {
 //
 // Response status:
 // 200: StatusOK
+// 400: StatusBadRequest
 // 500: StatusInternalServerError
 
 func (s *ProjectApi) UpdateProjectById(ctx *gin.Context) {
 	uriParams := &project.UpdateProjectByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
 	cmd := &project.UpdateProjectByIdCommand{}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
@@ -75,7 +78,8 @@ func (s *ProjectApi) UpdateProjectById(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, nil)
+	res := s.UpdateProjectById(ctx, cmd)
+	ctx.JSON(res.Status(), res.Body())
 }
 
 // DELETE /orgs/:orgId/workspaces/:workspaceId/projects/:projectId
@@ -84,12 +88,13 @@ func (s *ProjectApi) UpdateProjectById(ctx *gin.Context) {
 //
 // Response status:
 // 204: StatusNoContent
+// 400: StatusBadRequest
 // 500: StatusInternalServerError
 
 func (s *ProjectApi) DeleteProjectById(ctx *gin.Context) {
 	uriParams := &project.DeleteProjectByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
@@ -104,5 +109,6 @@ func (s *ProjectApi) DeleteProjectById(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusNoContent, nil)
+	res := s.DeleteProjectById(ctx, cmd)
+	ctx.JSON(res.Status(), res.Body())
 }
