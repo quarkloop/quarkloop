@@ -5,33 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/quarkloop/quarkloop/pkg/api"
-	"github.com/quarkloop/quarkloop/pkg/contextdata"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 )
-
-// GET /orgs
-//
-// Get global organization list.
-//
-// Response status:
-// 200: StatusOK
-// 500: StatusInternalServerError
-
-func (s *OrgApi) GetOrgList(ctx *gin.Context) {
-	user := contextdata.GetUser(ctx)
-
-	// query service
-	orgList, err := s.orgService.GetOrgList(ctx, &org.GetOrgListQuery{
-		UserId: user.GetId(), // TODO
-	})
-	if err != nil {
-		api.AbortWithInternalServerErrorJSON(ctx, err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, &orgList)
-}
 
 // GET /orgs/:orgId
 //
@@ -39,49 +14,53 @@ func (s *OrgApi) GetOrgList(ctx *gin.Context) {
 //
 // Response status:
 // 200: StatusOK
+// 400: StatusBadRequest
 // 500: StatusInternalServerError
 
 func (s *OrgApi) GetOrgById(ctx *gin.Context) {
 	uriParams := &org.GetOrgByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	// query service
-	org, err := s.orgService.GetOrgById(ctx, &org.GetOrgByIdQuery{
-		OrgId: uriParams.OrgId,
-	})
-	if err != nil {
-		api.AbortWithInternalServerErrorJSON(ctx, err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, org)
+	res := s.getOrgById(ctx, uriParams.OrgId)
+	ctx.JSON(res.Status(), res.Body())
 }
 
-// type GetOrgQueryParams struct {
-// 	org.Org
-// }
+// GET /orgs
+//
+// Get global organization list.
+//
+// Response status:
+// 200: StatusOK
+// 400: StatusBadRequest
+// 500: StatusInternalServerError
 
-// func (s *OrgApi) GetOrg(ctx *gin.Context) {
-// 	queryParams := &GetOrgQueryParams{}
-// 	if err := ctx.ShouldBindQuery(queryParams); err != nil {
-// 		api.AbortWithBadRequestJSON(ctx, err)
-// 		return
-// 	}
+func (s *OrgApi) GetOrgList(ctx *gin.Context) {
+	res := s.getOrgList(ctx)
+	ctx.JSON(res.Status(), res.Body())
+}
 
-// 	// query service
-// 	org, err := s.orgService.GetOrg(ctx, &org.GetOrgQuery{
-// 		Org: queryParams.Org,
-// 	})
-// 	if err != nil {
-// 		api.AbortWithInternalServerErrorJSON(ctx, err)
-// 		return
-// 	}
+// GET /orgs/:orgId/workspaces
+//
+// Get organization workspace list.
+//
+// Response status:
+// 200: StatusOK
+// 400: StatusBadRequest
+// 500: StatusInternalServerError
 
-// 	ctx.JSON(http.StatusOK, org)
-// }
+func (s *OrgApi) GetWorkspaceList(ctx *gin.Context) {
+	uriParams := &org.GetWorkspaceListUriParams{}
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	res := s.getWorkspaceList(ctx, uriParams.OrgId)
+	ctx.JSON(res.Status(), res.Body())
+}
 
 // GET /orgs/:orgId/projects
 //
@@ -89,25 +68,18 @@ func (s *OrgApi) GetOrgById(ctx *gin.Context) {
 //
 // Response status:
 // 200: StatusOK
+// 400: StatusBadRequest
 // 500: StatusInternalServerError
 
 func (s *OrgApi) GetProjectList(ctx *gin.Context) {
 	uriParams := &org.GetProjectListUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	// query service
-	projectList, err := s.orgService.GetProjectList(ctx, &org.GetProjectListQuery{
-		OrgId: uriParams.OrgId,
-	})
-	if err != nil {
-		api.AbortWithInternalServerErrorJSON(ctx, err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, &projectList)
+	res := s.getProjectList(ctx, uriParams.OrgId)
+	ctx.JSON(res.Status(), res.Body())
 }
 
 // GET /orgs/:orgId/users
@@ -116,23 +88,16 @@ func (s *OrgApi) GetProjectList(ctx *gin.Context) {
 //
 // Response status:
 // 200: StatusOK
+// 400: StatusBadRequest
 // 500: StatusInternalServerError
 
 func (s *OrgApi) GetUserList(ctx *gin.Context) {
 	uriParams := &org.GetUserListUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		api.AbortWithBadRequestJSON(ctx, err)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	// query service
-	userList, err := s.orgService.GetUserList(ctx, &org.GetUserListQuery{
-		OrgId: uriParams.OrgId,
-	})
-	if err != nil {
-		api.AbortWithInternalServerErrorJSON(ctx, err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, &userList)
+	res := s.getUserList(ctx, uriParams.OrgId)
+	ctx.JSON(res.Status(), res.Body())
 }
