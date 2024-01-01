@@ -37,7 +37,8 @@ func (o *Org) GeneratePath() {
 // GetOrgList
 
 type GetOrgListQuery struct {
-	UserId int
+	UserId     int
+	Visibility model.ScopeVisibility
 }
 
 // GetOrgById
@@ -100,7 +101,8 @@ type GetProjectListUriParams struct {
 }
 
 type GetProjectListQuery struct {
-	OrgId int
+	OrgId      int
+	Visibility model.ScopeVisibility
 }
 
 // GetUserList
