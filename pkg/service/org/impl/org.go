@@ -30,31 +30,7 @@ func NewOrgService(ds store.OrgStore, aclService accesscontrol.Service, quotaSer
 }
 
 func (s *orgService) GetOrgList(ctx *gin.Context, query *org.GetOrgListQuery) ([]*org.Org, error) {
-	if contextdata.IsUserAnonymous(ctx) {
-		// anonymous user => return public orgs
-		return s.getOrgList(ctx, model.PublicVisibility, query)
-	}
-
-	user := contextdata.GetUser(ctx)
-
-	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgRead, &accesscontrol.EvaluateFilterParams{
-		UserId: user.GetId(),
-	})
-	if err != nil {
-		if err == accesscontrol.ErrPermissionDenied {
-			// unauthorized user (permission denied) => return public orgs
-			return s.getOrgList(ctx, model.PublicVisibility, query)
-		}
-		return nil, err
-	}
-
-	// authorized user => return public + private orgs
-	return s.getOrgList(ctx, model.AllVisibility, query)
-}
-
-func (s *orgService) getOrgList(ctx *gin.Context, visibility model.ScopeVisibility, query *org.GetOrgListQuery) ([]*org.Org, error) {
-	orgList, err := s.store.GetOrgList(ctx, visibility, query.UserId)
+	orgList, err := s.store.GetOrgList(ctx, query.Visibility, query.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -63,6 +39,7 @@ func (s *orgService) getOrgList(ctx *gin.Context, visibility model.ScopeVisibili
 		org := orgList[i]
 		org.GeneratePath()
 	}
+
 	return orgList, nil
 }
 
@@ -72,31 +49,6 @@ func (s *orgService) GetOrgById(ctx *gin.Context, query *org.GetOrgByIdQuery) (*
 		return nil, err
 	}
 
-	isPrivate := *o.Visibility == model.PrivateVisibility
-
-	// anonymous user => return org not found error
-	if isPrivate && contextdata.IsUserAnonymous(ctx) {
-		return nil, org.ErrOrgNotFound
-	}
-	if isPrivate {
-		user := contextdata.GetUser(ctx)
-
-		// check permissions
-		err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgRead, &accesscontrol.EvaluateFilterParams{
-			UserId: user.GetId(),
-			OrgId:  query.OrgId,
-		})
-		if err != nil {
-			if err == accesscontrol.ErrPermissionDenied {
-				// unauthorized user (permission denied) => return org not found error
-				return nil, org.ErrOrgNotFound
-			}
-			return nil, err
-		}
-	}
-
-	// anonymous and unauthorized user => return public org
-	// authorized user => return public or private org
 	o.GeneratePath()
 	return o, nil
 }
@@ -120,7 +72,7 @@ func (s *orgService) CreateOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) (*or
 	scope := contextdata.GetScope(ctx)
 
 	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgCreate, &accesscontrol.EvaluateFilterParams{
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgCreate, &accesscontrol.EvaluateFilterQuery{
 		OrgId:  scope.OrgId(),
 		UserId: user.GetId(),
 	})
@@ -150,7 +102,7 @@ func (s *orgService) UpdateOrgById(ctx *gin.Context, cmd *org.UpdateOrgByIdComma
 	user := contextdata.GetUser(ctx)
 
 	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgUpdate, &accesscontrol.EvaluateFilterParams{
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgUpdate, &accesscontrol.EvaluateFilterQuery{
 		OrgId:  cmd.OrgId,
 		UserId: user.GetId(),
 	})
@@ -169,7 +121,7 @@ func (s *orgService) DeleteOrgById(ctx *gin.Context, cmd *org.DeleteOrgByIdComma
 	user := contextdata.GetUser(ctx)
 
 	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgDelete, &accesscontrol.EvaluateFilterParams{
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgDelete, &accesscontrol.EvaluateFilterQuery{
 		OrgId:  cmd.OrgId,
 		UserId: user.GetId(),
 	})
@@ -190,7 +142,7 @@ func (s *orgService) GetWorkspaceList(ctx *gin.Context, query *org.GetWorkspaceL
 	scope := contextdata.GetScope(ctx)
 
 	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceRead, &accesscontrol.EvaluateFilterParams{
+	err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceRead, &accesscontrol.EvaluateFilterQuery{
 		UserId: user.GetId(),
 		OrgId:  scope.OrgId(),
 	})
@@ -211,48 +163,25 @@ func (s *orgService) getWorkspaceList(ctx context.Context, visibility model.Scop
 	if err != nil {
 		return nil, err
 	}
+
 	for i := range workspaceList {
 		p := workspaceList[i]
 		p.GeneratePath()
 	}
+
 	return workspaceList, nil
 }
 
 func (s *orgService) GetProjectList(ctx *gin.Context, query *org.GetProjectListQuery) ([]*project.Project, error) {
-	if contextdata.IsUserAnonymous(ctx) {
-		// anonymous user => return public projects
-		return s.getProjectList(ctx, model.PublicVisibility, query)
-	}
-
-	user := contextdata.GetUser(ctx)
-	scope := contextdata.GetScope(ctx)
-
-	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterParams{
-		UserId:      user.GetId(),
-		OrgId:       scope.OrgId(),
-		WorkspaceId: scope.WorkspaceId(),
-	})
-	if err != nil {
-		if err == accesscontrol.ErrPermissionDenied {
-			// unauthorized user (permission denied) => return public projects
-			return s.getProjectList(ctx, model.PublicVisibility, query)
-		}
-		return nil, err
-	}
-
-	// authorized user => return public + private projects
-	return s.getProjectList(ctx, model.AllVisibility, query)
-}
-
-func (s *orgService) getProjectList(ctx context.Context, visibility model.ScopeVisibility, query *org.GetProjectListQuery) ([]*project.Project, error) {
-	projectList, err := s.store.GetProjectList(ctx, visibility, query.OrgId)
+	projectList, err := s.store.GetProjectList(ctx, query.Visibility, query.OrgId)
 	if err != nil {
 		return nil, err
 	}
+
 	for i := range projectList {
 		p := projectList[i]
 		p.GeneratePath()
 	}
+
 	return projectList, nil
 }
