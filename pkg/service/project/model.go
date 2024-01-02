@@ -45,7 +45,8 @@ func (p *Project) GeneratePath() {
 // GetProjectList
 
 type GetProjectListQuery struct {
-	UserId int
+	UserId     int
+	Visibility model.ScopeVisibility
 }
 
 // GetProjectById
