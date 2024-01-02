@@ -46,22 +46,22 @@ type GetQuotasByOrgIdQuery struct {
 	OrgId int
 }
 
-// CheckCreateOrgQuotaReached
-type CheckCreateOrgQuotaReachedQuery struct {
+// CheckCreateOrgQuota
+type CheckCreateOrgQuotaQuery struct {
 	UserId int
 }
 
-// CheckCreateOrgUserQuotaReached
-type CheckCreateOrgUserQuotaReachedQuery struct {
+// CheckCreateOrgUserQuota
+type CheckCreateOrgUserQuotaQuery struct {
 	OrgId int
 }
 
-// CheckCreateWorkspaceQuotaReached
-type CheckCreateWorkspaceQuotaReachedQuery struct {
+// CheckCreateWorkspaceQuota
+type CheckCreateWorkspaceQuotaQuery struct {
 	OrgId int
 }
 
-// CheckCreateProjectQuotaReached
-type CheckCreateProjectQuotaReachedQuery struct {
+// CheckCreateProjectQuota
+type CheckCreateProjectQuotaQuery struct {
 	OrgId int
 }
