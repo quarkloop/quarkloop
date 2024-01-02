@@ -91,7 +91,8 @@ type GetWorkspaceListUriParams struct {
 }
 
 type GetWorkspaceListQuery struct {
-	OrgId int
+	OrgId      int
+	Visibility model.ScopeVisibility
 }
 
 // GetProjectList
