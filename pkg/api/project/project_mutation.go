@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/quarkloop/quarkloop/pkg/api"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
@@ -24,23 +23,16 @@ func (s *ProjectApi) CreateProject(ctx *gin.Context) {
 		return
 	}
 
-	cmd := &project.CreateProjectCommand{}
+	cmd := &project.CreateProjectCommand{
+		OrgId:       uriParams.OrgId,
+		WorkspaceId: uriParams.WorkspaceId,
+	}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	project, err := s.createProject(ctx, &project.CreateProjectCommand{
-		OrgId:       uriParams.OrgId,
-		WorkspaceId: uriParams.WorkspaceId,
-		Project:     cmd.Project,
-	})
-	if err != nil {
-		api.AbortWithInternalServerErrorJSON(ctx, err)
-		return
-	}
-
-	res := s.CreateProject(ctx, cmd)
+	res := s.createProject(ctx, cmd)
 	ctx.JSON(res.Status(), res.Body())
 }
 
@@ -60,25 +52,17 @@ func (s *ProjectApi) UpdateProjectById(ctx *gin.Context) {
 		return
 	}
 
-	cmd := &project.UpdateProjectByIdCommand{}
+	cmd := &project.UpdateProjectByIdCommand{
+		OrgId:       uriParams.OrgId,
+		WorkspaceId: uriParams.WorkspaceId,
+		ProjectId:   uriParams.ProjectId,
+	}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	// query service
-	err := s.projectService.UpdateProjectById(ctx, &project.UpdateProjectByIdCommand{
-		OrgId:       uriParams.OrgId,
-		WorkspaceId: uriParams.WorkspaceId,
-		ProjectId:   uriParams.ProjectId,
-		Project:     cmd.Project,
-	})
-	if err != nil {
-		api.AbortWithInternalServerErrorJSON(ctx, err)
-		return
-	}
-
-	res := s.UpdateProjectById(ctx, cmd)
+	res := s.updateProjectById(ctx, cmd)
 	ctx.JSON(res.Status(), res.Body())
 }
 
@@ -98,17 +82,11 @@ func (s *ProjectApi) DeleteProjectById(ctx *gin.Context) {
 		return
 	}
 
-	// query service
-	err := s.projectService.DeleteProjectById(ctx, &project.DeleteProjectByIdCommand{
+	cmd := &project.DeleteProjectByIdCommand{
 		OrgId:       uriParams.OrgId,
 		WorkspaceId: uriParams.WorkspaceId,
 		ProjectId:   uriParams.ProjectId,
-	})
-	if err != nil {
-		api.AbortWithInternalServerErrorJSON(ctx, err)
-		return
 	}
-
-	res := s.DeleteProjectById(ctx, cmd)
+	res := s.deleteProjectById(ctx, cmd)
 	ctx.JSON(res.Status(), res.Body())
 }
