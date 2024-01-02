@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/quarkloop/quarkloop/pkg/api"
-	"github.com/quarkloop/quarkloop/pkg/contextdata"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
@@ -25,18 +23,12 @@ func (s *ProjectApi) GetProjectById(ctx *gin.Context) {
 		return
 	}
 
-	// query service
-	project, err := s.projectService.GetProjectById(ctx, &project.GetProjectByIdQuery{
+	query := &project.GetProjectByIdQuery{
 		OrgId:       uriParams.OrgId,
 		WorkspaceId: uriParams.WorkspaceId,
 		ProjectId:   uriParams.ProjectId,
-	})
-	if err != nil {
-		api.AbortWithInternalServerErrorJSON(ctx, err)
-		return
 	}
-
-	res := s.GetProjectById(ctx, query)
+	res := s.getProjectById(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
 
@@ -49,18 +41,7 @@ func (s *ProjectApi) GetProjectById(ctx *gin.Context) {
 // 500: StatusInternalServerError
 
 func (s *ProjectApi) GetProjectList(ctx *gin.Context) {
-	user := contextdata.GetUser(ctx)
-
-	// query service
-	wsList, err := s.projectService.GetProjectList(ctx, &project.GetProjectListQuery{
-		UserId: user.GetId(),
-	})
-	if err != nil {
-		api.AbortWithInternalServerErrorJSON(ctx, err)
-		return
-	}
-
-	res := s.GetProjectList(ctx, query)
+	res := s.getProjectList(ctx)
 	ctx.JSON(res.Status(), res.Body())
 }
 
@@ -80,17 +61,11 @@ func (s *ProjectApi) GetUserList(ctx *gin.Context) {
 		return
 	}
 
-	// query service
-	userList, err := s.projectService.GetUserList(ctx, &project.GetUserListQuery{
+	query := &project.GetUserListQuery{
 		OrgId:       uriParams.OrgId,
 		WorkspaceId: uriParams.WorkspaceId,
 		ProjectId:   uriParams.ProjectId,
-	})
-	if err != nil {
-		api.AbortWithInternalServerErrorJSON(ctx, err)
-		return
 	}
-
-	res := s.GetUserList(ctx, query)
+	res := s.getUserList(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
