@@ -98,6 +98,6 @@ func (s *OrgApi) GetUserList(ctx *gin.Context) {
 		return
 	}
 
-	res := s.getUserList(ctx, uriParams.OrgId)
+	res := s.getUserList(ctx, &org.GetUserListQuery{OrgId: uriParams.OrgId})
 	ctx.JSON(res.Status(), res.Body())
 }
