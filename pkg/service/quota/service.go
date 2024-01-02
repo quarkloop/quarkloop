@@ -7,10 +7,10 @@ type Service interface {
 	GetQuotasByUserId(context.Context, *GetQuotasByUserIdQuery) (Quota, error)
 	GetQuotasByOrgId(context.Context, *GetQuotasByOrgIdQuery) ([]Quota, error)
 
-	CheckCreateOrgQuotaReached(context.Context, *CheckCreateOrgQuotaReachedQuery) error
-	CheckCreateOrgUserQuotaReached(context.Context, *CheckCreateOrgUserQuotaReachedQuery) error
-	CheckCreateWorkspaceQuotaReached(context.Context, *CheckCreateWorkspaceQuotaReachedQuery) error
-	CheckCreateProjectQuotaReached(context.Context, *CheckCreateProjectQuotaReachedQuery) error
+	CheckCreateOrgQuota(context.Context, *CheckCreateOrgQuotaQuery) error
+	CheckCreateOrgUserQuota(context.Context, *CheckCreateOrgUserQuotaQuery) error
+	CheckCreateWorkspaceQuota(context.Context, *CheckCreateWorkspaceQuotaQuery) error
+	CheckCreateProjectQuota(context.Context, *CheckCreateProjectQuotaQuery) error
 
 	// overrides
 	// OverrideOrgUserQuotaLimit(context.Context, int) error
