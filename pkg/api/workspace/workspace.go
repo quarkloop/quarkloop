@@ -2,6 +2,8 @@ package workspace
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
+	"github.com/quarkloop/quarkloop/pkg/service/quota"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
@@ -20,10 +22,14 @@ type Api interface {
 
 type WorkspaceApi struct {
 	workspaceService workspace.Service
+	aclService       accesscontrol.Service
+	quotaService     quota.Service
 }
 
-func NewWorkspaceApi(service workspace.Service) *WorkspaceApi {
+func NewWorkspaceApi(service workspace.Service, aclService accesscontrol.Service, quotaService quota.Service) *WorkspaceApi {
 	return &WorkspaceApi{
 		workspaceService: service,
+		aclService:       aclService,
+		quotaService:     quotaService,
 	}
 }
