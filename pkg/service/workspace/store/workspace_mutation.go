@@ -44,22 +44,22 @@ RETURNING
     "updatedBy";
 `
 
-func (store *workspaceStore) CreateWorkspace(ctx context.Context, orgId int, ws *workspace.Workspace) (*workspace.Workspace, error) {
-	if ws.ScopeId == "" {
+func (store *workspaceStore) CreateWorkspace(ctx context.Context, cmd *workspace.CreateWorkspaceCommand) (*workspace.Workspace, error) {
+	if cmd.ScopeId == "" {
 		sid, err := gonanoid.New()
 		if err != nil {
 			return nil, err
 		}
-		ws.ScopeId = sid
+		cmd.ScopeId = sid
 	}
 
 	row := store.Conn.QueryRow(ctx, createWorkspaceMutation, pgx.NamedArgs{
-		"orgId":       orgId,
-		"sid":         ws.ScopeId,
-		"name":        ws.Name,
-		"description": ws.Description,
-		"visibility":  ws.Visibility,
-		"createdBy":   ws.CreatedBy,
+		"orgId":       cmd.OrgId,
+		"sid":         cmd.ScopeId,
+		"name":        cmd.Name,
+		"description": cmd.Description,
+		"visibility":  cmd.Visibility,
+		"createdBy":   cmd.CreatedBy,
 	})
 
 	var workspace workspace.Workspace
@@ -96,18 +96,21 @@ SET
     "updatedAt"   = @updatedAt,
     "updatedBy"   = @updatedBy,
 WHERE
-    "id" = @id;
+    "id" = @id
+AND
+    "orgId" = @orgId;
 `
 
-func (store *workspaceStore) UpdateWorkspaceById(ctx context.Context, workspaceId int, workspace *workspace.Workspace) error {
+func (store *workspaceStore) UpdateWorkspaceById(ctx context.Context, cmd *workspace.UpdateWorkspaceByIdCommand) error {
 	commandTag, err := store.Conn.Exec(ctx, updateWorkspaceByIdMutation, pgx.NamedArgs{
-		"id":          workspaceId,
-		"sid":         workspace.ScopeId,
-		"name":        workspace.Name,
-		"description": workspace.Description,
-		"visibility":  *workspace.Visibility,
+		"orgId":       cmd.OrgId,
+		"id":          cmd.WorkspaceId,
+		"sid":         cmd.ScopeId,
+		"name":        cmd.Name,
+		"description": cmd.Description,
+		"visibility":  cmd.Visibility,
+		"updatedBy":   cmd.UpdatedBy,
 		"updatedAt":   time.Now(),
-		"updatedBy":   workspace.UpdatedBy,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", err)
@@ -129,11 +132,16 @@ const deleteWorkspaceByIdMutation = `
 DELETE FROM
     "system"."Workspace"
 WHERE
-    "id" = @id;
+    "id" = @id
+AND
+    "orgId" = @orgId;	
 `
 
-func (store *workspaceStore) DeleteWorkspaceById(ctx context.Context, workspaceId int) error {
-	commandTag, err := store.Conn.Exec(ctx, deleteWorkspaceByIdMutation, pgx.NamedArgs{"id": workspaceId})
+func (store *workspaceStore) DeleteWorkspaceById(ctx context.Context, cmd *workspace.DeleteWorkspaceByIdCommand) error {
+	commandTag, err := store.Conn.Exec(ctx, deleteWorkspaceByIdMutation, pgx.NamedArgs{
+		"id":    cmd.WorkspaceId,
+		"orgId": cmd.OrgId,
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
 		return err
