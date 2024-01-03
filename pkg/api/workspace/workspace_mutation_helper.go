@@ -11,7 +11,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
-func (s *WorkspaceApi) createWorkspace(ctx *gin.Context, cmd *workspace.CreateWorkspaceCommand) api.Reponse {
+func (s *WorkspaceApi) createWorkspace(ctx *gin.Context, cmd *workspace.CreateWorkspaceCommand) api.Response {
 	// check permissions
 	if err := s.evaluateCreatePermission(ctx, accesscontrol.ActionWorkspaceCreate, cmd.OrgId); err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
@@ -31,7 +31,7 @@ func (s *WorkspaceApi) createWorkspace(ctx *gin.Context, cmd *workspace.CreateWo
 	return api.Success(http.StatusCreated, ws)
 }
 
-func (s *WorkspaceApi) updateWorkspaceById(ctx *gin.Context, cmd *workspace.UpdateWorkspaceByIdCommand) api.Reponse {
+func (s *WorkspaceApi) updateWorkspaceById(ctx *gin.Context, cmd *workspace.UpdateWorkspaceByIdCommand) api.Response {
 	// check permissions
 	if err := s.evaluatePermission(ctx, accesscontrol.ActionProjectUpdate, cmd.OrgId, cmd.WorkspaceId); err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
@@ -45,7 +45,7 @@ func (s *WorkspaceApi) updateWorkspaceById(ctx *gin.Context, cmd *workspace.Upda
 	return api.Success(http.StatusOK, nil)
 }
 
-func (s *WorkspaceApi) deleteWorkspaceById(ctx *gin.Context, cmd *workspace.DeleteWorkspaceByIdCommand) api.Reponse {
+func (s *WorkspaceApi) deleteWorkspaceById(ctx *gin.Context, cmd *workspace.DeleteWorkspaceByIdCommand) api.Response {
 	// check permissions
 	if err := s.evaluatePermission(ctx, accesscontrol.ActionProjectDelete, cmd.OrgId, cmd.WorkspaceId); err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
