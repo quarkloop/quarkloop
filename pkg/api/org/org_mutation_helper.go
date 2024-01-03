@@ -12,7 +12,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
 )
 
-func (s *OrgApi) createOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) api.Response {
+func (s *orgApi) createOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) api.Response {
 	// check permissions
 	if err := s.evaluateCreatePermission(ctx, accesscontrol.ActionOrgCreate); err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
@@ -33,7 +33,7 @@ func (s *OrgApi) createOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) api.Resp
 	return api.Success(http.StatusCreated, org)
 }
 
-func (s *OrgApi) updateOrgById(ctx *gin.Context, cmd *org.UpdateOrgByIdCommand) api.Response {
+func (s *orgApi) updateOrgById(ctx *gin.Context, cmd *org.UpdateOrgByIdCommand) api.Response {
 	// check permissions
 	if err := s.evaluatePermission(ctx, accesscontrol.ActionProjectUpdate, cmd.OrgId); err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
@@ -47,7 +47,7 @@ func (s *OrgApi) updateOrgById(ctx *gin.Context, cmd *org.UpdateOrgByIdCommand) 
 	return api.Success(http.StatusOK, nil)
 }
 
-func (s *OrgApi) deleteOrgById(ctx *gin.Context, orgId int) api.Response {
+func (s *orgApi) deleteOrgById(ctx *gin.Context, orgId int) api.Response {
 	// check permissions
 	if err := s.evaluatePermission(ctx, accesscontrol.ActionProjectDelete, orgId); err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
@@ -61,14 +61,14 @@ func (s *OrgApi) deleteOrgById(ctx *gin.Context, orgId int) api.Response {
 	return api.Success(http.StatusNoContent, nil)
 }
 
-func (s *OrgApi) evaluateCreatePermission(ctx *gin.Context, permission string) error {
+func (s *orgApi) evaluateCreatePermission(ctx *gin.Context, permission string) error {
 	user := contextdata.GetUser(ctx)
 	query := &accesscontrol.EvaluateFilterQuery{UserId: user.GetId()}
 
 	return s.aclService.Evaluate(ctx, permission, query)
 }
 
-func (s *OrgApi) evaluatePermission(ctx *gin.Context, permission string, orgId int) error {
+func (s *orgApi) evaluatePermission(ctx *gin.Context, permission string, orgId int) error {
 	user := contextdata.GetUser(ctx)
 	query := &accesscontrol.EvaluateFilterQuery{
 		UserId: user.GetId(),
