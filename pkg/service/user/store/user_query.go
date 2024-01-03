@@ -15,6 +15,7 @@ import (
 const getUserByIdQuery = `
 SELECT 
     "id",
+	"sid",
     "name",
     "email",
     "emailVerified",
@@ -39,6 +40,7 @@ func (store *orgStore) GetUserById(ctx context.Context, userId int) (*user.User,
 	var user user.User
 	err := row.Scan(
 		&user.Id,
+		&user.ScopeId,
 		&user.Name,
 		&user.Email,
 		&user.EmailVerified,
@@ -65,6 +67,7 @@ func (store *orgStore) GetUserById(ctx context.Context, userId int) (*user.User,
 const getUserByEmailQuery = `
 SELECT 
     "id",
+	"sid",
     "name",
     "email",
     "emailVerified",
@@ -89,6 +92,7 @@ func (store *orgStore) GetUserByEmail(ctx context.Context, email string) (*user.
 	var user user.User
 	err := row.Scan(
 		&user.Id,
+		&user.ScopeId,
 		&user.Name,
 		&user.Email,
 		&user.EmailVerified,
