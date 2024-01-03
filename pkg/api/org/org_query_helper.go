@@ -21,7 +21,7 @@ func (s *OrgApi) getOrgById(ctx *gin.Context, orgId int) api.Response {
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	isPrivate := *o.Visibility == model.PrivateVisibility
+	isPrivate := o.Visibility == model.PrivateVisibility
 
 	// anonymous user => return org not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
@@ -194,7 +194,7 @@ func (s *OrgApi) getMemberList(ctx *gin.Context, query *org.GetMemberListQuery) 
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	isPrivate := *o.Visibility == model.PrivateVisibility
+	isPrivate := o.Visibility == model.PrivateVisibility
 
 	// anonymous user => return org not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
