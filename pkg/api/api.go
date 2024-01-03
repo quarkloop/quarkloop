@@ -45,7 +45,7 @@ func AbortWithInternalServerErrorJSON(ctx *gin.Context, err error) {
 	ctx.AbortWithStatusJSON(http.StatusInternalServerError, response)
 }
 
-type Reponse interface {
+type Response interface {
 	Status() int
 	Body() any
 }
@@ -63,14 +63,14 @@ func (r *response) Body() any {
 	return r.body
 }
 
-func Error(status int, err error) Reponse {
+func Error(status int, err error) Response {
 	return &response{
 		status: status,
 		body:   err.Error(),
 	}
 }
 
-func Success(status int, message any) Reponse {
+func Success(status int, message any) Response {
 	return &response{
 		status: status,
 		body:   message,
