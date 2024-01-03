@@ -64,9 +64,16 @@ func (r *response) Body() any {
 }
 
 func Error(status int, err error) Response {
+	if err != nil {
+		return &response{
+			status: status,
+			body:   err.Error(),
+		}
+	}
+
 	return &response{
 		status: status,
-		body:   err.Error(),
+		body:   nil,
 	}
 }
 
