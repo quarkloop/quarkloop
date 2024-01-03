@@ -8,21 +8,15 @@ import (
 )
 
 type Service interface {
-	// org
-	GetOrgList(*gin.Context, *GetOrgListQuery) ([]*Org, error)
+	// query
 	GetOrgById(*gin.Context, *GetOrgByIdQuery) (*Org, error)
-	// TODO: rewrite
-	// GetOrg(context.Context, *GetOrgQuery) (*Org, error)
+	GetOrgList(*gin.Context, *GetOrgListQuery) ([]*Org, error)
+	GetWorkspaceList(*gin.Context, *GetWorkspaceListQuery) ([]*workspace.Workspace, error)
+	GetProjectList(*gin.Context, *GetProjectListQuery) ([]*project.Project, error)
+	GetUserAssignmentList(*gin.Context, *GetUserAssignmentListQuery) ([]*user.UserAssignment, error)
+
+	// mutation
 	CreateOrg(*gin.Context, *CreateOrgCommand) (*Org, error)
 	UpdateOrgById(*gin.Context, *UpdateOrgByIdCommand) error
 	DeleteOrgById(*gin.Context, *DeleteOrgByIdCommand) error
-
-	// workspace
-	GetWorkspaceList(*gin.Context, *GetWorkspaceListQuery) ([]*workspace.Workspace, error)
-
-	// project
-	GetProjectList(*gin.Context, *GetProjectListQuery) ([]*project.Project, error)
-
-	// user
-	GetUserList(*gin.Context, *GetUserListQuery) ([]*user.User, error)
 }
