@@ -5,6 +5,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
+	"github.com/quarkloop/quarkloop/pkg/service/user"
 )
 
 type Api interface {
@@ -13,7 +14,7 @@ type Api interface {
 	GetOrgList(*gin.Context)
 	GetWorkspaceList(*gin.Context)
 	GetProjectList(*gin.Context)
-	GetUserList(*gin.Context)
+	GetMemberList(*gin.Context)
 
 	// mutation
 	CreateOrg(*gin.Context)
@@ -22,14 +23,17 @@ type Api interface {
 }
 
 type OrgApi struct {
-	orgService   org.Service
+	orgService org.Service
+
+	userService  user.Service
 	aclService   accesscontrol.Service
 	quotaService quota.Service
 }
 
-func NewOrgApi(service org.Service, aclService accesscontrol.Service, quotaService quota.Service) *OrgApi {
+func NewOrgApi(service org.Service, userService user.Service, aclService accesscontrol.Service, quotaService quota.Service) *OrgApi {
 	return &OrgApi{
 		orgService:   service,
+		userService:  userService,
 		aclService:   aclService,
 		quotaService: quotaService,
 	}
