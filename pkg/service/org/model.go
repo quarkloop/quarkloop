@@ -14,20 +14,20 @@ var (
 
 type Org struct {
 	// id
-	Id      int    `json:"id" form:"id"`
+	Id      int    `json:"id"`
 	ScopeId string `json:"sid"`
 
 	// data
-	Name        string                 `json:"name,omitempty" form:"name,omitempty"`
-	Description string                 `json:"description,omitempty"`
-	Visibility  *model.ScopeVisibility `json:"visibility,omitempty" form:"visibility,omitempty"`
-	Path        string                 `json:"path,omitempty"`
+	Name        string                `json:"name"`
+	Description string                `json:"description"`
+	Visibility  model.ScopeVisibility `json:"visibility"`
+	Path        string                `json:"path"`
 
 	// history
-	CreatedAt time.Time  `json:"createdAt,omitempty" form:"createdAt,omitempty"`
-	UpdatedAt *time.Time `json:"updatedAt,omitempty" form:"updatedAt,omitempty"`
-	CreatedBy string     `json:"createdBy,omitempty"`
-	UpdatedBy *string    `json:"updatedBy,omitempty"`
+	CreatedAt time.Time  `json:"createdAt"`
+	CreatedBy string     `json:"createdBy"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+	UpdatedBy *string    `json:"updatedBy"`
 }
 
 func (o *Org) GeneratePath() {
@@ -51,16 +51,15 @@ type GetOrgByIdQuery struct {
 	OrgId int
 }
 
-// GetOrg
-
-// type GetOrgParams struct {
-// 	Org Org
-// }
-
 // CreateOrg
 
 type CreateOrgCommand struct {
-	Org
+	CreatedBy string
+
+	ScopeId     string                `json:"sid"`
+	Name        string                `json:"name"`
+	Description string                `json:"description,omitempty"`
+	Visibility  model.ScopeVisibility `json:"visibility"`
 }
 
 // UpdateOrgById
@@ -70,8 +69,13 @@ type UpdateOrgByIdUriParams struct {
 }
 
 type UpdateOrgByIdCommand struct {
-	OrgId int
-	Org
+	UpdatedBy string
+	OrgId     int
+
+	ScopeId     string                `json:"sid,omitempty"`
+	Name        string                `json:"name,omitempty"`
+	Description string                `json:"description,omitempty"`
+	Visibility  model.ScopeVisibility `json:"visibility,omitempty"`
 }
 
 // DeleteOrgById
