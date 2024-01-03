@@ -7,18 +7,14 @@ import (
 )
 
 type Service interface {
-	// workspace
-	GetWorkspaceList(*gin.Context, *GetWorkspaceListQuery) ([]*Workspace, error)
+	// query
 	GetWorkspaceById(*gin.Context, *GetWorkspaceByIdQuery) (*Workspace, error)
-	// TODO: rewrite
-	// GetWorkspace(context.Context, *GetWorkspaceQuery) (*Workspace, error)
+	GetWorkspaceList(*gin.Context, *GetWorkspaceListQuery) ([]*Workspace, error)
+	GetProjectList(*gin.Context, *GetProjectListQuery) ([]*project.Project, error)
+	GetUserAssignmentList(*gin.Context, *GetUserAssignmentListQuery) ([]*user.UserAssignment, error)
+
+	// mutation
 	CreateWorkspace(*gin.Context, *CreateWorkspaceCommand) (*Workspace, error)
 	UpdateWorkspaceById(*gin.Context, *UpdateWorkspaceByIdCommand) error
 	DeleteWorkspaceById(*gin.Context, *DeleteWorkspaceByIdCommand) error
-
-	// project
-	GetProjectList(*gin.Context, *GetProjectListQuery) ([]*project.Project, error)
-
-	// user
-	GetUserList(*gin.Context, *GetUserListQuery) ([]*user.User, error)
 }
