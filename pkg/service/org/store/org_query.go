@@ -35,8 +35,8 @@ WHERE
     "id" = @id;
 `
 
-func (store *orgStore) GetOrgById(ctx context.Context, orgId int) (*org.Org, error) {
-	row := store.Conn.QueryRow(ctx, getOrgByIdQuery, pgx.NamedArgs{"id": orgId})
+func (store *orgStore) GetOrgById(ctx context.Context, query *org.GetOrgByIdQuery) (*org.Org, error) {
+	row := store.Conn.QueryRow(ctx, getOrgByIdQuery, pgx.NamedArgs{"id": query.OrgId})
 
 	var org org.Org
 	err := row.Scan(
@@ -147,16 +147,16 @@ FROM
 %s	
 `
 
-// TODO: rewrite query
-func (store *orgStore) GetOrgList(ctx context.Context, visibility model.ScopeVisibility, userId int) ([]*org.Org, error) {
+// TODO: rewrite query, userId?
+func (store *orgStore) GetOrgList(ctx context.Context, query *org.GetOrgListQuery) ([]*org.Org, error) {
 	var finalQuery strings.Builder
-	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
+	if query.Visibility == model.PublicVisibility || query.Visibility == model.PrivateVisibility {
 		finalQuery.WriteString(fmt.Sprintf(listOrgsQuery, `WHERE "visibility" = @visibility;`))
 	} else {
 		finalQuery.WriteString(fmt.Sprintf(listOrgsQuery, ";"))
 	}
 
-	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{"visibility": visibility})
+	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{"visibility": query.Visibility})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
 		return nil, err
@@ -218,17 +218,17 @@ WHERE
 %s	
 `
 
-func (store *orgStore) GetWorkspaceList(ctx context.Context, visibility model.ScopeVisibility, orgId int) ([]*workspace.Workspace, error) {
+func (store *orgStore) GetWorkspaceList(ctx context.Context, query *org.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
 	var finalQuery strings.Builder
-	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
+	if query.Visibility == model.PublicVisibility || query.Visibility == model.PrivateVisibility {
 		finalQuery.WriteString(fmt.Sprintf(listWorkspacesQuery, `AND ws."visibility" = @visibility;`))
 	} else {
 		finalQuery.WriteString(fmt.Sprintf(listWorkspacesQuery, ";"))
 	}
 
 	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{
-		"orgId":      orgId,
-		"visibility": visibility,
+		"orgId":      query.OrgId,
+		"visibility": query.Visibility,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
@@ -295,17 +295,17 @@ WHERE
 %s
 `
 
-func (store *orgStore) GetProjectList(ctx context.Context, visibility model.ScopeVisibility, orgId int) ([]*project.Project, error) {
+func (store *orgStore) GetProjectList(ctx context.Context, query *org.GetProjectListQuery) ([]*project.Project, error) {
 	var finalQuery strings.Builder
-	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
+	if query.Visibility == model.PublicVisibility || query.Visibility == model.PrivateVisibility {
 		finalQuery.WriteString(fmt.Sprintf(listProjectsQuery, `AND p."visibility" = @visibility;`))
 	} else {
 		finalQuery.WriteString(fmt.Sprintf(listProjectsQuery, ";"))
 	}
 
 	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{
-		"orgId":      orgId,
-		"visibility": visibility,
+		"orgId":      query.OrgId,
+		"visibility": query.Visibility,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
@@ -371,8 +371,8 @@ GROUP BY
 ORDER BY id ASC;
 `
 
-func (store *orgStore) GetUserAssignmentList(ctx context.Context, orgId int) ([]*user.UserAssignment, error) {
-	rows, err := store.Conn.Query(ctx, getUserAssignmentListQuery, pgx.NamedArgs{"orgId": orgId})
+func (store *orgStore) GetUserAssignmentList(ctx context.Context, query *org.GetUserAssignmentListQuery) ([]*user.UserAssignment, error) {
+	rows, err := store.Conn.Query(ctx, getUserAssignmentListQuery, pgx.NamedArgs{"orgId": query.OrgId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
 		return nil, err
