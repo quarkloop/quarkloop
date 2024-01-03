@@ -22,10 +22,10 @@ type User struct {
 	Path          string     `json:"path,omitempty"`
 
 	// history
-	CreatedAt time.Time  `json:"createdAt,omitempty"`
-	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
-	CreatedBy string     `json:"createdBy,omitempty"`
-	UpdatedBy *string    `json:"updatedBy,omitempty"`
+	CreatedAt time.Time  `json:"createdAt"`
+	CreatedBy string     `json:"createdBy"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+	UpdatedBy *string    `json:"updatedBy"`
 }
 
 func (u *User) GetId() int {
@@ -71,10 +71,10 @@ type UserAssignment struct {
 	Role string `json:"role"`
 
 	// history
-	CreatedAt time.Time  `json:"createdAt,omitempty"`
-	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
-	CreatedBy string     `json:"createdBy,omitempty"`
-	UpdatedBy *string    `json:"updatedBy,omitempty"`
+	CreatedAt time.Time  `json:"createdAt"`
+	CreatedBy string     `json:"createdBy"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+	UpdatedBy *string    `json:"updatedBy"`
 }
 
 type MemberDTO struct {
