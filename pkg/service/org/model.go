@@ -14,8 +14,8 @@ var (
 
 type Org struct {
 	// id
-	Id       int    `json:"id" form:"id"`
-	ScopedId string `json:"sid"`
+	Id      int    `json:"id" form:"id"`
+	ScopeId string `json:"sid"`
 
 	// data
 	Name        string                 `json:"name,omitempty" form:"name,omitempty"`
@@ -31,7 +31,7 @@ type Org struct {
 }
 
 func (o *Org) GeneratePath() {
-	o.Path = fmt.Sprintf("/org/%s", o.ScopedId)
+	o.Path = fmt.Sprintf("/org/%s", o.ScopeId)
 }
 
 // GetOrgList
@@ -106,12 +106,18 @@ type GetProjectListQuery struct {
 	Visibility model.ScopeVisibility
 }
 
-// GetUserList
+// GetMemberList
 
-type GetUserListUriParams struct {
+type GetMemberListUriParams struct {
 	OrgId int `uri:"orgId" binding:"required"`
 }
 
-type GetUserListQuery struct {
+type GetMemberListQuery struct {
+	OrgId int
+}
+
+// GetUserAssignmentList
+
+type GetUserAssignmentListQuery struct {
 	OrgId int
 }
