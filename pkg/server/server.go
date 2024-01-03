@@ -19,6 +19,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/contextdata"
 	acl_impl "github.com/quarkloop/quarkloop/pkg/service/accesscontrol/impl"
 	acl_store "github.com/quarkloop/quarkloop/pkg/service/accesscontrol/store"
+	orgService "github.com/quarkloop/quarkloop/pkg/service/org"
 	org_impl "github.com/quarkloop/quarkloop/pkg/service/org/impl"
 	org_store "github.com/quarkloop/quarkloop/pkg/service/org/store"
 	project_impl "github.com/quarkloop/quarkloop/pkg/service/project/impl"
@@ -43,6 +44,8 @@ import (
 type Server struct {
 	router    *gin.Engine
 	dataStore *repository.Repository
+
+	orgService orgService.Service
 
 	orgApi       org.Api
 	workspaceApi workspace.Api
@@ -98,6 +101,8 @@ func NewDefaultServer(ds *repository.Repository) Server {
 		router:    router,
 		dataStore: ds,
 
+		orgService: orgService,
+
 		orgApi:       org.NewOrgApi(orgService, userService, aclService, quotaService),
 		workspaceApi: workspace.NewWorkspaceApi(workspaceService, userService, aclService, quotaService),
 		projectApi:   project.NewProjectApi(projectTableService, userService, aclService, quotaService, tableBranchService),
@@ -119,20 +124,20 @@ func (s *Server) UserAuth(ctx *gin.Context) {
 	client := http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		ctx.AbortWithError(resp.StatusCode, errors.New(resp.Status))
+		ctx.AbortWithStatusJSON(resp.StatusCode, errors.New(resp.Status))
 		return
 	}
 
 	u := &user.User{}
 	err = json.NewDecoder(resp.Body).Decode(u)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -143,16 +148,32 @@ func (s *Server) UserAuth(ctx *gin.Context) {
 
 func (s *Server) AbortAnonymousUserRequest(ctx *gin.Context) {
 	if contextdata.IsUserAnonymous(ctx) {
-		ctx.AbortWithError(http.StatusUnauthorized, errors.New("Unauthorized"))
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, errors.New("Unauthorized"))
 		return
 	}
 
 	ctx.Next()
 }
 
-func (s *Server) TestApi(ctx *gin.Context) {
-	u := contextdata.GetUser(ctx)
-	ctx.JSON(http.StatusOK, u)
+// TODO: rewrite
+func (s *Server) ValidateOrgIdUriParam(ctx *gin.Context) {
+	type OrgIdUriParam struct {
+		OrgId int `uri:"orgId" binding:"required"`
+	}
+
+	uriParam := &OrgIdUriParam{}
+	if err := ctx.ShouldBindUri(&uriParam); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	_, err := s.orgService.GetOrgById(ctx, &orgService.GetOrgByIdQuery{OrgId: uriParam.OrgId})
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusNotFound, "org not found")
+		return
+	}
+
+	ctx.Next()
 }
 
 func (s *Server) BindHandlers(api *api.ServerApi) {
@@ -160,20 +181,22 @@ func (s *Server) BindHandlers(api *api.ServerApi) {
 
 	testGroup := router.Group("/test")
 	testGroup.Use(s.UserAuth)
-	testGroup.GET("", s.TestApi)
 
-	// org apis
-	// org query
+	router.GET("/orgs", s.orgApi.GetOrgList)
+	router.GET("/workspaces", s.workspaceApi.GetWorkspaceList)
+	router.GET("/projects", s.projectApi.GetProjectList)
+
+	// org query apis
 	orgGroup := router.Group("/orgs")
 	orgGroup.Use(s.UserAuth)
+	//orgGroup.Use(s.ValidateOrgIdUriParam)
 	{
-		orgGroup.GET("", s.orgApi.GetOrgList)
 		orgGroup.GET("/:orgId", s.orgApi.GetOrgById)
-		// TODO: first must be a reserved name
-		// TODO: rewrite
-		// orgGroup.GET("/first", s.orgApi.GetOrg)
+		orgGroup.GET("/:orgId/workspaces", s.orgApi.GetWorkspaceList)
+		orgGroup.GET("/:orgId/projects", s.orgApi.GetProjectList)
+		orgGroup.GET("/:orgId/members", s.orgApi.GetMemberList)
 	}
-	// org mutation
+	// org mutation apis
 	orgMutationGroup := orgGroup.Group("")
 	orgMutationGroup.Use(s.AbortAnonymousUserRequest)
 	{
@@ -182,18 +205,15 @@ func (s *Server) BindHandlers(api *api.ServerApi) {
 		orgMutationGroup.DELETE("/:orgId", s.orgApi.DeleteOrgById)
 	}
 
-	// workspace apis
-	// workspace query
-	wsGroup := router.Group("/workspaces")
+	// workspace query apis
+	wsGroup := router.Group("/orgs/:orgId/workspaces")
 	wsGroup.Use(s.UserAuth)
 	{
-		wsGroup.GET("", s.workspaceApi.GetWorkspaceList)
 		wsGroup.GET("/:workspaceId", s.workspaceApi.GetWorkspaceById)
-		// TODO: first must be a reserved name
-		// TODO: rewrite
-		// wsGroup.GET("/first", s.workspaceApi.GetWorkspace)
+		wsGroup.GET("/:workspaceId/projects", s.workspaceApi.GetProjectList)
+		wsGroup.GET("/:workspaceId/members", s.workspaceApi.GetMemberList)
 	}
-	// workspace mutation
+	// workspace mutation apis
 	workspaceMutationGroup := wsGroup.Group("")
 	workspaceMutationGroup.Use(s.AbortAnonymousUserRequest)
 	{
@@ -202,15 +222,15 @@ func (s *Server) BindHandlers(api *api.ServerApi) {
 		workspaceMutationGroup.DELETE("/:workspaceId", s.workspaceApi.DeleteWorkspaceById)
 	}
 
-	// project apis
-	// project query
-	projectGroup := router.Group("/projects")
+	// project query apis
+	projectGroup := router.Group("/orgs/:orgId/workspaces/:workspaceId/projects")
 	projectGroup.Use(s.UserAuth)
 	{
-		projectGroup.GET("", s.projectApi.GetProjectList)
 		projectGroup.GET("/:projectId", s.projectApi.GetProjectById)
+		projectGroup.GET("/:projectId/projects", s.projectApi.GetProjectList)
+		projectGroup.GET("/:projectId/members", s.projectApi.GetMemberList)
 	}
-	// project mutation
+	// project mutation apis
 	projectMutationGroup := projectGroup.Group("")
 	projectMutationGroup.Use(s.AbortAnonymousUserRequest)
 	{
