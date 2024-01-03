@@ -14,22 +14,22 @@ var (
 
 type Workspace struct {
 	// id
-	Id         int    `json:"id" form:"id"`
+	Id         int    `json:"id"`
 	ScopeId    string `json:"sid"`
 	OrgId      int    `json:"orgId"`
 	OrgScopeId string `json:"orgScopeId"`
 
 	// data
-	Name        string                 `json:"name,omitempty" form:"name,omitempty"`
-	Description string                 `json:"description,omitempty"`
-	Visibility  *model.ScopeVisibility `json:"visibility,omitempty" form:"visibility,omitempty"`
-	Path        string                 `json:"path,omitempty"`
+	Name        string                `json:"name"`
+	Description string                `json:"description"`
+	Visibility  model.ScopeVisibility `json:"visibility"`
+	Path        string                `json:"path"`
 
 	// history
-	CreatedAt time.Time  `json:"createdAt,omitempty" form:"createdAt,omitempty"`
-	UpdatedAt *time.Time `json:"updatedAt,omitempty" form:"updatedAt,omitempty"`
-	CreatedBy string     `json:"createdBy,omitempty"`
-	UpdatedBy *string    `json:"updatedBy,omitempty"`
+	CreatedAt time.Time  `json:"createdAt"`
+	CreatedBy string     `json:"createdBy"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+	UpdatedBy *string    `json:"updatedBy"`
 }
 
 func (w *Workspace) GeneratePath() {
@@ -55,13 +55,6 @@ type GetWorkspaceByIdQuery struct {
 	WorkspaceId int
 }
 
-// GetWorkspace
-
-// type GetWorkspaceQuery struct {
-// 	OrgId     int
-// 	Workspace Workspace
-// }
-
 // CreateWorkspace
 
 type CreateWorkspaceUriParams struct {
@@ -69,8 +62,13 @@ type CreateWorkspaceUriParams struct {
 }
 
 type CreateWorkspaceCommand struct {
-	OrgId int
-	Workspace
+	OrgId     int
+	CreatedBy string
+
+	ScopeId     string                `json:"sid"`
+	Name        string                `json:"name"`
+	Description string                `json:"description,omitempty"`
+	Visibility  model.ScopeVisibility `json:"visibility"`
 }
 
 // UpdateWorkspaceById
@@ -83,7 +81,12 @@ type UpdateWorkspaceByIdUriParams struct {
 type UpdateWorkspaceByIdCommand struct {
 	OrgId       int
 	WorkspaceId int
-	Workspace
+	UpdatedBy   string
+
+	ScopeId     string                `json:"sid,omitempty"`
+	Name        string                `json:"name,omitempty"`
+	Description string                `json:"description,omitempty"`
+	Visibility  model.ScopeVisibility `json:"visibility,omitempty"`
 }
 
 // DeleteWorkspaceById
