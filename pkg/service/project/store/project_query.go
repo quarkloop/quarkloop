@@ -41,23 +41,23 @@ WHERE
 `
 
 // TODO: rewrite query
-func (store *projectStore) GetProjectList(ctx context.Context, visibility model.ScopeVisibility, userId int) ([]*project.Project, error) {
+func (store *projectStore) GetProjectList(ctx context.Context, query *project.GetProjectListQuery) ([]*project.Project, error) {
 	whereClause := []string{}
-	if len(orgId) != 0 {
-		whereClause = append(whereClause, `p."orgId" = ANY (@orgId)`)
-	}
-	if len(workspaceId) != 0 {
-		whereClause = append(whereClause, `p."workspaceId" = ANY (@workspaceId)`)
-	}
-	if visibility == model.PublicVisibility || visibility == model.PrivateVisibility {
+	// if len(orgId) != 0 {
+	// 	whereClause = append(whereClause, `p."orgId" = ANY (@orgId)`)
+	// }
+	// if len(workspaceId) != 0 {
+	// 	whereClause = append(whereClause, `p."workspaceId" = ANY (@workspaceId)`)
+	// }
+	if query.Visibility == model.PublicVisibility || query.Visibility == model.PrivateVisibility {
 		whereClause = append(whereClause, `p."visibility" = @visibility`)
 	}
 
 	finalQuery := fmt.Sprintf(listProjectsQuery, strings.Join(whereClause[:], " AND "))
 
 	rows, err := store.Conn.Query(ctx, finalQuery, pgx.NamedArgs{
-		"userId":     userId,
-		"visibility": visibility,
+		"userId":     query.UserId,
+		"visibility": query.Visibility,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
@@ -123,12 +123,21 @@ LEFT JOIN
     system."Organization" AS org ON org."id" = p."orgId"
 LEFT JOIN 
     system."Workspace" AS ws ON ws."id" = p."workspaceId"
-WHERE 
-    p."id" = @id;
+WHERE (
+	p."orgId" = @orgId
+	AND
+	p."workspaceId" = @workspaceId
+	AND
+	p."id" = @id
+);
 `
 
-func (store *projectStore) GetProjectById(ctx context.Context, projectId int) (*project.Project, error) {
-	row := store.Conn.QueryRow(ctx, getProjectByIdQuery, pgx.NamedArgs{"id": projectId})
+func (store *projectStore) GetProjectById(ctx context.Context, query *project.GetProjectByIdQuery) (*project.Project, error) {
+	row := store.Conn.QueryRow(ctx, getProjectByIdQuery, pgx.NamedArgs{
+		"orgId":       query.OrgId,
+		"workspaceId": query.WorkspaceId,
+		"id":          query.ProjectId,
+	})
 
 	var project project.Project
 	err := row.Scan(
@@ -268,11 +277,11 @@ GROUP BY
 ORDER BY id ASC;
 `
 
-func (store *projectStore) GetUserAssignmentList(ctx context.Context, orgId, workspaceId, projectId int) ([]*user.UserAssignment, error) {
+func (store *projectStore) GetUserAssignmentList(ctx context.Context, query *project.GetUserAssignmentListQuery) ([]*user.UserAssignment, error) {
 	rows, err := store.Conn.Query(ctx, getUserAssignmentListQuery, pgx.NamedArgs{
-		"orgId":       orgId,
-		"workspaceId": workspaceId,
-		"projectId":   projectId,
+		"orgId":       query.OrgId,
+		"workspaceId": query.WorkspaceId,
+		"projectId":   query.ProjectId,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
