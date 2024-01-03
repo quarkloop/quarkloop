@@ -22,7 +22,7 @@ type Api interface {
 	DeleteOrgById(*gin.Context)
 }
 
-type OrgApi struct {
+type orgApi struct {
 	orgService org.Service
 
 	userService  user.Service
@@ -30,11 +30,15 @@ type OrgApi struct {
 	quotaService quota.Service
 }
 
-func NewOrgApi(service org.Service, userService user.Service, aclService accesscontrol.Service, quotaService quota.Service) *OrgApi {
-	return &OrgApi{
+func NewOrgApi(service org.Service, userService user.Service, aclService accesscontrol.Service, quotaService quota.Service) *orgApi {
+	return &orgApi{
 		orgService:   service,
 		userService:  userService,
 		aclService:   aclService,
 		quotaService: quotaService,
 	}
+}
+
+func (api *orgApi) GetService() org.Service {
+	return api.orgService
 }
