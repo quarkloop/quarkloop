@@ -48,12 +48,12 @@ RETURNING
 `
 
 func (store *projectStore) CreateProject(ctx context.Context, orgId int, workspaceId int, p *project.Project) (*project.Project, error) {
-	if p.ScopedId == "" {
+	if p.ScopeId == "" {
 		sid, err := gonanoid.New()
 		if err != nil {
 			return nil, err
 		}
-		p.ScopedId = sid
+		p.ScopeId = sid
 	}
 
 	row := store.Conn.QueryRow(
@@ -62,7 +62,7 @@ func (store *projectStore) CreateProject(ctx context.Context, orgId int, workspa
 		pgx.NamedArgs{
 			"orgId":       orgId,
 			"workspaceId": workspaceId,
-			"sid":         p.ScopedId,
+			"sid":         p.ScopeId,
 			"name":        p.Name,
 			"description": p.Description,
 			"visibility":  p.Visibility,
@@ -73,7 +73,7 @@ func (store *projectStore) CreateProject(ctx context.Context, orgId int, workspa
 	var project project.Project
 	rowErr := row.Scan(
 		&project.Id,
-		&project.ScopedId,
+		&project.ScopeId,
 		&project.OrgId,
 		&project.WorkspaceId,
 		&project.Name,
@@ -111,7 +111,7 @@ func (store *projectStore) UpdateProjectById(ctx context.Context, projectId int,
 		updateProjectByIdMutation,
 		pgx.NamedArgs{
 			"id":          projectId,
-			"sid":         project.ScopedId,
+			"sid":         project.ScopeId,
 			"name":        project.Name,
 			"description": project.Description,
 			"updatedAt":   time.Now(),
