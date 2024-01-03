@@ -82,22 +82,22 @@ func (s *OrgApi) GetProjectList(ctx *gin.Context) {
 	ctx.JSON(res.Status(), res.Body())
 }
 
-// GET /orgs/:orgId/users
+// GET /orgs/:orgId/members
 //
-// Get organization user list.
+// Get organization member list.
 //
 // Response status:
 // 200: StatusOK
 // 400: StatusBadRequest
 // 500: StatusInternalServerError
 
-func (s *OrgApi) GetUserList(ctx *gin.Context) {
-	uriParams := &org.GetUserListUriParams{}
+func (s *OrgApi) GetMemberList(ctx *gin.Context) {
+	uriParams := &org.GetMemberListUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	res := s.getUserList(ctx, &org.GetUserListQuery{OrgId: uriParams.OrgId})
+	res := s.getMemberList(ctx, &org.GetMemberListQuery{OrgId: uriParams.OrgId})
 	ctx.JSON(res.Status(), res.Body())
 }
