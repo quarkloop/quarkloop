@@ -45,17 +45,17 @@ RETURNING
 `
 
 func (store *workspaceStore) CreateWorkspace(ctx context.Context, orgId int, ws *workspace.Workspace) (*workspace.Workspace, error) {
-	if ws.ScopedId == "" {
+	if ws.ScopeId == "" {
 		sid, err := gonanoid.New()
 		if err != nil {
 			return nil, err
 		}
-		ws.ScopedId = sid
+		ws.ScopeId = sid
 	}
 
 	row := store.Conn.QueryRow(ctx, createWorkspaceMutation, pgx.NamedArgs{
 		"orgId":       orgId,
-		"sid":         ws.ScopedId,
+		"sid":         ws.ScopeId,
 		"name":        ws.Name,
 		"description": ws.Description,
 		"visibility":  ws.Visibility,
@@ -65,7 +65,7 @@ func (store *workspaceStore) CreateWorkspace(ctx context.Context, orgId int, ws 
 	var workspace workspace.Workspace
 	rowErr := row.Scan(
 		&workspace.Id,
-		&workspace.ScopedId,
+		&workspace.ScopeId,
 		&workspace.OrgId,
 		&workspace.Name,
 		&workspace.Description,
@@ -102,7 +102,7 @@ WHERE
 func (store *workspaceStore) UpdateWorkspaceById(ctx context.Context, workspaceId int, workspace *workspace.Workspace) error {
 	commandTag, err := store.Conn.Exec(ctx, updateWorkspaceByIdMutation, pgx.NamedArgs{
 		"id":          workspaceId,
-		"sid":         workspace.ScopedId,
+		"sid":         workspace.ScopeId,
 		"name":        workspace.Name,
 		"description": workspace.Description,
 		"visibility":  *workspace.Visibility,
