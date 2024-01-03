@@ -84,10 +84,10 @@ type UserAssignment struct {
 	UserRoleId  int `json:"userRoleId"`
 
 	// history
-	CreatedAt time.Time  `json:"createdAt,omitempty"`
-	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
-	CreatedBy string     `json:"createdBy,omitempty"`
-	UpdatedBy *string    `json:"updatedBy,omitempty"`
+	CreatedAt time.Time  `json:"createdAt"`
+	CreatedBy string     `json:"createdBy"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+	UpdatedBy *string    `json:"updatedBy"`
 }
 
 type UserGroup struct {
@@ -100,10 +100,10 @@ type UserGroup struct {
 	Name string `json:"name,omitempty"`
 
 	// history
-	CreatedAt time.Time  `json:"createdAt,omitempty"`
-	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
-	CreatedBy string     `json:"createdBy,omitempty"`
-	UpdatedBy *string    `json:"updatedBy,omitempty"`
+	CreatedAt time.Time  `json:"createdAt"`
+	CreatedBy string     `json:"createdBy"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+	UpdatedBy *string    `json:"updatedBy"`
 }
 
 type UserRole struct {
@@ -115,10 +115,10 @@ type UserRole struct {
 	Name string `json:"name,omitempty"`
 
 	// history
-	CreatedAt time.Time  `json:"createdAt,omitempty"`
-	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
-	CreatedBy string     `json:"createdBy,omitempty"`
-	UpdatedBy *string    `json:"updatedBy,omitempty"`
+	CreatedAt time.Time  `json:"createdAt"`
+	CreatedBy string     `json:"createdBy"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+	UpdatedBy *string    `json:"updatedBy"`
 }
 
 type Permission struct {
@@ -129,10 +129,10 @@ type Permission struct {
 	Name string `json:"name,omitempty"`
 
 	// history
-	CreatedAt time.Time  `json:"createdAt,omitempty"`
-	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
-	CreatedBy string     `json:"createdBy,omitempty"`
-	UpdatedBy *string    `json:"updatedBy,omitempty"`
+	CreatedAt time.Time  `json:"createdAt"`
+	CreatedBy string     `json:"createdBy"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+	UpdatedBy *string    `json:"updatedBy"`
 }
 
 type EvaluateFilterQuery struct {
