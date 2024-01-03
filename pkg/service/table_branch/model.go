@@ -5,15 +5,17 @@ import (
 )
 
 type TableBranch struct {
-	Id          int        `json:"id,omitempty"`
-	Name        string     `json:"name,omitempty"`
-	Default     bool       `json:"default,omitempty"`
-	Type        string     `json:"type,omitempty"`
-	Description string     `json:"description,omitempty"`
-	CreatedAt   time.Time  `json:"createdAt,omitempty"`
-	UpdatedAt   *time.Time `json:"updatedAt,omitempty"`
-	CreatedBy   string     `json:"createdBy,omitempty"`
-	UpdatedBy   *string    `json:"updatedBy,omitempty"`
+	Id          int    `json:"id,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Default     bool   `json:"default,omitempty"`
+	Type        string `json:"type,omitempty"`
+	Description string `json:"description,omitempty"`
+
+	// history
+	CreatedAt time.Time  `json:"createdAt"`
+	CreatedBy string     `json:"createdBy"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+	UpdatedBy *string    `json:"updatedBy"`
 }
 
 type GetTableBranchListParams struct {
