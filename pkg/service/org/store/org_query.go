@@ -12,8 +12,122 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
+	"github.com/quarkloop/quarkloop/pkg/service/user"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
+
+/// GetOrgById
+
+const getOrgByIdQuery = `
+SELECT 
+    "id",
+    "sid",
+    "name",
+    "description",
+    "visibility",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy"
+FROM 
+    "system"."Organization"
+WHERE 
+    "id" = @id;
+`
+
+func (store *orgStore) GetOrgById(ctx context.Context, orgId int) (*org.Org, error) {
+	row := store.Conn.QueryRow(ctx, getOrgByIdQuery, pgx.NamedArgs{"id": orgId})
+
+	var org org.Org
+	err := row.Scan(
+		&org.Id,
+		&org.ScopeId,
+		&org.Name,
+		&org.Description,
+		&org.Visibility,
+		&org.CreatedAt,
+		&org.CreatedBy,
+		&org.UpdatedAt,
+		&org.UpdatedBy,
+	)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
+		return nil, err
+	}
+
+	return &org, nil
+}
+
+/// GetOrg
+
+const getOrgQuery = `
+SELECT 
+    "id",
+    "sid",
+    "name",
+    "description",
+    "visibility",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy"
+FROM 
+    "system"."Organization"
+WHERE
+`
+
+func (store *orgStore) GetOrg(ctx context.Context, organization *org.Org) (*org.Org, error) {
+	availableFields := []string{}
+	organizationFields := map[string]interface{}{
+		"sid":        organization.ScopeId,
+		"name":       organization.Name,
+		"visibility": organization.Visibility,
+		"createdAt":  organization.CreatedAt,
+		"updatedAt":  organization.UpdatedAt,
+	}
+	for key, value := range organizationFields {
+		switch v := value.(type) {
+		case int:
+			if v != 0 {
+				availableFields = append(availableFields, fmt.Sprintf("\"%s\" = '%d'", key, v))
+			}
+		case float64:
+			if v != 0.0 {
+				availableFields = append(availableFields, fmt.Sprintf("\"%s\" = '%f'", key, v))
+			}
+		case string:
+			if v != "" {
+				availableFields = append(availableFields, fmt.Sprintf("\"%s\" = '%s'", key, v))
+			}
+		case *time.Time:
+			if v != nil {
+				availableFields = append(availableFields, fmt.Sprintf("\"%s\" = '%s'", key, v))
+			}
+		}
+	}
+	finalQuery := getOrgQuery + strings.Join(availableFields, " AND ")
+
+	row := store.Conn.QueryRow(ctx, finalQuery)
+
+	var org org.Org
+	err := row.Scan(
+		&org.Id,
+		&org.ScopeId,
+		&org.Name,
+		&org.Description,
+		&org.Visibility,
+		&org.CreatedAt,
+		&org.CreatedBy,
+		&org.UpdatedAt,
+		&org.UpdatedBy,
+	)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
+		return nil, err
+	}
+
+	return &org, nil
+}
 
 /// GetOrgList
 
@@ -55,7 +169,7 @@ func (store *orgStore) GetOrgList(ctx context.Context, visibility model.ScopeVis
 		var org org.Org
 		err := rows.Scan(
 			&org.Id,
-			&org.ScopedId,
+			&org.ScopeId,
 			&org.Name,
 			&org.Description,
 			&org.Visibility,
@@ -78,119 +192,6 @@ func (store *orgStore) GetOrgList(ctx context.Context, visibility model.ScopeVis
 	}
 
 	return orgList, nil
-}
-
-/// GetOrgById
-
-const getOrgByIdQuery = `
-SELECT 
-    "id",
-    "sid",
-    "name",
-    "description",
-    "visibility",
-    "createdAt",
-    "createdBy",
-    "updatedAt",
-    "updatedBy"
-FROM 
-    "system"."Organization"
-WHERE 
-    "id" = @id;
-`
-
-func (store *orgStore) GetOrgById(ctx context.Context, orgId int) (*org.Org, error) {
-	row := store.Conn.QueryRow(ctx, getOrgByIdQuery, pgx.NamedArgs{"id": orgId})
-
-	var org org.Org
-	err := row.Scan(
-		&org.Id,
-		&org.ScopedId,
-		&org.Name,
-		&org.Description,
-		&org.Visibility,
-		&org.CreatedAt,
-		&org.CreatedBy,
-		&org.UpdatedAt,
-		&org.UpdatedBy,
-	)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
-		return nil, err
-	}
-
-	return &org, nil
-}
-
-/// GetOrg
-
-const getOrgQuery = `
-SELECT 
-    "id",
-    "sid",
-    "name",
-    "description",
-    "visibility",
-    "createdAt",
-    "createdBy",
-    "updatedAt",
-    "updatedBy"
-FROM 
-    "system"."Organization"
-WHERE
-`
-
-func (store *orgStore) GetOrg(ctx context.Context, organization *org.Org) (*org.Org, error) {
-	availableFields := []string{}
-	organizationFields := map[string]interface{}{
-		"sid":        organization.ScopedId,
-		"name":       organization.Name,
-		"visibility": organization.Visibility,
-		"createdAt":  organization.CreatedAt,
-		"updatedAt":  organization.UpdatedAt,
-	}
-	for key, value := range organizationFields {
-		switch v := value.(type) {
-		case int:
-			if v != 0 {
-				availableFields = append(availableFields, fmt.Sprintf("\"%s\" = '%d'", key, v))
-			}
-		case float64:
-			if v != 0.0 {
-				availableFields = append(availableFields, fmt.Sprintf("\"%s\" = '%f'", key, v))
-			}
-		case string:
-			if v != "" {
-				availableFields = append(availableFields, fmt.Sprintf("\"%s\" = '%s'", key, v))
-			}
-		case *time.Time:
-			if v != nil {
-				availableFields = append(availableFields, fmt.Sprintf("\"%s\" = '%s'", key, v))
-			}
-		}
-	}
-	finalQuery := getOrgQuery + strings.Join(availableFields, " AND ")
-
-	row := store.Conn.QueryRow(ctx, finalQuery)
-
-	var org org.Org
-	err := row.Scan(
-		&org.Id,
-		&org.ScopedId,
-		&org.Name,
-		&org.Description,
-		&org.Visibility,
-		&org.CreatedAt,
-		&org.CreatedBy,
-		&org.UpdatedAt,
-		&org.UpdatedBy,
-	)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
-		return nil, err
-	}
-
-	return &org, nil
 }
 
 /// GetWorkspaceList
@@ -241,9 +242,9 @@ func (store *orgStore) GetWorkspaceList(ctx context.Context, visibility model.Sc
 		var workspace workspace.Workspace
 		err := rows.Scan(
 			&workspace.Id,
-			&workspace.ScopedId,
+			&workspace.ScopeId,
 			&workspace.OrgId,
-			&workspace.OrgScopedId,
+			&workspace.OrgScopeId,
 			&workspace.Name,
 			&workspace.Description,
 			&workspace.Visibility,
@@ -318,11 +319,11 @@ func (store *orgStore) GetProjectList(ctx context.Context, visibility model.Scop
 		var project project.Project
 		err := rows.Scan(
 			&project.Id,
-			&project.ScopedId,
+			&project.ScopeId,
 			&project.OrgId,
 			&project.WorkspaceId,
-			&project.OrgScopedId,
-			&project.WorkspaceScopedId,
+			&project.OrgScopeId,
+			&project.WorkspaceScopeId,
 			&project.Name,
 			&project.Description,
 			&project.Visibility,
@@ -345,4 +346,64 @@ func (store *orgStore) GetProjectList(ctx context.Context, visibility model.Scop
 	}
 
 	return projectList, nil
+}
+
+/// GetUserAssignmentList
+
+const getUserAssignmentListQuery = `
+SELECT 
+    ua.id,
+    ua."userId",
+    ur."name",
+    ua."createdAt",
+    ua."createdBy",
+    ua."updatedAt",
+    ua."updatedBy"
+FROM 
+    "system"."UserAssignment" AS ua
+LEFT JOIN 
+    "system"."UserRole" AS ur ON ur.id = ua."userRoleId"
+WHERE 
+    ua."orgId" = @orgId
+GROUP BY 
+    ua.id,
+    ur."name"
+ORDER BY id ASC;
+`
+
+func (store *orgStore) GetUserAssignmentList(ctx context.Context, orgId int) ([]*user.UserAssignment, error) {
+	rows, err := store.Conn.Query(ctx, getUserAssignmentListQuery, pgx.NamedArgs{"orgId": orgId})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var uaList []*user.UserAssignment = []*user.UserAssignment{}
+
+	for rows.Next() {
+		var ua user.UserAssignment
+		err := rows.Scan(
+			&ua.Id,
+			&ua.UserId,
+			&ua.Role,
+			&ua.CreatedAt,
+			&ua.CreatedBy,
+			&ua.UpdatedAt,
+			&ua.UpdatedBy,
+		)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+			return nil, err
+		}
+
+		uaList = append(uaList, &ua)
+	}
+
+	if err := rows.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+		return nil, err
+	}
+
+	return uaList, nil
 }
