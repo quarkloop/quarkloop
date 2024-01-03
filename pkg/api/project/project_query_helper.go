@@ -15,6 +15,9 @@ import (
 func (s *ProjectApi) getProjectById(ctx *gin.Context, query *project.GetProjectByIdQuery) api.Response {
 	p, err := s.projectService.GetProjectById(ctx, query)
 	if err != nil {
+		if err == project.ErrProjectNotFound {
+			return api.Error(http.StatusNoContent, nil)
+		}
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
@@ -22,7 +25,7 @@ func (s *ProjectApi) getProjectById(ctx *gin.Context, query *project.GetProjectB
 
 	// anonymous user => return project not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
-		return api.Error(http.StatusInternalServerError, project.ErrProjectNotFound)
+		return api.Error(http.StatusNotFound, project.ErrProjectNotFound)
 	}
 	if isPrivate {
 		user := contextdata.GetUser(ctx)
@@ -36,7 +39,7 @@ func (s *ProjectApi) getProjectById(ctx *gin.Context, query *project.GetProjectB
 		if err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, query); err != nil {
 			if err == accesscontrol.ErrPermissionDenied {
 				// unauthorized user (permission denied) => return project not found error
-				return api.Error(http.StatusInternalServerError, project.ErrProjectNotFound) // TODO: change status code
+				return api.Error(http.StatusNotFound, project.ErrProjectNotFound) // TODO: change status code
 			}
 
 			return api.Error(http.StatusInternalServerError, err)
