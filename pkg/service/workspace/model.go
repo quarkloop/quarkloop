@@ -14,10 +14,10 @@ var (
 
 type Workspace struct {
 	// id
-	Id          int    `json:"id" form:"id"`
-	ScopedId    string `json:"sid"`
-	OrgId       int    `json:"orgId"`
-	OrgScopedId string `json:"orgScopedId"`
+	Id         int    `json:"id" form:"id"`
+	ScopeId    string `json:"sid"`
+	OrgId      int    `json:"orgId"`
+	OrgScopeId string `json:"orgScopeId"`
 
 	// data
 	Name        string                 `json:"name,omitempty" form:"name,omitempty"`
@@ -33,13 +33,14 @@ type Workspace struct {
 }
 
 func (w *Workspace) GeneratePath() {
-	w.Path = fmt.Sprintf("/org/%s/%s", w.OrgScopedId, w.ScopedId)
+	w.Path = fmt.Sprintf("/org/%s/%s", w.OrgScopeId, w.ScopeId)
 }
 
 // GetWorkspaceList
 
 type GetWorkspaceListQuery struct {
-	UserId int
+	UserId     int
+	Visibility model.ScopeVisibility
 }
 
 // GetWorkspaceById
@@ -107,16 +108,24 @@ type GetProjectListUriParams struct {
 type GetProjectListQuery struct {
 	OrgId       int
 	WorkspaceId int
+	Visibility  model.ScopeVisibility
 }
 
-// GetUserList
+// GetMemberList
 
-type GetUserListUriParams struct {
+type GetMemberListUriParams struct {
 	OrgId       int `uri:"orgId" binding:"required"`
 	WorkspaceId int `uri:"workspaceId" binding:"required"`
 }
 
-type GetUserListQuery struct {
+type GetMemberListQuery struct {
+	OrgId       int
+	WorkspaceId int
+}
+
+// GetUserAssignmentList
+
+type GetUserAssignmentListQuery struct {
 	OrgId       int
 	WorkspaceId int
 }
