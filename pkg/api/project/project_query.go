@@ -13,13 +13,15 @@ import (
 //
 // Response status:
 // 200: StatusOK
+// 204: StatusNoContent
 // 400: StatusBadRequest
+// 404: StatusNotFound
 // 500: StatusInternalServerError
 
 func (s *ProjectApi) GetProjectById(ctx *gin.Context) {
 	uriParams := &project.GetProjectByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -45,7 +47,7 @@ func (s *ProjectApi) GetProjectList(ctx *gin.Context) {
 	ctx.JSON(res.Status(), res.Body())
 }
 
-// GET /orgs/:orgId/workspaces/:workspaceId/projects/:projectId/users
+// GET /orgs/:orgId/workspaces/:workspaceId/projects/:projectId/members
 //
 // Get project user list.
 //
@@ -57,7 +59,7 @@ func (s *ProjectApi) GetProjectList(ctx *gin.Context) {
 func (s *ProjectApi) GetMemberList(ctx *gin.Context) {
 	uriParams := &project.GetMemberListUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
