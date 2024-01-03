@@ -17,10 +17,10 @@ import (
 // 400: StatusBadRequest
 // 500: StatusInternalServerError
 
-func (s *OrgApi) CreateOrg(ctx *gin.Context) {
+func (s *orgApi) CreateOrg(ctx *gin.Context) {
 	cmd := &org.CreateOrgCommand{}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -37,16 +37,16 @@ func (s *OrgApi) CreateOrg(ctx *gin.Context) {
 // 400: StatusBadRequest
 // 500: StatusInternalServerError
 
-func (s *OrgApi) UpdateOrgById(ctx *gin.Context) {
+func (s *orgApi) UpdateOrgById(ctx *gin.Context) {
 	uriParams := &org.UpdateOrgByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
 	cmd := &org.UpdateOrgByIdCommand{OrgId: uriParams.OrgId}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -63,10 +63,10 @@ func (s *OrgApi) UpdateOrgById(ctx *gin.Context) {
 // 400: StatusBadRequest
 // 500: StatusInternalServerError
 
-func (s *OrgApi) DeleteOrgById(ctx *gin.Context) {
+func (s *orgApi) DeleteOrgById(ctx *gin.Context) {
 	uriParams := &org.DeleteOrgByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
