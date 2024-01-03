@@ -18,7 +18,7 @@ func (s *ProjectApi) getProjectById(ctx *gin.Context, query *project.GetProjectB
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	isPrivate := *p.Visibility == model.PrivateVisibility
+	isPrivate := p.Visibility == model.PrivateVisibility
 
 	// anonymous user => return project not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
@@ -102,7 +102,7 @@ func (s *ProjectApi) getMemberList(ctx *gin.Context, query *project.GetMemberLis
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	isPrivate := *ws.Visibility == model.PrivateVisibility
+	isPrivate := ws.Visibility == model.PrivateVisibility
 
 	// anonymous user => return project not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
