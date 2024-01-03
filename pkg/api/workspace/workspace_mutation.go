@@ -19,13 +19,13 @@ import (
 func (s *WorkspaceApi) CreateWorkspace(ctx *gin.Context) {
 	uriParams := &workspace.CreateWorkspaceUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
 	cmd := &workspace.CreateWorkspaceCommand{OrgId: uriParams.OrgId}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -45,7 +45,7 @@ func (s *WorkspaceApi) CreateWorkspace(ctx *gin.Context) {
 func (s *WorkspaceApi) UpdateWorkspaceById(ctx *gin.Context) {
 	uriParams := &workspace.UpdateWorkspaceByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -54,7 +54,7 @@ func (s *WorkspaceApi) UpdateWorkspaceById(ctx *gin.Context) {
 		WorkspaceId: uriParams.WorkspaceId,
 	}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -74,7 +74,7 @@ func (s *WorkspaceApi) UpdateWorkspaceById(ctx *gin.Context) {
 func (s *WorkspaceApi) DeleteWorkspaceById(ctx *gin.Context) {
 	uriParams := &workspace.DeleteWorkspaceByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
