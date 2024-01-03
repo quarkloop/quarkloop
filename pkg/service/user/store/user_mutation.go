@@ -17,6 +17,7 @@ const updateUserByIdMutation = `
 UPDATE
     "auth"."User"
 SET
+    "sid"           = @scopeId,
     "email"         = @email,
     "emailVerified" = @emailVerified,
     "password"      = @password,
@@ -34,6 +35,7 @@ WHERE
 func (store *orgStore) UpdateUserById(ctx context.Context, userId int, user *user.User) error {
 	commandTag, err := store.Conn.Exec(ctx, updateUserByIdMutation, pgx.NamedArgs{
 		"id":            userId,
+		"scopeId":       user.ScopeId,
 		"email":         user.Email,
 		"emailVerified": user.EmailVerified,
 		"password":      user.Password,
