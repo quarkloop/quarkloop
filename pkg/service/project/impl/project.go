@@ -18,7 +18,7 @@ func NewProjectService(ds store.ProjectStore) project.Service {
 }
 
 func (s *projectService) GetProjectList(ctx *gin.Context, query *project.GetProjectListQuery) ([]*project.Project, error) {
-	projectList, err := s.store.GetProjectList(ctx, query.Visibility, query.UserId)
+	projectList, err := s.store.GetProjectList(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (s *projectService) GetProjectList(ctx *gin.Context, query *project.GetProj
 }
 
 func (s *projectService) GetProjectById(ctx *gin.Context, query *project.GetProjectByIdQuery) (*project.Project, error) {
-	p, err := s.store.GetProjectById(ctx, query.ProjectId)
+	p, err := s.store.GetProjectById(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (s *projectService) GetProjectById(ctx *gin.Context, query *project.GetProj
 }
 
 func (s *projectService) CreateProject(ctx *gin.Context, cmd *project.CreateProjectCommand) (*project.Project, error) {
-	p, err := s.store.CreateProject(ctx, cmd.OrgId, cmd.WorkspaceId, &cmd.Project)
+	p, err := s.store.CreateProject(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -51,15 +51,15 @@ func (s *projectService) CreateProject(ctx *gin.Context, cmd *project.CreateProj
 }
 
 func (s *projectService) UpdateProjectById(ctx *gin.Context, cmd *project.UpdateProjectByIdCommand) error {
-	return s.store.UpdateProjectById(ctx, cmd.ProjectId, &cmd.Project)
+	return s.store.UpdateProjectById(ctx, cmd)
 }
 
 func (s *projectService) DeleteProjectById(ctx *gin.Context, cmd *project.DeleteProjectByIdCommand) error {
-	return s.store.DeleteProjectById(ctx, cmd.ProjectId)
+	return s.store.DeleteProjectById(ctx, cmd)
 }
 
 func (s *projectService) GetUserAssignmentList(ctx *gin.Context, query *project.GetUserAssignmentListQuery) ([]*user.UserAssignment, error) {
-	uaList, err := s.store.GetUserAssignmentList(ctx, query.OrgId, query.WorkspaceId, query.ProjectId)
+	uaList, err := s.store.GetUserAssignmentList(ctx, query)
 	if err != nil {
 		return nil, err
 	}
