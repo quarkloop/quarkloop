@@ -9,9 +9,10 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
+	"github.com/quarkloop/quarkloop/pkg/service/user"
 )
 
-func (s *ProjectApi) getProjectById(ctx *gin.Context, query *project.GetProjectByIdQuery) api.Reponse {
+func (s *ProjectApi) getProjectById(ctx *gin.Context, query *project.GetProjectByIdQuery) api.Response {
 	p, err := s.projectService.GetProjectById(ctx, query)
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
@@ -47,7 +48,7 @@ func (s *ProjectApi) getProjectById(ctx *gin.Context, query *project.GetProjectB
 	return api.Success(http.StatusOK, p)
 }
 
-func (s *ProjectApi) getProjectList(ctx *gin.Context) api.Reponse {
+func (s *ProjectApi) getProjectList(ctx *gin.Context) api.Response {
 	if contextdata.IsUserAnonymous(ctx) {
 		// anonymous user => return public projects
 		projectList, err := s.projectService.GetProjectList(ctx, &project.GetProjectListQuery{Visibility: model.PublicVisibility})
@@ -91,7 +92,7 @@ func (s *ProjectApi) getProjectList(ctx *gin.Context) api.Reponse {
 	return api.Success(http.StatusOK, &projectList)
 }
 
-func (s *ProjectApi) getUserList(ctx *gin.Context, query *project.GetUserListQuery) api.Reponse {
+func (s *ProjectApi) getMemberList(ctx *gin.Context, query *project.GetMemberListQuery) api.Response {
 	ws, err := s.projectService.GetProjectById(ctx, &project.GetProjectByIdQuery{
 		OrgId:       query.OrgId,
 		WorkspaceId: query.WorkspaceId,
@@ -126,12 +127,36 @@ func (s *ProjectApi) getUserList(ctx *gin.Context, query *project.GetUserListQue
 		}
 	}
 
-	userList, err := s.projectService.GetUserList(ctx, query)
+	uaList, err := s.projectService.GetUserAssignmentList(ctx, &project.GetUserAssignmentListQuery{
+		OrgId:       query.OrgId,
+		WorkspaceId: query.WorkspaceId,
+		ProjectId:   query.ProjectId,
+	})
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	// anonymous and unauthorized user => return users of public project
-	// authorized user => return users of public or private project
-	return api.Success(http.StatusOK, &userList)
+	var memberList []*user.MemberDTO = []*user.MemberDTO{}
+	for i := range uaList {
+		ua := uaList[i]
+
+		u, err := s.userService.GetUserById(ctx, &user.GetUserByIdQuery{UserId: ua.UserId})
+		if err != nil {
+			return api.Error(http.StatusInternalServerError, err)
+		}
+
+		user := user.MemberDTO{
+			User:      u,
+			Role:      ua.Role,
+			CreatedAt: ua.CreatedAt,
+			CreatedBy: ua.CreatedBy,
+			UpdatedAt: ua.UpdatedAt,
+			UpdatedBy: ua.UpdatedBy,
+		}
+		memberList = append(memberList, &user)
+	}
+
+	// anonymous and unauthorized user => return members of public project
+	// authorized user => return members of public or private project
+	return api.Success(http.StatusOK, &memberList)
 }
