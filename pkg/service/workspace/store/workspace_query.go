@@ -121,26 +121,29 @@ func (store *workspaceStore) GetWorkspaceById(ctx context.Context, query *worksp
 		"id":    query.WorkspaceId,
 	})
 
-	var workspace workspace.Workspace
+	var ws workspace.Workspace
 	err := row.Scan(
-		&workspace.Id,
-		&workspace.ScopeId,
-		&workspace.OrgId,
-		&workspace.OrgScopeId,
-		&workspace.Name,
-		&workspace.Description,
-		&workspace.Visibility,
-		&workspace.CreatedAt,
-		&workspace.CreatedBy,
-		&workspace.UpdatedAt,
-		&workspace.UpdatedBy,
+		&ws.Id,
+		&ws.ScopeId,
+		&ws.OrgId,
+		&ws.OrgScopeId,
+		&ws.Name,
+		&ws.Description,
+		&ws.Visibility,
+		&ws.CreatedAt,
+		&ws.CreatedBy,
+		&ws.UpdatedAt,
+		&ws.UpdatedBy,
 	)
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, workspace.ErrWorkspaceNotFound
+		}
 		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
 		return nil, err
 	}
 
-	return &workspace, nil
+	return &ws, nil
 }
 
 /// GetWorkspace
