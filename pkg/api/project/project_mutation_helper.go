@@ -13,7 +13,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/table_branch"
 )
 
-func (s *ProjectApi) createProject(ctx *gin.Context, cmd *project.CreateProjectCommand) api.Reponse {
+func (s *ProjectApi) createProject(ctx *gin.Context, cmd *project.CreateProjectCommand) api.Response {
 	user := contextdata.GetUser(ctx)
 
 	// check permissions
@@ -94,7 +94,7 @@ func (s *ProjectApi) createProject(ctx *gin.Context, cmd *project.CreateProjectC
 	return api.Success(http.StatusOK, p)
 }
 
-func (s *ProjectApi) updateProjectById(ctx *gin.Context, cmd *project.UpdateProjectByIdCommand) api.Reponse {
+func (s *ProjectApi) updateProjectById(ctx *gin.Context, cmd *project.UpdateProjectByIdCommand) api.Response {
 	// check permissions
 	if err := s.evaluatePermission(ctx, accesscontrol.ActionProjectUpdate, cmd.OrgId, cmd.WorkspaceId, cmd.ProjectId); err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
@@ -107,7 +107,7 @@ func (s *ProjectApi) updateProjectById(ctx *gin.Context, cmd *project.UpdateProj
 	return api.Success(http.StatusOK, nil)
 }
 
-func (s *ProjectApi) deleteProjectById(ctx *gin.Context, cmd *project.DeleteProjectByIdCommand) api.Reponse {
+func (s *ProjectApi) deleteProjectById(ctx *gin.Context, cmd *project.DeleteProjectByIdCommand) api.Response {
 	// check permissions
 	if err := s.evaluatePermission(ctx, accesscontrol.ActionProjectDelete, cmd.OrgId, cmd.WorkspaceId, cmd.ProjectId); err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
