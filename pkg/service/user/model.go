@@ -7,8 +7,8 @@ import (
 
 type User struct {
 	// id
-	// string: type bigint from javascript is encoded into string
-	Id int `json:"id,string,omitempty"`
+	Id      int    `json:"id,string"` // string: type bigint from javascript is encoded into string
+	ScopeId string `json:"sid"`
 
 	// user
 	Name          string     `json:"name,omitempty"`
@@ -62,7 +62,40 @@ type UserSession struct {
 	ExpiresAt    string `json:"expires,omitempty"`
 }
 
+type UserAssignment struct {
+	// id
+	Id     int `json:"id"`
+	UserId int `json:"userId"`
+
+	// user assignment
+	Role string `json:"role"`
+
+	// history
+	CreatedAt time.Time  `json:"createdAt,omitempty"`
+	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+	CreatedBy string     `json:"createdBy,omitempty"`
+	UpdatedBy *string    `json:"updatedBy,omitempty"`
+}
+
+type MemberDTO struct {
+	// user
+	User *User `json:"user"`
+
+	// user assignment
+	Role string `json:"role"`
+
+	// history
+	CreatedAt time.Time  `json:"createdAt,omitempty"`
+	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+	CreatedBy string     `json:"createdBy,omitempty"`
+	UpdatedBy *string    `json:"updatedBy,omitempty"`
+}
+
 // GetUserById
+
+type GetUserByIdUriParams struct {
+	UserId int `uri:"userId" binding:"required"`
+}
 
 type GetUserByIdQuery struct {
 	UserId int
@@ -76,12 +109,20 @@ type GetUserByEmailQuery struct {
 
 // UpdateUserById
 
+type UpdateUserByIdUriParams struct {
+	UserId int `uri:"userId" binding:"required"`
+}
+
 type UpdateUserByIdCommand struct {
 	UserId int
 	User
 }
 
 // DeleteUserById
+
+type DeleteUserByIdUriParams struct {
+	UserId int `uri:"userId" binding:"required"`
+}
 
 type DeleteUserByIdCommand struct {
 	UserId int
