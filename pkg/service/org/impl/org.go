@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/gin-gonic/gin"
-	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 	"github.com/quarkloop/quarkloop/pkg/service/org/store"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
@@ -23,7 +22,7 @@ func NewOrgService(ds store.OrgStore) org.Service {
 }
 
 func (s *orgService) GetOrgList(ctx *gin.Context, query *org.GetOrgListQuery) ([]*org.Org, error) {
-	orgList, err := s.store.GetOrgList(ctx, query.Visibility, query.UserId)
+	orgList, err := s.store.GetOrgList(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +36,7 @@ func (s *orgService) GetOrgList(ctx *gin.Context, query *org.GetOrgListQuery) ([
 }
 
 func (s *orgService) GetOrgById(ctx *gin.Context, query *org.GetOrgByIdQuery) (*org.Org, error) {
-	o, err := s.store.GetOrgById(ctx, query.OrgId)
+	o, err := s.store.GetOrgById(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +46,7 @@ func (s *orgService) GetOrgById(ctx *gin.Context, query *org.GetOrgByIdQuery) (*
 }
 
 func (s *orgService) CreateOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) (*org.Org, error) {
-	o, err := s.store.CreateOrg(ctx, &cmd.Org)
+	o, err := s.store.CreateOrg(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -57,19 +56,19 @@ func (s *orgService) CreateOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) (*or
 }
 
 func (s *orgService) UpdateOrgById(ctx *gin.Context, cmd *org.UpdateOrgByIdCommand) error {
-	return s.store.UpdateOrgById(ctx, cmd.OrgId, &cmd.Org)
+	return s.store.UpdateOrgById(ctx, cmd)
 }
 
 func (s *orgService) DeleteOrgById(ctx *gin.Context, cmd *org.DeleteOrgByIdCommand) error {
-	return s.store.DeleteOrgById(ctx, cmd.OrgId)
+	return s.store.DeleteOrgById(ctx, cmd)
 }
 
 func (s *orgService) GetWorkspaceList(ctx *gin.Context, query *org.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
-	return s.getWorkspaceList(ctx, model.AllVisibility, query)
+	return s.getWorkspaceList(ctx, query)
 }
 
-func (s *orgService) getWorkspaceList(ctx context.Context, visibility model.ScopeVisibility, query *org.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
-	workspaceList, err := s.store.GetWorkspaceList(ctx, visibility, query.OrgId)
+func (s *orgService) getWorkspaceList(ctx context.Context, query *org.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
+	workspaceList, err := s.store.GetWorkspaceList(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +82,7 @@ func (s *orgService) getWorkspaceList(ctx context.Context, visibility model.Scop
 }
 
 func (s *orgService) GetProjectList(ctx *gin.Context, query *org.GetProjectListQuery) ([]*project.Project, error) {
-	projectList, err := s.store.GetProjectList(ctx, query.Visibility, query.OrgId)
+	projectList, err := s.store.GetProjectList(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +96,7 @@ func (s *orgService) GetProjectList(ctx *gin.Context, query *org.GetProjectListQ
 }
 
 func (s *orgService) GetUserAssignmentList(ctx *gin.Context, query *org.GetUserAssignmentListQuery) ([]*user.UserAssignment, error) {
-	uaList, err := s.store.GetUserAssignmentList(ctx, query.OrgId)
+	uaList, err := s.store.GetUserAssignmentList(ctx, query)
 	if err != nil {
 		return nil, err
 	}
