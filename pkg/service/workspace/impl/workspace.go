@@ -19,7 +19,7 @@ func NewWorkspaceService(ds store.WorkspaceStore) workspace.Service {
 }
 
 func (s *workspaceService) GetWorkspaceList(ctx *gin.Context, query *workspace.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
-	workspaceList, err := s.store.GetWorkspaceList(ctx, query.Visibility, query.UserId)
+	workspaceList, err := s.store.GetWorkspaceList(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (s *workspaceService) GetWorkspaceList(ctx *gin.Context, query *workspace.G
 }
 
 func (s *workspaceService) GetWorkspaceById(ctx *gin.Context, query *workspace.GetWorkspaceByIdQuery) (*workspace.Workspace, error) {
-	ws, err := s.store.GetWorkspaceById(ctx, query.WorkspaceId)
+	ws, err := s.store.GetWorkspaceById(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (s *workspaceService) GetWorkspaceById(ctx *gin.Context, query *workspace.G
 }
 
 func (s *workspaceService) CreateWorkspace(ctx *gin.Context, cmd *workspace.CreateWorkspaceCommand) (*workspace.Workspace, error) {
-	ws, err := s.store.CreateWorkspace(ctx, cmd.OrgId, &cmd.Workspace)
+	ws, err := s.store.CreateWorkspace(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -52,15 +52,15 @@ func (s *workspaceService) CreateWorkspace(ctx *gin.Context, cmd *workspace.Crea
 }
 
 func (s *workspaceService) UpdateWorkspaceById(ctx *gin.Context, cmd *workspace.UpdateWorkspaceByIdCommand) error {
-	return s.store.UpdateWorkspaceById(ctx, cmd.WorkspaceId, &cmd.Workspace)
+	return s.store.UpdateWorkspaceById(ctx, cmd)
 }
 
 func (s *workspaceService) DeleteWorkspaceById(ctx *gin.Context, cmd *workspace.DeleteWorkspaceByIdCommand) error {
-	return s.store.DeleteWorkspaceById(ctx, cmd.WorkspaceId)
+	return s.store.DeleteWorkspaceById(ctx, cmd)
 }
 
 func (s *workspaceService) GetProjectList(ctx *gin.Context, query *workspace.GetProjectListQuery) ([]*project.Project, error) {
-	projectList, err := s.store.GetProjectList(ctx, query.Visibility, query.OrgId, query.WorkspaceId)
+	projectList, err := s.store.GetProjectList(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (s *workspaceService) GetProjectList(ctx *gin.Context, query *workspace.Get
 }
 
 func (s *workspaceService) GetUserAssignmentList(ctx *gin.Context, query *workspace.GetUserAssignmentListQuery) ([]*user.UserAssignment, error) {
-	uaList, err := s.store.GetUserAssignmentList(ctx, query.OrgId, query.WorkspaceId)
+	uaList, err := s.store.GetUserAssignmentList(ctx, query)
 	if err != nil {
 		return nil, err
 	}
