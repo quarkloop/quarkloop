@@ -79,17 +79,17 @@ func (s *WorkspaceApi) GetProjectList(ctx *gin.Context) {
 // 400: StatusBadRequest
 // 500: StatusInternalServerError
 
-func (s *WorkspaceApi) GetUserList(ctx *gin.Context) {
-	uriParams := &workspace.GetUserListUriParams{}
+func (s *WorkspaceApi) GetMemberList(ctx *gin.Context) {
+	uriParams := &workspace.GetMemberListUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	query := &workspace.GetUserListQuery{
+	query := &workspace.GetMemberListQuery{
 		OrgId:       uriParams.OrgId,
 		WorkspaceId: uriParams.WorkspaceId,
 	}
-	res := s.getUserList(ctx, query)
+	res := s.getMemberList(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
