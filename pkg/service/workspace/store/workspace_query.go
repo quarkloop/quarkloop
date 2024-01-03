@@ -168,7 +168,7 @@ func (store *workspaceStore) GetWorkspace(ctx context.Context, orgId int, ws *wo
 	availableFields := []string{}
 	workspaceFields := map[string]interface{}{
 		"name":       ws.Name,
-		"visibility": *ws.Visibility,
+		"visibility": ws.Visibility,
 		"createdAt":  ws.CreatedAt,
 		"updatedAt":  ws.UpdatedAt,
 	}
