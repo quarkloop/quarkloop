@@ -19,13 +19,13 @@ import (
 func (s *UserApi) UpdateUserById(ctx *gin.Context) {
 	uriParams := &user.UpdateUserByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
 
 	cmd := &user.UpdateUserByIdCommand{UserId: uriParams.UserId}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
 
