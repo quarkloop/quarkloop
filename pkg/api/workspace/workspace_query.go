@@ -14,13 +14,15 @@ import (
 //
 // Response status:
 // 200: StatusOK
+// 204: StatusNoContent
 // 400: StatusBadRequest
+// 404: StatusNotFound
 // 500: StatusInternalServerError
 
 func (s *WorkspaceApi) GetWorkspaceById(ctx *gin.Context) {
 	uriParams := &workspace.GetWorkspaceByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -58,7 +60,7 @@ func (s *WorkspaceApi) GetWorkspaceList(ctx *gin.Context) {
 func (s *WorkspaceApi) GetProjectList(ctx *gin.Context) {
 	uriParams := &workspace.GetProjectListUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -70,7 +72,7 @@ func (s *WorkspaceApi) GetProjectList(ctx *gin.Context) {
 	ctx.JSON(res.Status(), res.Body())
 }
 
-// GET /orgs/:orgId/workspaces/:workspaceId/users
+// GET /orgs/:orgId/workspaces/:workspaceId/members
 //
 // Get workspace user list.
 //
@@ -82,7 +84,7 @@ func (s *WorkspaceApi) GetProjectList(ctx *gin.Context) {
 func (s *WorkspaceApi) GetMemberList(ctx *gin.Context) {
 	uriParams := &workspace.GetMemberListUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
