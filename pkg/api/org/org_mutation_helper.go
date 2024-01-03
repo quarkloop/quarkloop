@@ -12,7 +12,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
 )
 
-func (s *OrgApi) createOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) api.Reponse {
+func (s *OrgApi) createOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) api.Response {
 	// check permissions
 	if err := s.evaluateCreatePermission(ctx, accesscontrol.ActionOrgCreate); err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
@@ -33,7 +33,7 @@ func (s *OrgApi) createOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) api.Repo
 	return api.Success(http.StatusCreated, org)
 }
 
-func (s *OrgApi) updateOrgById(ctx *gin.Context, cmd *org.UpdateOrgByIdCommand) api.Reponse {
+func (s *OrgApi) updateOrgById(ctx *gin.Context, cmd *org.UpdateOrgByIdCommand) api.Response {
 	// check permissions
 	if err := s.evaluatePermission(ctx, accesscontrol.ActionProjectUpdate, cmd.OrgId); err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
@@ -47,7 +47,7 @@ func (s *OrgApi) updateOrgById(ctx *gin.Context, cmd *org.UpdateOrgByIdCommand) 
 	return api.Success(http.StatusOK, nil)
 }
 
-func (s *OrgApi) deleteOrgById(ctx *gin.Context, orgId int) api.Reponse {
+func (s *OrgApi) deleteOrgById(ctx *gin.Context, orgId int) api.Response {
 	// check permissions
 	if err := s.evaluatePermission(ctx, accesscontrol.ActionProjectDelete, orgId); err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
