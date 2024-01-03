@@ -1,7 +1,6 @@
 package project
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -16,37 +15,29 @@ var (
 
 type Project struct {
 	// id
-	Id               int    `json:"id" form:"id"`
+	Id               int    `json:"id"`
 	ScopeId          string `json:"sid"`
 	WorkspaceId      int    `json:"workspaceId"`
 	WorkspaceScopeId string `json:"workspaceScopeId"`
 	OrgId            int    `json:"orgId"`
 	OrgScopeId       string `json:"orgScopeId"`
 
-	// data
-	Name        string                      `json:"name,omitempty" form:"name,omitempty"`
-	Description string                      `json:"description,omitempty"`
-	Visibility  *model.ScopeVisibility      `json:"visibility,omitempty" form:"visibility,omitempty"`
-	Path        string                      `json:"path,omitempty"`
-	Metadata    json.RawMessage             `json:"metadata,omitempty"`
-	Branches    []*table_branch.TableBranch `json:"branches,omitempty"`
+	// project
+	Name        string                      `json:"name"`
+	Description string                      `json:"description"`
+	Visibility  model.ScopeVisibility       `json:"visibility"`
+	Path        string                      `json:"path"`
+	Branches    []*table_branch.TableBranch `json:"branches"`
 
 	// history
-	CreatedAt time.Time  `json:"createdAt,omitempty" form:"createdAt,omitempty"`
-	UpdatedAt *time.Time `json:"updatedAt,omitempty" form:"updatedAt,omitempty"`
-	CreatedBy string     `json:"createdBy,omitempty"`
-	UpdatedBy *string    `json:"updatedBy,omitempty"`
+	CreatedAt time.Time  `json:"createdAt"`
+	CreatedBy string     `json:"createdBy"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+	UpdatedBy *string    `json:"updatedBy"`
 }
 
 func (p *Project) GeneratePath() {
 	p.Path = fmt.Sprintf("/org/%s/%s/%s", p.OrgScopeId, p.WorkspaceScopeId, p.ScopeId)
-}
-
-// GetProjectList
-
-type GetProjectListQuery struct {
-	UserId     int
-	Visibility model.ScopeVisibility
 }
 
 // GetProjectById
@@ -63,10 +54,12 @@ type GetProjectByIdQuery struct {
 	ProjectId   int
 }
 
-// type GetProjectQuery struct {
-// 	OrgId   int
-// 	Project Project
-// }
+// GetProjectList
+
+type GetProjectListQuery struct {
+	UserId     int
+	Visibility model.ScopeVisibility
+}
 
 //  CreateProject
 
@@ -78,7 +71,12 @@ type CreateProjectUriParams struct {
 type CreateProjectCommand struct {
 	OrgId       int
 	WorkspaceId int
-	Project
+	CreatedBy   string
+
+	ScopeId     string                `json:"sid"`
+	Name        string                `json:"name"`
+	Description string                `json:"description"`
+	Visibility  model.ScopeVisibility `json:"visibility"`
 }
 
 // UpdateProjectById
@@ -93,7 +91,12 @@ type UpdateProjectByIdCommand struct {
 	OrgId       int
 	WorkspaceId int
 	ProjectId   int
-	Project
+	UpdatedBy   string
+
+	ScopeId     string                `json:"sid,omitempty"`
+	Name        string                `json:"name,omitempty"`
+	Description string                `json:"description,omitempty"`
+	Visibility  model.ScopeVisibility `json:"visibility,omitempty"`
 }
 
 // DeleteProjectById
