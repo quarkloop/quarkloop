@@ -12,10 +12,12 @@ type TableSchema struct {
 	Description string          `json:"description,omitempty"`
 	Metadata    json.RawMessage `json:"metadata,omitempty"`
 	Data        json.RawMessage `json:"data,omitempty"`
-	CreatedAt   time.Time       `json:"createdAt,omitempty"`
-	UpdatedAt   *time.Time      `json:"updatedAt,omitempty"`
-	CreatedBy   string          `json:"createdBy,omitempty"`
-	UpdatedBy   *string         `json:"updatedBy,omitempty"`
+
+	// history
+	CreatedAt time.Time  `json:"createdAt"`
+	CreatedBy string     `json:"createdBy"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+	UpdatedBy *string    `json:"updatedBy"`
 }
 
 type GetTableSchemaListParams struct {
