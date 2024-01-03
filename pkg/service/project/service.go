@@ -6,14 +6,13 @@ import (
 )
 
 type Service interface {
-	GetProjectList(*gin.Context, *GetProjectListQuery) ([]*Project, error)
+	// query
 	GetProjectById(*gin.Context, *GetProjectByIdQuery) (*Project, error)
-	// TODO: rewrite
-	//GetProject(context.Context, *GetProjectQuery) (*Project, error)
+	GetProjectList(*gin.Context, *GetProjectListQuery) ([]*Project, error)
+	GetUserAssignmentList(*gin.Context, *GetUserAssignmentListQuery) ([]*user.UserAssignment, error)
+
+	// mutation
 	CreateProject(*gin.Context, *CreateProjectCommand) (*Project, error)
 	UpdateProjectById(*gin.Context, *UpdateProjectByIdCommand) error
 	DeleteProjectById(*gin.Context, *DeleteProjectByIdCommand) error
-
-	// user
-	GetUserList(*gin.Context, *GetUserListQuery) ([]*user.User, error)
 }
