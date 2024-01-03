@@ -47,28 +47,24 @@ RETURNING
     "updatedBy";
 `
 
-func (store *projectStore) CreateProject(ctx context.Context, orgId int, workspaceId int, p *project.Project) (*project.Project, error) {
-	if p.ScopeId == "" {
+func (store *projectStore) CreateProject(ctx context.Context, cmd *project.CreateProjectCommand) (*project.Project, error) {
+	if cmd.ScopeId == "" {
 		sid, err := gonanoid.New()
 		if err != nil {
 			return nil, err
 		}
-		p.ScopeId = sid
+		cmd.ScopeId = sid
 	}
 
-	row := store.Conn.QueryRow(
-		ctx,
-		createProjectMutation,
-		pgx.NamedArgs{
-			"orgId":       orgId,
-			"workspaceId": workspaceId,
-			"sid":         p.ScopeId,
-			"name":        p.Name,
-			"description": p.Description,
-			"visibility":  p.Visibility,
-			"createdBy":   p.CreatedBy,
-		},
-	)
+	row := store.Conn.QueryRow(ctx, createProjectMutation, pgx.NamedArgs{
+		"orgId":       cmd.OrgId,
+		"workspaceId": cmd.WorkspaceId,
+		"sid":         cmd.ScopeId,
+		"name":        cmd.Name,
+		"description": cmd.Description,
+		"visibility":  cmd.Visibility,
+		"createdBy":   cmd.CreatedBy,
+	})
 
 	var project project.Project
 	rowErr := row.Scan(
@@ -81,6 +77,8 @@ func (store *projectStore) CreateProject(ctx context.Context, orgId int, workspa
 		&project.Visibility,
 		&project.CreatedAt,
 		&project.CreatedBy,
+		&project.UpdatedAt,
+		&project.UpdatedBy,
 	)
 	if rowErr != nil {
 		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", rowErr)
@@ -102,22 +100,24 @@ SET
     "updatedAt"   = @updatedAt,
     "updatedBy"   = @updatedBy,
 WHERE
-    "id" = @id;
+    "id" = @id
+AND
+    "orgId" = @orgId
+AND
+    "workspaceId" = @workspaceId;	
 `
 
-func (store *projectStore) UpdateProjectById(ctx context.Context, projectId int, project *project.Project) error {
-	commandTag, err := store.Conn.Exec(
-		ctx,
-		updateProjectByIdMutation,
-		pgx.NamedArgs{
-			"id":          projectId,
-			"sid":         project.ScopeId,
-			"name":        project.Name,
-			"description": project.Description,
-			"updatedAt":   time.Now(),
-			"updatedBy":   project.UpdatedBy,
-		},
-	)
+func (store *projectStore) UpdateProjectById(ctx context.Context, cmd *project.UpdateProjectByIdCommand) error {
+	commandTag, err := store.Conn.Exec(ctx, updateProjectByIdMutation, pgx.NamedArgs{
+		"orgId":       cmd.OrgId,
+		"workspaceId": cmd.WorkspaceId,
+		"id":          cmd.ProjectId,
+		"sid":         cmd.ScopeId,
+		"name":        cmd.Name,
+		"description": cmd.Description,
+		"updatedBy":   cmd.UpdatedBy,
+		"updatedAt":   time.Now(),
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", err)
 		return err
@@ -138,11 +138,19 @@ const deleteProjectByIdMutation = `
 DELETE FROM
     "system"."Project"
 WHERE
-    "id" = @id;
+    "id" = @id
+AND
+    "orgId" = @orgId
+AND
+    "workspaceId" = @workspaceId;		
 `
 
-func (store *projectStore) DeleteProjectById(ctx context.Context, projectId int) error {
-	commandTag, err := store.Conn.Exec(ctx, deleteProjectByIdMutation, pgx.NamedArgs{"id": projectId})
+func (store *projectStore) DeleteProjectById(ctx context.Context, cmd *project.DeleteProjectByIdCommand) error {
+	commandTag, err := store.Conn.Exec(ctx, deleteProjectByIdMutation, pgx.NamedArgs{
+		"orgId":       cmd.OrgId,
+		"workspaceId": cmd.WorkspaceId,
+		"id":          cmd.ProjectId,
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
 		return err
