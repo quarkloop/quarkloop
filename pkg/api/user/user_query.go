@@ -18,7 +18,7 @@ import (
 func (s *UserApi) GetUserById(ctx *gin.Context) {
 	uriParams := &user.GetUserByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
 
