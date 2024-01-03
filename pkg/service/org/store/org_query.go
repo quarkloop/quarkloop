@@ -38,24 +38,27 @@ WHERE
 func (store *orgStore) GetOrgById(ctx context.Context, query *org.GetOrgByIdQuery) (*org.Org, error) {
 	row := store.Conn.QueryRow(ctx, getOrgByIdQuery, pgx.NamedArgs{"id": query.OrgId})
 
-	var org org.Org
+	var o org.Org
 	err := row.Scan(
-		&org.Id,
-		&org.ScopeId,
-		&org.Name,
-		&org.Description,
-		&org.Visibility,
-		&org.CreatedAt,
-		&org.CreatedBy,
-		&org.UpdatedAt,
-		&org.UpdatedBy,
+		&o.Id,
+		&o.ScopeId,
+		&o.Name,
+		&o.Description,
+		&o.Visibility,
+		&o.CreatedAt,
+		&o.CreatedBy,
+		&o.UpdatedAt,
+		&o.UpdatedBy,
 	)
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, org.ErrOrgNotFound
+		}
 		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
 		return nil, err
 	}
 
-	return &org, nil
+	return &o, nil
 }
 
 /// GetOrg
@@ -237,7 +240,6 @@ func (store *orgStore) GetWorkspaceList(ctx context.Context, query *org.GetWorks
 	defer rows.Close()
 
 	var wsList []*workspace.Workspace = []*workspace.Workspace{}
-
 	for rows.Next() {
 		var workspace workspace.Workspace
 		err := rows.Scan(
