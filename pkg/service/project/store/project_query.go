@@ -139,28 +139,31 @@ func (store *projectStore) GetProjectById(ctx context.Context, query *project.Ge
 		"id":          query.ProjectId,
 	})
 
-	var project project.Project
+	var p project.Project
 	err := row.Scan(
-		&project.Id,
-		&project.ScopeId,
-		&project.OrgId,
-		&project.WorkspaceId,
-		&project.OrgScopeId,
-		&project.WorkspaceScopeId,
-		&project.Name,
-		&project.Description,
-		&project.Visibility,
-		&project.CreatedAt,
-		&project.CreatedBy,
-		&project.UpdatedAt,
-		&project.UpdatedBy,
+		&p.Id,
+		&p.ScopeId,
+		&p.OrgId,
+		&p.WorkspaceId,
+		&p.OrgScopeId,
+		&p.WorkspaceScopeId,
+		&p.Name,
+		&p.Description,
+		&p.Visibility,
+		&p.CreatedAt,
+		&p.CreatedBy,
+		&p.UpdatedAt,
+		&p.UpdatedBy,
 	)
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, project.ErrProjectNotFound
+		}
 		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
 		return nil, err
 	}
 
-	return &project, nil
+	return &p, nil
 }
 
 /// GetProject
