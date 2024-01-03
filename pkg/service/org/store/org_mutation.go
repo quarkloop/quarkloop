@@ -39,21 +39,21 @@ RETURNING
     "createdBy";
 `
 
-func (store *orgStore) CreateOrg(ctx context.Context, organization *org.Org) (*org.Org, error) {
-	if organization.ScopeId == "" {
+func (store *orgStore) CreateOrg(ctx context.Context, cmd *org.CreateOrgCommand) (*org.Org, error) {
+	if cmd.ScopeId == "" {
 		sid, err := gonanoid.New()
 		if err != nil {
 			return nil, err
 		}
-		organization.ScopeId = sid
+		cmd.ScopeId = sid
 	}
 
 	row := store.Conn.QueryRow(ctx, createOrgMutation, pgx.NamedArgs{
-		"sid":         organization.ScopeId,
-		"name":        organization.Name,
-		"description": organization.Description,
-		"visibility":  organization.Visibility,
-		"createdBy":   organization.CreatedBy,
+		"sid":         cmd.ScopeId,
+		"name":        cmd.Name,
+		"description": cmd.Description,
+		"visibility":  cmd.Visibility,
+		"createdBy":   cmd.CreatedBy,
 	})
 
 	var org org.Org
@@ -90,15 +90,15 @@ WHERE
     "id" = @id;
 `
 
-func (store *orgStore) UpdateOrgById(ctx context.Context, orgId int, org *org.Org) error {
+func (store *orgStore) UpdateOrgById(ctx context.Context, cmd *org.UpdateOrgByIdCommand) error {
 	commandTag, err := store.Conn.Exec(ctx, updateOrgByIdMutation, pgx.NamedArgs{
-		"id":          orgId,
-		"sid":         org.ScopeId,
-		"name":        org.Name,
-		"description": org.Description,
-		"visibility":  org.Visibility,
+		"id":          cmd.OrgId,
+		"sid":         cmd.ScopeId,
+		"name":        cmd.Name,
+		"description": cmd.Description,
+		"visibility":  cmd.Visibility,
+		"updatedBy":   cmd.UpdatedBy,
 		"updatedAt":   time.Now(),
-		"updatedBy":   org.UpdatedBy,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", err)
@@ -123,8 +123,8 @@ WHERE
     "id" = @id;
 `
 
-func (store *orgStore) DeleteOrgById(ctx context.Context, orgId int) error {
-	commandTag, err := store.Conn.Exec(ctx, deleteOrgByIdMutation, pgx.NamedArgs{"id": orgId})
+func (store *orgStore) DeleteOrgById(ctx context.Context, cmd *org.DeleteOrgByIdCommand) error {
+	commandTag, err := store.Conn.Exec(ctx, deleteOrgByIdMutation, pgx.NamedArgs{"id": cmd.OrgId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
 		return err
