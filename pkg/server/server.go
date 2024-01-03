@@ -33,6 +33,8 @@ import (
 	table_schema_impl "github.com/quarkloop/quarkloop/pkg/service/table_schema/impl"
 	table_schema_store "github.com/quarkloop/quarkloop/pkg/service/table_schema/store"
 	"github.com/quarkloop/quarkloop/pkg/service/user"
+	user_impl "github.com/quarkloop/quarkloop/pkg/service/user/impl"
+	user_store "github.com/quarkloop/quarkloop/pkg/service/user/store"
 	ws_impl "github.com/quarkloop/quarkloop/pkg/service/workspace/impl"
 	ws_store "github.com/quarkloop/quarkloop/pkg/service/workspace/store"
 	"github.com/quarkloop/quarkloop/pkg/store/repository"
@@ -78,6 +80,7 @@ func NewDefaultServer(ds *repository.Repository) Server {
 		MaxAge:        12 * time.Hour,
 	}))
 
+	userService := user_impl.NewUserService(user_store.NewOrgStore(ds.SystemDbConn))
 	aclService := acl_impl.NewAccessControlService(acl_store.NewAccessControlStore(ds.SystemDbConn))
 	quotaService := quota_impl.NewQuotaService(quota_store.NewQuotaStore(ds.SystemDbConn))
 
@@ -85,9 +88,9 @@ func NewDefaultServer(ds *repository.Repository) Server {
 	tableSchemaService := table_schema_impl.NewTableSchemaService(table_schema_store.NewTableSchemaStore(ds.ProjectDbConn))
 	tableRecordService := table_record_impl.NewTableRecordService(table_record_store.NewTableRecordStore(ds.ProjectDbConn))
 
-	orgService := org_impl.NewOrgService(org_store.NewOrgStore(ds.SystemDbConn), aclService, quotaService)
-	workspaceService := ws_impl.NewWorkspaceService(ws_store.NewWorkspaceStore(ds.SystemDbConn), aclService, quotaService)
-	projectTableService := project_impl.NewProjectService(project_store.NewProjectStore(ds.SystemDbConn), aclService, quotaService, tableBranchService)
+	orgService := org_impl.NewOrgService(org_store.NewOrgStore(ds.SystemDbConn))
+	workspaceService := ws_impl.NewWorkspaceService(ws_store.NewWorkspaceStore(ds.SystemDbConn))
+	projectTableService := project_impl.NewProjectService(project_store.NewProjectStore(ds.SystemDbConn))
 
 	projectSubmissionService := project_submission_impl.NewAppSubmissionService(ds)
 
@@ -95,9 +98,9 @@ func NewDefaultServer(ds *repository.Repository) Server {
 		router:    router,
 		dataStore: ds,
 
-		orgApi:       org.NewOrgApi(orgService),
-		workspaceApi: workspace.NewWorkspaceApi(workspaceService),
-		projectApi:   project.NewProjectApi(projectTableService),
+		orgApi:       org.NewOrgApi(orgService, userService, aclService, quotaService),
+		workspaceApi: workspace.NewWorkspaceApi(workspaceService, userService, aclService, quotaService),
+		projectApi:   project.NewProjectApi(projectTableService, userService, aclService, quotaService, tableBranchService),
 
 		tableBranchApi: table_branch.NewTableBranchApi(tableBranchService),
 		tableSchemaApi: table_schema.NewTableSchemaApi(tableSchemaService),
