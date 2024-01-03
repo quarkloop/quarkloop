@@ -14,13 +14,15 @@ import (
 //
 // Response status:
 // 200: StatusOK
+// 204: StatusNoContent
 // 400: StatusBadRequest
+// 404: StatusNotFound
 // 500: StatusInternalServerError
 
-func (s *OrgApi) GetOrgById(ctx *gin.Context) {
+func (s *orgApi) GetOrgById(ctx *gin.Context) {
 	uriParams := &org.GetOrgByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -37,7 +39,7 @@ func (s *OrgApi) GetOrgById(ctx *gin.Context) {
 // 400: StatusBadRequest
 // 500: StatusInternalServerError
 
-func (s *OrgApi) GetOrgList(ctx *gin.Context) {
+func (s *orgApi) GetOrgList(ctx *gin.Context) {
 	res := s.getOrgList(ctx)
 	ctx.JSON(res.Status(), res.Body())
 }
@@ -51,10 +53,10 @@ func (s *OrgApi) GetOrgList(ctx *gin.Context) {
 // 400: StatusBadRequest
 // 500: StatusInternalServerError
 
-func (s *OrgApi) GetWorkspaceList(ctx *gin.Context) {
+func (s *orgApi) GetWorkspaceList(ctx *gin.Context) {
 	uriParams := &org.GetWorkspaceListUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -71,10 +73,10 @@ func (s *OrgApi) GetWorkspaceList(ctx *gin.Context) {
 // 400: StatusBadRequest
 // 500: StatusInternalServerError
 
-func (s *OrgApi) GetProjectList(ctx *gin.Context) {
+func (s *orgApi) GetProjectList(ctx *gin.Context) {
 	uriParams := &org.GetProjectListUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -91,10 +93,10 @@ func (s *OrgApi) GetProjectList(ctx *gin.Context) {
 // 400: StatusBadRequest
 // 500: StatusInternalServerError
 
-func (s *OrgApi) GetMemberList(ctx *gin.Context) {
+func (s *orgApi) GetMemberList(ctx *gin.Context) {
 	uriParams := &org.GetMemberListUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
