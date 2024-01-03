@@ -16,12 +16,12 @@ var (
 
 type Project struct {
 	// id
-	Id                int    `json:"id" form:"id"`
-	ScopedId          string `json:"sid"`
-	WorkspaceId       int    `json:"workspaceId"`
-	WorkspaceScopedId string `json:"workspaceScopedId"`
-	OrgId             int    `json:"orgId"`
-	OrgScopedId       string `json:"orgScopedId"`
+	Id               int    `json:"id" form:"id"`
+	ScopeId          string `json:"sid"`
+	WorkspaceId      int    `json:"workspaceId"`
+	WorkspaceScopeId string `json:"workspaceScopeId"`
+	OrgId            int    `json:"orgId"`
+	OrgScopeId       string `json:"orgScopeId"`
 
 	// data
 	Name        string                      `json:"name,omitempty" form:"name,omitempty"`
@@ -39,7 +39,7 @@ type Project struct {
 }
 
 func (p *Project) GeneratePath() {
-	p.Path = fmt.Sprintf("/org/%s/%s/%s", p.OrgScopedId, p.WorkspaceScopedId, p.ScopedId)
+	p.Path = fmt.Sprintf("/org/%s/%s/%s", p.OrgScopeId, p.WorkspaceScopeId, p.ScopeId)
 }
 
 // GetProjectList
@@ -110,15 +110,23 @@ type DeleteProjectByIdCommand struct {
 	ProjectId   int
 }
 
-// GetUserList
+// GetMemberList
 
-type GetUserListUriParams struct {
+type GetMemberListUriParams struct {
 	OrgId       int `uri:"orgId" binding:"required"`
 	WorkspaceId int `uri:"workspaceId" binding:"required"`
 	ProjectId   int `uri:"projectId" binding:"required"`
 }
 
-type GetUserListQuery struct {
+type GetMemberListQuery struct {
+	OrgId       int
+	WorkspaceId int
+	ProjectId   int
+}
+
+// GetUserAssignmentList
+
+type GetUserAssignmentListQuery struct {
 	OrgId       int
 	WorkspaceId int
 	ProjectId   int
