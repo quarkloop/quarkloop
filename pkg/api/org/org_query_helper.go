@@ -10,9 +10,10 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
+	"github.com/quarkloop/quarkloop/pkg/service/user"
 )
 
-func (s *OrgApi) getOrgById(ctx *gin.Context, orgId int) api.Reponse {
+func (s *OrgApi) getOrgById(ctx *gin.Context, orgId int) api.Response {
 	o, err := s.orgService.GetOrgById(ctx, &org.GetOrgByIdQuery{
 		OrgId: orgId,
 	})
@@ -48,7 +49,7 @@ func (s *OrgApi) getOrgById(ctx *gin.Context, orgId int) api.Reponse {
 	return api.Success(http.StatusOK, o)
 }
 
-func (s *OrgApi) getOrgList(ctx *gin.Context) api.Reponse {
+func (s *OrgApi) getOrgList(ctx *gin.Context) api.Response {
 	if contextdata.IsUserAnonymous(ctx) {
 		// anonymous user => return public orgs
 		orgList, err := s.orgService.GetOrgList(ctx, &org.GetOrgListQuery{Visibility: model.PublicVisibility})
@@ -88,7 +89,7 @@ func (s *OrgApi) getOrgList(ctx *gin.Context) api.Reponse {
 	return api.Success(http.StatusOK, &orgList)
 }
 
-func (s *OrgApi) getWorkspaceList(ctx *gin.Context, orgId int) api.Reponse {
+func (s *OrgApi) getWorkspaceList(ctx *gin.Context, orgId int) api.Response {
 	if contextdata.IsUserAnonymous(ctx) {
 		// anonymous user => return public workspaces
 		wsList, err := s.orgService.GetWorkspaceList(ctx, &org.GetWorkspaceListQuery{
@@ -137,7 +138,7 @@ func (s *OrgApi) getWorkspaceList(ctx *gin.Context, orgId int) api.Reponse {
 	return api.Success(http.StatusOK, &wsList)
 }
 
-func (s *OrgApi) getProjectList(ctx *gin.Context, orgId int) api.Reponse {
+func (s *OrgApi) getProjectList(ctx *gin.Context, orgId int) api.Response {
 	if contextdata.IsUserAnonymous(ctx) {
 		// anonymous user => return public projects
 		projectList, err := s.orgService.GetProjectList(ctx, &org.GetProjectListQuery{
@@ -187,7 +188,7 @@ func (s *OrgApi) getProjectList(ctx *gin.Context, orgId int) api.Reponse {
 	return api.Success(http.StatusOK, &projectList)
 }
 
-func (s *OrgApi) getUserList(ctx *gin.Context, query *org.GetUserListQuery) api.Reponse {
+func (s *OrgApi) getMemberList(ctx *gin.Context, query *org.GetMemberListQuery) api.Response {
 	o, err := s.orgService.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: query.OrgId})
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
@@ -216,12 +217,32 @@ func (s *OrgApi) getUserList(ctx *gin.Context, query *org.GetUserListQuery) api.
 		}
 	}
 
-	userList, err := s.orgService.GetUserList(ctx, query)
+	uaList, err := s.orgService.GetUserAssignmentList(ctx, &org.GetUserAssignmentListQuery{OrgId: query.OrgId})
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	// anonymous and unauthorized user => return users of public org
-	// authorized user => return users of public or private org
-	return api.Success(http.StatusOK, &userList)
+	var memberList []*user.MemberDTO = []*user.MemberDTO{}
+	for i := range uaList {
+		ua := uaList[i]
+
+		u, err := s.userService.GetUserById(ctx, &user.GetUserByIdQuery{UserId: ua.UserId})
+		if err != nil {
+			return api.Error(http.StatusInternalServerError, err)
+		}
+
+		user := user.MemberDTO{
+			User:      u,
+			Role:      ua.Role,
+			CreatedAt: ua.CreatedAt,
+			CreatedBy: ua.CreatedBy,
+			UpdatedAt: ua.UpdatedAt,
+			UpdatedBy: ua.UpdatedBy,
+		}
+		memberList = append(memberList, &user)
+	}
+
+	// anonymous and unauthorized user => return members of public org
+	// authorized user => return members of public or private org
+	return api.Success(http.StatusOK, &memberList)
 }
