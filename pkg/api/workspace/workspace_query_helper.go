@@ -16,9 +16,37 @@ import (
 func (s *WorkspaceApi) getWorkspaceById(ctx *gin.Context, query *workspace.GetWorkspaceByIdQuery) api.Response {
 	ws, err := s.workspaceService.GetWorkspaceById(ctx, query)
 	if err != nil {
+		if err == workspace.ErrWorkspaceNotFound {
+			return api.Error(http.StatusNoContent, nil)
+		}
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
+	isPrivate := ws.Visibility == model.PrivateVisibility
+
+	// anonymous user => return workspace not found error
+	if isPrivate && contextdata.IsUserAnonymous(ctx) {
+		return api.Error(http.StatusNotFound, workspace.ErrWorkspaceNotFound)
+	}
+	if isPrivate {
+		user := contextdata.GetUser(ctx)
+		// check permissions
+		query := &accesscontrol.EvaluateFilterQuery{
+			UserId:      user.GetId(),
+			OrgId:       query.OrgId,
+			WorkspaceId: query.WorkspaceId,
+		}
+		if err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceRead, query); err != nil {
+			if err == accesscontrol.ErrPermissionDenied {
+				// unauthorized user (permission denied) => return workspace not found error
+				return api.Error(http.StatusNotFound, workspace.ErrWorkspaceNotFound)
+			}
+			return api.Error(http.StatusInternalServerError, err)
+		}
+	}
+
+	// anonymous and unauthorized user => return public workspace
+	// authorized user => return public or private workspace
 	return api.Success(http.StatusOK, ws)
 }
 
@@ -38,7 +66,7 @@ func (s *WorkspaceApi) getWorkspaceList(ctx *gin.Context) api.Response {
 	query := &accesscontrol.EvaluateFilterQuery{
 		UserId: user.GetId(),
 	}
-	if err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgRead, query); err != nil {
+	if err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceRead, query); err != nil {
 		if err == accesscontrol.ErrPermissionDenied {
 			// unauthorized user (permission denied) => return public workspaces
 			wsList, err := s.workspaceService.GetWorkspaceList(ctx, &workspace.GetWorkspaceListQuery{
