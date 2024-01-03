@@ -126,7 +126,7 @@ func (s *WorkspaceApi) getMemberList(ctx *gin.Context, query *workspace.GetMembe
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	isPrivate := *ws.Visibility == model.PrivateVisibility
+	isPrivate := ws.Visibility == model.PrivateVisibility
 
 	// anonymous user => return workspace not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
