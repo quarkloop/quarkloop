@@ -10,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
+	"github.com/quarkloop/quarkloop/pkg/service/user"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
@@ -62,9 +63,9 @@ func (store *workspaceStore) GetWorkspaceList(ctx context.Context, visibility mo
 		var workspace workspace.Workspace
 		err := rows.Scan(
 			&workspace.Id,
-			&workspace.ScopedId,
+			&workspace.ScopeId,
 			&workspace.OrgId,
-			&workspace.OrgScopedId,
+			&workspace.OrgScopeId,
 			&workspace.Name,
 			&workspace.Description,
 			&workspace.Visibility,
@@ -118,9 +119,9 @@ func (store *workspaceStore) GetWorkspaceById(ctx context.Context, workspaceId i
 	var workspace workspace.Workspace
 	err := row.Scan(
 		&workspace.Id,
-		&workspace.ScopedId,
+		&workspace.ScopeId,
 		&workspace.OrgId,
-		&workspace.OrgScopedId,
+		&workspace.OrgScopeId,
 		&workspace.Name,
 		&workspace.Description,
 		&workspace.Visibility,
@@ -198,9 +199,9 @@ func (store *workspaceStore) GetWorkspace(ctx context.Context, orgId int, ws *wo
 	var workspace workspace.Workspace
 	err := row.Scan(
 		&workspace.Id,
-		&workspace.ScopedId,
+		&workspace.ScopeId,
 		&workspace.OrgId,
-		&workspace.OrgScopedId,
+		&workspace.OrgScopeId,
 		&workspace.Name,
 		&workspace.Description,
 		&workspace.Visibility,
@@ -272,11 +273,11 @@ func (store *workspaceStore) GetProjectList(ctx context.Context, visibility mode
 		var project project.Project
 		err := rows.Scan(
 			&project.Id,
-			&project.ScopedId,
+			&project.ScopeId,
 			&project.OrgId,
 			&project.WorkspaceId,
-			&project.OrgScopedId,
-			&project.WorkspaceScopedId,
+			&project.OrgScopeId,
+			&project.WorkspaceScopeId,
 			&project.Name,
 			&project.Description,
 			&project.Visibility,
@@ -299,4 +300,70 @@ func (store *workspaceStore) GetProjectList(ctx context.Context, visibility mode
 	}
 
 	return projectList, nil
+}
+
+/// GetUserAssignmentList
+
+const getUserAssignmentListQuery = `
+SELECT 
+    ua.id,
+    ua."userId",
+    ur."name",
+    ua."createdAt",
+    ua."createdBy",
+    ua."updatedAt",
+    ua."updatedBy"
+FROM 
+    "system"."UserAssignment" AS ua
+LEFT JOIN 
+    "system"."UserRole" AS ur ON ur.id = ua."userRoleId"
+WHERE (
+	ua."orgId" = @orgId
+	AND
+	ua."workspaceId" = @workspaceId
+)
+GROUP BY 
+    ua.id,
+    ur."name"
+ORDER BY id ASC;
+`
+
+func (store *workspaceStore) GetUserAssignmentList(ctx context.Context, orgId, workspaceId int) ([]*user.UserAssignment, error) {
+	rows, err := store.Conn.Query(ctx, getUserAssignmentListQuery, pgx.NamedArgs{
+		"orgId":       orgId,
+		"workspaceId": workspaceId,
+	})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var uaList []*user.UserAssignment = []*user.UserAssignment{}
+
+	for rows.Next() {
+		var ua user.UserAssignment
+		err := rows.Scan(
+			&ua.Id,
+			&ua.UserId,
+			&ua.Role,
+			&ua.CreatedAt,
+			&ua.CreatedBy,
+			&ua.UpdatedAt,
+			&ua.UpdatedBy,
+		)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+			return nil, err
+		}
+
+		uaList = append(uaList, &ua)
+	}
+
+	if err := rows.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+		return nil, err
+	}
+
+	return uaList, nil
 }
