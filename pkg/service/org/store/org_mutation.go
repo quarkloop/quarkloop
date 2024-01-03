@@ -40,16 +40,16 @@ RETURNING
 `
 
 func (store *orgStore) CreateOrg(ctx context.Context, organization *org.Org) (*org.Org, error) {
-	if organization.ScopedId == "" {
+	if organization.ScopeId == "" {
 		sid, err := gonanoid.New()
 		if err != nil {
 			return nil, err
 		}
-		organization.ScopedId = sid
+		organization.ScopeId = sid
 	}
 
 	row := store.Conn.QueryRow(ctx, createOrgMutation, pgx.NamedArgs{
-		"sid":         organization.ScopedId,
+		"sid":         organization.ScopeId,
 		"name":        organization.Name,
 		"description": organization.Description,
 		"visibility":  organization.Visibility,
@@ -59,7 +59,7 @@ func (store *orgStore) CreateOrg(ctx context.Context, organization *org.Org) (*o
 	var org org.Org
 	rowErr := row.Scan(
 		&org.Id,
-		&org.ScopedId,
+		&org.ScopeId,
 		&org.Name,
 		&org.Description,
 		&org.Visibility,
@@ -93,7 +93,7 @@ WHERE
 func (store *orgStore) UpdateOrgById(ctx context.Context, orgId int, org *org.Org) error {
 	commandTag, err := store.Conn.Exec(ctx, updateOrgByIdMutation, pgx.NamedArgs{
 		"id":          orgId,
-		"sid":         org.ScopedId,
+		"sid":         org.ScopeId,
 		"name":        org.Name,
 		"description": org.Description,
 		"visibility":  org.Visibility,
