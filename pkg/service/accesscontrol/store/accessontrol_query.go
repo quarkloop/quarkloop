@@ -31,7 +31,7 @@ SELECT jsonb_array_length(permissions)::bool FROM (
 	(
 		((@userId = 0 AND ua."userId" IS NULL) OR ua."userId" = @userId) 
 		OR
-		ug."users" @> '[@userId]'
+		ug."users" @> '["@userId"]'::jsonb
 	)
 	AND
 	(
