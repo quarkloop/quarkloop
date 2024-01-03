@@ -19,7 +19,7 @@ import (
 func (s *ProjectApi) CreateProject(ctx *gin.Context) {
 	uriParams := &project.CreateProjectUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -28,7 +28,7 @@ func (s *ProjectApi) CreateProject(ctx *gin.Context) {
 		WorkspaceId: uriParams.WorkspaceId,
 	}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -48,7 +48,7 @@ func (s *ProjectApi) CreateProject(ctx *gin.Context) {
 func (s *ProjectApi) UpdateProjectById(ctx *gin.Context) {
 	uriParams := &project.UpdateProjectByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -58,7 +58,7 @@ func (s *ProjectApi) UpdateProjectById(ctx *gin.Context) {
 		ProjectId:   uriParams.ProjectId,
 	}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -78,7 +78,7 @@ func (s *ProjectApi) UpdateProjectById(ctx *gin.Context) {
 func (s *ProjectApi) DeleteProjectById(ctx *gin.Context) {
 	uriParams := &project.DeleteProjectByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
