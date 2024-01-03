@@ -13,11 +13,12 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/user"
 )
 
-func (s *OrgApi) getOrgById(ctx *gin.Context, orgId int) api.Response {
-	o, err := s.orgService.GetOrgById(ctx, &org.GetOrgByIdQuery{
-		OrgId: orgId,
-	})
+func (s *orgApi) getOrgById(ctx *gin.Context, orgId int) api.Response {
+	o, err := s.orgService.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: orgId})
 	if err != nil {
+		if err == org.ErrOrgNotFound {
+			return api.Error(http.StatusNoContent, nil)
+		}
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
@@ -25,7 +26,7 @@ func (s *OrgApi) getOrgById(ctx *gin.Context, orgId int) api.Response {
 
 	// anonymous user => return org not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
-		return api.Error(http.StatusInternalServerError, org.ErrOrgNotFound)
+		return api.Error(http.StatusNotFound, org.ErrOrgNotFound)
 	}
 	if isPrivate {
 		user := contextdata.GetUser(ctx)
@@ -37,7 +38,7 @@ func (s *OrgApi) getOrgById(ctx *gin.Context, orgId int) api.Response {
 		if err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgRead, query); err != nil {
 			if err == accesscontrol.ErrPermissionDenied {
 				// unauthorized user (permission denied) => return org not found error
-				return api.Error(http.StatusInternalServerError, org.ErrOrgNotFound) // TODO: change status code
+				return api.Error(http.StatusNotFound, org.ErrOrgNotFound) // TODO: change status code
 			}
 
 			return api.Error(http.StatusInternalServerError, err)
@@ -49,7 +50,7 @@ func (s *OrgApi) getOrgById(ctx *gin.Context, orgId int) api.Response {
 	return api.Success(http.StatusOK, o)
 }
 
-func (s *OrgApi) getOrgList(ctx *gin.Context) api.Response {
+func (s *orgApi) getOrgList(ctx *gin.Context) api.Response {
 	if contextdata.IsUserAnonymous(ctx) {
 		// anonymous user => return public orgs
 		orgList, err := s.orgService.GetOrgList(ctx, &org.GetOrgListQuery{Visibility: model.PublicVisibility})
@@ -61,6 +62,7 @@ func (s *OrgApi) getOrgList(ctx *gin.Context) api.Response {
 	}
 
 	user := contextdata.GetUser(ctx)
+
 	// check permissions
 	query := &accesscontrol.EvaluateFilterQuery{UserId: user.GetId()}
 	if err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgRead, query); err != nil {
@@ -89,7 +91,7 @@ func (s *OrgApi) getOrgList(ctx *gin.Context) api.Response {
 	return api.Success(http.StatusOK, &orgList)
 }
 
-func (s *OrgApi) getWorkspaceList(ctx *gin.Context, orgId int) api.Response {
+func (s *orgApi) getWorkspaceList(ctx *gin.Context, orgId int) api.Response {
 	if contextdata.IsUserAnonymous(ctx) {
 		// anonymous user => return public workspaces
 		wsList, err := s.orgService.GetWorkspaceList(ctx, &org.GetWorkspaceListQuery{
@@ -138,7 +140,7 @@ func (s *OrgApi) getWorkspaceList(ctx *gin.Context, orgId int) api.Response {
 	return api.Success(http.StatusOK, &wsList)
 }
 
-func (s *OrgApi) getProjectList(ctx *gin.Context, orgId int) api.Response {
+func (s *orgApi) getProjectList(ctx *gin.Context, orgId int) api.Response {
 	if contextdata.IsUserAnonymous(ctx) {
 		// anonymous user => return public projects
 		projectList, err := s.orgService.GetProjectList(ctx, &org.GetProjectListQuery{
@@ -188,7 +190,7 @@ func (s *OrgApi) getProjectList(ctx *gin.Context, orgId int) api.Response {
 	return api.Success(http.StatusOK, &projectList)
 }
 
-func (s *OrgApi) getMemberList(ctx *gin.Context, query *org.GetMemberListQuery) api.Response {
+func (s *orgApi) getMemberList(ctx *gin.Context, query *org.GetMemberListQuery) api.Response {
 	o, err := s.orgService.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: query.OrgId})
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
