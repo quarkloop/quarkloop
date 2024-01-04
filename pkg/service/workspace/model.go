@@ -55,6 +55,13 @@ type GetWorkspaceByIdQuery struct {
 	WorkspaceId int
 }
 
+// GetWorkspaceVisibilityById
+
+type GetWorkspaceVisibilityByIdQuery struct {
+	OrgId       int
+	WorkspaceId int
+}
+
 // CreateWorkspace
 
 type CreateWorkspaceUriParams struct {
