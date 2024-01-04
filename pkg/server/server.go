@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -16,6 +15,7 @@ import (
 	table_branch "github.com/quarkloop/quarkloop/pkg/api/table_branch"
 	table_record "github.com/quarkloop/quarkloop/pkg/api/table_record"
 	table_schema "github.com/quarkloop/quarkloop/pkg/api/table_schema"
+	"github.com/quarkloop/quarkloop/pkg/api/user"
 	"github.com/quarkloop/quarkloop/pkg/api/workspace"
 	"github.com/quarkloop/quarkloop/pkg/contextdata"
 	acl_impl "github.com/quarkloop/quarkloop/pkg/service/accesscontrol/impl"
@@ -34,7 +34,7 @@ import (
 	table_record_store "github.com/quarkloop/quarkloop/pkg/service/table_record/store"
 	table_schema_impl "github.com/quarkloop/quarkloop/pkg/service/table_schema/impl"
 	table_schema_store "github.com/quarkloop/quarkloop/pkg/service/table_schema/store"
-	"github.com/quarkloop/quarkloop/pkg/service/user"
+	user_service "github.com/quarkloop/quarkloop/pkg/service/user"
 	user_impl "github.com/quarkloop/quarkloop/pkg/service/user/impl"
 	user_store "github.com/quarkloop/quarkloop/pkg/service/user/store"
 	ws_impl "github.com/quarkloop/quarkloop/pkg/service/workspace/impl"
@@ -48,14 +48,13 @@ type Server struct {
 
 	orgService orgService.Service
 
-	orgApi       org.Api
-	workspaceApi workspace.Api
-	projectApi   project.Api
-
-	tableBranchApi table_branch.Api
-	tableSchemaApi table_schema.Api
-	tableRecordApi table_record.Api
-
+	userApi              user.Api
+	orgApi               org.Api
+	workspaceApi         workspace.Api
+	projectApi           project.Api
+	tableBranchApi       table_branch.Api
+	tableSchemaApi       table_schema.Api
+	tableRecordApi       table_record.Api
 	projectSubmissionApi project_submission.Api
 }
 
@@ -104,14 +103,13 @@ func NewDefaultServer(ds *repository.Repository) Server {
 
 		orgService: orgService,
 
-		orgApi:       org.NewOrgApi(orgService, userService, aclService, quotaService),
-		workspaceApi: workspace.NewWorkspaceApi(workspaceService, userService, aclService, quotaService),
-		projectApi:   project.NewProjectApi(projectTableService, userService, aclService, quotaService, tableBranchService),
-
-		tableBranchApi: table_branch.NewTableBranchApi(tableBranchService),
-		tableSchemaApi: table_schema.NewTableSchemaApi(tableSchemaService),
-		tableRecordApi: table_record.NewTableRecordApi(tableRecordService),
-
+		userApi:              user.NewUserApi(userService, aclService),
+		orgApi:               org.NewOrgApi(orgService, userService, aclService, quotaService),
+		workspaceApi:         workspace.NewWorkspaceApi(workspaceService, userService, aclService, quotaService),
+		projectApi:           project.NewProjectApi(projectTableService, userService, aclService, quotaService, tableBranchService),
+		tableBranchApi:       table_branch.NewTableBranchApi(tableBranchService),
+		tableSchemaApi:       table_schema.NewTableSchemaApi(tableSchemaService),
+		tableRecordApi:       table_record.NewTableRecordApi(tableRecordService),
 		projectSubmissionApi: project_submission.NewAppSubmissionApi(projectSubmissionService),
 	}
 
@@ -135,7 +133,7 @@ func (s *Server) UserAuth(ctx *gin.Context) {
 		return
 	}
 
-	u := &user.User{}
+	u := &user_service.User{}
 	err = json.NewDecoder(resp.Body).Decode(u)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
@@ -177,15 +175,87 @@ func (s *Server) ValidateOrgIdUriParam(ctx *gin.Context) {
 	ctx.Next()
 }
 
-func (s *Server) TestHandler1(ctx *gin.Context) {
-	fmt.Printf("\nTestHandler 1\n")
-}
-
-func (s *Server) TestHandler2(ctx *gin.Context) {
-	fmt.Printf("\nTestHandler 2\n")
+func (s *Server) TODOHandler(ctx *gin.Context) {
+	ctx.String(http.StatusOK, "This is a TODO handler")
 }
 
 func (s *Server) BindHandlers(api *api.ServerApi) {
+	// query apis
+	query := s.router.Group("/api/v1")
+	query.Use(s.UserAuth)
+	{
+		query.GET("/user", s.userApi.GetUser)
+		query.GET("/user/username", s.userApi.GetUsername)
+		query.GET("/user/status", s.userApi.GetStatus)
+		query.GET("/user/email", s.userApi.GetEmail)
+		query.GET("/user/preferences", s.userApi.GetPreferences)
+		query.GET("/user/sessions", s.userApi.GetSessions)
+		query.GET("/user/accounts", s.userApi.GetAccounts)
+
+		query.GET("/users", s.userApi.GetUsers)
+		query.GET("/users/:userId_or_username", s.userApi.GetUserById)
+		query.GET("/users/:userId_or_username/username", s.userApi.GetUsernameByUserId)
+		query.GET("/users/:userId_or_username/status", s.userApi.GetStatusByUserId)
+		query.GET("/users/:userId_or_username/email", s.userApi.GetEmailByUserId)
+		query.GET("/users/:userId_or_username/preferences", s.userApi.GetPreferencesByUserId)
+		query.GET("/users/:userId_or_username/sessions", s.userApi.GetSessionsByUserId)
+		query.GET("/users/:userId_or_username/accounts", s.userApi.GetAccountsByUserId)
+	}
+	{
+		query.GET("/orgs", s.orgApi.GetOrgList)
+		query.GET("/workspaces", s.workspaceApi.GetWorkspaceList)
+		query.GET("/projects", s.projectApi.GetProjectList)
+
+		query.GET("/orgs/:orgId", s.orgApi.GetOrgById)
+		query.GET("/orgs/:orgId/members", s.orgApi.GetMemberList)
+		query.GET("/orgs/:orgId/workspaces", s.orgApi.GetWorkspaceList)
+		query.GET("/orgs/:orgId/workspaces/:workspaceId", s.workspaceApi.GetWorkspaceById)
+		query.GET("/orgs/:orgId/workspaces/:workspaceId/projects", s.workspaceApi.GetProjectList)
+		query.GET("/orgs/:orgId/workspaces/:workspaceId/members", s.workspaceApi.GetMemberList)
+		query.GET("/orgs/:orgId/projects", s.orgApi.GetProjectList)
+		query.GET("/orgs/:orgId/projects/:projectId", s.projectApi.GetProjectById)
+		query.GET("/orgs/:orgId/projects/:projectId/members", s.projectApi.GetMemberList)
+	}
+
+	// mutation apis
+	mutation := s.router.Group("/api/v1")
+	mutation.Use(s.UserAuth)
+	mutation.Use(s.AbortAnonymousUserRequest)
+	{
+		mutation.PUT("/user", s.userApi.UpdateUser)
+		mutation.PUT("/user/username", s.userApi.UpdateUsername)
+		mutation.PUT("/user/password", s.userApi.UpdatePassword)
+		mutation.PUT("/user/preferences", s.userApi.UpdatePreferences)
+
+		mutation.PUT("/users/:userId", s.userApi.UpdateUserById)
+		mutation.PUT("/users/:userId/username", s.userApi.UpdateUsernameByUserId)
+		mutation.PUT("/users/:userId/password", s.userApi.UpdatePasswordByUserId)
+		mutation.PUT("/users/:userId/preferences", s.userApi.UpdatePreferencesByUserId)
+		mutation.PUT("/users/:userId/activate", s.TODOHandler)
+		mutation.PUT("/users/:userId/deactivate", s.TODOHandler)
+		mutation.PUT("/users/:userId/block", s.TODOHandler)
+		mutation.PUT("/users/:userId/unblock", s.TODOHandler)
+
+		mutation.DELETE("/users/:userId", s.userApi.DeleteUserById)
+		mutation.DELETE("/users/:userId/sessions/:sessionId", s.userApi.DeleteSessionById)
+		mutation.DELETE("/users/:userId/accounts/:accountId", s.userApi.DeleteAccountById)
+	}
+	{
+		mutation.POST("/orgs", s.orgApi.CreateOrg)
+		mutation.POST("/orgs/:orgId/workspaces", s.workspaceApi.CreateWorkspace)
+		mutation.POST("/orgs/:orgId/workspaces/:workspaceId/projects", s.projectApi.CreateProject)
+
+		mutation.PUT("/orgs/:orgId", s.orgApi.UpdateOrgById)
+		mutation.PUT("/orgs/:orgId/workspaces/:workspaceId", s.workspaceApi.UpdateWorkspaceById)
+		mutation.PUT("/orgs/:orgId/workspaces/:workspaceId/projects/:projectId", s.projectApi.UpdateProjectById)
+
+		mutation.DELETE("/orgs/:orgId", s.orgApi.DeleteOrgById)
+		mutation.DELETE("/orgs/:orgId/workspaces/:workspaceId", s.workspaceApi.DeleteWorkspaceById)
+		mutation.DELETE("/orgs/:orgId/workspaces/:workspaceId/projects/:projectId", s.projectApi.DeleteProjectById)
+	}
+}
+
+func (s *Server) BindHandlers_old(api *api.ServerApi) {
 	router := s.router.Group("/api/v1")
 
 	testGroup := router.Group("/test")
