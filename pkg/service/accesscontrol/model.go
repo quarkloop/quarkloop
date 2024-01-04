@@ -17,6 +17,7 @@ var (
 	GlobalOrgId = 0
 
 	// org actions
+	ActionOrgList   = "org:list"
 	ActionOrgRead   = "org:read"
 	ActionOrgCreate = "org:create"
 	ActionOrgUpdate = "org:update"
@@ -36,6 +37,7 @@ var (
 	ActionOrgUserDelete = "org.user:delete"
 
 	// workspace actions
+	ActionWorkspaceList   = "workspace:list"
 	ActionWorkspaceRead   = "workspace:read"
 	ActionWorkspaceCreate = "workspace:create"
 	ActionWorkspaceUpdate = "workspace:update"
@@ -55,6 +57,7 @@ var (
 	ActionWorkspaceUserDelete = "workspace.user:delete"
 
 	// project actions
+	ActionProjectList   = "project:list"
 	ActionProjectRead   = "project:read"
 	ActionProjectCreate = "project:create"
 	ActionProjectUpdate = "project:update"
