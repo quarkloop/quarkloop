@@ -13,7 +13,6 @@ import (
 //
 // Response status:
 // 200: StatusOK
-// 204: StatusNoContent
 // 400: StatusBadRequest
 // 404: StatusNotFound
 // 500: StatusInternalServerError
@@ -54,6 +53,7 @@ func (s *ProjectApi) GetProjectList(ctx *gin.Context) {
 // Response status:
 // 200: StatusOK
 // 400: StatusBadRequest
+// 404: StatusNotFound
 // 500: StatusInternalServerError
 
 func (s *ProjectApi) GetMemberList(ctx *gin.Context) {
