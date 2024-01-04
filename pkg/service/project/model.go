@@ -54,6 +54,14 @@ type GetProjectByIdQuery struct {
 	ProjectId   int
 }
 
+// GetProjectVisibilityById
+
+type GetProjectVisibilityByIdQuery struct {
+	OrgId       int
+	WorkspaceId int
+	ProjectId   int
+}
+
 // GetProjectList
 
 type GetProjectListQuery struct {
