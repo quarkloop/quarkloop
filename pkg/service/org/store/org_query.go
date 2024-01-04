@@ -61,6 +61,32 @@ func (store *orgStore) GetOrgById(ctx context.Context, query *org.GetOrgByIdQuer
 	return &o, nil
 }
 
+/// GetOrgVisibilityById
+
+const getOrgVisibilityByIdQuery = `
+SELECT 
+    "visibility"::int
+FROM 
+    "system"."Organization"
+WHERE 
+    "id" = @id;
+`
+
+func (store *orgStore) GetOrgVisibilityById(ctx context.Context, query *org.GetOrgVisibilityByIdQuery) (model.ScopeVisibility, error) {
+	row := store.Conn.QueryRow(ctx, getOrgVisibilityByIdQuery, pgx.NamedArgs{"id": query.OrgId})
+
+	var visibility model.ScopeVisibility
+	if err := row.Scan(&visibility); err != nil {
+		if err == pgx.ErrNoRows {
+			return 0, org.ErrOrgNotFound
+		}
+		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
+		return 0, err
+	}
+
+	return visibility, nil
+}
+
 /// GetOrg
 
 const getOrgQuery = `
