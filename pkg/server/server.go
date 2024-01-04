@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -174,6 +175,14 @@ func (s *Server) ValidateOrgIdUriParam(ctx *gin.Context) {
 	}
 
 	ctx.Next()
+}
+
+func (s *Server) TestHandler1(ctx *gin.Context) {
+	fmt.Printf("\nTestHandler 1\n")
+}
+
+func (s *Server) TestHandler2(ctx *gin.Context) {
+	fmt.Printf("\nTestHandler 2\n")
 }
 
 func (s *Server) BindHandlers(api *api.ServerApi) {
