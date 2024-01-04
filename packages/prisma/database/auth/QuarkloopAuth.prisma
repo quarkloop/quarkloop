@@ -12,8 +12,8 @@ datasource db {
 
 model User {
     // id
-    id  BigInt @id @default(autoincrement())
-    sid String @unique // scope id
+    id       BigInt @id @default(autoincrement())
+    username String @unique
 
     // user
     name          String?
