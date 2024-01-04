@@ -8,7 +8,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/user"
 )
 
-func (s *UserApi) updateUserById(ctx *gin.Context, cmd *user.UpdateUserByIdCommand) api.Response {
+func (s *userApi) updateUserById(ctx *gin.Context, cmd *user.UpdateUserByIdCommand) api.Response {
 	err := s.userService.UpdateUserById(ctx, cmd)
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
@@ -17,7 +17,7 @@ func (s *UserApi) updateUserById(ctx *gin.Context, cmd *user.UpdateUserByIdComma
 	return api.Success(http.StatusOK, nil)
 }
 
-func (s *UserApi) deleteUserById(ctx *gin.Context, cmd *user.DeleteUserByIdCommand) api.Response {
+func (s *userApi) deleteUserById(ctx *gin.Context, cmd *user.DeleteUserByIdCommand) api.Response {
 	err := s.userService.DeleteUserById(ctx, cmd)
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
