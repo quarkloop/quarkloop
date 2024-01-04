@@ -2,6 +2,7 @@ package project_impl
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/project/store"
 	"github.com/quarkloop/quarkloop/pkg/service/user"
@@ -38,6 +39,10 @@ func (s *projectService) GetProjectById(ctx *gin.Context, query *project.GetProj
 
 	p.GeneratePath()
 	return p, nil
+}
+
+func (s *projectService) GetProjectVisibilityById(ctx *gin.Context, query *project.GetProjectVisibilityByIdQuery) (model.ScopeVisibility, error) {
+	return s.store.GetProjectVisibilityById(ctx, query)
 }
 
 func (s *projectService) CreateProject(ctx *gin.Context, cmd *project.CreateProjectCommand) (*project.Project, error) {
