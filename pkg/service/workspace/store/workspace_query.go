@@ -109,10 +109,11 @@ FROM
     "system"."Workspace" AS ws
 LEFT JOIN 
     system."Organization" AS org ON org."id" = ws."orgId"
-WHERE 
-    ws."id" = @id
-AND
-    ws."orgId" = @orgId;
+WHERE (
+	ws."orgId" = @orgId
+	AND
+	ws."id" = @id
+);
 `
 
 func (store *workspaceStore) GetWorkspaceById(ctx context.Context, query *workspace.GetWorkspaceByIdQuery) (*workspace.Workspace, error) {
@@ -144,6 +145,38 @@ func (store *workspaceStore) GetWorkspaceById(ctx context.Context, query *worksp
 	}
 
 	return &ws, nil
+}
+
+/// GetWorkspaceVisibilityById
+
+const getWorkspaceVisibilityByIdQuery = `
+SELECT 
+    "visibility"
+FROM 
+    "system"."Workspace"
+WHERE (
+	"orgId" = @orgId
+	AND
+	"id" = @id
+);
+`
+
+func (store *workspaceStore) GetWorkspaceVisibilityById(ctx context.Context, query *workspace.GetWorkspaceVisibilityByIdQuery) (model.ScopeVisibility, error) {
+	row := store.Conn.QueryRow(ctx, getWorkspaceVisibilityByIdQuery, pgx.NamedArgs{
+		"orgId": query.OrgId,
+		"id":    query.WorkspaceId,
+	})
+
+	var visibility model.ScopeVisibility
+	if err := row.Scan(&visibility); err != nil {
+		if err == pgx.ErrNoRows {
+			return 0, workspace.ErrWorkspaceNotFound
+		}
+		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
+		return 0, err
+	}
+
+	return visibility, nil
 }
 
 /// GetWorkspace
