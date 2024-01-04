@@ -122,7 +122,7 @@ type GetAccountsQuery struct{}
 // GetUserById
 
 type GetUserByIdUriParams struct {
-	UserId int `uri:"userId" binding:"required"`
+	UserId int `uri:"userId_or_username" binding:"required"`
 }
 
 type GetUserByIdQuery struct {
@@ -131,56 +131,69 @@ type GetUserByIdQuery struct {
 
 // GetUsernameByUserId
 
-type GetUsernameByUserIdQuery struct{}
+type GetUsernameByUserIdUriParams struct {
+	UserId int `uri:"userId_or_username" binding:"required"`
+}
+
+type GetUsernameByUserIdQuery struct {
+	UserId int
+}
 
 // GetEmailByUserId
 
-type GetEmailByUserIdQuery struct{}
+type GetEmailByUserIdUriParams struct {
+	UserId int `uri:"userId_or_username" binding:"required"`
+}
+
+type GetEmailByUserIdQuery struct {
+	UserId int
+}
 
 // GetStatusByUserId
 
-type GetStatusByUserIdQuery struct{}
+type GetStatusByUserIdUriParams struct {
+	UserId int `uri:"userId_or_username" binding:"required"`
+}
+
+type GetStatusByUserIdQuery struct {
+	UserId int
+}
 
 // GetPreferencesByUserId
 
-type GetPreferencesByUserIdQuery struct{}
+type GetPreferencesByUserIdUriParams struct {
+	UserId int `uri:"userId_or_username" binding:"required"`
+}
+
+type GetPreferencesByUserIdQuery struct {
+	UserId int
+}
 
 // GetSessionsByUserId
 
-type GetSessionsByUserIdQuery struct{}
+type GetSessionsByUserIdUriParams struct {
+	UserId int `uri:"userId_or_username" binding:"required"`
+}
+
+type GetSessionsByUserIdQuery struct {
+	UserId int
+}
 
 // GetAccountsByUserId
 
-type GetAccountsByUserIdQuery struct{}
+type GetAccountsByUserIdUriParams struct {
+	UserId int `uri:"userId_or_username" binding:"required"`
+}
+
+type GetAccountsByUserIdQuery struct {
+	UserId int
+}
 
 // GetUsers
 
 type GetUsersQuery struct{}
 
-////////////////////
-
-// UpdateUserById
-
-type UpdateUserByIdUriParams struct {
-	UserId int `uri:"userId" binding:"required"`
-}
-
-type UpdateUserByIdCommand struct {
-	UserId int
-	User
-}
-
-// DeleteUserById
-
-type DeleteUserByIdUriParams struct {
-	UserId int `uri:"userId" binding:"required"`
-}
-
-type DeleteUserByIdCommand struct {
-	UserId int
-}
-
-/////////////////////////
+//////////////////////////////////////////////////
 
 // UpdateUser
 
@@ -200,28 +213,74 @@ type UpdatePreferencesCommand struct{}
 
 // UpdateUserById
 
-type UpdateUserByIdCommand struct{}
+type UpdateUserByIdUriParams struct {
+	UserId int `uri:"userId" binding:"required"`
+}
+
+type UpdateUserByIdCommand struct {
+	UserId int
+}
 
 // UpdateUsernameByUserId
 
-type UpdateUsernameByUserIdCommand struct{}
+type UpdateUsernameByUserIdUriParams struct {
+	UserId int `uri:"userId" binding:"required"`
+}
+
+type UpdateUsernameByUserIdCommand struct {
+	UserId int
+}
 
 // UpdatePasswordByUserId
 
-type UpdatePasswordByUserIdCommand struct{}
+type UpdatePasswordByUserIdUriParams struct {
+	UserId int `uri:"userId" binding:"required"`
+}
+
+type UpdatePasswordByUserIdCommand struct {
+	UserId int
+}
 
 // UpdatePreferencesByUserId
 
-type UpdatePreferencesByUserIdCommand struct{}
+type UpdatePreferencesByUserIdUriParams struct {
+	UserId int `uri:"userId" binding:"required"`
+}
+
+type UpdatePreferencesByUserIdCommand struct {
+	UserId int
+}
 
 //  DeleteUserById
 
-type DeleteUserByIdCommand struct{}
+type DeleteUserByIdUriParams struct {
+	UserId int `uri:"userId" binding:"required"`
+}
+
+type DeleteUserByIdCommand struct {
+	UserId int
+}
 
 // DeleteSessionById
 
-type DeleteSessionByIdCommand struct{}
+type DeleteSessionByIdUriParams struct {
+	UserId    int `uri:"userId" binding:"required"`
+	SessionId int `uri:"sessionId" binding:"required"`
+}
+
+type DeleteSessionByIdCommand struct {
+	UserId    int
+	SessionId int
+}
 
 // DeleteAccountById
 
-type DeleteAccountByIdCommand struct{}
+type DeleteAccountByIdUriParams struct {
+	UserId    int `uri:"userId" binding:"required"`
+	AccountId int `uri:"accountId" binding:"required"`
+}
+
+type DeleteAccountByIdCommand struct {
+	UserId    int
+	AccountId int
+}
