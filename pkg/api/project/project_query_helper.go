@@ -16,7 +16,7 @@ func (s *ProjectApi) getProjectById(ctx *gin.Context, query *project.GetProjectB
 	p, err := s.projectService.GetProjectById(ctx, query)
 	if err != nil {
 		if err == project.ErrProjectNotFound {
-			return api.Error(http.StatusNoContent, nil)
+			return api.Error(http.StatusNotFound, err)
 		}
 		return api.Error(http.StatusInternalServerError, err)
 	}
@@ -52,46 +52,29 @@ func (s *ProjectApi) getProjectById(ctx *gin.Context, query *project.GetProjectB
 }
 
 func (s *ProjectApi) getProjectList(ctx *gin.Context) api.Response {
-	if contextdata.IsUserAnonymous(ctx) {
-		// anonymous user => return public projects
-		projectList, err := s.projectService.GetProjectList(ctx, &project.GetProjectListQuery{Visibility: model.PublicVisibility})
-		if err != nil {
-			return api.Error(http.StatusInternalServerError, err) // TODO: change status code
-		}
-
-		return api.Success(http.StatusOK, &projectList)
-	}
-
-	user := contextdata.GetUser(ctx)
-
-	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterQuery{UserId: user.GetId()})
-	if err != nil {
-		if err == accesscontrol.ErrPermissionDenied {
-			// unauthorized user (permission denied) => return public projects
-			projectList, err := s.projectService.GetProjectList(ctx, &project.GetProjectListQuery{
-				UserId:     user.GetId(),
-				Visibility: model.PublicVisibility,
-			})
-			if err != nil {
-				return api.Error(http.StatusInternalServerError, err) // TODO: change status code
+	query := &project.GetProjectListQuery{Visibility: model.PublicVisibility}
+	if !contextdata.IsUserAnonymous(ctx) {
+		// check permissions
+		user := contextdata.GetUser(ctx)
+		evalQuery := &accesscontrol.EvaluateFilterQuery{UserId: user.GetId()}
+		if err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectList, evalQuery); err != nil {
+			if err != accesscontrol.ErrPermissionDenied {
+				return api.Error(http.StatusInternalServerError, err)
 			}
-
-			return api.Success(http.StatusOK, &projectList)
+		} else {
+			query.UserId = user.GetId()
+			query.Visibility = model.AllVisibility
 		}
-
-		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	// authorized user => return public + private projects
-	projectList, err := s.projectService.GetProjectList(ctx, &project.GetProjectListQuery{
-		UserId:     user.GetId(),
-		Visibility: model.AllVisibility,
-	})
+	projectList, err := s.projectService.GetProjectList(ctx, query)
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
+	// anonymous user => return public projects
+	// unauthorized user (permission denied) => return public projects
+	// authorized user => return public + private projects
 	return api.Success(http.StatusOK, &projectList)
 }
 
@@ -102,6 +85,9 @@ func (s *ProjectApi) getMemberList(ctx *gin.Context, query *project.GetMemberLis
 		ProjectId:   query.ProjectId,
 	})
 	if err != nil {
+		if err == project.ErrProjectNotFound {
+			return api.Error(http.StatusNotFound, err)
+		}
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
@@ -109,7 +95,7 @@ func (s *ProjectApi) getMemberList(ctx *gin.Context, query *project.GetMemberLis
 
 	// anonymous user => return project not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
-		return api.Error(http.StatusInternalServerError, project.ErrProjectNotFound) // TODO: change sttaus code
+		return api.Error(http.StatusNotFound, project.ErrProjectNotFound) // TODO: change sttaus code
 	}
 	if isPrivate {
 		user := contextdata.GetUser(ctx)
@@ -123,7 +109,7 @@ func (s *ProjectApi) getMemberList(ctx *gin.Context, query *project.GetMemberLis
 		if err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceUserRead, query); err != nil {
 			if err == accesscontrol.ErrPermissionDenied {
 				// unauthorized user (permission denied) => return project not found error
-				return api.Error(http.StatusInternalServerError, project.ErrProjectNotFound) // TODO: change status code
+				return api.Error(http.StatusNotFound, project.ErrProjectNotFound) // TODO: change status code
 			}
 
 			return api.Error(http.StatusInternalServerError, err)
