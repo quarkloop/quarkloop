@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/user"
 )
@@ -9,6 +10,7 @@ import (
 type Service interface {
 	// query
 	GetWorkspaceById(*gin.Context, *GetWorkspaceByIdQuery) (*Workspace, error)
+	GetWorkspaceVisibilityById(*gin.Context, *GetWorkspaceVisibilityByIdQuery) (model.ScopeVisibility, error)
 	GetWorkspaceList(*gin.Context, *GetWorkspaceListQuery) ([]*Workspace, error)
 	GetProjectList(*gin.Context, *GetProjectListQuery) ([]*project.Project, error)
 	GetUserAssignmentList(*gin.Context, *GetUserAssignmentListQuery) ([]*user.UserAssignment, error)
