@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/user"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
@@ -12,6 +13,7 @@ import (
 type WorkspaceStore interface {
 	// query
 	GetWorkspaceById(context.Context, *workspace.GetWorkspaceByIdQuery) (*workspace.Workspace, error)
+	GetWorkspaceVisibilityById(context.Context, *workspace.GetWorkspaceVisibilityByIdQuery) (model.ScopeVisibility, error)
 	GetWorkspaceList(context.Context, *workspace.GetWorkspaceListQuery) ([]*workspace.Workspace, error)
 	GetProjectList(context.Context, *workspace.GetProjectListQuery) ([]*project.Project, error)
 	GetUserAssignmentList(context.Context, *workspace.GetUserAssignmentListQuery) ([]*user.UserAssignment, error)
