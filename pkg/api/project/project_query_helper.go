@@ -13,7 +13,11 @@ import (
 )
 
 func (s *ProjectApi) getProjectById(ctx *gin.Context, query *project.GetProjectByIdQuery) api.Response {
-	p, err := s.projectService.GetProjectById(ctx, query)
+	visibility, err := s.projectService.GetProjectVisibilityById(ctx, &project.GetProjectVisibilityByIdQuery{
+		OrgId:       query.OrgId,
+		WorkspaceId: query.WorkspaceId,
+		ProjectId:   query.ProjectId,
+	})
 	if err != nil {
 		if err == project.ErrProjectNotFound {
 			return api.Error(http.StatusNotFound, err)
@@ -21,7 +25,7 @@ func (s *ProjectApi) getProjectById(ctx *gin.Context, query *project.GetProjectB
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	isPrivate := p.Visibility == model.PrivateVisibility
+	isPrivate := visibility == model.PrivateVisibility
 
 	// anonymous user => return project not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
@@ -44,6 +48,14 @@ func (s *ProjectApi) getProjectById(ctx *gin.Context, query *project.GetProjectB
 
 			return api.Error(http.StatusInternalServerError, err)
 		}
+	}
+
+	p, err := s.projectService.GetProjectById(ctx, query)
+	if err != nil {
+		if err == project.ErrProjectNotFound {
+			return api.Error(http.StatusNotFound, err)
+		}
+		return api.Error(http.StatusInternalServerError, err)
 	}
 
 	// anonymous and unauthorized user => return public project
@@ -79,7 +91,7 @@ func (s *ProjectApi) getProjectList(ctx *gin.Context) api.Response {
 }
 
 func (s *ProjectApi) getMemberList(ctx *gin.Context, query *project.GetMemberListQuery) api.Response {
-	ws, err := s.projectService.GetProjectById(ctx, &project.GetProjectByIdQuery{
+	visibility, err := s.projectService.GetProjectVisibilityById(ctx, &project.GetProjectVisibilityByIdQuery{
 		OrgId:       query.OrgId,
 		WorkspaceId: query.WorkspaceId,
 		ProjectId:   query.ProjectId,
@@ -91,7 +103,7 @@ func (s *ProjectApi) getMemberList(ctx *gin.Context, query *project.GetMemberLis
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	isPrivate := ws.Visibility == model.PrivateVisibility
+	isPrivate := visibility == model.PrivateVisibility
 
 	// anonymous user => return project not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
