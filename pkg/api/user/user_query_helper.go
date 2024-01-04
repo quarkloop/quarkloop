@@ -8,7 +8,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/user"
 )
 
-func (s *UserApi) getUserById(ctx *gin.Context, query *user.GetUserByIdQuery) api.Response {
+func (s *userApi) getUserById(ctx *gin.Context, query *user.GetUserByIdQuery) api.Response {
 	user, err := s.userService.GetUserById(ctx, query)
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
