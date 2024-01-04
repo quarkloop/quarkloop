@@ -86,3 +86,102 @@ func (store *orgStore) DeleteUserById(ctx context.Context, userId int) error {
 
 	return nil
 }
+
+/// UpdateUserQuery
+
+const updateUserQuery = `
+`
+
+func (store *orgStore) UpdateUser(ctx context.Context, cmd *user.UpdateUserCommand) error {
+
+}
+
+/// UpdateUsernameQuery
+
+const updateUsernameQuery = `
+`
+
+func (store *orgStore) UpdateUsername(ctx context.Context, cmd *user.UpdateUsernameCommand) error {
+
+}
+
+/// UpdatePasswordQuery
+
+const updatePasswordQuery = `
+`
+
+func (store *orgStore) UpdatePassword(ctx context.Context, cmd *user.UpdatePasswordCommand) error {
+
+}
+
+/// UpdatePreferencesQuery
+
+const updatePreferencesQuery = `
+`
+
+func (store *orgStore) UpdatePreferences(ctx context.Context, cmd *user.UpdatePreferencesCommand) error {
+
+}
+
+/// UpdateUserByIdQuery
+
+const updateUserByIdQuery = `
+`
+
+func (store *orgStore) UpdateUserById(ctx context.Context, cmd *user.UpdateUserByIdCommand) error {
+
+}
+
+/// UpdateUsernameByUserIdQuery
+
+const updateUsernameByUserIdQuery = `
+`
+
+func (store *orgStore) UpdateUsernameByUserId(ctx context.Context, cmd *user.UpdateUsernameByUserIdCommand) error {
+
+}
+
+/// UpdatePasswordByUserIdQuery
+
+const updatePasswordByUserIdQuery = `
+`
+
+func (store *orgStore) UpdatePasswordByUserId(ctx context.Context, cmd *user.UpdatePasswordByUserIdCommand) error {
+
+}
+
+/// UpdatePreferencesByUserIdQuery
+
+const updatePreferencesByUserIdQuery = `
+`
+
+func (store *orgStore) UpdatePreferencesByUserId(ctx context.Context, cmd *user.UpdatePreferencesByUserIdCommand) error {
+
+}
+
+/// DeleteUserByIdQuery
+
+const deleteUserByIdQuery = `
+`
+
+func (store *orgStore) DeleteUserById(ctx context.Context, cmd *user.DeleteUserByIdCommand) error {
+
+}
+
+/// DeleteSessionByIdQuery
+
+const deleteSessionByIdQuery = `
+`
+
+func (store *orgStore) DeleteSessionById(ctx context.Context, cmd *user.DeleteSessionByIdCommand) error {
+
+}
+
+/// deleteAccountByIdQuery
+
+const DeleteAccountByIdQuery = `
+`
+
+func (store *orgStore) DeleteAccountById(ctx context.Context, cmd *user.DeleteAccountByIdCommand) error {
+
+}
