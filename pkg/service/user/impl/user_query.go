@@ -17,13 +17,6 @@ func NewUserService(ds store.OrgStore) user.Service {
 	}
 }
 
-func (s *userService) GetUserById(ctx context.Context, query *user.GetUserByIdQuery) (*user.User, error) {
-	u, err := s.store.GetUserById(ctx, query.UserId)
-	return u, err
-}
-
-/////////////
-
 func (s *userService) GetUser(ctx context.Context, query *user.GetUserQuery) (*user.User, error) {
 	res, err := s.store.GetUser(ctx, query)
 	return res, err
