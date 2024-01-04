@@ -51,6 +51,11 @@ type GetOrgByIdQuery struct {
 	OrgId int
 }
 
+// GetOrgVisibilityById
+type GetOrgVisibilityByIdQuery struct {
+	OrgId int
+}
+
 // CreateOrg
 
 type CreateOrgCommand struct {
