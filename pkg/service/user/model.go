@@ -7,8 +7,8 @@ import (
 
 type User struct {
 	// id
-	Id      int    `json:"id,string"` // string: type bigint from javascript is encoded into string
-	ScopeId string `json:"sid"`
+	Id       int    `json:"id,string"` // string: type bigint from javascript is encoded into string
+	Username string `json:"username"`
 
 	// user
 	Name          string     `json:"name,omitempty"`
@@ -91,6 +91,34 @@ type MemberDTO struct {
 	UpdatedBy *string    `json:"updatedBy,omitempty"`
 }
 
+// GetUser
+
+type GetUserQuery struct{}
+
+// GetUsername
+
+type GetUsernameQuery struct{}
+
+// GetEmail
+
+type GetEmailQuery struct{}
+
+// GetStatus
+
+type GetStatusQuery struct{}
+
+// GetPreferences
+
+type GetPreferencesQuery struct{}
+
+// GetSessions
+
+type GetSessionsQuery struct{}
+
+// GetAccounts
+
+type GetAccountsQuery struct{}
+
 // GetUserById
 
 type GetUserByIdUriParams struct {
@@ -101,11 +129,35 @@ type GetUserByIdQuery struct {
 	UserId int
 }
 
-// GetUserByEmail
+// GetUsernameByUserId
 
-type GetUserByEmailQuery struct {
-	Email string
-}
+type GetUsernameByUserIdQuery struct{}
+
+// GetEmailByUserId
+
+type GetEmailByUserIdQuery struct{}
+
+// GetStatusByUserId
+
+type GetStatusByUserIdQuery struct{}
+
+// GetPreferencesByUserId
+
+type GetPreferencesByUserIdQuery struct{}
+
+// GetSessionsByUserId
+
+type GetSessionsByUserIdQuery struct{}
+
+// GetAccountsByUserId
+
+type GetAccountsByUserIdQuery struct{}
+
+// GetUsers
+
+type GetUsersQuery struct{}
+
+////////////////////
 
 // UpdateUserById
 
@@ -128,14 +180,48 @@ type DeleteUserByIdCommand struct {
 	UserId int
 }
 
-// GetUserAccountByUserId
+/////////////////////////
 
-type GetUserAccountByUserIdQuery struct {
-	UserId int
-}
+// UpdateUser
 
-//  GetUserSessionByUserId
+type UpdateUserCommand struct{}
 
-type GetUserSessionByUserIdQuery struct {
-	UserId int
-}
+// UpdateUsername
+
+type UpdateUsernameCommand struct{}
+
+// UpdatePassword
+
+type UpdatePasswordCommand struct{}
+
+// UpdatePreferences
+
+type UpdatePreferencesCommand struct{}
+
+// UpdateUserById
+
+type UpdateUserByIdCommand struct{}
+
+// UpdateUsernameByUserId
+
+type UpdateUsernameByUserIdCommand struct{}
+
+// UpdatePasswordByUserId
+
+type UpdatePasswordByUserIdCommand struct{}
+
+// UpdatePreferencesByUserId
+
+type UpdatePreferencesByUserIdCommand struct{}
+
+//  DeleteUserById
+
+type DeleteUserByIdCommand struct{}
+
+// DeleteSessionById
+
+type DeleteSessionByIdCommand struct{}
+
+// DeleteAccountById
+
+type DeleteAccountByIdCommand struct{}
