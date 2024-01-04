@@ -14,7 +14,10 @@ import (
 )
 
 func (s *WorkspaceApi) getWorkspaceById(ctx *gin.Context, query *workspace.GetWorkspaceByIdQuery) api.Response {
-	ws, err := s.workspaceService.GetWorkspaceById(ctx, query)
+	visibility, err := s.workspaceService.GetWorkspaceVisibilityById(ctx, &workspace.GetWorkspaceVisibilityByIdQuery{
+		OrgId:       query.OrgId,
+		WorkspaceId: query.WorkspaceId,
+	})
 	if err != nil {
 		if err == workspace.ErrWorkspaceNotFound {
 			return api.Error(http.StatusNotFound, err)
@@ -22,7 +25,7 @@ func (s *WorkspaceApi) getWorkspaceById(ctx *gin.Context, query *workspace.GetWo
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	isPrivate := ws.Visibility == model.PrivateVisibility
+	isPrivate := visibility == model.PrivateVisibility
 
 	// anonymous user => return workspace not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
@@ -43,6 +46,14 @@ func (s *WorkspaceApi) getWorkspaceById(ctx *gin.Context, query *workspace.GetWo
 			}
 			return api.Error(http.StatusInternalServerError, err)
 		}
+	}
+
+	ws, err := s.workspaceService.GetWorkspaceById(ctx, query)
+	if err != nil {
+		if err == workspace.ErrWorkspaceNotFound {
+			return api.Error(http.StatusNotFound, err)
+		}
+		return api.Error(http.StatusInternalServerError, err)
 	}
 
 	// anonymous and unauthorized user => return public workspace
@@ -108,7 +119,7 @@ func (s *WorkspaceApi) getProjectList(ctx *gin.Context, query *workspace.GetProj
 }
 
 func (s *WorkspaceApi) getMemberList(ctx *gin.Context, query *workspace.GetMemberListQuery) api.Response {
-	ws, err := s.workspaceService.GetWorkspaceById(ctx, &workspace.GetWorkspaceByIdQuery{
+	visibility, err := s.workspaceService.GetWorkspaceVisibilityById(ctx, &workspace.GetWorkspaceVisibilityByIdQuery{
 		OrgId:       query.OrgId,
 		WorkspaceId: query.WorkspaceId,
 	})
@@ -119,7 +130,7 @@ func (s *WorkspaceApi) getMemberList(ctx *gin.Context, query *workspace.GetMembe
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	isPrivate := ws.Visibility == model.PrivateVisibility
+	isPrivate := visibility == model.PrivateVisibility
 
 	// anonymous user => return workspace not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
