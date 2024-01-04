@@ -2,6 +2,7 @@ package workspace_impl
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/user"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
@@ -39,6 +40,10 @@ func (s *workspaceService) GetWorkspaceById(ctx *gin.Context, query *workspace.G
 
 	ws.GeneratePath()
 	return ws, nil
+}
+
+func (s *workspaceService) GetWorkspaceVisibilityById(ctx *gin.Context, query *workspace.GetWorkspaceVisibilityByIdQuery) (model.ScopeVisibility, error) {
+	return s.store.GetWorkspaceVisibilityById(ctx, query)
 }
 
 func (s *workspaceService) CreateWorkspace(ctx *gin.Context, cmd *workspace.CreateWorkspaceCommand) (*workspace.Workspace, error) {
