@@ -13,36 +13,43 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/user"
 )
 
-func (s *orgApi) getOrgById(ctx *gin.Context, orgId int) api.Response {
-	o, err := s.orgService.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: orgId})
+func (s *orgApi) getOrgById(ctx *gin.Context, query *org.GetOrgByIdQuery) api.Response {
+	visibility, err := s.orgService.GetOrgVisibilityById(ctx, &org.GetOrgVisibilityByIdQuery{OrgId: query.OrgId})
 	if err != nil {
 		if err == org.ErrOrgNotFound {
-			return api.Error(http.StatusNoContent, nil)
+			return api.Error(http.StatusNotFound, err)
 		}
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	isPrivate := o.Visibility == model.PrivateVisibility
+	isPrivate := visibility == model.PrivateVisibility
 
 	// anonymous user => return org not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
 		return api.Error(http.StatusNotFound, org.ErrOrgNotFound)
 	}
 	if isPrivate {
-		user := contextdata.GetUser(ctx)
 		// check permissions
+		user := contextdata.GetUser(ctx)
 		query := &accesscontrol.EvaluateFilterQuery{
 			UserId: user.GetId(),
-			OrgId:  orgId,
+			OrgId:  query.OrgId,
 		}
 		if err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgRead, query); err != nil {
 			if err == accesscontrol.ErrPermissionDenied {
 				// unauthorized user (permission denied) => return org not found error
 				return api.Error(http.StatusNotFound, org.ErrOrgNotFound) // TODO: change status code
 			}
-
 			return api.Error(http.StatusInternalServerError, err)
 		}
+	}
+
+	o, err := s.orgService.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: query.OrgId})
+	if err != nil {
+		if err == org.ErrOrgNotFound {
+			return api.Error(http.StatusNotFound, err)
+		}
+		return api.Error(http.StatusInternalServerError, err)
 	}
 
 	// anonymous and unauthorized user => return public org
@@ -51,160 +58,114 @@ func (s *orgApi) getOrgById(ctx *gin.Context, orgId int) api.Response {
 }
 
 func (s *orgApi) getOrgList(ctx *gin.Context) api.Response {
-	if contextdata.IsUserAnonymous(ctx) {
-		// anonymous user => return public orgs
-		orgList, err := s.orgService.GetOrgList(ctx, &org.GetOrgListQuery{Visibility: model.PublicVisibility})
-		if err != nil {
-			return api.Error(http.StatusInternalServerError, err)
-		}
-
-		return api.Success(http.StatusOK, &orgList)
-	}
-
-	user := contextdata.GetUser(ctx)
-
-	// check permissions
-	query := &accesscontrol.EvaluateFilterQuery{UserId: user.GetId()}
-	if err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgRead, query); err != nil {
-		if err == accesscontrol.ErrPermissionDenied {
-			// unauthorized user (permission denied) => return public orgs
-			orgList, err := s.orgService.GetOrgList(ctx, &org.GetOrgListQuery{Visibility: model.PublicVisibility})
-			if err != nil {
-				return api.Error(http.StatusInternalServerError, err) // TODO: change status code
+	query := &org.GetOrgListQuery{Visibility: model.PublicVisibility}
+	if !contextdata.IsUserAnonymous(ctx) {
+		// check permissions
+		user := contextdata.GetUser(ctx)
+		evalQuery := &accesscontrol.EvaluateFilterQuery{UserId: user.GetId()}
+		if err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgList, evalQuery); err != nil {
+			if err != accesscontrol.ErrPermissionDenied {
+				return api.Error(http.StatusInternalServerError, err)
 			}
-
-			return api.Success(http.StatusOK, &orgList)
+		} else {
+			query.UserId = user.GetId()
+			query.Visibility = model.AllVisibility
 		}
-
-		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	// authorized user => return public + private orgs
-	orgList, err := s.orgService.GetOrgList(ctx, &org.GetOrgListQuery{
-		UserId:     user.GetId(),
-		Visibility: model.AllVisibility,
-	})
+	orgList, err := s.orgService.GetOrgList(ctx, query)
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
+	// anonymous user => return public orgs
+	// unauthorized user (permission denied) => return public orgs
+	// authorized user => return public + private orgs
 	return api.Success(http.StatusOK, &orgList)
 }
 
 func (s *orgApi) getWorkspaceList(ctx *gin.Context, orgId int) api.Response {
-	if contextdata.IsUserAnonymous(ctx) {
-		// anonymous user => return public workspaces
-		wsList, err := s.orgService.GetWorkspaceList(ctx, &org.GetWorkspaceListQuery{
-			OrgId:      orgId,
-			Visibility: model.PublicVisibility,
-		})
-		if err != nil {
-			return api.Error(http.StatusInternalServerError, err) // TODO: change status code
+	visibility := model.PublicVisibility
+	if !contextdata.IsUserAnonymous(ctx) {
+		// check permissions
+		user := contextdata.GetUser(ctx)
+		query := &accesscontrol.EvaluateFilterQuery{
+			UserId: user.GetId(),
+			OrgId:  orgId,
 		}
-
-		return api.Success(http.StatusOK, &wsList)
-	}
-
-	user := contextdata.GetUser(ctx)
-	// check permissions
-	query := &accesscontrol.EvaluateFilterQuery{
-		UserId: user.GetId(),
-		OrgId:  orgId,
-	}
-	if err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgRead, query); err != nil {
-		if err == accesscontrol.ErrPermissionDenied {
-			// unauthorized user (permission denied) => return public workspaces
-			wsList, err := s.orgService.GetWorkspaceList(ctx, &org.GetWorkspaceListQuery{
-				OrgId:      orgId,
-				Visibility: model.PublicVisibility,
-			})
-			if err != nil {
-				return api.Error(http.StatusInternalServerError, err) // TODO: change status code
+		if err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceList, query); err != nil {
+			if err != accesscontrol.ErrPermissionDenied {
+				return api.Error(http.StatusInternalServerError, err)
 			}
-
-			return api.Success(http.StatusOK, &wsList)
+		} else {
+			visibility = model.AllVisibility
 		}
-
-		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	// authorized user => return public + private workspaces
 	wsList, err := s.orgService.GetWorkspaceList(ctx, &org.GetWorkspaceListQuery{
 		OrgId:      orgId,
-		Visibility: model.AllVisibility,
+		Visibility: visibility,
 	})
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
+	// anonymous user => return public workspaces
+	// unauthorized user (permission denied) => return public workspaces
+	// authorized user => return public + private workspaces
 	return api.Success(http.StatusOK, &wsList)
 }
 
 func (s *orgApi) getProjectList(ctx *gin.Context, orgId int) api.Response {
-	if contextdata.IsUserAnonymous(ctx) {
-		// anonymous user => return public projects
-		projectList, err := s.orgService.GetProjectList(ctx, &org.GetProjectListQuery{
-			OrgId:      orgId,
-			Visibility: model.PublicVisibility,
+	visibility := model.PublicVisibility
+	if !contextdata.IsUserAnonymous(ctx) {
+		// check permissions
+		user := contextdata.GetUser(ctx)
+		err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectList, &accesscontrol.EvaluateFilterQuery{
+			UserId: user.GetId(),
+			OrgId:  orgId,
 		})
 		if err != nil {
-			return api.Error(http.StatusInternalServerError, err) // TODO: change status code
-		}
-
-		return api.Success(http.StatusOK, &projectList)
-	}
-
-	user := contextdata.GetUser(ctx)
-
-	// check permissions
-	err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, &accesscontrol.EvaluateFilterQuery{
-		UserId: user.GetId(),
-		OrgId:  orgId,
-	})
-	if err != nil {
-		if err == accesscontrol.ErrPermissionDenied {
-			// unauthorized user (permission denied) => return public projects
-			projectList, err := s.orgService.GetProjectList(ctx, &org.GetProjectListQuery{
-				OrgId:      orgId,
-				Visibility: model.PublicVisibility,
-			})
-			if err != nil {
-				return api.Error(http.StatusInternalServerError, err) // TODO: change status code
+			if err != accesscontrol.ErrPermissionDenied {
+				return api.Error(http.StatusInternalServerError, err)
 			}
-
-			return api.Success(http.StatusOK, &projectList)
+		} else {
+			visibility = model.AllVisibility
 		}
-
-		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	// authorized user => return public + private projects
 	projectList, err := s.orgService.GetProjectList(ctx, &org.GetProjectListQuery{
 		OrgId:      orgId,
-		Visibility: model.AllVisibility,
+		Visibility: visibility,
 	})
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
+	// anonymous user => return public projects
+	// unauthorized user (permission denied) => return public projects
+	// authorized user => return public + private projects
 	return api.Success(http.StatusOK, &projectList)
 }
 
 func (s *orgApi) getMemberList(ctx *gin.Context, query *org.GetMemberListQuery) api.Response {
-	o, err := s.orgService.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: query.OrgId})
+	visibility, err := s.orgService.GetOrgVisibilityById(ctx, &org.GetOrgVisibilityByIdQuery{OrgId: query.OrgId})
 	if err != nil {
+		if err == org.ErrOrgNotFound {
+			return api.Error(http.StatusNotFound, err)
+		}
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	isPrivate := o.Visibility == model.PrivateVisibility
+	isPrivate := visibility == model.PrivateVisibility
 
 	// anonymous user => return org not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
-		return api.Error(http.StatusInternalServerError, org.ErrOrgNotFound) // TODO: change sttaus code
+		return api.Error(http.StatusNotFound, org.ErrOrgNotFound) // TODO: change sttaus code
 	}
 	if isPrivate {
-		user := contextdata.GetUser(ctx)
 		// check permissions
+		user := contextdata.GetUser(ctx)
 		query := &accesscontrol.EvaluateFilterQuery{
 			UserId: user.GetId(),
 			OrgId:  query.OrgId,
@@ -212,7 +173,7 @@ func (s *orgApi) getMemberList(ctx *gin.Context, query *org.GetMemberListQuery) 
 		if err := s.aclService.Evaluate(ctx, accesscontrol.ActionOrgUserRead, query); err != nil {
 			if err == accesscontrol.ErrPermissionDenied {
 				// unauthorized user (permission denied) => return org not found error
-				return api.Error(http.StatusInternalServerError, org.ErrOrgNotFound) // TODO: change status code
+				return api.Error(http.StatusNotFound, org.ErrOrgNotFound) // TODO: change status code
 			}
 
 			return api.Error(http.StatusInternalServerError, err)
