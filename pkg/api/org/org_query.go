@@ -14,7 +14,6 @@ import (
 //
 // Response status:
 // 200: StatusOK
-// 204: StatusNoContent
 // 400: StatusBadRequest
 // 404: StatusNotFound
 // 500: StatusInternalServerError
@@ -26,7 +25,7 @@ func (s *orgApi) GetOrgById(ctx *gin.Context) {
 		return
 	}
 
-	res := s.getOrgById(ctx, uriParams.OrgId)
+	res := s.getOrgById(ctx, &org.GetOrgByIdQuery{OrgId: uriParams.OrgId})
 	ctx.JSON(res.Status(), res.Body())
 }
 
@@ -91,6 +90,7 @@ func (s *orgApi) GetProjectList(ctx *gin.Context) {
 // Response status:
 // 200: StatusOK
 // 400: StatusBadRequest
+// 404: StatusNotFound
 // 500: StatusInternalServerError
 
 func (s *orgApi) GetMemberList(ctx *gin.Context) {
