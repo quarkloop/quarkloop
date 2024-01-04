@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/user"
 )
@@ -11,6 +12,7 @@ import (
 type ProjectStore interface {
 	// query
 	GetProjectById(context.Context, *project.GetProjectByIdQuery) (*project.Project, error)
+	GetProjectVisibilityById(context.Context, *project.GetProjectVisibilityByIdQuery) (model.ScopeVisibility, error)
 	GetProjectList(context.Context, *project.GetProjectListQuery) ([]*project.Project, error)
 	GetUserAssignmentList(context.Context, *project.GetUserAssignmentListQuery) ([]*user.UserAssignment, error)
 
