@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gin-gonic/gin"
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 	"github.com/quarkloop/quarkloop/pkg/service/org/store"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
@@ -43,6 +44,10 @@ func (s *orgService) GetOrgById(ctx *gin.Context, query *org.GetOrgByIdQuery) (*
 
 	o.GeneratePath()
 	return o, nil
+}
+
+func (s *orgService) GetOrgVisibilityById(ctx *gin.Context, query *org.GetOrgVisibilityByIdQuery) (model.ScopeVisibility, error) {
+	return s.store.GetOrgVisibilityById(ctx, query)
 }
 
 func (s *orgService) CreateOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) (*org.Org, error) {
