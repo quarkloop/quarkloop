@@ -166,6 +166,41 @@ func (store *projectStore) GetProjectById(ctx context.Context, query *project.Ge
 	return &p, nil
 }
 
+/// GetProjectVisibilityById
+
+const getProjectVisibilityByIdQuery = `
+SELECT 
+    "visibility"
+FROM 
+    "system"."Project"
+WHERE (
+	"orgId" = @orgId
+	AND
+	"workspaceId" = @workspaceId
+	AND
+	"id" = @id
+);
+`
+
+func (store *projectStore) GetProjectVisibilityById(ctx context.Context, query *project.GetProjectVisibilityByIdQuery) (model.ScopeVisibility, error) {
+	row := store.Conn.QueryRow(ctx, getProjectVisibilityByIdQuery, pgx.NamedArgs{
+		"orgId":       query.OrgId,
+		"workspaceId": query.WorkspaceId,
+		"id":          query.ProjectId,
+	})
+
+	var visibility model.ScopeVisibility
+	if err := row.Scan(&visibility); err != nil {
+		if err == pgx.ErrNoRows {
+			return 0, project.ErrProjectNotFound
+		}
+		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
+		return 0, err
+	}
+
+	return visibility, nil
+}
+
 /// GetProject
 
 const getProjectQuery = `
