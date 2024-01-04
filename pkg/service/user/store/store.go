@@ -8,17 +8,35 @@ import (
 )
 
 type OrgStore interface {
-	// user
-	GetUserById(ctx context.Context, userId int) (*user.User, error)
-	GetUserByEmail(ctx context.Context, email string) (*user.User, error)
-	UpdateUserById(ctx context.Context, userId int, user *user.User) error
-	DeleteUserById(ctx context.Context, userId int) error
+	// query
+	GetUser(context.Context, *user.GetUserQuery) (*user.User, error)
+	GetUsername(context.Context, *user.GetUsernameQuery) (string, error)
+	GetEmail(context.Context, *user.GetEmailQuery) (string, error)
+	GetStatus(context.Context, *user.GetStatusQuery) (any, error)
+	GetPreferences(context.Context, *user.GetPreferencesQuery) (any, error)
+	GetSessions(context.Context, *user.GetSessionsQuery) ([]*user.UserSession, error)
+	GetAccounts(context.Context, *user.GetAccountsQuery) ([]*user.UserAccount, error)
+	GetUserById(context.Context, *user.GetUserByIdQuery) (*user.User, error)
+	GetUsernameByUserId(context.Context, *user.GetUsernameByUserIdQuery) (string, error)
+	GetEmailByUserId(context.Context, *user.GetEmailByUserIdQuery) (string, error)
+	GetStatusByUserId(context.Context, *user.GetStatusByUserIdQuery) (any, error)
+	GetPreferencesByUserId(context.Context, *user.GetPreferencesByUserIdQuery) (any, error)
+	GetSessionsByUserId(context.Context, *user.GetSessionsByUserIdQuery) ([]*user.UserSession, error)
+	GetAccountsByUserId(context.Context, *user.GetAccountsByUserIdQuery) ([]*user.UserAccount, error)
+	GetUsers(context.Context, *user.GetUsersQuery) ([]*user.User, error)
 
-	// account
-	GetUserAccountByUserId(ctx context.Context, userId int) (*user.UserAccount, error)
-
-	// session
-	GetUserSessionByUserId(ctx context.Context, userId int) (*user.UserSession, error)
+	// mutation
+	UpdateUser(context.Context, *user.UpdateUserCommand) error
+	UpdateUsername(context.Context, *user.UpdateUsernameCommand) error
+	UpdatePassword(context.Context, *user.UpdatePasswordCommand) error
+	UpdatePreferences(context.Context, *user.UpdatePreferencesCommand) error
+	UpdateUserById(context.Context, *user.UpdateUserByIdCommand) error
+	UpdateUsernameByUserId(context.Context, *user.UpdateUsernameByUserIdCommand) error
+	UpdatePasswordByUserId(context.Context, *user.UpdatePasswordByUserIdCommand) error
+	UpdatePreferencesByUserId(context.Context, *user.UpdatePreferencesByUserIdCommand) error
+	DeleteUserById(context.Context, *user.DeleteUserByIdCommand) error
+	DeleteSessionById(context.Context, *user.DeleteSessionByIdCommand) error
+	DeleteAccountById(context.Context, *user.DeleteAccountByIdCommand) error
 }
 
 type orgStore struct {
