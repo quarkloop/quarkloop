@@ -65,7 +65,7 @@ func (store *orgStore) GetOrgById(ctx context.Context, query *org.GetOrgByIdQuer
 
 const getOrgVisibilityByIdQuery = `
 SELECT 
-    "visibility"::int
+    "visibility"
 FROM 
     "system"."Organization"
 WHERE 
