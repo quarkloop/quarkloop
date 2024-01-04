@@ -134,7 +134,13 @@ func (s *userApi) GetUserById(ctx *gin.Context) {
 // 500: StatusInternalServerError
 
 func (s *userApi) GetUsernameByUserId(ctx *gin.Context) {
-	query := &user.GetUsernameByUserIdQuery{}
+	uriParams := &user.GetUsernameByUserIdUriParams{}
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	query := &user.GetUsernameByUserIdQuery{UserId: uriParams.UserId}
 	res := s.getUsernameByUserId(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
@@ -148,7 +154,13 @@ func (s *userApi) GetUsernameByUserId(ctx *gin.Context) {
 // 500: StatusInternalServerError
 
 func (s *userApi) GetEmailByUserId(ctx *gin.Context) {
-	query := &user.GetEmailByUserIdQuery{}
+	uriParams := &user.GetEmailByUserIdUriParams{}
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	query := &user.GetEmailByUserIdQuery{UserId: uriParams.UserId}
 	res := s.getEmailByUserId(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
@@ -162,7 +174,13 @@ func (s *userApi) GetEmailByUserId(ctx *gin.Context) {
 // 500: StatusInternalServerError
 
 func (s *userApi) GetStatusByUserId(ctx *gin.Context) {
-	query := &user.GetStatusByUserIdQuery{}
+	uriParams := &user.GetStatusByUserIdUriParams{}
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	query := &user.GetStatusByUserIdQuery{UserId: uriParams.UserId}
 	res := s.getStatusByUserId(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
@@ -176,7 +194,13 @@ func (s *userApi) GetStatusByUserId(ctx *gin.Context) {
 // 500: StatusInternalServerError
 
 func (s *userApi) GetPreferencesByUserId(ctx *gin.Context) {
-	query := &user.GetPreferencesByUserIdQuery{}
+	uriParams := &user.GetPreferencesByUserIdUriParams{}
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	query := &user.GetPreferencesByUserIdQuery{UserId: uriParams.UserId}
 	res := s.getPreferencesByUserId(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
@@ -190,7 +214,13 @@ func (s *userApi) GetPreferencesByUserId(ctx *gin.Context) {
 // 500: StatusInternalServerError
 
 func (s *userApi) GetSessionsByUserId(ctx *gin.Context) {
-	query := &user.GetSessionsByUserIdQuery{}
+	uriParams := &user.GetSessionsByUserIdUriParams{}
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	query := &user.GetSessionsByUserIdQuery{UserId: uriParams.UserId}
 	res := s.getSessionsByUserId(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
@@ -204,7 +234,13 @@ func (s *userApi) GetSessionsByUserId(ctx *gin.Context) {
 // 500: StatusInternalServerError
 
 func (s *userApi) GetAccountsByUserId(ctx *gin.Context) {
-	query := &user.GetAccountsByUserIdQuery{}
+	uriParams := &user.GetAccountsByUserIdUriParams{}
+	if err := ctx.ShouldBindUri(uriParams); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
+
+	query := &user.GetAccountsByUserIdQuery{UserId: uriParams.UserId}
 	res := s.getAccountsByUserId(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
