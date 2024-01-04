@@ -7,11 +7,27 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/user"
 )
 
+// GET /user
+//
+// Get current user.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
+
 func (s *userApi) GetUser(ctx *gin.Context) {
 	query := &user.GetUserQuery{}
 	res := s.getUser(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
+
+// GET /user/username
+//
+// Get current user username.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
 
 func (s *userApi) GetUsername(ctx *gin.Context) {
 	query := &user.GetUsernameQuery{}
@@ -19,11 +35,27 @@ func (s *userApi) GetUsername(ctx *gin.Context) {
 	ctx.JSON(res.Status(), res.Body())
 }
 
+// GET /user/email
+//
+// Get current user email address.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
+
 func (s *userApi) GetEmail(ctx *gin.Context) {
 	query := &user.GetEmailQuery{}
 	res := s.getEmail(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
+
+// GET /user/status
+//
+// Get current user status.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
 
 func (s *userApi) GetStatus(ctx *gin.Context) {
 	query := &user.GetStatusQuery{}
@@ -31,11 +63,27 @@ func (s *userApi) GetStatus(ctx *gin.Context) {
 	ctx.JSON(res.Status(), res.Body())
 }
 
+// GET /user/preferences
+//
+// Get current user preferences.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
+
 func (s *userApi) GetPreferences(ctx *gin.Context) {
 	query := &user.GetPreferencesQuery{}
 	res := s.getPreferences(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
+
+// GET /user/sessions
+//
+// Get current user sessions.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
 
 func (s *userApi) GetSessions(ctx *gin.Context) {
 	query := &user.GetSessionsQuery{}
@@ -43,15 +91,23 @@ func (s *userApi) GetSessions(ctx *gin.Context) {
 	ctx.JSON(res.Status(), res.Body())
 }
 
+// GET /user/accounts
+//
+// Get current user accounts.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
+
 func (s *userApi) GetAccounts(ctx *gin.Context) {
 	query := &user.GetAccountsQuery{}
 	res := s.getAccounts(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
 
-// GET /users/:userId
+// GET /users/:userId_or_username
 //
-// Get user by id.
+// Get user by id or username.
 //
 // Response status:
 // 200: StatusOK
@@ -69,11 +125,27 @@ func (s *userApi) GetUserById(ctx *gin.Context) {
 	ctx.JSON(res.Status(), res.Body())
 }
 
+// GET /users/:userId_or_username/username
+//
+// Get user username by id or username.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
+
 func (s *userApi) GetUsernameByUserId(ctx *gin.Context) {
 	query := &user.GetUsernameByUserIdQuery{}
 	res := s.getUsernameByUserId(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
+
+// GET /users/:userId_or_username/email
+//
+// Get user email address by id or username.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
 
 func (s *userApi) GetEmailByUserId(ctx *gin.Context) {
 	query := &user.GetEmailByUserIdQuery{}
@@ -81,11 +153,27 @@ func (s *userApi) GetEmailByUserId(ctx *gin.Context) {
 	ctx.JSON(res.Status(), res.Body())
 }
 
+// GET /users/:userId_or_username/status
+//
+// Get user status by id or username.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
+
 func (s *userApi) GetStatusByUserId(ctx *gin.Context) {
 	query := &user.GetStatusByUserIdQuery{}
 	res := s.getStatusByUserId(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
+
+// GET /users/:userId_or_username/preferences
+//
+// Get user preferences by id or username.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
 
 func (s *userApi) GetPreferencesByUserId(ctx *gin.Context) {
 	query := &user.GetPreferencesByUserIdQuery{}
@@ -93,17 +181,41 @@ func (s *userApi) GetPreferencesByUserId(ctx *gin.Context) {
 	ctx.JSON(res.Status(), res.Body())
 }
 
+// GET /users/:userId_or_username/sessions
+//
+// Get user sessions by id or username.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
+
 func (s *userApi) GetSessionsByUserId(ctx *gin.Context) {
 	query := &user.GetSessionsByUserIdQuery{}
 	res := s.getSessionsByUserId(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
 
+// GET /users/:userId_or_username/accounts
+//
+// Get user accounts by id or username.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
+
 func (s *userApi) GetAccountsByUserId(ctx *gin.Context) {
 	query := &user.GetAccountsByUserIdQuery{}
 	res := s.getAccountsByUserId(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
+
+// GET /users
+//
+// Get users.
+//
+// Response status:
+// 200: StatusOK
+// 500: StatusInternalServerError
 
 func (s *userApi) GetUsers(ctx *gin.Context) {
 	query := &user.GetUsersQuery{}
