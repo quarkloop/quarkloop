@@ -83,7 +83,7 @@ func NewDefaultServer(ds *repository.Repository) Server {
 		MaxAge:        12 * time.Hour,
 	}))
 
-	userService := user_impl.NewUserService(user_store.NewOrgStore(ds.SystemDbConn))
+	userService := user_impl.NewUserService(user_store.NewUserStore(ds.AuthDbConn))
 	aclService := acl_impl.NewAccessControlService(acl_store.NewAccessControlStore(ds.SystemDbConn))
 	quotaService := quota_impl.NewQuotaService(quota_store.NewQuotaStore(ds.SystemDbConn))
 
