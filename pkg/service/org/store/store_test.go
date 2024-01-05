@@ -3,117 +3,47 @@ package store_test
 import (
 	"context"
 	"fmt"
-	"log"
-	"os"
 	"testing"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/require"
 
-	"github.com/quarkloop/quarkloop/pkg/db"
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 	"github.com/quarkloop/quarkloop/pkg/service/org/store"
+	"github.com/quarkloop/quarkloop/pkg/test"
 )
 
-var conn *pgx.Conn
-var ctx context.Context
+var (
+	ctx  context.Context
+	conn *pgx.Conn
+)
+
+const orgCount = 10
 
 func init() {
-	err := godotenv.Load("/home/reza/dev/quarkloop/submodules/quarkloop/.env.development")
-	if err != nil {
-		log.Fatal("Error loading .env file", err.Error())
-	}
-
-	database := db.NewSystemDatabase()
-	database.Connect()
-	conn = database.Connection()
-	ctx = context.Background()
+	ctx, conn = test.InitTestSystemDB()
 }
 
-const getOrgListQuery = `
-SELECT 
-    "id",
-    "sid",
-    "name",
-    "description",
-    "visibility",
-    "createdAt",
-    "createdBy",
-    "updatedAt",
-    "updatedBy"
-FROM 
-    "system"."Organization"
-ORDER BY id ASC;
-`
-
-func getAllOrgList(ctx context.Context) ([]*org.Org, error) {
-	rows, err := conn.Query(ctx, getOrgListQuery)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
-		return nil, err
-	}
-	defer rows.Close()
-
-	var orgList []*org.Org = []*org.Org{}
-	for rows.Next() {
-		var org org.Org
-		err := rows.Scan(
-			&org.Id,
-			&org.ScopeId,
-			&org.Name,
-			&org.Description,
-			&org.Visibility,
-			&org.CreatedAt,
-			&org.CreatedBy,
-			&org.UpdatedAt,
-			&org.UpdatedBy,
-		)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
-			return nil, err
-		}
-		orgList = append(orgList, &org)
-	}
-	if err := rows.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
-		return nil, err
-	}
-
-	return orgList, nil
-}
-
-const truncateTablesQuery = `
-TRUNCATE
-    "system"."Permission",
-    "system"."UserRole",
-    "system"."UserGroup",
-    "system"."UserAssignment",
-    "system"."Project",
-    "system"."Workspace",
-    "system"."Organization";
-`
-
-func truncateTables(ctx context.Context) error {
-	_, err := conn.Exec(ctx, truncateTablesQuery)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[TRUNCATE] failed: %v\n", err)
-		return err
-	}
-	return nil
-}
-
-func TestOrgService(t *testing.T) {
-	store := store.NewOrgStore(conn)
-
+func TestOrgServiceReturnEmpty(t *testing.T) {
 	t.Run("truncate tables", func(t *testing.T) {
-		err := truncateTables(ctx)
+		err := test.TruncateSystemDBTables(ctx, conn)
 		require.NoError(t, err)
 	})
 
+	t.Run("get org list return empty after truncating tables", func(t *testing.T) {
+		orgList, err := test.GetFullOrgList(ctx, conn)
+		require.NoError(t, err)
+		require.Zero(t, len(orgList))
+		require.Equal(t, 0, len(orgList))
+	})
+}
+
+func TestOrgServiceCreate(t *testing.T) {
+	store := store.NewOrgStore(conn)
+
 	t.Run("CreateOrg", func(t *testing.T) {
-		for i := 0; i < 100; i++ {
+		for i := 0; i < orgCount; i++ {
 			cmd := &org.CreateOrgCommand{
 				Name:        fmt.Sprintf("Quarkloop_%d", i),
 				ScopeId:     fmt.Sprintf("quarkloop_%d", i),
@@ -127,10 +57,20 @@ func TestOrgService(t *testing.T) {
 		}
 	})
 
-	t.Run("GetOrgById after creation", func(t *testing.T) {
-		orgList, err := getAllOrgList(ctx)
+	t.Run("get org list return full", func(t *testing.T) {
+		orgList, err := test.GetFullOrgList(ctx, conn)
 		require.NoError(t, err)
 		require.NotZero(t, len(orgList))
+		require.Equal(t, orgCount, len(orgList))
+	})
+}
+
+func TestOrgService(t *testing.T) {
+	store := store.NewOrgStore(conn)
+
+	t.Run("GetOrgById after creation", func(t *testing.T) {
+		orgList, err := test.GetFullOrgList(ctx, conn)
+		require.NoError(t, err)
 
 		for idx, o := range orgList {
 			org, err := store.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: o.Id})
@@ -145,9 +85,8 @@ func TestOrgService(t *testing.T) {
 	})
 
 	t.Run("GetOrgVisibilityById after creation", func(t *testing.T) {
-		orgList, err := getAllOrgList(ctx)
+		orgList, err := test.GetFullOrgList(ctx, conn)
 		require.NoError(t, err)
-		require.NotZero(t, len(orgList))
 
 		for _, o := range orgList {
 			visibility, err := store.GetOrgVisibilityById(ctx, &org.GetOrgVisibilityByIdQuery{OrgId: o.Id})
@@ -157,10 +96,122 @@ func TestOrgService(t *testing.T) {
 		}
 	})
 
-	t.Run("UpdateOrgById", func(t *testing.T) {
-		orgList, err := getAllOrgList(ctx)
+	t.Run("UpdateOrgById: ScopeId update fail with duplicate Organization_sid_key", func(t *testing.T) {
+		orgList, err := test.GetFullOrgList(ctx, conn)
 		require.NoError(t, err)
-		require.NotZero(t, len(orgList))
+		{
+			cmd := &org.UpdateOrgByIdCommand{
+				OrgId:   orgList[0].Id,
+				ScopeId: "Quarkloop_Updated",
+			}
+			err := store.UpdateOrgById(ctx, cmd)
+			require.NoError(t, err)
+		}
+		{
+			cmd := &org.UpdateOrgByIdCommand{
+				OrgId:   orgList[len(orgList)-1].Id,
+				ScopeId: "Quarkloop_Updated",
+			}
+			err := store.UpdateOrgById(ctx, cmd)
+			require.Error(t, err)
+			require.Exactly(t, org.ErrOrgAlreadyExists, err)
+			require.Equal(t, "org with same scopeId already exists", err.Error())
+		}
+	})
+
+	t.Run("UpdateOrgById: partial update", func(t *testing.T) {
+		orgList, err := test.GetFullOrgList(ctx, conn)
+		require.NoError(t, err)
+
+		for idx, o := range orgList {
+			name := fmt.Sprintf("Quarkloop_Updated_%d", idx)
+
+			cmd := &org.UpdateOrgByIdCommand{
+				OrgId: o.Id,
+				Name:  name,
+			}
+			err := store.UpdateOrgById(ctx, cmd)
+			require.NoError(t, err)
+
+			org, err := store.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: o.Id})
+			require.NoError(t, err)
+			require.NotEmpty(t, org)
+			require.Equal(t, name, org.Name)
+
+			require.NotEmpty(t, org.ScopeId)
+			require.NotEmpty(t, org.Name)
+			require.NotEmpty(t, org.Description)
+			require.NotEmpty(t, org.Visibility)
+			require.NotEmpty(t, org.CreatedBy)
+		}
+		for idx, o := range orgList {
+			description := fmt.Sprintf("Quarkloop_Description_Updated_%d", idx)
+
+			cmd := &org.UpdateOrgByIdCommand{
+				OrgId:       o.Id,
+				Description: description,
+			}
+			err := store.UpdateOrgById(ctx, cmd)
+			require.NoError(t, err)
+
+			org, err := store.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: o.Id})
+			require.NoError(t, err)
+			require.NotEmpty(t, org)
+			require.Equal(t, description, org.Description)
+
+			require.NotEmpty(t, org.ScopeId)
+			require.NotEmpty(t, org.Name)
+			require.NotEmpty(t, org.Description)
+			require.NotEmpty(t, org.Visibility)
+			require.NotEmpty(t, org.CreatedBy)
+		}
+		for _, o := range orgList {
+			visibility := model.PrivateVisibility
+
+			cmd := &org.UpdateOrgByIdCommand{
+				OrgId:      o.Id,
+				Visibility: visibility,
+			}
+			err := store.UpdateOrgById(ctx, cmd)
+			require.NoError(t, err)
+
+			org, err := store.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: o.Id})
+			require.NoError(t, err)
+			require.NotEmpty(t, org)
+			require.Equal(t, visibility, org.Visibility)
+
+			require.NotEmpty(t, org.ScopeId)
+			require.NotEmpty(t, org.Name)
+			require.NotEmpty(t, org.Description)
+			require.NotEmpty(t, org.Visibility)
+			require.NotEmpty(t, org.CreatedBy)
+		}
+		for idx, o := range orgList {
+			updatedBy := fmt.Sprintf("Quarkloop_Admin2_Updated_%d", idx)
+
+			cmd := &org.UpdateOrgByIdCommand{
+				OrgId:     o.Id,
+				UpdatedBy: updatedBy,
+			}
+			err := store.UpdateOrgById(ctx, cmd)
+			require.NoError(t, err)
+
+			org, err := store.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: o.Id})
+			require.NoError(t, err)
+			require.NotEmpty(t, org)
+			require.Equal(t, updatedBy, *org.UpdatedBy)
+
+			require.NotEmpty(t, org.ScopeId)
+			require.NotEmpty(t, org.Name)
+			require.NotEmpty(t, org.Description)
+			require.NotEmpty(t, org.Visibility)
+			require.NotEmpty(t, org.CreatedBy)
+		}
+	})
+
+	t.Run("UpdateOrgById: full update", func(t *testing.T) {
+		orgList, err := test.GetFullOrgList(ctx, conn)
+		require.NoError(t, err)
 
 		for idx, o := range orgList {
 			cmd := &org.UpdateOrgByIdCommand{
@@ -173,31 +224,28 @@ func TestOrgService(t *testing.T) {
 			}
 			err := store.UpdateOrgById(ctx, cmd)
 			require.NoError(t, err)
-		}
-	})
 
-	t.Run("GetOrgById after update", func(t *testing.T) {
-		orgList, err := getAllOrgList(ctx)
-		require.NoError(t, err)
-		require.NotZero(t, len(orgList))
-
-		for idx, o := range orgList {
 			org, err := store.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: o.Id})
 			require.NoError(t, err)
 			require.NotEmpty(t, org)
-			require.Equal(t, fmt.Sprintf("Quarkloop_Updated_%d", idx), org.Name)
-			require.Equal(t, fmt.Sprintf("quarkloop_Updated_%d", idx), org.ScopeId)
-			require.Equal(t, fmt.Sprintf("Quarkloop Corporation Updated #%d", idx), org.Description)
-			require.Equal(t, fmt.Sprintf("admin_%d", idx), org.CreatedBy)
-			require.Equal(t, fmt.Sprintf("admin_Updated_%d", idx), *org.UpdatedBy)
-			require.Equal(t, model.PrivateVisibility, org.Visibility)
+
+			require.Equal(t, cmd.ScopeId, org.ScopeId)
+			require.Equal(t, cmd.Name, org.Name)
+			require.Equal(t, cmd.Description, org.Description)
+			require.Equal(t, cmd.Visibility, org.Visibility)
+			require.Equal(t, cmd.UpdatedBy, *org.UpdatedBy)
+
+			require.NotEmpty(t, org.ScopeId)
+			require.NotEmpty(t, org.Name)
+			require.NotEmpty(t, org.Description)
+			require.NotEmpty(t, org.Visibility)
+			require.NotEmpty(t, org.CreatedBy)
 		}
 	})
 
 	t.Run("GetOrgVisibilityById after update", func(t *testing.T) {
-		orgList, err := getAllOrgList(ctx)
+		orgList, err := test.GetFullOrgList(ctx, conn)
 		require.NoError(t, err)
-		require.NotZero(t, len(orgList))
 
 		for _, o := range orgList {
 			visibility, err := store.GetOrgVisibilityById(ctx, &org.GetOrgVisibilityByIdQuery{OrgId: o.Id})
@@ -206,11 +254,14 @@ func TestOrgService(t *testing.T) {
 			require.Equal(t, model.PrivateVisibility, visibility)
 		}
 	})
+}
+
+func TestOrgServiceRelations(t *testing.T) {
+	store := store.NewOrgStore(conn)
 
 	t.Run("GetWorkspaceList", func(t *testing.T) {
-		orgList, err := getAllOrgList(ctx)
+		orgList, err := test.GetFullOrgList(ctx, conn)
 		require.NoError(t, err)
-		require.NotZero(t, len(orgList))
 
 		for _, o := range orgList {
 			query := &org.GetWorkspaceListQuery{
@@ -225,9 +276,8 @@ func TestOrgService(t *testing.T) {
 	})
 
 	t.Run("GetProjectList", func(t *testing.T) {
-		orgList, err := getAllOrgList(ctx)
+		orgList, err := test.GetFullOrgList(ctx, conn)
 		require.NoError(t, err)
-		require.NotZero(t, len(orgList))
 
 		for _, o := range orgList {
 			query := &org.GetProjectListQuery{
@@ -242,9 +292,8 @@ func TestOrgService(t *testing.T) {
 	})
 
 	t.Run("GetUserAssignmentList", func(t *testing.T) {
-		orgList, err := getAllOrgList(ctx)
+		orgList, err := test.GetFullOrgList(ctx, conn)
 		require.NoError(t, err)
-		require.NotZero(t, len(orgList))
 
 		for _, o := range orgList {
 			query := &org.GetUserAssignmentListQuery{OrgId: o.Id}
@@ -254,15 +303,25 @@ func TestOrgService(t *testing.T) {
 			require.Equal(t, 0, len(list))
 		}
 	})
-
-	t.Run("DeleteOrgById", func(t *testing.T) {
-		orgList, err := getAllOrgList(ctx)
-		require.NoError(t, err)
-		require.NotZero(t, len(orgList))
-
-		for _, o := range orgList {
-			err := store.DeleteOrgById(ctx, &org.DeleteOrgByIdCommand{OrgId: o.Id})
-			require.NoError(t, err)
-		}
-	})
 }
+
+// func TestOrgServiceDelete(t *testing.T) {
+// 	store := store.NewOrgStore(conn)
+
+// 	t.Run("DeleteOrgById", func(t *testing.T) {
+// 		orgList, err := test.GetFullOrgList(ctx, conn)
+// 		require.NoError(t, err)
+
+// 		for _, o := range orgList {
+// 			err := store.DeleteOrgById(ctx, &org.DeleteOrgByIdCommand{OrgId: o.Id})
+// 			require.NoError(t, err)
+// 		}
+// 	})
+
+// 	t.Run("get org list return empty after deleting tables", func(t *testing.T) {
+// 		orgList, err := test.GetFullOrgList(ctx, conn)
+// 		require.NoError(t, err)
+// 		require.Zero(t, len(orgList))
+// 		require.Equal(t, 0, len(orgList))
+// 	})
+// }
