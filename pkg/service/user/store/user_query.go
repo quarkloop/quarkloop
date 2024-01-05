@@ -10,186 +10,6 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/user"
 )
 
-/// GetUserById
-
-const getUserByIdQuery = `
-SELECT 
-    "id",
-	"sid",
-    "name",
-    "email",
-    "emailVerified",
-    "password",
-    "birthdate",
-    "country",
-    "image",
-    "status",
-    "createdAt",
-    "createdBy",
-    "updatedAt",
-    "updatedBy"
-FROM 
-    "auth"."User"
-WHERE 
-    "id" = @id;
-`
-
-func (store *orgStore) GetUserById(ctx context.Context, userId int) (*user.User, error) {
-	row := store.Conn.QueryRow(ctx, getUserByIdQuery, pgx.NamedArgs{"id": userId})
-
-	var user user.User
-	err := row.Scan(
-		&user.Id,
-		&user.ScopeId,
-		&user.Name,
-		&user.Email,
-		&user.EmailVerified,
-		&user.Password,
-		&user.Birthdate,
-		&user.Country,
-		&user.Image,
-		&user.Status,
-		&user.CreatedAt,
-		&user.CreatedBy,
-		&user.UpdatedAt,
-		&user.UpdatedBy,
-	)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
-		return nil, err
-	}
-
-	return &user, nil
-}
-
-/// GetUserByEmail
-
-const getUserByEmailQuery = `
-SELECT 
-    "id",
-	"sid",
-    "name",
-    "email",
-    "emailVerified",
-    "password",
-    "birthdate",
-    "country",
-    "image",
-    "status",
-    "createdAt",
-    "createdBy",
-    "updatedAt",
-    "updatedBy"
-FROM 
-    "auth"."User"
-WHERE 
-    "email" = @email;
-`
-
-func (store *orgStore) GetUserByEmail(ctx context.Context, email string) (*user.User, error) {
-	row := store.Conn.QueryRow(ctx, getUserByEmailQuery, pgx.NamedArgs{"email": email})
-
-	var user user.User
-	err := row.Scan(
-		&user.Id,
-		&user.ScopeId,
-		&user.Name,
-		&user.Email,
-		&user.EmailVerified,
-		&user.Password,
-		&user.Birthdate,
-		&user.Country,
-		&user.Image,
-		&user.Status,
-		&user.CreatedAt,
-		&user.CreatedBy,
-		&user.UpdatedAt,
-		&user.UpdatedBy,
-	)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
-		return nil, err
-	}
-
-	return &user, nil
-}
-
-/// GetUserAccountByUserId
-
-const getUserAccountByUserIdQuery = `
-SELECT 
-    "id",
-    "type",
-    "provider",
-    "providerAccountId",
-    "refresh_token",
-    "access_token",
-    "expires_at",
-    "token_type",
-    "scope",
-    "id_token",
-    "session_state"
-FROM 
-    "auth"."Account"
-WHERE 
-    "userId" = @userId;
-`
-
-func (store *orgStore) GetUserAccountByUserId(ctx context.Context, userId int) (*user.UserAccount, error) {
-	row := store.Conn.QueryRow(ctx, getUserAccountByUserIdQuery, pgx.NamedArgs{"userId": userId})
-
-	var acc user.UserAccount
-	err := row.Scan(
-		&acc.Id,
-		&acc.Type,
-		&acc.Provider,
-		&acc.ProviderAccountId,
-		&acc.RefreshToken,
-		&acc.AccessToken,
-		&acc.ExpiresAt,
-		&acc.TokenType,
-		&acc.Scope,
-		&acc.TokenId,
-		&acc.SessionState,
-	)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
-		return nil, err
-	}
-
-	return &acc, nil
-}
-
-/// GetUserSessionByUserId
-
-const getUserSessionByUserIdQuery = `
-SELECT 
-    "id",
-    "sessionToken",
-    "expires"
-FROM 
-    "auth"."Session"
-WHERE 
-    "userId" = @userId;
-`
-
-func (store *orgStore) GetUserSessionByUserId(ctx context.Context, userId int) (*user.UserSession, error) {
-	row := store.Conn.QueryRow(ctx, getUserSessionByUserIdQuery, pgx.NamedArgs{"userId": userId})
-
-	var session user.UserSession
-	err := row.Scan(
-		&session.Id,
-		&session.SessionToken,
-		&session.ExpiresAt,
-	)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
-		return nil, err
-	}
-
-	return &session, nil
-}
-
 /// GetUser
 
 const getUserQuery = `
@@ -214,8 +34,8 @@ WHERE
     "id" = @id;
 `
 
-func (store *orgStore) GetUser(ctx context.Context, query *user.GetUserQuery) (*user.User, error) {
-
+func (store *userStore) GetUser(ctx context.Context, query *user.GetUserQuery) (*user.User, error) {
+	panic("not implemented")
 }
 
 /// GetUsername
@@ -229,8 +49,8 @@ WHERE
     "id" = @id;
 `
 
-func (store *orgStore) GetUsername(ctx context.Context, query *user.GetUsernameQuery) (string, error) {
-
+func (store *userStore) GetUsername(ctx context.Context, query *user.GetUsernameQuery) (string, error) {
+	panic("not implemented")
 }
 
 /// GetEmail
@@ -244,8 +64,8 @@ WHERE
     "id" = @id;
 `
 
-func (store *orgStore) GetEmail(ctx context.Context, query *user.GetEmailQuery) (string, error) {
-
+func (store *userStore) GetEmail(ctx context.Context, query *user.GetEmailQuery) (string, error) {
+	panic("not implemented")
 }
 
 /// GetStatus
@@ -259,16 +79,16 @@ WHERE
     "id" = @id;
 `
 
-func (store *orgStore) GetStatus(ctx context.Context, query *user.GetStatusQuery) (any, error) {
-
+func (store *userStore) GetStatus(ctx context.Context, query *user.GetStatusQuery) (any, error) {
+	panic("not implemented")
 }
 
 /// GetPreferences
 
 const getPreferencesQuery = ``
 
-func (store *orgStore) GetPreferences(ctx context.Context, query *user.GetPreferencesQuery) (any, error) {
-
+func (store *userStore) GetPreferences(ctx context.Context, query *user.GetPreferencesQuery) (any, error) {
+	panic("not implemented")
 }
 
 /// GetSessions
@@ -284,8 +104,8 @@ WHERE
     "userId" = @userId;
 `
 
-func (store *orgStore) GetSessions(ctx context.Context, query *user.GetSessionsQuery) ([]*user.UserSession, error) {
-
+func (store *userStore) GetSessions(ctx context.Context, query *user.GetSessionsQuery) ([]*user.UserSession, error) {
+	panic("not implemented")
 }
 
 /// GetAccounts
@@ -309,8 +129,8 @@ WHERE
     "userId" = @userId;
 `
 
-func (store *orgStore) GetAccounts(ctx context.Context, query *user.GetAccountsQuery) ([]*user.UserAccount, error) {
-
+func (store *userStore) GetAccounts(ctx context.Context, query *user.GetAccountsQuery) ([]*user.UserAccount, error) {
+	panic("not implemented")
 }
 
 /// GetUserById
@@ -337,8 +157,32 @@ WHERE
     "id" = @id;
 `
 
-func (store *orgStore) GetUserById(ctx context.Context, query *user.GetUserByIdQuery) (*user.User, error) {
+func (store *userStore) GetUserById(ctx context.Context, query *user.GetUserByIdQuery) (*user.User, error) {
+	row := store.Conn.QueryRow(ctx, getUserByIdQuery, pgx.NamedArgs{"id": query.UserId})
 
+	var user user.User
+	err := row.Scan(
+		&user.Id,
+		&user.Username,
+		&user.Name,
+		&user.Email,
+		&user.EmailVerified,
+		&user.Password,
+		&user.Birthdate,
+		&user.Country,
+		&user.Image,
+		&user.Status,
+		&user.CreatedAt,
+		&user.CreatedBy,
+		&user.UpdatedAt,
+		&user.UpdatedBy,
+	)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
+		return nil, err
+	}
+
+	return &user, nil
 }
 
 /// GetUsernameByUserId
@@ -352,8 +196,16 @@ WHERE
     "id" = @id;
 `
 
-func (store *orgStore) GetUsernameByUserId(ctx context.Context, query *user.GetUsernameByUserIdQuery) (string, error) {
+func (store *userStore) GetUsernameByUserId(ctx context.Context, query *user.GetUsernameByUserIdQuery) (string, error) {
+	row := store.Conn.QueryRow(ctx, getUserByIdQuery, pgx.NamedArgs{"id": query.UserId})
 
+	var username string
+	if err := row.Scan(&username); err != nil {
+		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
+		return "", err
+	}
+
+	return username, nil
 }
 
 /// GetEmailByUserId
@@ -367,8 +219,16 @@ WHERE
     "id" = @id;
 `
 
-func (store *orgStore) GetEmailByUserId(ctx context.Context, query *user.GetEmailByUserIdQuery) (string, error) {
+func (store *userStore) GetEmailByUserId(ctx context.Context, query *user.GetEmailByUserIdQuery) (string, error) {
+	row := store.Conn.QueryRow(ctx, getUserByIdQuery, pgx.NamedArgs{"id": query.UserId})
 
+	var email string
+	if err := row.Scan(&email); err != nil {
+		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
+		return "", err
+	}
+
+	return email, nil
 }
 
 /// GetStatusByUserId
@@ -382,16 +242,24 @@ WHERE
     "id" = @id;
 `
 
-func (store *orgStore) GetStatusByUserId(ctx context.Context, query *user.GetStatusByUserIdQuery) (any, error) {
+func (store *userStore) GetStatusByUserId(ctx context.Context, query *user.GetStatusByUserIdQuery) (int, error) {
+	row := store.Conn.QueryRow(ctx, getUserByIdQuery, pgx.NamedArgs{"id": query.UserId})
 
+	var status int
+	if err := row.Scan(&status); err != nil {
+		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
+		return 0, err
+	}
+
+	return status, nil
 }
 
 /// GetPreferencesByUserId
 
 const getPreferencesByUserIdQuery = ``
 
-func (store *orgStore) GetPreferencesByUserId(ctx context.Context, query *user.GetPreferencesByUserIdQuery) (any, error) {
-
+func (store *userStore) GetPreferencesByUserId(ctx context.Context, query *user.GetPreferencesByUserIdQuery) (any, error) {
+	panic("not implemented")
 }
 
 /// GetSessionsByUserId
@@ -407,8 +275,30 @@ WHERE
     "userId" = @userId;
 `
 
-func (store *orgStore) GetSessionsByUserId(ctx context.Context, query *user.GetSessionsByUserIdQuery) ([]*user.UserSession, error) {
+func (store *userStore) GetSessionsByUserId(ctx context.Context, query *user.GetSessionsByUserIdQuery) ([]*user.UserSession, error) {
+	rows, err := store.Conn.Query(ctx, getSessionsByUserIdQuery, pgx.NamedArgs{"userId": query.UserId})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
 
+	var sessionList []*user.UserSession = []*user.UserSession{}
+	for rows.Next() {
+		var session user.UserSession
+		err := rows.Scan(
+			&session.Id,
+			&session.SessionToken,
+			&session.ExpiresAt,
+		)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+			return nil, err
+		}
+		sessionList = append(sessionList, &session)
+	}
+
+	return sessionList, nil
 }
 
 /// GetAccountsByUserId
@@ -421,7 +311,7 @@ SELECT
     "providerAccountId",
     "refresh_token",
     "access_token",
-    "expires_at",
+    to_timestamp("expires_at") AS expires_at,
     "token_type",
     "scope",
     "id_token",
@@ -432,14 +322,44 @@ WHERE
     "userId" = @userId;
 `
 
-func (store *orgStore) GetAccountsByUserId(ctx context.Context, query *user.GetAccountsByUserIdQuery) ([]*user.UserAccount, error) {
+func (store *userStore) GetAccountsByUserId(ctx context.Context, query *user.GetAccountsByUserIdQuery) ([]*user.UserAccount, error) {
+	rows, err := store.Conn.Query(ctx, getAccountsByUserIdQuery, pgx.NamedArgs{"userId": query.UserId})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
 
+	var accountList []*user.UserAccount = []*user.UserAccount{}
+	for rows.Next() {
+		var acc user.UserAccount
+		err := rows.Scan(
+			&acc.Id,
+			&acc.Type,
+			&acc.Provider,
+			&acc.ProviderAccountId,
+			&acc.RefreshToken,
+			&acc.AccessToken,
+			&acc.ExpiresAt,
+			&acc.TokenType,
+			&acc.Scope,
+			&acc.TokenId,
+			&acc.SessionState,
+		)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+			return nil, err
+		}
+		accountList = append(accountList, &acc)
+	}
+
+	return accountList, nil
 }
 
 /// GetUsers
 
 const getUsersQuery = ``
 
-func (store *orgStore) GetUsers(ctx context.Context, query *user.GetUsersQuery) ([]*user.User, error) {
-
+func (store *userStore) GetUsers(ctx context.Context, query *user.GetUsersQuery) ([]*user.User, error) {
+	panic("not implemented")
 }
