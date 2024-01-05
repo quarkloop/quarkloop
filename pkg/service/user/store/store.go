@@ -7,7 +7,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/user"
 )
 
-type OrgStore interface {
+type UserStore interface {
 	// query
 	GetUser(context.Context, *user.GetUserQuery) (*user.User, error)
 	GetUsername(context.Context, *user.GetUsernameQuery) (string, error)
@@ -19,7 +19,7 @@ type OrgStore interface {
 	GetUserById(context.Context, *user.GetUserByIdQuery) (*user.User, error)
 	GetUsernameByUserId(context.Context, *user.GetUsernameByUserIdQuery) (string, error)
 	GetEmailByUserId(context.Context, *user.GetEmailByUserIdQuery) (string, error)
-	GetStatusByUserId(context.Context, *user.GetStatusByUserIdQuery) (any, error)
+	GetStatusByUserId(context.Context, *user.GetStatusByUserIdQuery) (int, error)
 	GetPreferencesByUserId(context.Context, *user.GetPreferencesByUserIdQuery) (any, error)
 	GetSessionsByUserId(context.Context, *user.GetSessionsByUserIdQuery) ([]*user.UserSession, error)
 	GetAccountsByUserId(context.Context, *user.GetAccountsByUserIdQuery) ([]*user.UserAccount, error)
@@ -39,12 +39,12 @@ type OrgStore interface {
 	DeleteAccountById(context.Context, *user.DeleteAccountByIdCommand) error
 }
 
-type orgStore struct {
+type userStore struct {
 	Conn *pgx.Conn
 }
 
-func NewOrgStore(conn *pgx.Conn) *orgStore {
-	return &orgStore{
+func NewUserStore(conn *pgx.Conn) *userStore {
+	return &userStore{
 		Conn: conn,
 	}
 }
