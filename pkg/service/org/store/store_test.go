@@ -25,7 +25,7 @@ func init() {
 	ctx, conn = test.InitTestSystemDB()
 }
 
-func TestOrgServiceReturnEmpty(t *testing.T) {
+func TestMutationTruncateTables(t *testing.T) {
 	t.Run("truncate tables", func(t *testing.T) {
 		err := test.TruncateSystemDBTables(ctx, conn)
 		require.NoError(t, err)
@@ -39,10 +39,39 @@ func TestOrgServiceReturnEmpty(t *testing.T) {
 	})
 }
 
-func TestOrgServiceCreate(t *testing.T) {
+func TestMutationCreateOrg(t *testing.T) {
 	store := store.NewOrgStore(conn)
 
-	t.Run("CreateOrg", func(t *testing.T) {
+	t.Run("CreateOrg without scopeId to generate it", func(t *testing.T) {
+		for i := 0; i < orgCount; i++ {
+			cmd := &org.CreateOrgCommand{
+				Name:        fmt.Sprintf("Quarkloop_%d", i),
+				Description: fmt.Sprintf("Quarkloop Corporation #%d", i),
+				CreatedBy:   fmt.Sprintf("admin_%d", i),
+				Visibility:  model.PublicVisibility,
+			}
+			o, err := store.CreateOrg(ctx, cmd)
+
+			require.NoError(t, err)
+			require.NotEmpty(t, o)
+
+			require.Equal(t, cmd.Name, o.Name)
+			require.Equal(t, cmd.Description, o.Description)
+			require.Equal(t, cmd.Visibility, o.Visibility)
+			require.Equal(t, cmd.CreatedBy, o.CreatedBy)
+
+			require.NotEmpty(t, o.ScopeId)
+			require.NotEmpty(t, o.Name)
+			require.NotEmpty(t, o.Description)
+			require.NotEmpty(t, o.Visibility)
+			require.NotEmpty(t, o.CreatedBy)
+
+			deleteErr := store.DeleteOrgById(ctx, &org.DeleteOrgByIdCommand{OrgId: o.Id})
+			require.NoError(t, deleteErr)
+		}
+	})
+
+	t.Run("CreateOrg with scopeId", func(t *testing.T) {
 		for i := 0; i < orgCount; i++ {
 			cmd := &org.CreateOrgCommand{
 				Name:        fmt.Sprintf("Quarkloop_%d", i),
@@ -52,20 +81,34 @@ func TestOrgServiceCreate(t *testing.T) {
 				Visibility:  model.PublicVisibility,
 			}
 			org, err := store.CreateOrg(ctx, cmd)
+
 			require.NoError(t, err)
 			require.NotEmpty(t, org)
+
+			require.Equal(t, cmd.ScopeId, org.ScopeId)
+			require.Equal(t, cmd.Name, org.Name)
+			require.Equal(t, cmd.Description, org.Description)
+			require.Equal(t, cmd.Visibility, org.Visibility)
+			require.Equal(t, cmd.CreatedBy, org.CreatedBy)
+
+			require.NotEmpty(t, org.ScopeId)
+			require.NotEmpty(t, org.Name)
+			require.NotEmpty(t, org.Description)
+			require.NotEmpty(t, org.Visibility)
+			require.NotEmpty(t, org.CreatedBy)
 		}
 	})
 
 	t.Run("get org list return full", func(t *testing.T) {
 		orgList, err := test.GetFullOrgList(ctx, conn)
+
 		require.NoError(t, err)
 		require.NotZero(t, len(orgList))
 		require.Equal(t, orgCount, len(orgList))
 	})
 }
 
-func TestOrgService(t *testing.T) {
+func TestQueryGetOrgAfterCreate(t *testing.T) {
 	store := store.NewOrgStore(conn)
 
 	t.Run("GetOrgById after creation", func(t *testing.T) {
@@ -74,6 +117,7 @@ func TestOrgService(t *testing.T) {
 
 		for idx, o := range orgList {
 			org, err := store.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: o.Id})
+
 			require.NoError(t, err)
 			require.NotEmpty(t, org)
 			require.Equal(t, fmt.Sprintf("Quarkloop_%d", idx), org.Name)
@@ -90,21 +134,28 @@ func TestOrgService(t *testing.T) {
 
 		for _, o := range orgList {
 			visibility, err := store.GetOrgVisibilityById(ctx, &org.GetOrgVisibilityByIdQuery{OrgId: o.Id})
+
 			require.NoError(t, err)
 			require.NotEmpty(t, visibility)
 			require.Equal(t, model.PublicVisibility, visibility)
 		}
 	})
+}
+
+func TestMutationUpdateOrg(t *testing.T) {
+	store := store.NewOrgStore(conn)
 
 	t.Run("UpdateOrgById: ScopeId update fail with duplicate Organization_sid_key", func(t *testing.T) {
 		orgList, err := test.GetFullOrgList(ctx, conn)
 		require.NoError(t, err)
+
 		{
 			cmd := &org.UpdateOrgByIdCommand{
 				OrgId:   orgList[0].Id,
 				ScopeId: "Quarkloop_Updated",
 			}
 			err := store.UpdateOrgById(ctx, cmd)
+
 			require.NoError(t, err)
 		}
 		{
@@ -113,6 +164,7 @@ func TestOrgService(t *testing.T) {
 				ScopeId: "Quarkloop_Updated",
 			}
 			err := store.UpdateOrgById(ctx, cmd)
+
 			require.Error(t, err)
 			require.Exactly(t, org.ErrOrgAlreadyExists, err)
 			require.Equal(t, "org with same scopeId already exists", err.Error())
@@ -134,6 +186,7 @@ func TestOrgService(t *testing.T) {
 			require.NoError(t, err)
 
 			org, err := store.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: o.Id})
+
 			require.NoError(t, err)
 			require.NotEmpty(t, org)
 			require.Equal(t, name, org.Name)
@@ -155,6 +208,7 @@ func TestOrgService(t *testing.T) {
 			require.NoError(t, err)
 
 			org, err := store.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: o.Id})
+
 			require.NoError(t, err)
 			require.NotEmpty(t, org)
 			require.Equal(t, description, org.Description)
@@ -176,6 +230,7 @@ func TestOrgService(t *testing.T) {
 			require.NoError(t, err)
 
 			org, err := store.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: o.Id})
+
 			require.NoError(t, err)
 			require.NotEmpty(t, org)
 			require.Equal(t, visibility, org.Visibility)
@@ -197,6 +252,7 @@ func TestOrgService(t *testing.T) {
 			require.NoError(t, err)
 
 			org, err := store.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: o.Id})
+
 			require.NoError(t, err)
 			require.NotEmpty(t, org)
 			require.Equal(t, updatedBy, *org.UpdatedBy)
@@ -226,6 +282,7 @@ func TestOrgService(t *testing.T) {
 			require.NoError(t, err)
 
 			org, err := store.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: o.Id})
+
 			require.NoError(t, err)
 			require.NotEmpty(t, org)
 
@@ -242,6 +299,10 @@ func TestOrgService(t *testing.T) {
 			require.NotEmpty(t, org.CreatedBy)
 		}
 	})
+}
+
+func TestQueryGetOrgAfterUpdate(t *testing.T) {
+	store := store.NewOrgStore(conn)
 
 	t.Run("GetOrgVisibilityById after update", func(t *testing.T) {
 		orgList, err := test.GetFullOrgList(ctx, conn)
@@ -249,6 +310,7 @@ func TestOrgService(t *testing.T) {
 
 		for _, o := range orgList {
 			visibility, err := store.GetOrgVisibilityById(ctx, &org.GetOrgVisibilityByIdQuery{OrgId: o.Id})
+
 			require.NoError(t, err)
 			require.NotEmpty(t, visibility)
 			require.Equal(t, model.PrivateVisibility, visibility)
@@ -256,7 +318,7 @@ func TestOrgService(t *testing.T) {
 	})
 }
 
-func TestOrgServiceRelations(t *testing.T) {
+func TestQueryOrgRelations(t *testing.T) {
 	store := store.NewOrgStore(conn)
 
 	t.Run("GetWorkspaceList", func(t *testing.T) {
@@ -269,6 +331,7 @@ func TestOrgServiceRelations(t *testing.T) {
 				Visibility: model.AllVisibility,
 			}
 			list, err := store.GetWorkspaceList(ctx, query)
+
 			require.NoError(t, err)
 			require.Empty(t, list)
 			require.Equal(t, 0, len(list))
@@ -285,6 +348,7 @@ func TestOrgServiceRelations(t *testing.T) {
 				Visibility: model.AllVisibility,
 			}
 			list, err := store.GetProjectList(ctx, query)
+
 			require.NoError(t, err)
 			require.Empty(t, list)
 			require.Equal(t, 0, len(list))
@@ -298,6 +362,7 @@ func TestOrgServiceRelations(t *testing.T) {
 		for _, o := range orgList {
 			query := &org.GetUserAssignmentListQuery{OrgId: o.Id}
 			list, err := store.GetUserAssignmentList(ctx, query)
+
 			require.NoError(t, err)
 			require.Empty(t, list)
 			require.Equal(t, 0, len(list))
@@ -305,23 +370,24 @@ func TestOrgServiceRelations(t *testing.T) {
 	})
 }
 
-// func TestOrgServiceDelete(t *testing.T) {
-// 	store := store.NewOrgStore(conn)
+func TestMutationDeleteOrg(t *testing.T) {
+	store := store.NewOrgStore(conn)
 
-// 	t.Run("DeleteOrgById", func(t *testing.T) {
-// 		orgList, err := test.GetFullOrgList(ctx, conn)
-// 		require.NoError(t, err)
+	t.Run("DeleteOrgById", func(t *testing.T) {
+		orgList, err := test.GetFullOrgList(ctx, conn)
+		require.NoError(t, err)
 
-// 		for _, o := range orgList {
-// 			err := store.DeleteOrgById(ctx, &org.DeleteOrgByIdCommand{OrgId: o.Id})
-// 			require.NoError(t, err)
-// 		}
-// 	})
+		for _, o := range orgList {
+			err := store.DeleteOrgById(ctx, &org.DeleteOrgByIdCommand{OrgId: o.Id})
+			require.NoError(t, err)
+		}
+	})
 
-// 	t.Run("get org list return empty after deleting tables", func(t *testing.T) {
-// 		orgList, err := test.GetFullOrgList(ctx, conn)
-// 		require.NoError(t, err)
-// 		require.Zero(t, len(orgList))
-// 		require.Equal(t, 0, len(orgList))
-// 	})
-// }
+	t.Run("get org list return empty after deleting tables", func(t *testing.T) {
+		orgList, err := test.GetFullOrgList(ctx, conn)
+
+		require.NoError(t, err)
+		require.Zero(t, len(orgList))
+		require.Equal(t, 0, len(orgList))
+	})
+}
