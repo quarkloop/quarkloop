@@ -45,6 +45,7 @@ SELECT
     "updatedBy"
 FROM 
     "system"."Organization"
+ORDER BY id ASC;
 `
 
 func getAllOrgList(ctx context.Context) ([]*org.Org, error) {
@@ -112,7 +113,7 @@ func TestOrgService(t *testing.T) {
 	})
 
 	t.Run("CreateOrg", func(t *testing.T) {
-		for i := 0; i < 10; i++ {
+		for i := 0; i < 100; i++ {
 			cmd := &org.CreateOrgCommand{
 				Name:        fmt.Sprintf("Quarkloop_%d", i),
 				ScopeId:     fmt.Sprintf("quarkloop_%d", i),
@@ -135,11 +136,11 @@ func TestOrgService(t *testing.T) {
 			org, err := store.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: o.Id})
 			require.NoError(t, err)
 			require.NotEmpty(t, org)
-			require.Equal(t, org.Name, fmt.Sprintf("Quarkloop_%d", idx))
-			require.Equal(t, org.ScopeId, fmt.Sprintf("quarkloop_%d", idx))
-			require.Equal(t, org.Description, fmt.Sprintf("Quarkloop Corporation #%d", idx))
-			require.Equal(t, org.CreatedBy, fmt.Sprintf("admin_%d", idx))
-			require.Equal(t, org.Visibility, model.PublicVisibility)
+			require.Equal(t, fmt.Sprintf("Quarkloop_%d", idx), org.Name)
+			require.Equal(t, fmt.Sprintf("quarkloop_%d", idx), org.ScopeId)
+			require.Equal(t, fmt.Sprintf("Quarkloop Corporation #%d", idx), org.Description)
+			require.Equal(t, fmt.Sprintf("admin_%d", idx), org.CreatedBy)
+			require.Equal(t, model.PublicVisibility, org.Visibility)
 		}
 	})
 
@@ -149,10 +150,10 @@ func TestOrgService(t *testing.T) {
 		require.NotZero(t, len(orgList))
 
 		for _, o := range orgList {
-			org, err := store.GetOrgVisibilityById(ctx, &org.GetOrgVisibilityByIdQuery{OrgId: o.Id})
+			visibility, err := store.GetOrgVisibilityById(ctx, &org.GetOrgVisibilityByIdQuery{OrgId: o.Id})
 			require.NoError(t, err)
-			require.NotEmpty(t, org)
-			require.Equal(t, org, model.PublicVisibility)
+			require.NotEmpty(t, visibility)
+			require.Equal(t, model.PublicVisibility, visibility)
 		}
 	})
 
@@ -184,12 +185,12 @@ func TestOrgService(t *testing.T) {
 			org, err := store.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: o.Id})
 			require.NoError(t, err)
 			require.NotEmpty(t, org)
-			require.Equal(t, org.Name, fmt.Sprintf("Quarkloop_Updated_%d", idx))
-			require.Equal(t, org.ScopeId, fmt.Sprintf("quarkloop_Updated_%d", idx))
-			require.Equal(t, org.Description, fmt.Sprintf("Quarkloop Corporation Updated #%d", idx))
-			require.Equal(t, org.CreatedBy, fmt.Sprintf("admin_%d", idx))
-			require.Equal(t, *org.UpdatedBy, fmt.Sprintf("admin_Updated_%d", idx))
-			require.Equal(t, org.Visibility, model.PrivateVisibility)
+			require.Equal(t, fmt.Sprintf("Quarkloop_Updated_%d", idx), org.Name)
+			require.Equal(t, fmt.Sprintf("quarkloop_Updated_%d", idx), org.ScopeId)
+			require.Equal(t, fmt.Sprintf("Quarkloop Corporation Updated #%d", idx), org.Description)
+			require.Equal(t, fmt.Sprintf("admin_%d", idx), org.CreatedBy)
+			require.Equal(t, fmt.Sprintf("admin_Updated_%d", idx), *org.UpdatedBy)
+			require.Equal(t, model.PrivateVisibility, org.Visibility)
 		}
 	})
 
@@ -199,10 +200,10 @@ func TestOrgService(t *testing.T) {
 		require.NotZero(t, len(orgList))
 
 		for _, o := range orgList {
-			org, err := store.GetOrgVisibilityById(ctx, &org.GetOrgVisibilityByIdQuery{OrgId: o.Id})
+			visibility, err := store.GetOrgVisibilityById(ctx, &org.GetOrgVisibilityByIdQuery{OrgId: o.Id})
 			require.NoError(t, err)
-			require.NotEmpty(t, org)
-			require.Equal(t, org, model.PrivateVisibility)
+			require.NotEmpty(t, visibility)
+			require.Equal(t, model.PrivateVisibility, visibility)
 		}
 	})
 
@@ -219,7 +220,7 @@ func TestOrgService(t *testing.T) {
 			list, err := store.GetWorkspaceList(ctx, query)
 			require.NoError(t, err)
 			require.Empty(t, list)
-			require.Equal(t, len(list), 0)
+			require.Equal(t, 0, len(list))
 		}
 	})
 
@@ -236,7 +237,7 @@ func TestOrgService(t *testing.T) {
 			list, err := store.GetProjectList(ctx, query)
 			require.NoError(t, err)
 			require.Empty(t, list)
-			require.Equal(t, len(list), 0)
+			require.Equal(t, 0, len(list))
 		}
 	})
 
@@ -250,7 +251,7 @@ func TestOrgService(t *testing.T) {
 			list, err := store.GetUserAssignmentList(ctx, query)
 			require.NoError(t, err)
 			require.Empty(t, list)
-			require.Equal(t, len(list), 0)
+			require.Equal(t, 0, len(list))
 		}
 	})
 
