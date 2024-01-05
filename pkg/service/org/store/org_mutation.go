@@ -85,7 +85,7 @@ SET
     "description" = @description,
     "visibility"  = @visibility,
     "updatedAt"   = @updatedAt,
-    "updatedBy"   = @updatedBy,
+    "updatedBy"   = @updatedBy
 WHERE
     "id" = @id;
 `
