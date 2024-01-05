@@ -14,16 +14,16 @@ type User struct {
 	Name          string     `json:"name,omitempty"`
 	Email         string     `json:"email,omitempty"`
 	EmailVerified *time.Time `json:"emailVerified,omitempty"`
-	Password      string     `json:"password,omitempty"`
+	Password      *string    `json:"password,omitempty"`
 	Birthdate     *time.Time `json:"birthdate,omitempty"`
-	Country       string     `json:"country,omitempty"`
+	Country       *string    `json:"country,omitempty"`
 	Image         string     `json:"image,omitempty"`
 	Status        int        `json:"status,omitempty"`
 	Path          string     `json:"path,omitempty"`
 
 	// history
 	CreatedAt time.Time  `json:"createdAt"`
-	CreatedBy string     `json:"createdBy"`
+	CreatedBy *string    `json:"createdBy"` // just for user type we use pointer string, cuz we cannot fill it while creation
 	UpdatedAt *time.Time `json:"updatedAt"`
 	UpdatedBy *string    `json:"updatedBy"`
 }
@@ -43,14 +43,14 @@ type UserAccount struct {
 	ProviderAccountId string `json:"providerAccountId,omitempty"`
 
 	// account
-	Type         string     `json:"type,omitempty"`
-	TokenType    string     `json:"tokenType,omitempty"`
-	Provider     string     `json:"provider,omitempty"`
-	RefreshToken string     `json:"refereshToken,omitempty"`
-	AccessToken  string     `json:"accessToken,omitempty"`
-	Scope        string     `json:"scope,omitempty"`
-	SessionState string     `json:"sessionState,omitempty"`
-	ExpiresAt    *time.Time `json:"expiresAt,omitempty"`
+	Type         string    `json:"type,omitempty"`
+	TokenType    string    `json:"tokenType,omitempty"`
+	Provider     string    `json:"provider,omitempty"`
+	RefreshToken *string   `json:"refereshToken,omitempty"`
+	AccessToken  string    `json:"accessToken,omitempty"`
+	Scope        string    `json:"scope,omitempty"`
+	SessionState *string   `json:"sessionState,omitempty"`
+	ExpiresAt    time.Time `json:"expiresAt,omitempty"`
 }
 
 type UserSession struct {
@@ -58,8 +58,8 @@ type UserSession struct {
 	Id int `json:"id,omitempty"`
 
 	// session
-	SessionToken string `json:"sessionToken,omitempty"`
-	ExpiresAt    string `json:"expires,omitempty"`
+	SessionToken string    `json:"sessionToken,omitempty"`
+	ExpiresAt    time.Time `json:"expires,omitempty"`
 }
 
 type UserAssignment struct {
@@ -218,7 +218,16 @@ type UpdateUserByIdUriParams struct {
 }
 
 type UpdateUserByIdCommand struct {
-	UserId int
+	UserId    int
+	UpdatedBy string
+
+	Name          string    `json:"name,omitempty"`
+	Email         string    `json:"email,omitempty"`
+	EmailVerified time.Time `json:"emailVerified,omitempty"`
+	Birthdate     time.Time `json:"birthdate,omitempty"`
+	Country       string    `json:"country,omitempty"`
+	Image         string    `json:"image,omitempty"`
+	Status        int       `json:"status,omitempty"`
 }
 
 // UpdateUsernameByUserId
@@ -228,7 +237,9 @@ type UpdateUsernameByUserIdUriParams struct {
 }
 
 type UpdateUsernameByUserIdCommand struct {
-	UserId int
+	UserId    int
+	UpdatedBy string
+	Username  string `json:"username" binding:"required"`
 }
 
 // UpdatePasswordByUserId
@@ -238,7 +249,9 @@ type UpdatePasswordByUserIdUriParams struct {
 }
 
 type UpdatePasswordByUserIdCommand struct {
-	UserId int
+	UserId    int
+	UpdatedBy string
+	Password  string `json:"password" binding:"required"`
 }
 
 // UpdatePreferencesByUserId
