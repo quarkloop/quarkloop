@@ -80,10 +80,10 @@ const updateOrgByIdMutation = `
 UPDATE
     "system"."Organization"
 SET
-    "sid"         = @sid, 
-    "name"        = @name,
-    "description" = @description,
-    "visibility"  = @visibility,
+    "sid"         = COALESCE (NULLIF(@sid, ''), "sid"),
+    "name"        = COALESCE (NULLIF(@name, ''), "name"),
+    "description" = COALESCE (NULLIF(@description, ''), "description"),
+    "visibility"  = COALESCE (NULLIF(@visibility, 0), "visibility"),
     "updatedAt"   = @updatedAt,
     "updatedBy"   = @updatedBy
 WHERE
@@ -102,7 +102,7 @@ func (store *orgStore) UpdateOrgById(ctx context.Context, cmd *org.UpdateOrgById
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", err)
-		return err
+		return org.HandleError(err)
 	}
 
 	if commandTag.RowsAffected() != 1 {
