@@ -4,18 +4,7 @@ import (
 	"context"
 
 	"github.com/quarkloop/quarkloop/pkg/service/user"
-	"github.com/quarkloop/quarkloop/pkg/service/user/store"
 )
-
-type userService struct {
-	store store.OrgStore
-}
-
-func NewUserService(ds store.OrgStore) user.Service {
-	return &userService{
-		store: ds,
-	}
-}
 
 func (s *userService) UpdateUser(ctx context.Context, cmd *user.UpdateUserCommand) error {
 	err := s.store.UpdateUser(ctx, cmd)
