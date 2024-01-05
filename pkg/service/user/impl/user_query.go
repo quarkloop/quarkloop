@@ -4,18 +4,7 @@ import (
 	"context"
 
 	"github.com/quarkloop/quarkloop/pkg/service/user"
-	"github.com/quarkloop/quarkloop/pkg/service/user/store"
 )
-
-type userService struct {
-	store store.OrgStore
-}
-
-func NewUserService(ds store.OrgStore) user.Service {
-	return &userService{
-		store: ds,
-	}
-}
 
 func (s *userService) GetUser(ctx context.Context, query *user.GetUserQuery) (*user.User, error) {
 	res, err := s.store.GetUser(ctx, query)
@@ -67,7 +56,7 @@ func (s *userService) GetEmailByUserId(ctx context.Context, query *user.GetEmail
 	return res, err
 }
 
-func (s *userService) GetStatusByUserId(ctx context.Context, query *user.GetStatusByUserIdQuery) (any, error) {
+func (s *userService) GetStatusByUserId(ctx context.Context, query *user.GetStatusByUserIdQuery) (int, error) {
 	res, err := s.store.GetStatusByUserId(ctx, query)
 	return res, err
 }
