@@ -14,7 +14,7 @@ type Service interface {
 	GetUserById(context.Context, *GetUserByIdQuery) (*User, error)
 	GetUsernameByUserId(context.Context, *GetUsernameByUserIdQuery) (string, error)
 	GetEmailByUserId(context.Context, *GetEmailByUserIdQuery) (string, error)
-	GetStatusByUserId(context.Context, *GetStatusByUserIdQuery) (any, error)
+	GetStatusByUserId(context.Context, *GetStatusByUserIdQuery) (int, error)
 	GetPreferencesByUserId(context.Context, *GetPreferencesByUserIdQuery) (any, error)
 	GetSessionsByUserId(context.Context, *GetSessionsByUserIdQuery) ([]*UserSession, error)
 	GetAccountsByUserId(context.Context, *GetAccountsByUserIdQuery) ([]*UserAccount, error)
