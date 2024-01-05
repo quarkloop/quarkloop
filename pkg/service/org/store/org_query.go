@@ -314,10 +314,12 @@ SELECT
     p."createdBy",
     p."updatedAt",
     p."updatedBy"
-FROM 
+FROM
     "system"."Project" AS p
+LEFT JOIN
+    "system"."Workspace" AS ws ON ws.id = p."workspaceId"
 LEFT JOIN 
-    "system"."Organization" AS org ON org."id" = p."orgId"
+    "system"."Organization" AS org ON org.id = p."orgId"
 WHERE
     p."orgId" = @orgId
 %s
