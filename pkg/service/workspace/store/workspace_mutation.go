@@ -62,25 +62,25 @@ func (store *workspaceStore) CreateWorkspace(ctx context.Context, cmd *workspace
 		"createdBy":   cmd.CreatedBy,
 	})
 
-	var workspace workspace.Workspace
-	rowErr := row.Scan(
-		&workspace.Id,
-		&workspace.ScopeId,
-		&workspace.OrgId,
-		&workspace.Name,
-		&workspace.Description,
-		&workspace.Visibility,
-		&workspace.CreatedAt,
-		&workspace.CreatedBy,
-		&workspace.UpdatedAt,
-		&workspace.UpdatedBy,
+	var ws workspace.Workspace
+	err := row.Scan(
+		&ws.Id,
+		&ws.ScopeId,
+		&ws.OrgId,
+		&ws.Name,
+		&ws.Description,
+		&ws.Visibility,
+		&ws.CreatedAt,
+		&ws.CreatedBy,
+		&ws.UpdatedAt,
+		&ws.UpdatedBy,
 	)
-	if rowErr != nil {
-		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", rowErr)
-		return nil, rowErr
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", err)
+		return nil, workspace.HandleError(err)
 	}
 
-	return &workspace, nil
+	return &ws, nil
 }
 
 /// UpdateWorkspaceById
@@ -114,7 +114,7 @@ func (store *workspaceStore) UpdateWorkspaceById(ctx context.Context, cmd *works
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", err)
-		return err
+		return workspace.HandleError(err)
 	}
 
 	if commandTag.RowsAffected() != 1 {
