@@ -56,22 +56,22 @@ func (store *orgStore) CreateOrg(ctx context.Context, cmd *org.CreateOrgCommand)
 		"createdBy":   cmd.CreatedBy,
 	})
 
-	var org org.Org
-	rowErr := row.Scan(
-		&org.Id,
-		&org.ScopeId,
-		&org.Name,
-		&org.Description,
-		&org.Visibility,
-		&org.CreatedAt,
-		&org.CreatedBy,
+	var o org.Org
+	err := row.Scan(
+		&o.Id,
+		&o.ScopeId,
+		&o.Name,
+		&o.Description,
+		&o.Visibility,
+		&o.CreatedAt,
+		&o.CreatedBy,
 	)
-	if rowErr != nil {
-		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", rowErr)
-		return nil, rowErr
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", err)
+		return nil, org.HandleError(err)
 	}
 
-	return &org, nil
+	return &o, nil
 }
 
 /// UpdateOrgById
