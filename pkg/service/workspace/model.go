@@ -9,7 +9,8 @@ import (
 )
 
 var (
-	ErrWorkspaceNotFound = errors.New("workspace not found")
+	ErrWorkspaceNotFound      = errors.New("workspace not found")
+	ErrWorkspaceAlreadyExists = errors.New("workspace with same scopeId already exists")
 )
 
 type Workspace struct {
