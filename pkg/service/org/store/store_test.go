@@ -378,11 +378,32 @@ func TestQueryOrgRelations(t *testing.T) {
 				OrgId:      o.Id,
 				Visibility: model.AllVisibility,
 			}
-			list, err := store.GetWorkspaceList(ctx, query)
+			// public and private
+			{
+				list, err := store.GetWorkspaceList(ctx, query)
 
-			require.NoError(t, err)
-			require.Empty(t, list)
-			require.Equal(t, 0, len(list))
+				require.NoError(t, err)
+				require.Empty(t, list)
+				require.Equal(t, 0, len(list))
+			}
+			// public
+			{
+				query.Visibility = model.PublicVisibility
+				list, err := store.GetWorkspaceList(ctx, query)
+
+				require.NoError(t, err)
+				require.Empty(t, list)
+				require.Equal(t, 0, len(list))
+			}
+			// private
+			{
+				query.Visibility = model.PrivateVisibility
+				list, err := store.GetWorkspaceList(ctx, query)
+
+				require.NoError(t, err)
+				require.Empty(t, list)
+				require.Equal(t, 0, len(list))
+			}
 		}
 	})
 
@@ -395,11 +416,32 @@ func TestQueryOrgRelations(t *testing.T) {
 				OrgId:      o.Id,
 				Visibility: model.AllVisibility,
 			}
-			list, err := store.GetProjectList(ctx, query)
+			// public and private
+			{
+				list, err := store.GetProjectList(ctx, query)
 
-			require.NoError(t, err)
-			require.Empty(t, list)
-			require.Equal(t, 0, len(list))
+				require.NoError(t, err)
+				require.Empty(t, list)
+				require.Equal(t, 0, len(list))
+			}
+			// public
+			{
+				query.Visibility = model.PublicVisibility
+				list, err := store.GetProjectList(ctx, query)
+
+				require.NoError(t, err)
+				require.Empty(t, list)
+				require.Equal(t, 0, len(list))
+			}
+			// private
+			{
+				query.Visibility = model.PrivateVisibility
+				list, err := store.GetProjectList(ctx, query)
+
+				require.NoError(t, err)
+				require.Empty(t, list)
+				require.Equal(t, 0, len(list))
+			}
 		}
 	})
 
