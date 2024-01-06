@@ -63,7 +63,6 @@ func TestMutationCreateOrg(t *testing.T) {
 		}
 		{
 			// second org (duplicate)
-			cmd.ScopeId = "acme"
 			orgDuplicate, err := store.CreateOrg(ctx, cmd)
 
 			require.Nil(t, orgDuplicate)
@@ -206,6 +205,7 @@ func TestMutationUpdateOrg(t *testing.T) {
 		require.NoError(t, err)
 
 		{
+			// original scope id
 			cmd := &org.UpdateOrgByIdCommand{
 				OrgId:   orgList[0].Id,
 				ScopeId: "quarkloop_updated_scopeid",
@@ -215,6 +215,7 @@ func TestMutationUpdateOrg(t *testing.T) {
 			require.NoError(t, err)
 		}
 		{
+			// duplicate scope id
 			cmd := &org.UpdateOrgByIdCommand{
 				OrgId:   orgList[len(orgList)-1].Id,
 				ScopeId: "quarkloop_updated_scopeid",
