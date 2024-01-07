@@ -7,6 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
+	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
@@ -112,4 +113,56 @@ func GetFullWorkspaceList(ctx context.Context, conn *pgx.Conn) ([]*workspace.Wor
 	}
 
 	return wsList, nil
+}
+
+const getProjectListQuery = `
+SELECT 
+    "id",
+    "sid",
+    "name",
+    "description",
+    "visibility",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy"
+FROM 
+    "system"."Project"
+ORDER BY id ASC;
+`
+
+func GetFullProjectList(ctx context.Context, conn *pgx.Conn) ([]*project.Project, error) {
+	rows, err := conn.Query(ctx, getProjectListQuery)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var projectList []*project.Project = []*project.Project{}
+	for rows.Next() {
+		var ws project.Project
+		err := rows.Scan(
+			&ws.Id,
+			&ws.ScopeId,
+			&ws.Name,
+			&ws.Description,
+			&ws.Visibility,
+			&ws.CreatedAt,
+			&ws.CreatedBy,
+			&ws.UpdatedAt,
+			&ws.UpdatedBy,
+		)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+			return nil, err
+		}
+		projectList = append(projectList, &ws)
+	}
+	if err := rows.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+		return nil, err
+	}
+
+	return projectList, nil
 }
