@@ -66,26 +66,26 @@ func (store *projectStore) CreateProject(ctx context.Context, cmd *project.Creat
 		"createdBy":   cmd.CreatedBy,
 	})
 
-	var project project.Project
-	rowErr := row.Scan(
-		&project.Id,
-		&project.ScopeId,
-		&project.OrgId,
-		&project.WorkspaceId,
-		&project.Name,
-		&project.Description,
-		&project.Visibility,
-		&project.CreatedAt,
-		&project.CreatedBy,
-		&project.UpdatedAt,
-		&project.UpdatedBy,
+	var pr project.Project
+	err := row.Scan(
+		&pr.Id,
+		&pr.ScopeId,
+		&pr.OrgId,
+		&pr.WorkspaceId,
+		&pr.Name,
+		&pr.Description,
+		&pr.Visibility,
+		&pr.CreatedAt,
+		&pr.CreatedBy,
+		&pr.UpdatedAt,
+		&pr.UpdatedBy,
 	)
-	if rowErr != nil {
-		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", rowErr)
-		return nil, rowErr
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", err)
+		return nil, project.HandleError(err)
 	}
 
-	return &project, nil
+	return &pr, nil
 }
 
 /// UpdateProjectById
@@ -94,11 +94,12 @@ const updateProjectByIdMutation = `
 UPDATE
     "system"."Project"
 SET
-    "sid"         = @sid,
-    "name"        = @name,
-    "description" = @description,
+    "sid"         = COALESCE (NULLIF(@sid, ''), "sid"),
+    "name"        = COALESCE (NULLIF(@name, ''), "name"),
+    "description" = COALESCE (NULLIF(@description, ''), "description"),
+    "visibility"  = COALESCE (NULLIF(@visibility, 0), "visibility"),
     "updatedAt"   = @updatedAt,
-    "updatedBy"   = @updatedBy,
+    "updatedBy"   = @updatedBy
 WHERE
     "id" = @id
 AND
@@ -115,12 +116,13 @@ func (store *projectStore) UpdateProjectById(ctx context.Context, cmd *project.U
 		"sid":         cmd.ScopeId,
 		"name":        cmd.Name,
 		"description": cmd.Description,
+		"visibility":  cmd.Visibility,
 		"updatedBy":   cmd.UpdatedBy,
 		"updatedAt":   time.Now(),
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", err)
-		return err
+		return project.HandleError(err)
 	}
 
 	if commandTag.RowsAffected() != 1 {
