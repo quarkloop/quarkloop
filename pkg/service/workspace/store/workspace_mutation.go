@@ -89,12 +89,12 @@ const updateWorkspaceByIdMutation = `
 UPDATE
     "system"."Workspace"
 SET
-    "sid"         = @sid,
-    "name"        = @name,
-    "description" = @description,
-    "visibility"  = @visibility,
+    "sid"         = COALESCE (NULLIF(@sid, ''), "sid"),
+    "name"        = COALESCE (NULLIF(@name, ''), "name"),
+    "description" = COALESCE (NULLIF(@description, ''), "description"),
+    "visibility"  = COALESCE (NULLIF(@visibility, 0), "visibility"),
     "updatedAt"   = @updatedAt,
-    "updatedBy"   = @updatedBy,
+    "updatedBy"   = @updatedBy
 WHERE
     "id" = @id
 AND
