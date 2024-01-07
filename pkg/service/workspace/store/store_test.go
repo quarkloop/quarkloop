@@ -101,7 +101,8 @@ func TestMutationCreateWorkspace(t *testing.T) {
 			deleteErr := store.DeleteWorkspaceById(ctx, cmd)
 			require.NoError(t, deleteErr)
 
-			ws, err := store.GetWorkspaceById(ctx, &workspace.GetWorkspaceByIdQuery{WorkspaceId: workspaceId})
+			query := &workspace.GetWorkspaceByIdQuery{OrgId: orgId, WorkspaceId: workspaceId}
+			ws, err := store.GetWorkspaceById(ctx, query)
 			require.Nil(t, ws)
 			require.Error(t, err)
 			require.Exactly(t, workspace.ErrWorkspaceNotFound, err)
@@ -138,7 +139,8 @@ func TestMutationCreateWorkspace(t *testing.T) {
 				deleteErr := store.DeleteWorkspaceById(ctx, cmd)
 				require.NoError(t, deleteErr)
 
-				ws, err := store.GetWorkspaceById(ctx, &workspace.GetWorkspaceByIdQuery{WorkspaceId: ws.Id})
+				query := &workspace.GetWorkspaceByIdQuery{OrgId: orgId, WorkspaceId: ws.Id}
+				ws, err := store.GetWorkspaceById(ctx, query)
 				require.Nil(t, ws)
 				require.Error(t, err)
 				require.Exactly(t, workspace.ErrWorkspaceNotFound, err)
@@ -191,10 +193,16 @@ func TestQueryGetWorkspaceAfterCreate(t *testing.T) {
 		require.NoError(t, err)
 
 		for idx, ws := range wsList {
-			workspace, err := store.GetWorkspaceById(ctx, &workspace.GetWorkspaceByIdQuery{WorkspaceId: ws.Id})
+			query := &workspace.GetWorkspaceByIdQuery{OrgId: orgId, WorkspaceId: ws.Id}
+			workspace, err := store.GetWorkspaceById(ctx, query)
 
 			require.NoError(t, err)
 			require.NotNil(t, workspace)
+			require.NotEmpty(t, workspace.ScopeId)
+			require.NotEmpty(t, workspace.Name)
+			require.NotEmpty(t, workspace.Description)
+			require.NotEmpty(t, workspace.CreatedBy)
+			require.NotZero(t, workspace.Visibility)
 			require.Equal(t, fmt.Sprintf("quarkloop_%d", idx), workspace.ScopeId)
 			require.Equal(t, fmt.Sprintf("Quarkloop_%d", idx), workspace.Name)
 			require.Equal(t, fmt.Sprintf("Quarkloop Corporation #%d", idx), workspace.Description)
@@ -204,7 +212,8 @@ func TestQueryGetWorkspaceAfterCreate(t *testing.T) {
 	})
 
 	t.Run("get workspace by wrong id", func(t *testing.T) {
-		ws, err := store.GetWorkspaceById(ctx, &workspace.GetWorkspaceByIdQuery{WorkspaceId: 9999999})
+		query := &workspace.GetWorkspaceByIdQuery{OrgId: orgId, WorkspaceId: 9999999}
+		ws, err := store.GetWorkspaceById(ctx, query)
 
 		require.Nil(t, ws)
 		require.Error(t, err)
@@ -217,7 +226,8 @@ func TestQueryGetWorkspaceAfterCreate(t *testing.T) {
 		require.NoError(t, err)
 
 		for _, ws := range wsList {
-			visibility, err := store.GetWorkspaceVisibilityById(ctx, &workspace.GetWorkspaceVisibilityByIdQuery{WorkspaceId: ws.Id})
+			query := &workspace.GetWorkspaceVisibilityByIdQuery{OrgId: orgId, WorkspaceId: ws.Id}
+			visibility, err := store.GetWorkspaceVisibilityById(ctx, query)
 
 			require.NoError(t, err)
 			require.NotZero(t, visibility)
@@ -236,6 +246,7 @@ func TestMutationUpdateWorkspace(t *testing.T) {
 		{
 			// original scope id
 			cmd := &workspace.UpdateWorkspaceByIdCommand{
+				OrgId:       orgId,
 				WorkspaceId: wsList[0].Id,
 				ScopeId:     "quarkloop_updated_scopeid",
 			}
@@ -246,6 +257,7 @@ func TestMutationUpdateWorkspace(t *testing.T) {
 		{
 			// duplicate scope id
 			cmd := &workspace.UpdateWorkspaceByIdCommand{
+				OrgId:       orgId,
 				WorkspaceId: wsList[len(wsList)-1].Id,
 				ScopeId:     "quarkloop_updated_scopeid",
 			}
@@ -265,6 +277,7 @@ func TestMutationUpdateWorkspace(t *testing.T) {
 		for idx, ws := range wsList {
 			name := fmt.Sprintf("Quarkloop_Updated_%d", idx)
 			cmd := &workspace.UpdateWorkspaceByIdCommand{
+				OrgId:       orgId,
 				WorkspaceId: ws.Id,
 				Name:        name,
 			}
@@ -273,7 +286,8 @@ func TestMutationUpdateWorkspace(t *testing.T) {
 
 			{
 				// check the update
-				workspace, err := store.GetWorkspaceById(ctx, &workspace.GetWorkspaceByIdQuery{WorkspaceId: ws.Id})
+				query := &workspace.GetWorkspaceByIdQuery{OrgId: orgId, WorkspaceId: ws.Id}
+				workspace, err := store.GetWorkspaceById(ctx, query)
 
 				require.NoError(t, err)
 				require.NotNil(t, workspace)
@@ -289,6 +303,7 @@ func TestMutationUpdateWorkspace(t *testing.T) {
 		for idx, ws := range wsList {
 			description := fmt.Sprintf("Quarkloop_Description_Updated_%d", idx)
 			cmd := &workspace.UpdateWorkspaceByIdCommand{
+				OrgId:       orgId,
 				WorkspaceId: ws.Id,
 				Description: description,
 			}
@@ -297,7 +312,8 @@ func TestMutationUpdateWorkspace(t *testing.T) {
 
 			{
 				// check the update
-				workspace, err := store.GetWorkspaceById(ctx, &workspace.GetWorkspaceByIdQuery{WorkspaceId: ws.Id})
+				query := &workspace.GetWorkspaceByIdQuery{OrgId: orgId, WorkspaceId: ws.Id}
+				workspace, err := store.GetWorkspaceById(ctx, query)
 
 				require.NoError(t, err)
 				require.NotNil(t, workspace)
@@ -313,6 +329,7 @@ func TestMutationUpdateWorkspace(t *testing.T) {
 		for _, ws := range wsList {
 			visibility := model.PrivateVisibility
 			cmd := &workspace.UpdateWorkspaceByIdCommand{
+				OrgId:       orgId,
 				WorkspaceId: ws.Id,
 				Visibility:  visibility,
 			}
@@ -321,7 +338,8 @@ func TestMutationUpdateWorkspace(t *testing.T) {
 
 			{
 				// check the update
-				workspace, err := store.GetWorkspaceById(ctx, &workspace.GetWorkspaceByIdQuery{WorkspaceId: ws.Id})
+				query := &workspace.GetWorkspaceByIdQuery{OrgId: orgId, WorkspaceId: ws.Id}
+				workspace, err := store.GetWorkspaceById(ctx, query)
 
 				require.NoError(t, err)
 				require.NotNil(t, workspace)
@@ -337,6 +355,7 @@ func TestMutationUpdateWorkspace(t *testing.T) {
 		for idx, ws := range wsList {
 			updatedBy := fmt.Sprintf("Quarkloop_Admin2_Updated_%d", idx)
 			cmd := &workspace.UpdateWorkspaceByIdCommand{
+				OrgId:       orgId,
 				WorkspaceId: ws.Id,
 				UpdatedBy:   updatedBy,
 			}
@@ -345,7 +364,8 @@ func TestMutationUpdateWorkspace(t *testing.T) {
 
 			{
 				// check the update
-				workspace, err := store.GetWorkspaceById(ctx, &workspace.GetWorkspaceByIdQuery{WorkspaceId: ws.Id})
+				query := &workspace.GetWorkspaceByIdQuery{OrgId: orgId, WorkspaceId: ws.Id}
+				workspace, err := store.GetWorkspaceById(ctx, query)
 
 				require.NoError(t, err)
 				require.NotNil(t, workspace)
@@ -365,6 +385,7 @@ func TestMutationUpdateWorkspace(t *testing.T) {
 
 		for idx, ws := range wsList {
 			cmd := &workspace.UpdateWorkspaceByIdCommand{
+				OrgId:       orgId,
 				WorkspaceId: ws.Id,
 				ScopeId:     fmt.Sprintf("quarkloop_new_update_%d", idx),
 				Name:        fmt.Sprintf("Quarkloop_New_Update_%d", idx),
@@ -377,7 +398,8 @@ func TestMutationUpdateWorkspace(t *testing.T) {
 
 			{
 				// check the update
-				workspace, err := store.GetWorkspaceById(ctx, &workspace.GetWorkspaceByIdQuery{WorkspaceId: ws.Id})
+				query := &workspace.GetWorkspaceByIdQuery{OrgId: orgId, WorkspaceId: ws.Id}
+				workspace, err := store.GetWorkspaceById(ctx, query)
 
 				require.NoError(t, err)
 				require.NotNil(t, workspace)
