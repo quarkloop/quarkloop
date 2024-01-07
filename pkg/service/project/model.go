@@ -10,7 +10,8 @@ import (
 )
 
 var (
-	ErrProjectNotFound = errors.New("project not found")
+	ErrProjectNotFound      = errors.New("project not found")
+	ErrProjectAlreadyExists = errors.New("project with same scopeId already exists")
 )
 
 type Project struct {
