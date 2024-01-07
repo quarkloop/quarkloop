@@ -45,7 +45,7 @@ func TestMutationTruncateTables(t *testing.T) {
 func TestPrepare(t *testing.T) {
 	orgStore := orgStore.NewOrgStore(conn)
 
-	t.Run("create workspace with duplicate scopeId", func(t *testing.T) {
+	t.Run("create single org for whole test", func(t *testing.T) {
 		cmd := &org.CreateOrgCommand{
 			ScopeId:     "quarkloop",
 			Name:        "Quarkloop",
