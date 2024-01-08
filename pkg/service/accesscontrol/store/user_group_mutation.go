@@ -35,11 +35,11 @@ RETURNING
     "updatedBy";
 `
 
-func (store *accessControlStore) CreateUserGroup(ctx context.Context, orgId int, userGroup *accesscontrol.UserGroup) (*accesscontrol.UserGroup, error) {
+func (store *accessControlStore) CreateUserGroup(ctx context.Context, cmd *accesscontrol.CreateUserGroupCommand) (*accesscontrol.UserGroup, error) {
 	row := store.Conn.QueryRow(ctx, createUserGroupQuery, pgx.NamedArgs{
-		"orgId":     userGroup.OrgId,
-		"name":      userGroup.Name,
-		"createdBy": userGroup.CreatedBy,
+		"orgId":     cmd.UserGroup.OrgId,
+		"name":      cmd.UserGroup.Name,
+		"createdBy": cmd.UserGroup.CreatedBy,
 	})
 
 	var ug accesscontrol.UserGroup
@@ -74,12 +74,12 @@ WHERE
     "id" = @id;
 `
 
-func (store *accessControlStore) UpdateUserGroupById(ctx context.Context, userGroupId int, userGroup *accesscontrol.UserGroup) error {
+func (store *accessControlStore) UpdateUserGroupById(ctx context.Context, cmd *accesscontrol.UpdateUserGroupByIdCommand) error {
 	commandTag, err := store.Conn.Exec(ctx, updateUserGroupByIdQuery, pgx.NamedArgs{
-		"id":        userGroupId,
-		"name":      userGroup.Name,
+		"id":        cmd.UserGroupId,
+		"name":      cmd.UserGroup.Name,
+		"updatedBy": cmd.UserGroup.UpdatedBy,
 		"updatedAt": time.Now(),
-		"updatedBy": userGroup.UpdatedBy,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", err)
@@ -106,10 +106,10 @@ AND
     "id" = @id;
 `
 
-func (store *accessControlStore) DeleteUserGroupById(ctx context.Context, orgId int, userGroupId int) error {
+func (store *accessControlStore) DeleteUserGroupById(ctx context.Context, cmd *accesscontrol.DeleteUserGroupByIdCommand) error {
 	commandTag, err := store.Conn.Exec(ctx, deleteUserGroupByIdQuery, pgx.NamedArgs{
-		"orgId": orgId,
-		"id":    userGroupId,
+		"orgId": cmd.OrgId,
+		"id":    cmd.UserGroupId,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
