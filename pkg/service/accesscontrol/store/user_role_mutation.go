@@ -34,11 +34,11 @@ RETURNING
     "updatedBy";
 `
 
-func (store *accessControlStore) CreateUserRole(ctx context.Context, orgId int, userRole *accesscontrol.UserRole) (*accesscontrol.UserRole, error) {
+func (store *accessControlStore) CreateUserRole(ctx context.Context, cmd *accesscontrol.CreateUserRoleCommand) (*accesscontrol.UserRole, error) {
 	row := store.Conn.QueryRow(ctx, createUserRoleQuery, pgx.NamedArgs{
-		"orgId":     userRole.OrgId,
-		"name":      userRole.Name,
-		"createdBy": userRole.CreatedBy,
+		"orgId":     cmd.UserRole.OrgId,
+		"name":      cmd.UserRole.Name,
+		"createdBy": cmd.UserRole.CreatedBy,
 	})
 
 	var ur accesscontrol.UserRole
@@ -72,12 +72,12 @@ WHERE
     "id" = @id;
 `
 
-func (store *accessControlStore) UpdateUserRoleById(ctx context.Context, userRoleId int, userRole *accesscontrol.UserRole) error {
+func (store *accessControlStore) UpdateUserRoleById(ctx context.Context, cmd *accesscontrol.UpdateUserRoleByIdCommand) error {
 	commandTag, err := store.Conn.Exec(ctx, updateUserRoleByIdQuery, pgx.NamedArgs{
-		"id":        userRoleId,
-		"name":      userRole.Name,
+		"id":        cmd.UserRoleId,
+		"name":      cmd.UserRole.Name,
+		"updatedBy": cmd.UserRole.UpdatedBy,
 		"updatedAt": time.Now(),
-		"updatedBy": userRole.UpdatedBy,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", err)
@@ -104,10 +104,10 @@ AND
     "id" = @id;
 `
 
-func (store *accessControlStore) DeleteUserRoleById(ctx context.Context, orgId int, userRoleId int) error {
+func (store *accessControlStore) DeleteUserRoleById(ctx context.Context, cmd *accesscontrol.DeleteUserRoleByIdCommand) error {
 	commandTag, err := store.Conn.Exec(ctx, deleteUserRoleByIdQuery, pgx.NamedArgs{
-		"orgId": orgId,
-		"id":    userRoleId,
+		"orgId": cmd.OrgId,
+		"id":    cmd.UserRoleId,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
