@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
+	"github.com/quarkloop/quarkloop/pkg/service/user"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
@@ -165,4 +166,62 @@ func GetFullProjectList(ctx context.Context, conn *pgx.Conn) ([]*project.Project
 	}
 
 	return projectList, nil
+}
+
+const getUserListQuery = `
+SELECT 
+    "id",
+    "username",
+    "name",
+    "email",
+    "birthdate",
+    "country",
+    "image",
+    "status",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy"
+FROM 
+    "auth"."User"
+ORDER BY id ASC;
+`
+
+func GetFullUserList(ctx context.Context, conn *pgx.Conn) ([]*user.User, error) {
+	rows, err := conn.Query(ctx, getUserListQuery)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var userList []*user.User = []*user.User{}
+	for rows.Next() {
+		var u user.User
+		err := rows.Scan(
+			&u.Id,
+			&u.Username,
+			&u.Name,
+			&u.Email,
+			&u.Birthdate,
+			&u.Country,
+			&u.Image,
+			&u.Status,
+			&u.CreatedAt,
+			&u.CreatedBy,
+			&u.UpdatedAt,
+			&u.UpdatedBy,
+		)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+			return nil, err
+		}
+		userList = append(userList, &u)
+	}
+	if err := rows.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+		return nil, err
+	}
+
+	return userList, nil
 }
