@@ -26,8 +26,8 @@ WHERE
     "orgId" = @orgId;
 `
 
-func (store *accessControlStore) ListUserRoles(ctx context.Context, orgId int) ([]accesscontrol.UserRole, error) {
-	rows, err := store.Conn.Query(ctx, listUserRolesQuery, pgx.NamedArgs{"orgId": orgId})
+func (store *accessControlStore) GetUserRoleList(ctx context.Context, query *accesscontrol.GetUserRoleListQuery) ([]accesscontrol.UserRole, error) {
+	rows, err := store.Conn.Query(ctx, listUserRolesQuery, pgx.NamedArgs{"orgId": query.OrgId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
 		return nil, err
@@ -80,8 +80,8 @@ WHERE
     "id" = @id;
 `
 
-func (store *accessControlStore) GetUserRoleById(ctx context.Context, userRoleId int) (*accesscontrol.UserRole, error) {
-	row := store.Conn.QueryRow(ctx, getUserRoleByIdQuery, pgx.NamedArgs{"id": userRoleId})
+func (store *accessControlStore) GetUserRoleById(ctx context.Context, query *accesscontrol.GetUserRoleByIdQuery) (*accesscontrol.UserRole, error) {
+	row := store.Conn.QueryRow(ctx, getUserRoleByIdQuery, pgx.NamedArgs{"id": query.UserRoleId})
 
 	var ur accesscontrol.UserRole
 	err := row.Scan(
