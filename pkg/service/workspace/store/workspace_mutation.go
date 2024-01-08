@@ -39,9 +39,7 @@ RETURNING
     "description",
     "visibility",
     "createdAt",
-    "createdBy",
-    "updatedAt",
-    "updatedBy";
+    "createdBy";
 `
 
 func (store *workspaceStore) CreateWorkspace(ctx context.Context, cmd *workspace.CreateWorkspaceCommand) (*workspace.Workspace, error) {
@@ -72,8 +70,6 @@ func (store *workspaceStore) CreateWorkspace(ctx context.Context, cmd *workspace
 		&ws.Visibility,
 		&ws.CreatedAt,
 		&ws.CreatedBy,
-		&ws.UpdatedAt,
-		&ws.UpdatedBy,
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", err)
