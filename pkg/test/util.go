@@ -10,8 +10,20 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/util"
 )
 
+func InitTestAuthDB() (context.Context, *pgx.Conn) {
+	err := godotenv.Load(util.GetTestEnvFilePath())
+	if err != nil {
+		log.Fatal("Error loading .env file", err.Error())
+	}
+
+	db := db.NewAuthDatabase()
+	db.Connect()
+
+	return context.Background(), db.GetConnection()
+}
+
 func InitTestSystemDB() (context.Context, *pgx.Conn) {
-	err := godotenv.Load(util.GetDevEnvFilePath())
+	err := godotenv.Load(util.GetTestEnvFilePath())
 	if err != nil {
 		log.Fatal("Error loading .env file", err.Error())
 	}
@@ -19,5 +31,5 @@ func InitTestSystemDB() (context.Context, *pgx.Conn) {
 	db := db.NewSystemDatabase()
 	db.Connect()
 
-	return context.Background(), db.Connection()
+	return context.Background(), db.GetConnection()
 }
