@@ -38,20 +38,20 @@ func (u *User) GeneratePath() {
 
 type Account struct {
 	// id
-	Id                int    `json:"id"`
-	UserId            int    `json:"userId"`
-	TokenId           string `json:"tokenId"`
-	ProviderAccountId string `json:"providerAccountId"`
+	Id                int     `json:"id"`
+	UserId            int     `json:"userId"`
+	TokenId           *string `json:"tokenId"`
+	ProviderAccountId string  `json:"providerAccountId"`
 
 	// account
-	Type         string    `json:"type"`
-	TokenType    string    `json:"tokenType"`
-	Provider     string    `json:"provider"`
-	RefreshToken *string   `json:"refereshToken"`
-	AccessToken  string    `json:"accessToken"`
-	Scope        string    `json:"scope"`
-	SessionState *string   `json:"sessionState"`
-	ExpiresAt    time.Time `json:"expiresAt"`
+	Type         string     `json:"type"`
+	TokenType    *string    `json:"tokenType"`
+	Provider     string     `json:"provider"`
+	RefreshToken *string    `json:"refereshToken"`
+	AccessToken  *string    `json:"accessToken"`
+	Scope        *string    `json:"scope"`
+	SessionState *string    `json:"sessionState"`
+	ExpiresAt    *time.Time `json:"expiresAt"`
 }
 
 type Session struct {
@@ -322,6 +322,7 @@ type CreateAccountCommand struct {
 	Type         string  `json:"type"`
 	TokenType    string  `json:"tokenType"`
 	Provider     string  `json:"provider"`
+	Scope        string  `json:"scope"`
 	RefreshToken *string `json:"refereshToken"`
 	AccessToken  string  `json:"accessToken"`
 }
