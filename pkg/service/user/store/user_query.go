@@ -104,7 +104,7 @@ WHERE
     "userId" = @userId;
 `
 
-func (store *userStore) GetSessions(ctx context.Context, query *user.GetSessionsQuery) ([]*user.UserSession, error) {
+func (store *userStore) GetSessions(ctx context.Context, query *user.GetSessionsQuery) ([]*user.Session, error) {
 	panic("not implemented")
 }
 
@@ -129,7 +129,7 @@ WHERE
     "userId" = @userId;
 `
 
-func (store *userStore) GetAccounts(ctx context.Context, query *user.GetAccountsQuery) ([]*user.UserAccount, error) {
+func (store *userStore) GetAccounts(ctx context.Context, query *user.GetAccountsQuery) ([]*user.Account, error) {
 	panic("not implemented")
 }
 
@@ -275,7 +275,7 @@ WHERE
     "userId" = @userId;
 `
 
-func (store *userStore) GetSessionsByUserId(ctx context.Context, query *user.GetSessionsByUserIdQuery) ([]*user.UserSession, error) {
+func (store *userStore) GetSessionsByUserId(ctx context.Context, query *user.GetSessionsByUserIdQuery) ([]*user.Session, error) {
 	rows, err := store.Conn.Query(ctx, getSessionsByUserIdQuery, pgx.NamedArgs{"userId": query.UserId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
@@ -283,9 +283,9 @@ func (store *userStore) GetSessionsByUserId(ctx context.Context, query *user.Get
 	}
 	defer rows.Close()
 
-	var sessionList []*user.UserSession = []*user.UserSession{}
+	var sessionList []*user.Session = []*user.Session{}
 	for rows.Next() {
-		var session user.UserSession
+		var session user.Session
 		err := rows.Scan(
 			&session.Id,
 			&session.SessionToken,
@@ -322,7 +322,7 @@ WHERE
     "userId" = @userId;
 `
 
-func (store *userStore) GetAccountsByUserId(ctx context.Context, query *user.GetAccountsByUserIdQuery) ([]*user.UserAccount, error) {
+func (store *userStore) GetAccountsByUserId(ctx context.Context, query *user.GetAccountsByUserIdQuery) ([]*user.Account, error) {
 	rows, err := store.Conn.Query(ctx, getAccountsByUserIdQuery, pgx.NamedArgs{"userId": query.UserId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
@@ -330,9 +330,9 @@ func (store *userStore) GetAccountsByUserId(ctx context.Context, query *user.Get
 	}
 	defer rows.Close()
 
-	var accountList []*user.UserAccount = []*user.UserAccount{}
+	var accountList []*user.Account = []*user.Account{}
 	for rows.Next() {
-		var acc user.UserAccount
+		var acc user.Account
 		err := rows.Scan(
 			&acc.Id,
 			&acc.Type,
