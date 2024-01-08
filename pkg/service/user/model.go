@@ -11,15 +11,15 @@ type User struct {
 	Username string `json:"username"`
 
 	// user
-	Name          string     `json:"name,omitempty"`
-	Email         string     `json:"email,omitempty"`
-	EmailVerified *time.Time `json:"emailVerified,omitempty"`
-	Password      *string    `json:"password,omitempty"`
-	Birthdate     *time.Time `json:"birthdate,omitempty"`
-	Country       *string    `json:"country,omitempty"`
-	Image         string     `json:"image,omitempty"`
-	Status        int        `json:"status,omitempty"`
-	Path          string     `json:"path,omitempty"`
+	Name          string     `json:"name"`
+	Email         string     `json:"email"`
+	EmailVerified *time.Time `json:"emailVerified"`
+	Password      *string    `json:"password"`
+	Birthdate     *time.Time `json:"birthdate"`
+	Country       *string    `json:"country"`
+	Image         string     `json:"image"`
+	Status        int        `json:"status"`
+	Path          string     `json:"path"`
 
 	// history
 	CreatedAt time.Time  `json:"createdAt"`
@@ -36,30 +36,32 @@ func (u *User) GeneratePath() {
 	u.Path = fmt.Sprintf("/users/%d", u.GetId())
 }
 
-type UserAccount struct {
+type Account struct {
 	// id
-	Id                int    `json:"id,omitempty"`
-	TokenId           string `json:"idToken,omitempty"`
-	ProviderAccountId string `json:"providerAccountId,omitempty"`
+	Id                int    `json:"id"`
+	UserId            int    `json:"userId"`
+	TokenId           string `json:"tokenId"`
+	ProviderAccountId string `json:"providerAccountId"`
 
 	// account
-	Type         string    `json:"type,omitempty"`
-	TokenType    string    `json:"tokenType,omitempty"`
-	Provider     string    `json:"provider,omitempty"`
-	RefreshToken *string   `json:"refereshToken,omitempty"`
-	AccessToken  string    `json:"accessToken,omitempty"`
-	Scope        string    `json:"scope,omitempty"`
-	SessionState *string   `json:"sessionState,omitempty"`
-	ExpiresAt    time.Time `json:"expiresAt,omitempty"`
+	Type         string    `json:"type"`
+	TokenType    string    `json:"tokenType"`
+	Provider     string    `json:"provider"`
+	RefreshToken *string   `json:"refereshToken"`
+	AccessToken  string    `json:"accessToken"`
+	Scope        string    `json:"scope"`
+	SessionState *string   `json:"sessionState"`
+	ExpiresAt    time.Time `json:"expiresAt"`
 }
 
-type UserSession struct {
+type Session struct {
 	// id
-	Id int `json:"id,omitempty"`
+	Id     int
+	UserId int
 
 	// session
-	SessionToken string    `json:"sessionToken,omitempty"`
-	ExpiresAt    time.Time `json:"expires,omitempty"`
+	SessionToken string    `json:"sessionToken"`
+	ExpiresAt    time.Time `json:"expires"`
 }
 
 type UserAssignment struct {
@@ -193,7 +195,21 @@ type GetAccountsByUserIdQuery struct {
 
 type GetUsersQuery struct{}
 
-//////////////////////////////////////////////////
+/******************************* mutations*******************************/
+
+// CreateUser
+
+type CreateUserCommand struct {
+	CreatedBy string
+
+	Username  string     `json:"username"`
+	Name      string     `json:"name"`
+	Email     string     `json:"email"`
+	Birthdate *time.Time `json:"birthdate"`
+	Country   string     `json:"country"`
+	Image     string     `json:"image"`
+	Status    int        `json:"status"`
+}
 
 // UpdateUser
 
@@ -221,13 +237,14 @@ type UpdateUserByIdCommand struct {
 	UserId    int
 	UpdatedBy string
 
-	Name          string    `json:"name,omitempty"`
-	Email         string    `json:"email,omitempty"`
-	EmailVerified time.Time `json:"emailVerified,omitempty"`
-	Birthdate     time.Time `json:"birthdate,omitempty"`
-	Country       string    `json:"country,omitempty"`
-	Image         string    `json:"image,omitempty"`
-	Status        int       `json:"status,omitempty"`
+	Username      string     `json:"username"`
+	Name          string     `json:"name"`
+	Email         string     `json:"email"`
+	EmailVerified *time.Time `json:"emailVerified"`
+	Birthdate     *time.Time `json:"birthdate"`
+	Country       string     `json:"country"`
+	Image         string     `json:"image"`
+	Status        int        `json:"status"`
 }
 
 // UpdateUsernameByUserId
@@ -274,6 +291,15 @@ type DeleteUserByIdCommand struct {
 	UserId int
 }
 
+// CreateSession
+
+type CreateSessionCommand struct {
+	UserId int
+
+	SessionToken string    `json:"sessionToken"`
+	ExpiresAt    time.Time `json:"expires"`
+}
+
 // DeleteSessionById
 
 type DeleteSessionByIdUriParams struct {
@@ -284,6 +310,20 @@ type DeleteSessionByIdUriParams struct {
 type DeleteSessionByIdCommand struct {
 	UserId    int
 	SessionId int
+}
+
+// CreateAccountCommand
+
+type CreateAccountCommand struct {
+	UserId            int
+	TokenId           string `json:"tokenId"`
+	ProviderAccountId string `json:"providerAccountId"`
+
+	Type         string  `json:"type"`
+	TokenType    string  `json:"tokenType"`
+	Provider     string  `json:"provider"`
+	RefreshToken *string `json:"refereshToken"`
+	AccessToken  string  `json:"accessToken"`
 }
 
 // DeleteAccountById
