@@ -138,8 +138,12 @@ type Permission struct {
 	UpdatedBy *string    `json:"updatedBy"`
 }
 
-type EvaluateFilterQuery struct {
-	OrgId, WorkspaceId, ProjectId, UserId int
+type EvaluateQuery struct {
+	Permission  string
+	UserId      int
+	OrgId       int
+	WorkspaceId int
+	ProjectId   int
 }
 
 // GetUserGroupList
@@ -257,3 +261,78 @@ type DeleteUserRoleByIdCommand struct {
 	OrgId      int
 	UserRoleId int
 }
+
+////////////////////////////////////////////////////
+
+// GetUserAssignmentList
+
+type GetUserAssignmentListQuery struct {
+	OrgId int
+}
+
+// GetUserAssignmentById
+
+type GetUserAssignmentByIdQuery struct {
+	UserAssignmentId int
+}
+
+// CreateUserAssignment
+
+type CreateUserAssignmentCommand struct {
+	OrgId    int
+	UserRole *UserAssignment
+}
+
+// UpdateUserAssignmentById
+
+type UpdateUserAssignmentByIdCommand struct {
+	OrgId            int
+	UserAssignmentId int
+	UserRole         *UserAssignment
+}
+
+// DeleteUserAssignmentById
+
+type DeleteUserAssignmentByIdCommand struct {
+	OrgId            int
+	UserAssignmentId int
+}
+
+/////////
+
+// type GetUserGroupListQuery struct {
+// 	OrgId int
+// }
+
+// type GetUserGroupByIdQuery struct {
+// 	UserGroupId int
+// }
+
+// type CreateUserGroupCommand struct {
+// 	OrgId     int
+// 	UserGroup *accesscontrol.UserGroup
+// }
+
+// type UpdateUserGroupByIdCommand struct {
+// 	UserGroupId int
+// 	UserGroup   *accesscontrol.UserGroup
+// }
+
+// type DeleteUserGroupByIdCommand struct {
+// 	OrgId       int
+// 	UserGroupId int
+// }
+
+// type GetUserRoleByIdQuery struct {
+// 	UserRoleId int
+// }
+
+// type CreateUserRoleCommand struct {
+// 	OrgId    int
+// 	UserRole *accesscontrol.UserRole
+// }
+
+// type UpdateUserRoleByIdCommand struct {
+// 	UserRoleId int
+// 	UserRole   *accesscontrol.UserRole
+// }
