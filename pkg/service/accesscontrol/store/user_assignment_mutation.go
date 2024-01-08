@@ -43,14 +43,14 @@ RETURNING
     "updatedBy";
 `
 
-func (store *accessControlStore) CreateUserAssignment(ctx context.Context, orgId int, userRole *accesscontrol.UserAssignment) (*accesscontrol.UserAssignment, error) {
+func (store *accessControlStore) CreateUserAssignment(ctx context.Context, cmd *accesscontrol.CreateUserAssignmentCommand) (*accesscontrol.UserAssignment, error) {
 	row := store.Conn.QueryRow(ctx, createUserAssignmentQuery, pgx.NamedArgs{
-		"orgId":       userRole.OrgId,
-		"workspaceId": userRole.WorkspaceId,
-		"projectId":   userRole.ProjectId,
-		"userGroupId": userRole.UserGroupId,
-		"userRoleId":  userRole.UserRoleId,
-		"createdBy":   userRole.CreatedBy,
+		"orgId":       cmd.OrgId,
+		"workspaceId": cmd.UserRole.WorkspaceId,
+		"projectId":   cmd.UserRole.ProjectId,
+		"userGroupId": cmd.UserRole.UserGroupId,
+		"userRoleId":  cmd.UserRole.UserRoleId,
+		"createdBy":   cmd.UserRole.CreatedBy,
 	})
 
 	var ua accesscontrol.UserAssignment
@@ -87,12 +87,12 @@ WHERE
     "id" = @id;
 `
 
-func (store *accessControlStore) UpdateUserAssignmentById(ctx context.Context, userAssignmentId int, userRole *accesscontrol.UserAssignment) error {
+func (store *accessControlStore) UpdateUserAssignmentById(ctx context.Context, cmd *accesscontrol.UpdateUserAssignmentByIdCommand) error {
 	commandTag, err := store.Conn.Exec(ctx, updateUserAssignmentByIdQuery, pgx.NamedArgs{
-		"id":         userAssignmentId,
-		"userRoleId": userRole.UserRoleId,
+		"id":         cmd.UserAssignmentId,
+		"userRoleId": cmd.UserRole.UserRoleId,
+		"updatedBy":  cmd.UserRole.UpdatedBy,
 		"updatedAt":  time.Now(),
-		"updatedBy":  userRole.UpdatedBy,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", err)
@@ -119,10 +119,10 @@ AND
     "id" = @id;
 `
 
-func (store *accessControlStore) DeleteUserAssignmentById(ctx context.Context, orgId int, userAssignmentId int) error {
+func (store *accessControlStore) DeleteUserAssignmentById(ctx context.Context, cmd *accesscontrol.DeleteUserAssignmentByIdCommand) error {
 	commandTag, err := store.Conn.Exec(ctx, deleteUserAssignmentByIdQuery, pgx.NamedArgs{
-		"orgId": orgId,
-		"id":    userAssignmentId,
+		"orgId": cmd.OrgId,
+		"id":    cmd.UserAssignmentId,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
