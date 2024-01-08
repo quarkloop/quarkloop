@@ -17,8 +17,8 @@ func NewAccessControlService(ds store.AccessControlStore) accesscontrol.Service 
 	}
 }
 
-func (s *aclService) Evaluate(ctx context.Context, permission string, p *accesscontrol.EvaluateFilterQuery) error {
-	hasPermission, err := s.store.Evaluate(ctx, permission, p.OrgId, p.WorkspaceId, p.ProjectId, p.UserId)
+func (s *aclService) Evaluate(ctx context.Context, query *accesscontrol.EvaluateQuery) error {
+	hasPermission, err := s.store.Evaluate(ctx, query)
 	if err != nil {
 		return err
 	}
@@ -30,27 +30,27 @@ func (s *aclService) Evaluate(ctx context.Context, permission string, p *accessc
 	return nil
 }
 
-func (s *aclService) ListUserAccesses(ctx context.Context, orgId int) ([]accesscontrol.UserAssignment, error) {
-	uaList, err := s.store.ListUserAssignments(ctx, orgId)
+func (s *aclService) GetUserAccessList(ctx context.Context, query *accesscontrol.GetUserAssignmentListQuery) ([]accesscontrol.UserAssignment, error) {
+	uaList, err := s.store.GetUserAssignmentList(ctx, query)
 	return uaList, err
 }
 
-func (s *aclService) GetUserAccessById(ctx context.Context, userAssignmentId int) (*accesscontrol.UserAssignment, error) {
-	ua, err := s.store.GetUserAssignmentById(ctx, userAssignmentId)
+func (s *aclService) GetUserAccessById(ctx context.Context, query *accesscontrol.GetUserAssignmentByIdQuery) (*accesscontrol.UserAssignment, error) {
+	ua, err := s.store.GetUserAssignmentById(ctx, query)
 	return ua, err
 }
 
-func (s *aclService) GrantUserAccess(ctx context.Context, orgId int, userRole *accesscontrol.UserAssignment) (*accesscontrol.UserAssignment, error) {
-	ua, err := s.store.CreateUserAssignment(ctx, orgId, userRole)
+func (s *aclService) GrantUserAccess(ctx context.Context, cmd *accesscontrol.CreateUserAssignmentCommand) (*accesscontrol.UserAssignment, error) {
+	ua, err := s.store.CreateUserAssignment(ctx, cmd)
 	return ua, err
 }
 
-func (s *aclService) UpdateUserAccessById(ctx context.Context, userAssignmentId int, userRole *accesscontrol.UserAssignment) error {
-	err := s.store.UpdateUserAssignmentById(ctx, userAssignmentId, userRole)
+func (s *aclService) UpdateUserAccessById(ctx context.Context, cmd *accesscontrol.UpdateUserAssignmentByIdCommand) error {
+	err := s.store.UpdateUserAssignmentById(ctx, cmd)
 	return err
 }
 
-func (s *aclService) RevokeUserAccessById(ctx context.Context, orgId int, userAssignmentId int) error {
-	err := s.store.DeleteUserAssignmentById(ctx, orgId, userAssignmentId)
+func (s *aclService) RevokeUserAccessById(ctx context.Context, cmd *accesscontrol.DeleteUserAssignmentByIdCommand) error {
+	err := s.store.DeleteUserAssignmentById(ctx, cmd)
 	return err
 }
