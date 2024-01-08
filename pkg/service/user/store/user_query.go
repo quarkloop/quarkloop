@@ -298,6 +298,11 @@ func (store *userStore) GetSessionsByUserId(ctx context.Context, query *user.Get
 		sessionList = append(sessionList, &session)
 	}
 
+	if err = rows.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST]: Rows error: %v\n", rows.Err())
+		return nil, err
+	}
+
 	return sessionList, nil
 }
 
@@ -351,6 +356,11 @@ func (store *userStore) GetAccountsByUserId(ctx context.Context, query *user.Get
 			return nil, err
 		}
 		accountList = append(accountList, &acc)
+	}
+
+	if err = rows.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "[LIST]: Rows error: %v\n", rows.Err())
+		return nil, err
 	}
 
 	return accountList, nil
