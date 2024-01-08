@@ -29,8 +29,8 @@ WHERE
     "orgId" = @orgId;
 `
 
-func (store *accessControlStore) ListUserAssignments(ctx context.Context, orgId int) ([]accesscontrol.UserAssignment, error) {
-	rows, err := store.Conn.Query(ctx, listUserAssignmentsQuery, pgx.NamedArgs{"orgId": orgId})
+func (store *accessControlStore) GetUserAssignmentList(ctx context.Context, query *accesscontrol.GetUserAssignmentListQuery) ([]accesscontrol.UserAssignment, error) {
+	rows, err := store.Conn.Query(ctx, listUserAssignmentsQuery, pgx.NamedArgs{"orgId": query.OrgId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
 		return nil, err
@@ -89,8 +89,8 @@ WHERE
     "id" = @id;
 `
 
-func (store *accessControlStore) GetUserAssignmentById(ctx context.Context, userAssignmentId int) (*accesscontrol.UserAssignment, error) {
-	row := store.Conn.QueryRow(ctx, getUserAssignmentByIdQuery, pgx.NamedArgs{"id": userAssignmentId})
+func (store *accessControlStore) GetUserAssignmentById(ctx context.Context, query *accesscontrol.GetUserAssignmentByIdQuery) (*accesscontrol.UserAssignment, error) {
+	row := store.Conn.QueryRow(ctx, getUserAssignmentByIdQuery, pgx.NamedArgs{"id": query.UserAssignmentId})
 
 	var ua accesscontrol.UserAssignment
 	err := row.Scan(
