@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 )
 
 /// Evaluate
@@ -40,13 +41,13 @@ SELECT jsonb_array_length(permissions)::bool FROM (
 ) AS permission_exists
 `
 
-func (store *accessControlStore) Evaluate(ctx context.Context, permission string, orgId, workspaceId, projectId, userId int) (bool, error) {
+func (store *accessControlStore) Evaluate(ctx context.Context, query *accesscontrol.EvaluateQuery) (bool, error) {
 	row := store.Conn.QueryRow(ctx, evaluateQuery, pgx.NamedArgs{
-		"orgId":       orgId,
-		"workspaceId": workspaceId,
-		"projectId":   projectId,
-		"userId":      userId,
-		"permission":  permission,
+		"permission":  query.Permission,
+		"userId":      query.UserId,
+		"orgId":       query.OrgId,
+		"workspaceId": query.WorkspaceId,
+		"projectId":   query.ProjectId,
 	})
 
 	var permission_exists bool
