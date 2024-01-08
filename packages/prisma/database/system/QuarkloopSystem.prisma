@@ -128,7 +128,7 @@ model UserGroup {
 
     // user group
     name  String
-    users Json   @default(dbgenerated("[]")) @db.JsonB
+    users Json   @default(dbgenerated("'[]'")) @db.JsonB
 
     // history
     createdAt DateTime  @default(now())
