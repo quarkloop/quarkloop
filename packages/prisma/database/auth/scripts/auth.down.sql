@@ -1,22 +1,25 @@
 -- DropForeignKey
-ALTER TABLE IF EXISTS "auth"."Account"
+ALTER TABLE "auth"."Account"
 DROP CONSTRAINT "Account_userId_fkey";
 
 -- DropForeignKey
-ALTER TABLE IF EXISTS "auth"."Session"
+ALTER TABLE "auth"."Session"
 DROP CONSTRAINT "Session_userId_fkey";
 
 -- DropTable
-DROP TABLE IF EXISTS "auth"."User";
+DROP TABLE "auth"."VerificationToken";
 
 -- DropTable
-DROP TABLE IF EXISTS "auth"."Account";
+DROP TABLE "auth"."Session";
 
 -- DropTable
-DROP TABLE IF EXISTS "auth"."Session";
+DROP TABLE "auth"."Account";
 
 -- DropTable
-DROP TABLE IF EXISTS "auth"."VerificationToken";
+DROP TABLE "auth"."User";
+
+-- _prisma_migrations
+DROP TABLE "auth"."_prisma_migrations";
 
 -- DropSchema
 DROP SCHEMA IF EXISTS "auth";
