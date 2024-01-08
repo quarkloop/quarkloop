@@ -42,9 +42,7 @@ RETURNING
     "description",
     "visibility",
     "createdAt",
-    "createdBy",
-    "updatedAt",
-    "updatedBy";
+    "createdBy";
 `
 
 func (store *projectStore) CreateProject(ctx context.Context, cmd *project.CreateProjectCommand) (*project.Project, error) {
@@ -77,8 +75,6 @@ func (store *projectStore) CreateProject(ctx context.Context, cmd *project.Creat
 		&pr.Visibility,
 		&pr.CreatedAt,
 		&pr.CreatedBy,
-		&pr.UpdatedAt,
-		&pr.UpdatedBy,
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", err)
