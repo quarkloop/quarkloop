@@ -4,14 +4,14 @@ import "context"
 
 type Service interface {
 	// access control query
-	Evaluate(ctx context.Context, permission string, p *EvaluateFilterQuery) error
-	ListUserAccesses(ctx context.Context, orgId int) ([]UserAssignment, error)
-	GetUserAccessById(ctx context.Context, userAssignmentId int) (*UserAssignment, error)
+	Evaluate(context.Context, *EvaluateQuery) error
+	GetUserAccessList(context.Context, *GetUserAssignmentListQuery) ([]UserAssignment, error)
+	GetUserAccessById(context.Context, *GetUserAssignmentByIdQuery) (*UserAssignment, error)
 
 	// access control mutation
-	GrantUserAccess(ctx context.Context, orgId int, userRole *UserAssignment) (*UserAssignment, error)
-	UpdateUserAccessById(ctx context.Context, userAssignmentId int, userRole *UserAssignment) error
-	RevokeUserAccessById(ctx context.Context, orgId int, userAssignmentId int) error
+	GrantUserAccess(context.Context, *CreateUserAssignmentCommand) (*UserAssignment, error)
+	UpdateUserAccessById(context.Context, *UpdateUserAssignmentByIdCommand) error
+	RevokeUserAccessById(context.Context, *DeleteUserAssignmentByIdCommand) error
 
 	// user group query
 	GetUserGroupList(context.Context, *GetUserGroupListQuery) ([]UserGroup, error)
