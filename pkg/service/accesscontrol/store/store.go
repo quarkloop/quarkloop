@@ -8,27 +8,33 @@ import (
 )
 
 type AccessControlStore interface {
-	// access control
-	Evaluate(ctx context.Context, permission string, orgId, workspaceId, projectId, userId int) (bool, error)
-	ListUserAssignments(ctx context.Context, orgId int) ([]accesscontrol.UserAssignment, error)
-	GetUserAssignmentById(ctx context.Context, userAssignmentId int) (*accesscontrol.UserAssignment, error)
-	CreateUserAssignment(ctx context.Context, orgId int, userRole *accesscontrol.UserAssignment) (*accesscontrol.UserAssignment, error)
-	UpdateUserAssignmentById(ctx context.Context, userAssignmentId int, userRole *accesscontrol.UserAssignment) error
-	DeleteUserAssignmentById(ctx context.Context, orgId int, userAssignmentId int) error
+	// access control query
+	Evaluate(context.Context, *accesscontrol.EvaluateQuery) (bool, error)
+	GetUserAssignmentList(context.Context, *accesscontrol.GetUserAssignmentListQuery) ([]accesscontrol.UserAssignment, error)
+	GetUserAssignmentById(context.Context, *accesscontrol.GetUserAssignmentByIdQuery) (*accesscontrol.UserAssignment, error)
 
-	// user groups
-	GetUserGroupList(ctx context.Context, orgId int) ([]accesscontrol.UserGroup, error)
-	GetUserGroupById(ctx context.Context, userGroupId int) (*accesscontrol.UserGroup, error)
-	CreateUserGroup(ctx context.Context, orgId int, userGroup *accesscontrol.UserGroup) (*accesscontrol.UserGroup, error)
-	UpdateUserGroupById(ctx context.Context, userGroupId int, userGroup *accesscontrol.UserGroup) error
-	DeleteUserGroupById(ctx context.Context, orgId int, userGroupId int) error
+	// access control mutation
+	CreateUserAssignment(context.Context, *accesscontrol.CreateUserAssignmentCommand) (*accesscontrol.UserAssignment, error)
+	UpdateUserAssignmentById(context.Context, *accesscontrol.UpdateUserAssignmentByIdCommand) error
+	DeleteUserAssignmentById(context.Context, *accesscontrol.DeleteUserAssignmentByIdCommand) error
 
-	// roles
-	ListUserRoles(ctx context.Context, orgId int) ([]accesscontrol.UserRole, error)
-	GetUserRoleById(ctx context.Context, userRoleId int) (*accesscontrol.UserRole, error)
-	CreateUserRole(ctx context.Context, orgId int, userRole *accesscontrol.UserRole) (*accesscontrol.UserRole, error)
-	UpdateUserRoleById(ctx context.Context, userRoleId int, userRole *accesscontrol.UserRole) error
-	DeleteUserRoleById(ctx context.Context, orgId int, userRoleId int) error
+	// user group query
+	GetUserGroupList(context.Context, *accesscontrol.GetUserGroupListQuery) ([]accesscontrol.UserGroup, error)
+	GetUserGroupById(context.Context, *accesscontrol.GetUserGroupByIdQuery) (*accesscontrol.UserGroup, error)
+
+	// user group mutation
+	CreateUserGroup(context.Context, *accesscontrol.CreateUserGroupCommand) (*accesscontrol.UserGroup, error)
+	UpdateUserGroupById(context.Context, *accesscontrol.UpdateUserGroupByIdCommand) error
+	DeleteUserGroupById(context.Context, *accesscontrol.DeleteUserGroupByIdCommand) error
+
+	// role query
+	GetUserRoleList(context.Context, *accesscontrol.GetUserRoleListQuery) ([]accesscontrol.UserRole, error)
+	GetUserRoleById(context.Context, *accesscontrol.GetUserRoleByIdQuery) (*accesscontrol.UserRole, error)
+
+	// role mutation
+	CreateUserRole(context.Context, *accesscontrol.CreateUserRoleCommand) (*accesscontrol.UserRole, error)
+	UpdateUserRoleById(context.Context, *accesscontrol.UpdateUserRoleByIdCommand) error
+	DeleteUserRoleById(context.Context, *accesscontrol.DeleteUserRoleByIdCommand) error
 }
 
 type accessControlStore struct {
