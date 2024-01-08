@@ -372,7 +372,7 @@ RETURNING
 `
 
 func (store *userStore) CreateAccount(ctx context.Context, cmd *user.CreateAccountCommand) (*user.Account, error) {
-	row := store.Conn.QueryRow(ctx, createSessionQuery, pgx.NamedArgs{
+	row := store.Conn.QueryRow(ctx, createAccountQuery, pgx.NamedArgs{
 		"userId":            cmd.UserId,
 		"type":              cmd.Type,
 		"provider":          cmd.Provider,
