@@ -233,8 +233,13 @@ type CreateUserRoleUriParams struct {
 }
 
 type CreateUserRoleCommand struct {
-	OrgId    int
-	UserRole *UserRole
+	OrgId     int
+	CreatedBy string
+
+	Name        string `json:"name"`
+	Permissions []struct {
+		Name string
+	} `json:"permissions"`
 }
 
 // UpdateUserRoleById
