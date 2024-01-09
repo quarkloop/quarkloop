@@ -95,12 +95,12 @@ type UserAssignment struct {
 
 type UserGroup struct {
 	// id
-	Id     int `json:"id"`
-	OrgId  int `json:"orgId"`
-	UserId int `json:"userId"`
+	Id    int `json:"id"`
+	OrgId int `json:"orgId"`
 
 	// user
-	Name string `json:"name,omitempty"`
+	Name  string `json:"name"`
+	Users []int  `json:"users"`
 
 	// history
 	CreatedAt time.Time  `json:"createdAt"`
@@ -115,7 +115,8 @@ type UserRole struct {
 	OrgId int `json:"orgId"`
 
 	// user
-	Name string `json:"name,omitempty"`
+	Name        string   `json:"name"`
+	Permissions []string `json:"permissions"`
 
 	// history
 	CreatedAt time.Time  `json:"createdAt"`
@@ -124,19 +125,19 @@ type UserRole struct {
 	UpdatedBy *string    `json:"updatedBy"`
 }
 
-type Permission struct {
-	// id
-	Id int `json:"id"`
+// type Permission struct {
+// 	// id
+// 	Id int `json:"id"`
 
-	// user
-	Name string `json:"name,omitempty"`
+// 	// user
+// 	Name string `json:"name,omitempty"`
 
-	// history
-	CreatedAt time.Time  `json:"createdAt"`
-	CreatedBy string     `json:"createdBy"`
-	UpdatedAt *time.Time `json:"updatedAt"`
-	UpdatedBy *string    `json:"updatedBy"`
-}
+// 	// history
+// 	CreatedAt time.Time  `json:"createdAt"`
+// 	CreatedBy string     `json:"createdBy"`
+// 	UpdatedAt *time.Time `json:"updatedAt"`
+// 	UpdatedBy *string    `json:"updatedBy"`
+// }
 
 type EvaluateQuery struct {
 	Permission  string
@@ -176,7 +177,10 @@ type CreateUserGroupUriParams struct {
 
 type CreateUserGroupCommand struct {
 	OrgId     int
-	UserGroup *UserGroup
+	CreatedBy string
+
+	Name  string `json:"name"`
+	Users []int  `json:"users"`
 }
 
 // UpdateUserGroupById
@@ -252,7 +256,9 @@ type UpdateUserRoleByIdUriParams struct {
 type UpdateUserRoleByIdCommand struct {
 	OrgId      int
 	UserRoleId int
-	UserRole   *UserRole
+	UpdatedBy  string
+
+	Name string `json:"name"`
 }
 
 // DeleteUserRoleById
