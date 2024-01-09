@@ -26,19 +26,32 @@ SELECT
 FROM 
     "system"."UserAssignment"
 WHERE 
-    "orgId" = @orgId;
+%s;
 `
 
-func (store *accessControlStore) GetUserAssignmentList(ctx context.Context, query *accesscontrol.GetUserAssignmentListQuery) ([]accesscontrol.UserAssignment, error) {
-	rows, err := store.Conn.Query(ctx, listUserAssignmentsQuery, pgx.NamedArgs{"orgId": query.OrgId})
+func (store *accessControlStore) GetUserAssignmentList(ctx context.Context, query *accesscontrol.GetUserAssignmentListQuery) ([]*accesscontrol.UserAssignment, error) {
+	var whereClause string
+	if query.OrgId != 0 && query.WorkspaceId != 0 && query.ProjectId != 0 {
+		whereClause = `"orgId" = @orgId AND "workspaceId" = @workspaceId AND "projectId" = @projectId;`
+	} else if query.OrgId != 0 && query.WorkspaceId != 0 {
+		whereClause = `"orgId" = @orgId AND "workspaceId" = @workspaceId AND "projectId" is NULL;`
+	} else if query.OrgId != 0 {
+		whereClause = `"orgId" = @orgId AND "workspaceId" is NULL AND "projectId" is NULL;`
+	}
+	finalQuery := fmt.Sprintf(listUserAssignmentsQuery, whereClause)
+
+	rows, err := store.Conn.Query(ctx, finalQuery, pgx.NamedArgs{
+		"orgId":       query.OrgId,
+		"workspaceId": query.WorkspaceId,
+		"projectId":   query.ProjectId,
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
 		return nil, err
 	}
 	defer rows.Close()
 
-	var aclList []accesscontrol.UserAssignment = []accesscontrol.UserAssignment{}
-
+	var uaList []*accesscontrol.UserAssignment = []*accesscontrol.UserAssignment{}
 	for rows.Next() {
 		var ua accesscontrol.UserAssignment
 		err := rows.Scan(
@@ -57,8 +70,7 @@ func (store *accessControlStore) GetUserAssignmentList(ctx context.Context, quer
 			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
 			return nil, err
 		}
-
-		aclList = append(aclList, ua)
+		uaList = append(uaList, &ua)
 	}
 
 	if err := rows.Err(); err != nil {
@@ -66,7 +78,7 @@ func (store *accessControlStore) GetUserAssignmentList(ctx context.Context, quer
 		return nil, err
 	}
 
-	return aclList, nil
+	return uaList, nil
 }
 
 /// GetUserAssignmentById
