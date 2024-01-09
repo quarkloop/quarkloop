@@ -12,18 +12,25 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol/store"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 	orgStore "github.com/quarkloop/quarkloop/pkg/service/org/store"
+	"github.com/quarkloop/quarkloop/pkg/service/project"
+	projectStore "github.com/quarkloop/quarkloop/pkg/service/project/store"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 	workspaceStore "github.com/quarkloop/quarkloop/pkg/service/workspace/store"
 	"github.com/quarkloop/quarkloop/pkg/test"
 )
 
 var (
-	ctx         context.Context
-	conn        *pgx.Conn
-	orgId       int
-	workspaceId int
-	roleId      int
-	groupId     int
+	ctx                 context.Context
+	conn                *pgx.Conn
+	orgId               int
+	workspaceId         int
+	projectId           int
+	roleId              int
+	groupId             int
+	userId              int = 1
+	orgAssignment       int
+	workspaceAssignment int
+	projectAssignment   int
 )
 
 func init() {
@@ -40,6 +47,7 @@ func TestMutationTruncateTables(t *testing.T) {
 func TestPrepare(t *testing.T) {
 	orgStore := orgStore.NewOrgStore(conn)
 	workspaceStore := workspaceStore.NewWorkspaceStore(conn)
+	projectStore := projectStore.NewProjectStore(conn)
 
 	t.Run("create single org for whole test", func(t *testing.T) {
 		cmd := &org.CreateOrgCommand{
@@ -72,6 +80,24 @@ func TestPrepare(t *testing.T) {
 		require.NotNil(t, ws)
 
 		workspaceId = ws.Id
+	})
+
+	t.Run("create single project for whole test", func(t *testing.T) {
+		cmd := &project.CreateProjectCommand{
+			OrgId:       orgId,
+			WorkspaceId: workspaceId,
+			ScopeId:     "expenses",
+			Name:        "Expenses",
+			Description: "IT department Expenses",
+			CreatedBy:   "admin",
+			Visibility:  model.PublicVisibility,
+		}
+		pr, err := projectStore.CreateProject(ctx, cmd)
+
+		require.NoError(t, err)
+		require.NotNil(t, pr)
+
+		projectId = pr.Id
 	})
 }
 
@@ -196,6 +222,176 @@ func TestQueryRole(t *testing.T) {
 		require.Nil(t, role)
 		require.Exactly(t, accesscontrol.ErrRoleNotFound, err)
 		require.Equal(t, "role not found", err.Error())
+	})
+}
+
+func TestMutationCreateAssignment(t *testing.T) {
+	store := store.NewAccessControlStore(conn)
+	cmd := &accesscontrol.CreateUserAssignmentCommand{
+		UserId:      userId,
+		CreatedBy:   "admin",
+		OrgId:       orgId,
+		WorkspaceId: 0,
+		ProjectId:   0,
+		UserGroupId: 0,
+		UserRoleId:  roleId,
+	}
+
+	t.Run("create user assignment for an org with userId", func(t *testing.T) {
+		ua, err := store.CreateUserAssignment(ctx, cmd)
+
+		require.NoError(t, err)
+		require.NotNil(t, ua)
+
+		orgAssignment = ua.Id
+	})
+
+	t.Run("create user assignment for a workspace with userId", func(t *testing.T) {
+		cmd.WorkspaceId = workspaceId
+		ua, err := store.CreateUserAssignment(ctx, cmd)
+
+		require.NoError(t, err)
+		require.NotNil(t, ua)
+
+		workspaceAssignment = ua.Id
+	})
+
+	t.Run("create user assignment for a project with userId", func(t *testing.T) {
+		cmd.ProjectId = projectId
+		ua, err := store.CreateUserAssignment(ctx, cmd)
+
+		require.NoError(t, err)
+		require.NotNil(t, ua)
+
+		projectAssignment = ua.Id
+	})
+}
+
+func TestQueryUserAssignment(t *testing.T) {
+	store := store.NewAccessControlStore(conn)
+
+	t.Run("get assignment list by org id", func(t *testing.T) {
+		query := &accesscontrol.GetUserAssignmentListQuery{OrgId: orgId}
+		uaList, err := store.GetUserAssignmentList(ctx, query)
+
+		require.NoError(t, err)
+		require.NotEmpty(t, uaList)
+		require.NotZero(t, len(uaList))
+	})
+
+	t.Run("get assignment list by wrong org id", func(t *testing.T) {
+		query := &accesscontrol.GetUserAssignmentListQuery{OrgId: 99999}
+		uaList, err := store.GetUserAssignmentList(ctx, query)
+
+		require.NoError(t, err)
+		require.Empty(t, uaList)
+		require.Zero(t, len(uaList))
+	})
+
+	t.Run("get assignment list by workspace id", func(t *testing.T) {
+		query := &accesscontrol.GetUserAssignmentListQuery{OrgId: orgId, WorkspaceId: workspaceId}
+		uaList, err := store.GetUserAssignmentList(ctx, query)
+
+		require.NoError(t, err)
+		require.NotEmpty(t, uaList)
+		require.NotZero(t, len(uaList))
+	})
+
+	t.Run("get assignment list by wrong workspace id", func(t *testing.T) {
+		query := &accesscontrol.GetUserAssignmentListQuery{OrgId: orgId, WorkspaceId: 99999}
+		uaList, err := store.GetUserAssignmentList(ctx, query)
+
+		require.NoError(t, err)
+		require.Empty(t, uaList)
+		require.Zero(t, len(uaList))
+	})
+
+	t.Run("get assignment list by project id", func(t *testing.T) {
+		query := &accesscontrol.GetUserAssignmentListQuery{OrgId: orgId, WorkspaceId: workspaceId, ProjectId: projectId}
+		uaList, err := store.GetUserAssignmentList(ctx, query)
+
+		require.NoError(t, err)
+		require.NotEmpty(t, uaList)
+		require.NotZero(t, len(uaList))
+	})
+
+	t.Run("get assignment list by wrong project id", func(t *testing.T) {
+		query := &accesscontrol.GetUserAssignmentListQuery{OrgId: orgId, WorkspaceId: workspaceId, ProjectId: 99999}
+		uaList, err := store.GetUserAssignmentList(ctx, query)
+
+		require.NoError(t, err)
+		require.Empty(t, uaList)
+		require.Zero(t, len(uaList))
+	})
+}
+
+func TestMutationDeleteUserAssignment(t *testing.T) {
+	store := store.NewAccessControlStore(conn)
+
+	t.Run("delete org's user assignment by wrong id", func(t *testing.T) {
+		cmd := &accesscontrol.DeleteUserAssignmentByIdCommand{
+			OrgId:            orgId,
+			UserAssignmentId: 99999,
+		}
+		err := store.DeleteUserAssignmentById(ctx, cmd)
+
+		require.Error(t, err)
+	})
+
+	t.Run("delete org's user assignment by id", func(t *testing.T) {
+		cmd := &accesscontrol.DeleteUserAssignmentByIdCommand{
+			OrgId:            orgId,
+			UserAssignmentId: orgAssignment,
+		}
+		err := store.DeleteUserAssignmentById(ctx, cmd)
+
+		require.NoError(t, err)
+	})
+
+	t.Run("delete workspace's user assignment by wrong id", func(t *testing.T) {
+		cmd := &accesscontrol.DeleteUserAssignmentByIdCommand{
+			OrgId:            orgId,
+			WorkspaceId:      workspaceId,
+			UserAssignmentId: 99999,
+		}
+		err := store.DeleteUserAssignmentById(ctx, cmd)
+
+		require.Error(t, err)
+	})
+
+	t.Run("delete workspace's user assignment by id", func(t *testing.T) {
+		cmd := &accesscontrol.DeleteUserAssignmentByIdCommand{
+			OrgId:            orgId,
+			WorkspaceId:      workspaceId,
+			UserAssignmentId: workspaceAssignment,
+		}
+		err := store.DeleteUserAssignmentById(ctx, cmd)
+
+		require.NoError(t, err)
+	})
+
+	t.Run("delete project's user assignment by wrong id", func(t *testing.T) {
+		cmd := &accesscontrol.DeleteUserAssignmentByIdCommand{
+			OrgId:            orgId,
+			WorkspaceId:      workspaceId,
+			ProjectId:        projectId,
+			UserAssignmentId: 99999,
+		}
+		err := store.DeleteUserAssignmentById(ctx, cmd)
+
+		require.Error(t, err)
+	})
+
+	t.Run("delete project's user assignment by id", func(t *testing.T) {
+		cmd := &accesscontrol.DeleteUserAssignmentByIdCommand{
+			OrgId:            orgId,
+			WorkspaceId:      workspaceId,
+			ProjectId:        projectId,
+			UserAssignmentId: projectAssignment,
+		}
+		err := store.DeleteUserAssignmentById(ctx, cmd)
+
+		require.NoError(t, err)
 	})
 }
 
