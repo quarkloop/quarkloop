@@ -21,10 +21,10 @@ func (s *aclService) CreateUserRole(ctx context.Context, cmd *accesscontrol.Crea
 	return ur, err
 }
 
-func (s *aclService) UpdateUserRoleById(ctx context.Context, cmd *accesscontrol.UpdateUserRoleByIdCommand) error {
-	err := s.store.UpdateUserRoleById(ctx, cmd)
-	return err
-}
+// func (s *aclService) UpdateUserRoleById(ctx context.Context, cmd *accesscontrol.UpdateUserRoleByIdCommand) error {
+// 	err := s.store.UpdateUserRoleById(ctx, cmd)
+// 	return err
+// }
 
 func (s *aclService) DeleteUserRoleById(ctx context.Context, cmd *accesscontrol.DeleteUserRoleByIdCommand) error {
 	err := s.store.DeleteUserRoleById(ctx, cmd)
