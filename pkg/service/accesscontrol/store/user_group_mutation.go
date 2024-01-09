@@ -17,18 +17,20 @@ const createUserGroupQuery = `
 INSERT INTO "system"."UserGroup" (
     "orgId", 
     "name", 
+	"users",
     "createdBy"
 )
 VALUES (
     @orgId, 
     @name, 
+	@users,
     @createdBy
 )
 RETURNING 
     "id",
     "orgId",
-    "userId",
     "name",
+	"users",
     "createdAt",
     "createdBy",
     "updatedAt",
@@ -37,17 +39,18 @@ RETURNING
 
 func (store *accessControlStore) CreateUserGroup(ctx context.Context, cmd *accesscontrol.CreateUserGroupCommand) (*accesscontrol.UserGroup, error) {
 	row := store.Conn.QueryRow(ctx, createUserGroupQuery, pgx.NamedArgs{
-		"orgId":     cmd.UserGroup.OrgId,
-		"name":      cmd.UserGroup.Name,
-		"createdBy": cmd.UserGroup.CreatedBy,
+		"orgId":     cmd.OrgId,
+		"name":      cmd.Name,
+		"users":     cmd.Users,
+		"createdBy": cmd.CreatedBy,
 	})
 
 	var ug accesscontrol.UserGroup
 	rowErr := row.Scan(
 		&ug.Id,
 		&ug.OrgId,
-		&ug.UserId,
 		&ug.Name,
+		&ug.Users,
 		&ug.CreatedAt,
 		&ug.CreatedBy,
 		&ug.UpdatedAt,
