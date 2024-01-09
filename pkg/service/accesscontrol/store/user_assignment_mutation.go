@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -18,16 +19,18 @@ INSERT INTO "system"."UserAssignment" (
     "orgId",
     "workspaceId",
     "projectId",
+	"userId",
     "userGroupId",
     "userRoleId",
     "createdBy"
 )
 VALUES (
-    @orgId,
+	NULLIF(@orgId, 0),
     NULLIF(@workspaceId, 0),
     NULLIF(@projectId, 0),
-    @userGroupId,
-    @userRoleId,
+	NULLIF(@userId, 0),
+	NULLIF(@userGroupId, 0),
+	NULLIF(@userRoleId, 0),
     @createdBy
 )
 RETURNING 
@@ -35,6 +38,7 @@ RETURNING
     "orgId",
     "workspaceId",
     "projectId",
+	"userId",
     "userGroupId",
     "userRoleId",
     "createdAt",
@@ -46,11 +50,12 @@ RETURNING
 func (store *accessControlStore) CreateUserAssignment(ctx context.Context, cmd *accesscontrol.CreateUserAssignmentCommand) (*accesscontrol.UserAssignment, error) {
 	row := store.Conn.QueryRow(ctx, createUserAssignmentQuery, pgx.NamedArgs{
 		"orgId":       cmd.OrgId,
-		"workspaceId": cmd.UserRole.WorkspaceId,
-		"projectId":   cmd.UserRole.ProjectId,
-		"userGroupId": cmd.UserRole.UserGroupId,
-		"userRoleId":  cmd.UserRole.UserRoleId,
-		"createdBy":   cmd.UserRole.CreatedBy,
+		"workspaceId": cmd.WorkspaceId,
+		"projectId":   cmd.ProjectId,
+		"userId":      cmd.UserId,
+		"userGroupId": cmd.UserGroupId,
+		"userRoleId":  cmd.UserRoleId,
+		"createdBy":   cmd.CreatedBy,
 	})
 
 	var ua accesscontrol.UserAssignment
@@ -59,6 +64,7 @@ func (store *accessControlStore) CreateUserAssignment(ctx context.Context, cmd *
 		&ua.OrgId,
 		&ua.WorkspaceId,
 		&ua.ProjectId,
+		&ua.UserId,
 		&ua.UserGroupId,
 		&ua.UserRoleId,
 		&ua.CreatedAt,
@@ -114,15 +120,29 @@ const deleteUserAssignmentByIdQuery = `
 DELETE FROM
     "system"."UserAssignment"
 WHERE
-    "orgId" = @orgId
-AND
-    "id" = @id;
+    "id" = @id
+%s;
 `
 
 func (store *accessControlStore) DeleteUserAssignmentById(ctx context.Context, cmd *accesscontrol.DeleteUserAssignmentByIdCommand) error {
-	commandTag, err := store.Conn.Exec(ctx, deleteUserAssignmentByIdQuery, pgx.NamedArgs{
-		"orgId": cmd.OrgId,
-		"id":    cmd.UserAssignmentId,
+	var whereClause []string
+	if cmd.OrgId != 0 {
+		whereClause = append(whereClause, `AND "orgId" = @orgId`)
+	}
+	if cmd.OrgId != 0 && cmd.WorkspaceId != 0 {
+		whereClause = append(whereClause, `"workspaceId" = @workspaceId`)
+	}
+	if cmd.OrgId != 0 && cmd.WorkspaceId != 0 && cmd.ProjectId != 0 {
+		whereClause = append(whereClause, `"projectId" = @projectId`)
+	}
+
+	finalQuery := fmt.Sprintf(deleteUserAssignmentByIdQuery, strings.Join(whereClause, " AND "))
+
+	commandTag, err := store.Conn.Exec(ctx, finalQuery, pgx.NamedArgs{
+		"id":          cmd.UserAssignmentId,
+		"orgId":       cmd.OrgId,
+		"workspaceId": cmd.WorkspaceId,
+		"projectId":   cmd.ProjectId,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
