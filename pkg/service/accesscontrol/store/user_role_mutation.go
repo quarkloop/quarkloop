@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
@@ -82,49 +81,57 @@ func (store *accessControlStore) CreateUserRole(ctx context.Context, cmd *access
 	return &ur, nil
 }
 
-/// UpdateUserRoleById
+// /// UpdateUserRoleById
 
-const updateUserRoleByIdQuery = `
-UPDATE
-    "system"."UserRole"
-SET
-    "name"        = @name,
-    "updatedAt"   = @updatedAt,
-    "updatedBy"   = @updatedBy,
-WHERE
-    "id" = @id;
-`
+// const updateUserRoleByIdQuery = `
+// UPDATE
+//     "system"."UserRole"
+// SET
+//     "name"        = @name,
+//     "updatedAt"   = @updatedAt,
+//     "updatedBy"   = @updatedBy,
+// WHERE
+//     "id" = @id;
+// `
 
-func (store *accessControlStore) UpdateUserRoleById(ctx context.Context, cmd *accesscontrol.UpdateUserRoleByIdCommand) error {
-	commandTag, err := store.Conn.Exec(ctx, updateUserRoleByIdQuery, pgx.NamedArgs{
-		"id":        cmd.UserRoleId,
-		"name":      cmd.UserRole.Name,
-		"updatedBy": cmd.UserRole.UpdatedBy,
-		"updatedAt": time.Now(),
-	})
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", err)
-		return err
-	}
+// func (store *accessControlStore) UpdateUserRoleById(ctx context.Context, cmd *accesscontrol.UpdateUserRoleByIdCommand) error {
+// 	commandTag, err := store.Conn.Exec(ctx, updateUserRoleByIdQuery, pgx.NamedArgs{
+// 		"id":        cmd.UserRoleId,
+// 		"name":      cmd.UserRole.Name,
+// 		"updatedBy": cmd.UserRole.UpdatedBy,
+// 		"updatedAt": time.Now(),
+// 	})
+// 	if err != nil {
+// 		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", err)
+// 		return err
+// 	}
 
-	if commandTag.RowsAffected() != 1 {
-		notFoundErr := errors.New("cannot find to update")
-		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", notFoundErr)
-		return notFoundErr
-	}
+// 	if commandTag.RowsAffected() != 1 {
+// 		notFoundErr := errors.New("cannot find to update")
+// 		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", notFoundErr)
+// 		return notFoundErr
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 /// DeleteUserRoleById
 
 const deleteUserRoleByIdQuery = `
+WITH 
+permission AS (
+	DELETE FROM
+       "system"."UserRole"
+	WHERE
+		"orgId" = @orgId
+	AND
+		"id" = @id
+	RETURNING "id"
+)
 DELETE FROM
-    "system"."UserRole"
+    "system"."Permission"
 WHERE
-    "orgId" = @orgId
-AND
-    "id" = @id;
+    "roleId" = (SELECT "id" FROM permission);
 `
 
 func (store *accessControlStore) DeleteUserRoleById(ctx context.Context, cmd *accesscontrol.DeleteUserRoleByIdCommand) error {
@@ -137,10 +144,10 @@ func (store *accessControlStore) DeleteUserRoleById(ctx context.Context, cmd *ac
 		return err
 	}
 
-	if commandTag.RowsAffected() != 1 {
-		notFoundErr := errors.New("cannot find to delete")
-		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", notFoundErr)
-		return notFoundErr
+	if commandTag.RowsAffected() == 0 {
+		err = errors.New("no rows has been deleted")
+		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
+		return err
 	}
 
 	return nil
