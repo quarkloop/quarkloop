@@ -79,12 +79,13 @@ var (
 
 type UserAssignment struct {
 	// id
-	Id          int `json:"id"`
-	OrgId       int `json:"orgId"`
-	WorkspaceId int `json:"workspaceId"`
-	ProjectId   int `json:"projectId"`
-	UserGroupId int `json:"userGroupId"`
-	UserRoleId  int `json:"userRoleId"`
+	Id          int  `json:"id"`
+	OrgId       *int `json:"orgId"`
+	WorkspaceId *int `json:"workspaceId"`
+	ProjectId   *int `json:"projectId"`
+	UserId      *int `json:"userId"`
+	UserGroupId *int `json:"userGroupId"`
+	UserRoleId  int  `json:"userRoleId"`
 
 	// history
 	CreatedAt time.Time  `json:"createdAt"`
@@ -278,7 +279,9 @@ type DeleteUserRoleByIdCommand struct {
 // GetUserAssignmentList
 
 type GetUserAssignmentListQuery struct {
-	OrgId int
+	OrgId       int
+	WorkspaceId int
+	ProjectId   int
 }
 
 // GetUserAssignmentById
@@ -290,8 +293,15 @@ type GetUserAssignmentByIdQuery struct {
 // CreateUserAssignment
 
 type CreateUserAssignmentCommand struct {
-	OrgId    int
-	UserRole *UserAssignment
+	CreatedBy string
+
+	UserId      int
+	UserGroupId int
+	UserRoleId  int
+
+	OrgId       int
+	WorkspaceId int
+	ProjectId   int
 }
 
 // UpdateUserAssignmentById
@@ -305,8 +315,11 @@ type UpdateUserAssignmentByIdCommand struct {
 // DeleteUserAssignmentById
 
 type DeleteUserAssignmentByIdCommand struct {
-	OrgId            int
 	UserAssignmentId int
+
+	OrgId       int
+	WorkspaceId int
+	ProjectId   int
 }
 
 /////////
