@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -14,35 +15,57 @@ import (
 /// CreateUserRole
 
 const createUserRoleQuery = `
-INSERT INTO "system"."UserRole" (
-    "orgId", 
-    "name", 
-    "createdBy"
+WITH 
+role AS (
+    INSERT INTO "system"."UserRole" (
+		"orgId", 
+		"name", 
+		"createdBy"
+	)
+    VALUES (
+		@orgId, 
+		@name, 
+		@createdBy
+	)
+    RETURNING 
+	    "id",
+        "orgId",
+        "name",
+        "createdAt",
+        "createdBy",
+        "updatedAt",
+        "updatedBy"
+), 
+permission AS (
+    INSERT INTO "system"."Permission" ("roleId", "name") VALUES %s
 )
-VALUES (
-    @orgId, 
-    @name, 
-    @createdBy
-)
-RETURNING 
+SELECT
     "id",
     "orgId",
     "name",
     "createdAt",
     "createdBy",
     "updatedAt",
-    "updatedBy";
+    "updatedBy"
+FROM 
+    role;
 `
 
 func (store *accessControlStore) CreateUserRole(ctx context.Context, cmd *accesscontrol.CreateUserRoleCommand) (*accesscontrol.UserRole, error) {
-	row := store.Conn.QueryRow(ctx, createUserRoleQuery, pgx.NamedArgs{
-		"orgId":     cmd.UserRole.OrgId,
-		"name":      cmd.UserRole.Name,
-		"createdBy": cmd.UserRole.CreatedBy,
+	permissions := []string{}
+	for _, perm := range cmd.Permissions {
+		permissions = append(permissions, fmt.Sprintf("((SELECT id FROM role),'%s')", perm.Name))
+	}
+	finalQuery := fmt.Sprintf(createUserRoleQuery, strings.Join(permissions, ","))
+
+	row := store.Conn.QueryRow(ctx, finalQuery, pgx.NamedArgs{
+		"orgId":     cmd.OrgId,
+		"name":      cmd.Name,
+		"createdBy": cmd.CreatedBy,
 	})
 
 	var ur accesscontrol.UserRole
-	rowErr := row.Scan(
+	err := row.Scan(
 		&ur.Id,
 		&ur.OrgId,
 		&ur.Name,
@@ -51,9 +74,9 @@ func (store *accessControlStore) CreateUserRole(ctx context.Context, cmd *access
 		&ur.UpdatedAt,
 		&ur.UpdatedBy,
 	)
-	if rowErr != nil {
-		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", rowErr)
-		return nil, rowErr
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[CREATE] failed: %v\n", err)
+		return nil, err
 	}
 
 	return &ur, nil
