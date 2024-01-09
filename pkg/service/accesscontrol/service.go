@@ -28,6 +28,6 @@ type Service interface {
 
 	// user role mutation
 	CreateUserRole(context.Context, *CreateUserRoleCommand) (*UserRole, error)
-	UpdateUserRoleById(context.Context, *UpdateUserRoleByIdCommand) error
+	//UpdateUserRoleById(context.Context, *UpdateUserRoleByIdCommand) error
 	DeleteUserRoleById(context.Context, *DeleteUserRoleByIdCommand) error
 }
