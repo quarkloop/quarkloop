@@ -19,7 +19,7 @@ type AccessControlStore interface {
 	DeleteUserAssignmentById(context.Context, *accesscontrol.DeleteUserAssignmentByIdCommand) error
 
 	// user group query
-	GetUserGroupList(context.Context, *accesscontrol.GetUserGroupListQuery) ([]accesscontrol.UserGroup, error)
+	GetUserGroupList(context.Context, *accesscontrol.GetUserGroupListQuery) ([]*accesscontrol.UserGroup, error)
 	GetUserGroupById(context.Context, *accesscontrol.GetUserGroupByIdQuery) (*accesscontrol.UserGroup, error)
 
 	// user group mutation
@@ -28,12 +28,12 @@ type AccessControlStore interface {
 	DeleteUserGroupById(context.Context, *accesscontrol.DeleteUserGroupByIdCommand) error
 
 	// role query
-	GetUserRoleList(context.Context, *accesscontrol.GetUserRoleListQuery) ([]accesscontrol.UserRole, error)
+	GetUserRoleList(context.Context, *accesscontrol.GetUserRoleListQuery) ([]*accesscontrol.UserRole, error)
 	GetUserRoleById(context.Context, *accesscontrol.GetUserRoleByIdQuery) (*accesscontrol.UserRole, error)
 
 	// role mutation
 	CreateUserRole(context.Context, *accesscontrol.CreateUserRoleCommand) (*accesscontrol.UserRole, error)
-	UpdateUserRoleById(context.Context, *accesscontrol.UpdateUserRoleByIdCommand) error
+	//UpdateUserRoleById(context.Context, *accesscontrol.UpdateUserRoleByIdCommand) error
 	DeleteUserRoleById(context.Context, *accesscontrol.DeleteUserRoleByIdCommand) error
 }
 
