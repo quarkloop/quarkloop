@@ -9,8 +9,9 @@ import (
 )
 
 var (
-	ErrOrgNotFound      = errors.New("org not found")
-	ErrOrgAlreadyExists = errors.New("org with same scopeId already exists")
+	ErrOrgNotFound       = errors.New("org not found")
+	ErrOrgMemberNotFound = errors.New("org member not found")
+	ErrOrgAlreadyExists  = errors.New("org with same scopeId already exists")
 )
 
 type Org struct {
