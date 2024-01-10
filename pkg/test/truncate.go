@@ -28,10 +28,10 @@ func TruncateAuthDBTables(ctx context.Context, conn *pgx.Conn) error {
 
 const truncateSystemDbTablesQuery = `
 TRUNCATE
-    "system"."Permission",
-    "system"."UserRole",
-    "system"."UserGroup",
-    "system"."UserAssignment",
+    "system"."Role",
+    "system"."ProjectMember",
+	"system"."WorkspaceMember",
+	"system"."OrganizationMember",
     "system"."Project",
     "system"."Workspace",
     "system"."Organization";
