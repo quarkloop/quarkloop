@@ -7,13 +7,17 @@ import (
 
 var (
 	ErrResourceNotFound   = errors.New("resource not found")
-	ErrUserGroupNotFound  = errors.New("user group not found")
 	ErrRoleNotFound       = errors.New("role not found")
 	ErrPermissionNotFound = errors.New("permission not found")
 	ErrPermissionDenied   = errors.New("permission denied")
 )
 
-var (
+const (
+	DirectMembership    = 1
+	InheritedMembership = 2
+)
+
+const (
 	GlobalOrgId = 0
 
 	// org actions
@@ -77,15 +81,15 @@ var (
 	ActionProjectUserDelete = "project.user:delete"
 )
 
-type UserAssignment struct {
+type OrgMember struct {
 	// id
-	Id          int  `json:"id"`
-	OrgId       *int `json:"orgId"`
-	WorkspaceId *int `json:"workspaceId"`
-	ProjectId   *int `json:"projectId"`
-	UserId      *int `json:"userId"`
-	UserGroupId *int `json:"userGroupId"`
-	UserRoleId  int  `json:"userRoleId"`
+	Id     int `json:"id"`
+	UserId int `json:"userId"`
+	RoleId int `json:"userRoleId"`
+	OrgId  int `json:"orgId"`
+
+	// membership
+	ExpireDate *time.Time `json:"expireDate"`
 
 	// history
 	CreatedAt time.Time  `json:"createdAt"`
@@ -94,14 +98,17 @@ type UserAssignment struct {
 	UpdatedBy *string    `json:"updatedBy"`
 }
 
-type UserGroup struct {
+type WorkspaceMember struct {
 	// id
-	Id    int `json:"id"`
-	OrgId int `json:"orgId"`
+	Id          int `json:"id"`
+	UserId      int `json:"userId"`
+	RoleId      int `json:"userRoleId"`
+	WorkspaceId int `json:"workspaceId"`
 
-	// user
-	Name  string `json:"name"`
-	Users []int  `json:"users"`
+	// membership
+	Type       int        `json:"type"`
+	Source     *int       `json:"source"`
+	ExpireDate *time.Time `json:"expireDate"`
 
 	// history
 	CreatedAt time.Time  `json:"createdAt"`
@@ -110,10 +117,61 @@ type UserGroup struct {
 	UpdatedBy *string    `json:"updatedBy"`
 }
 
-type UserRole struct {
+type ProjectMember struct {
 	// id
-	Id    int `json:"id"`
-	OrgId int `json:"orgId"`
+	Id        int `json:"id"`
+	UserId    int `json:"userId"`
+	RoleId    int `json:"userRoleId"`
+	ProjectId int `json:"projectId"`
+
+	// membership
+	Type       int        `json:"type"`
+	Source     *int       `json:"source"`
+	ExpireDate *time.Time `json:"expireDate"`
+
+	// history
+	CreatedAt time.Time  `json:"createdAt"`
+	CreatedBy string     `json:"createdBy"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+	UpdatedBy *string    `json:"updatedBy"`
+}
+
+// type UserAssignment struct {
+// 	// id
+// 	Id          int  `json:"id"`
+// 	OrgId       *int `json:"orgId"`
+// 	WorkspaceId *int `json:"workspaceId"`
+// 	ProjectId   *int `json:"projectId"`
+// 	UserId      *int `json:"userId"`
+// 	UserGroupId *int `json:"userGroupId"`
+// 	RoleId  int  `json:"userRoleId"`
+
+// 	// history
+// 	CreatedAt time.Time  `json:"createdAt"`
+// 	CreatedBy string     `json:"createdBy"`
+// 	UpdatedAt *time.Time `json:"updatedAt"`
+// 	UpdatedBy *string    `json:"updatedBy"`
+// }
+
+// type UserGroup struct {
+// 	// id
+// 	Id    int `json:"id"`
+// 	OrgId int `json:"orgId"`
+
+// 	// user
+// 	Name  string `json:"name"`
+// 	Users []int  `json:"users"`
+
+// 	// history
+// 	CreatedAt time.Time  `json:"createdAt"`
+// 	CreatedBy string     `json:"createdBy"`
+// 	UpdatedAt *time.Time `json:"updatedAt"`
+// 	UpdatedBy *string    `json:"updatedBy"`
+// }
+
+type Role struct {
+	// id
+	Id int `json:"id"`
 
 	// user
 	Name        string   `json:"name"`
@@ -126,201 +184,340 @@ type UserRole struct {
 	UpdatedBy *string    `json:"updatedBy"`
 }
 
-// type Permission struct {
-// 	// id
-// 	Id int `json:"id"`
-
-// 	// user
-// 	Name string `json:"name,omitempty"`
-
-// 	// history
-// 	CreatedAt time.Time  `json:"createdAt"`
-// 	CreatedBy string     `json:"createdBy"`
-// 	UpdatedAt *time.Time `json:"updatedAt"`
-// 	UpdatedBy *string    `json:"updatedBy"`
-// }
+// Evaluate
 
 type EvaluateQuery struct {
-	Permission  string
-	UserId      int
+	UserId     int
+	Permission string
+
 	OrgId       int
 	WorkspaceId int
 	ProjectId   int
 }
 
-// GetUserGroupList
+// GrantUserAccess
 
-type GetUserGroupListUriParams struct {
-	OrgId int `uri:"orgId" binding:"required"`
+type GrantUserAccessCommand struct {
+	UserId int
+	RoleId int
+
+	OrgId       int
+	WorkspaceId int
+	ProjectId   int
 }
 
-type GetUserGroupListQuery struct {
+// RevokeUserAccess
+
+type RevokeUserAccessCommand struct {
+	UserId int
+}
+
+////////////////////////////////////////////
+
+// GetOrgMemberList
+
+type GetOrgMemberListQuery struct {
 	OrgId int
 }
 
-// GetUserGroupById
+// GetOrgMemberById
 
-type GetUserGroupByIdUriParams struct {
-	OrgId       int `uri:"orgId" binding:"required"`
-	UserGroupId int `uri:"groupId" binding:"required"`
+type GetOrgMemberByIdQuery struct {
+	OrgId    int
+	MemberId int
 }
 
-type GetUserGroupByIdQuery struct {
-	OrgId       int
-	UserGroupId int
+// GetOrgMemberByUserId
+
+type GetOrgMemberByUserIdQuery struct {
+	OrgId  int
+	UserId int
 }
 
-// CreateUserGroup
+// GetWorkspaceMemberList
 
-type CreateUserGroupUriParams struct {
-	OrgId int `uri:"orgId" binding:"required"`
+type GetWorkspaceMemberListQuery struct {
+	WorkspaceId int
 }
 
-type CreateUserGroupCommand struct {
+// GetWorkspaceMemberById
+
+type GetWorkspaceMemberByIdQuery struct {
+	WorkspaceId int
+	MemberId    int
+}
+
+// GetWorkspaceMemberByUserId
+
+type GetWorkspaceMemberByUserIdQuery struct {
+	WorkspaceId int
+	UserId      int
+}
+
+// GetProjectMemberList
+
+type GetProjectMemberListQuery struct {
+	ProjectId int
+}
+
+// GetProjectMemberById
+
+type GetProjectMemberByIdQuery struct {
+	ProjectId int
+	MemberId  int
+}
+
+// GetProjectMemberByUserId
+
+type GetProjectMemberByUserIdQuery struct {
+	ProjectId int
+	UserId    int
+}
+
+/////////////////////////////////////////////
+
+// CreateOrgMember
+
+type CreateOrgMemberCommand struct {
+	UserId    int
+	RoleId    int
 	OrgId     int
 	CreatedBy string
 
-	Name  string `json:"name"`
-	Users []int  `json:"users"`
+	ExpireDate *time.Time `json:"expireDate"`
 }
 
-// UpdateUserGroupById
+// UpdateOrgMemberById
 
-type UpdateUserGroupByIdUriParams struct {
-	OrgId       int `uri:"orgId" binding:"required"`
-	UserGroupId int `uri:"groupId" binding:"required"`
-}
-
-type UpdateUserGroupByIdCommand struct {
-	OrgId       int
-	UserGroupId int
-	UserGroup   *UserGroup
-}
-
-// DeleteUserGroupById
-
-type DeleteUserGroupByIdUriParams struct {
-	OrgId       int `uri:"orgId" binding:"required"`
-	UserGroupId int `uri:"groupId" binding:"required"`
-}
-
-type DeleteUserGroupByIdCommand struct {
-	OrgId       int
-	UserGroupId int
-}
-
-// GetUserRoleList
-
-type GetUserRoleListUriParams struct {
-	OrgId int `uri:"orgId" binding:"required"`
-}
-
-type GetUserRoleListQuery struct {
-	OrgId int
-}
-
-// GetUserRoleById
-
-type GetUserRoleByIdUriParams struct {
-	OrgId      int `uri:"orgId" binding:"required"`
-	UserRoleId int `uri:"roleId" binding:"required"`
-}
-
-type GetUserRoleByIdQuery struct {
-	OrgId      int
-	UserRoleId int
-}
-
-// CreateUserRole
-
-type CreateUserRoleUriParams struct {
-	OrgId int `uri:"orgId" binding:"required"`
-}
-
-type CreateUserRoleCommand struct {
+type UpdateOrgMemberByIdCommand struct {
 	OrgId     int
+	MemberId  int
+	UpdatedBy string
+
+	RoleId     int        `json:"roleId"`
+	ExpireDate *time.Time `json:"expireDate"`
+}
+
+// DeleteOrgMemberById
+
+type DeleteOrgMemberByIdCommand struct {
+	OrgId    int
+	MemberId int
+}
+
+// CreateWorkspaceMember
+
+type CreateWorkspaceMemberCommand struct {
+	UserId      int
+	RoleId      int
+	WorkspaceId int
+	CreatedBy   string
+
+	Type       int        `json:"type"`
+	Source     int        `json:"source"`
+	ExpireDate *time.Time `json:"expireDate"`
+}
+
+// UpdateWorkspaceMemberById
+
+type UpdateWorkspaceMemberByIdCommand struct {
+	WorkspaceId int
+	MemberId    int
+	UpdatedBy   string
+
+	RoleId     int        `json:"roleId"`
+	ExpireDate *time.Time `json:"expireDate"`
+}
+
+// DeleteWorkspaceMemberById
+
+type DeleteWorkspaceMemberByIdCommand struct {
+	WorkspaceId int
+	MemberId    int
+}
+
+// CreateProjectMember
+
+type CreateProjectMemberCommand struct {
+	UserId    int
+	RoleId    int
+	ProjectId int
 	CreatedBy string
 
-	Name        string `json:"name"`
-	Permissions []struct {
-		Name string
-	} `json:"permissions"`
+	Type       int        `json:"type"`
+	Source     int        `json:"source"`
+	ExpireDate *time.Time `json:"expireDate"`
 }
 
-// UpdateUserRoleById
+// UpdateProjectMemberById
 
-type UpdateUserRoleByIdUriParams struct {
-	OrgId      int `uri:"orgId" binding:"required"`
-	UserRoleId int `uri:"roleId" binding:"required"`
+type UpdateProjectMemberByIdCommand struct {
+	ProjectId int
+	MemberId  int
+	UpdatedBy string
+
+	RoleId     int        `json:"roleId"`
+	ExpireDate *time.Time `json:"expireDate"`
 }
 
-type UpdateUserRoleByIdCommand struct {
-	OrgId      int
-	UserRoleId int
-	UpdatedBy  string
+// DeleteProjectMemberById
+
+type DeleteProjectMemberByIdCommand struct {
+	ProjectId int
+	MemberId  int
+}
+
+/////////////////////////////////////////////
+
+// GetRoleById
+
+type GetRoleByIdUriParams struct {
+	RoleId int `uri:"roleId" binding:"required"`
+}
+
+type GetRoleByIdQuery struct {
+	RoleId int
+}
+
+// CreateRole
+
+type CreateRoleCommand struct {
+	CreatedBy string
 
 	Name string `json:"name"`
 }
 
-// DeleteUserRoleById
+// UpdateRoleById
 
-type DeleteUserRoleByIdUriParams struct {
-	OrgId      int `uri:"orgId" binding:"required"`
-	UserRoleId int `uri:"roleId" binding:"required"`
+type UpdateRoleByIdUriParams struct {
+	RoleId int `uri:"roleId" binding:"required"`
 }
 
-type DeleteUserRoleByIdCommand struct {
-	OrgId      int
-	UserRoleId int
+type UpdateRoleByIdCommand struct {
+	RoleId    int
+	UpdatedBy string
+
+	Name string `json:"name"`
+}
+
+// DeleteRoleById
+
+type DeleteRoleByIdUriParams struct {
+	RoleId int `uri:"roleId" binding:"required"`
+}
+
+type DeleteRoleByIdCommand struct {
+	RoleId int
 }
 
 ////////////////////////////////////////////////////
 
-// GetUserAssignmentList
+// // GetUserGroupList
 
-type GetUserAssignmentListQuery struct {
-	OrgId       int
-	WorkspaceId int
-	ProjectId   int
-}
+// type GetUserGroupListUriParams struct {
+// 	OrgId int `uri:"orgId" binding:"required"`
+// }
 
-// GetUserAssignmentById
+// type GetUserGroupListQuery struct {
+// 	OrgId int
+// }
 
-type GetUserAssignmentByIdQuery struct {
-	UserAssignmentId int
-}
+// // GetUserGroupById
 
-// CreateUserAssignment
+// type GetUserGroupByIdUriParams struct {
+// 	OrgId       int `uri:"orgId" binding:"required"`
+// 	UserGroupId int `uri:"groupId" binding:"required"`
+// }
 
-type CreateUserAssignmentCommand struct {
-	CreatedBy string
+// type GetUserGroupByIdQuery struct {
+// 	OrgId       int
+// 	UserGroupId int
+// }
 
-	UserId      int
-	UserGroupId int
-	UserRoleId  int
+// // CreateUserGroup
 
-	OrgId       int
-	WorkspaceId int
-	ProjectId   int
-}
+// type CreateUserGroupUriParams struct {
+// 	OrgId int `uri:"orgId" binding:"required"`
+// }
 
-// UpdateUserAssignmentById
+// type CreateUserGroupCommand struct {
+// 	OrgId     int
+// 	CreatedBy string
 
-type UpdateUserAssignmentByIdCommand struct {
-	OrgId            int
-	UserAssignmentId int
-	UserRole         *UserAssignment
-}
+// 	Name  string `json:"name"`
+// 	Users []int  `json:"users"`
+// }
 
-// DeleteUserAssignmentById
+// // UpdateUserGroupById
 
-type DeleteUserAssignmentByIdCommand struct {
-	UserAssignmentId int
+// type UpdateUserGroupByIdUriParams struct {
+// 	OrgId       int `uri:"orgId" binding:"required"`
+// 	UserGroupId int `uri:"groupId" binding:"required"`
+// }
 
-	OrgId       int
-	WorkspaceId int
-	ProjectId   int
-}
+// type UpdateUserGroupByIdCommand struct {
+// 	OrgId       int
+// 	UserGroupId int
+// 	UserGroup   *UserGroup
+// }
+
+// // DeleteUserGroupById
+
+// type DeleteUserGroupByIdUriParams struct {
+// 	OrgId       int `uri:"orgId" binding:"required"`
+// 	UserGroupId int `uri:"groupId" binding:"required"`
+// }
+
+// type DeleteUserGroupByIdCommand struct {
+// 	OrgId       int
+// 	UserGroupId int
+// }
+
+// // GetUserAssignmentList
+
+// type GetUserAssignmentListQuery struct {
+// 	OrgId       int
+// 	WorkspaceId int
+// 	ProjectId   int
+// }
+
+// // GetUserAssignmentById
+
+// type GetUserAssignmentByIdQuery struct {
+// 	UserAssignmentId int
+// }
+
+// // CreateUserAssignment
+
+// type CreateUserAssignmentCommand struct {
+// 	CreatedBy string
+
+// 	UserId      int
+// 	UserGroupId int
+// 	RoleId  int
+
+// 	OrgId       int
+// 	WorkspaceId int
+// 	ProjectId   int
+// }
+
+// // UpdateUserAssignmentById
+
+// type UpdateUserAssignmentByIdCommand struct {
+// 	OrgId            int
+// 	UserAssignmentId int
+// 	Role         *UserAssignment
+// }
+
+// // DeleteUserAssignmentById
+
+// type DeleteUserAssignmentByIdCommand struct {
+// 	UserAssignmentId int
+
+// 	OrgId       int
+// 	WorkspaceId int
+// 	ProjectId   int
+// }
 
 /////////
 
@@ -347,16 +544,16 @@ type DeleteUserAssignmentByIdCommand struct {
 // 	UserGroupId int
 // }
 
-// type GetUserRoleByIdQuery struct {
-// 	UserRoleId int
+// type GetRoleByIdQuery struct {
+// 	RoleId int
 // }
 
-// type CreateUserRoleCommand struct {
+// type CreateRoleCommand struct {
 // 	OrgId    int
-// 	UserRole *accesscontrol.UserRole
+// 	Role *accesscontrol.Role
 // }
 
-// type UpdateUserRoleByIdCommand struct {
-// 	UserRoleId int
-// 	UserRole   *accesscontrol.UserRole
+// type UpdateRoleByIdCommand struct {
+// 	RoleId int
+// 	Role   *accesscontrol.Role
 // }
