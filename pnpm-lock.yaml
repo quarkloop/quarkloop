@@ -57,9 +57,15 @@ importers:
       '@next/bundle-analyzer':
         specifier: ^13.4.5
         version: 13.4.5
+      '@quarkloop/components':
+        specifier: workspace:*
+        version: link:../../packages/components
       '@quarkloop/prisma':
         specifier: workspace:*
         version: link:../../packages/prisma
+      '@quarkloop/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       '@types/node':
         specifier: 20.3.1
         version: 20.3.1
