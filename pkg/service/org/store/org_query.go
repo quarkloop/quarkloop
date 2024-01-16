@@ -12,7 +12,6 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
-	"github.com/quarkloop/quarkloop/pkg/service/user"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
@@ -35,10 +34,10 @@ WHERE
     "id" = @id;
 `
 
-func (store *orgStore) GetOrgById(ctx context.Context, query *org.GetOrgByIdQuery) (*org.Org, error) {
+func (store *orgStore) GetOrgById(ctx context.Context, query *org.GetOrgByIdQuery) (*model.Org, error) {
 	row := store.Conn.QueryRow(ctx, getOrgByIdQuery, pgx.NamedArgs{"id": query.OrgId})
 
-	var o org.Org
+	var o model.Org
 	err := row.Scan(
 		&o.Id,
 		&o.ScopeId,
@@ -105,7 +104,7 @@ FROM
 WHERE
 `
 
-func (store *orgStore) GetOrg(ctx context.Context, organization *org.Org) (*org.Org, error) {
+func (store *orgStore) GetOrg(ctx context.Context, organization *model.Org) (*model.Org, error) {
 	availableFields := []string{}
 	organizationFields := map[string]interface{}{
 		"sid":        organization.ScopeId,
@@ -138,7 +137,7 @@ func (store *orgStore) GetOrg(ctx context.Context, organization *org.Org) (*org.
 
 	row := store.Conn.QueryRow(ctx, finalQuery)
 
-	var org org.Org
+	var org model.Org
 	err := row.Scan(
 		&org.Id,
 		&org.ScopeId,
@@ -177,7 +176,7 @@ FROM
 `
 
 // TODO: rewrite query, userId?
-func (store *orgStore) GetOrgList(ctx context.Context, query *org.GetOrgListQuery) ([]*org.Org, error) {
+func (store *orgStore) GetOrgList(ctx context.Context, query *org.GetOrgListQuery) ([]*model.Org, error) {
 	var finalQuery strings.Builder
 	if query.Visibility == model.PublicVisibility || query.Visibility == model.PrivateVisibility {
 		finalQuery.WriteString(fmt.Sprintf(listOrgsQuery, `WHERE "visibility" = @visibility;`))
@@ -192,10 +191,10 @@ func (store *orgStore) GetOrgList(ctx context.Context, query *org.GetOrgListQuer
 	}
 	defer rows.Close()
 
-	var orgList []*org.Org = []*org.Org{}
+	var orgList []*model.Org = []*model.Org{}
 
 	for rows.Next() {
-		var org org.Org
+		var org model.Org
 		err := rows.Scan(
 			&org.Id,
 			&org.ScopeId,
@@ -241,7 +240,7 @@ SELECT
 FROM 
     "system"."Workspace" AS ws
 LEFT JOIN 
-    system."Organization" AS org ON org."id" = ws."orgId"
+    "system"."Organization" AS org ON org."id" = ws."orgId"
 WHERE 
     ws."orgId" = @orgId
 %s	
@@ -378,62 +377,62 @@ func (store *orgStore) GetProjectList(ctx context.Context, query *org.GetProject
 	return projectList, nil
 }
 
-/// GetUserAssignmentList
+// /// GetUserAssignmentList
 
-const getUserAssignmentListQuery = `
-SELECT 
-    ua.id,
-    ua."userId",
-    ur."name",
-    ua."createdAt",
-    ua."createdBy",
-    ua."updatedAt",
-    ua."updatedBy"
-FROM 
-    "system"."UserAssignment" AS ua
-LEFT JOIN 
-    "system"."UserRole" AS ur ON ur.id = ua."userRoleId"
-WHERE 
-    ua."orgId" = @orgId
-GROUP BY 
-    ua.id,
-    ur."name"
-ORDER BY id ASC;
-`
+// const getUserAssignmentListQuery = `
+// SELECT
+//     ua.id,
+//     ua."userId",
+//     ur."name",
+//     ua."createdAt",
+//     ua."createdBy",
+//     ua."updatedAt",
+//     ua."updatedBy"
+// FROM
+//     "system"."UserAssignment" AS ua
+// LEFT JOIN
+//     "system"."UserRole" AS ur ON ur.id = ua."userRoleId"
+// WHERE
+//     ua."orgId" = @orgId
+// GROUP BY
+//     ua.id,
+//     ur."name"
+// ORDER BY id ASC;
+// `
 
-func (store *orgStore) GetUserAssignmentList(ctx context.Context, query *org.GetUserAssignmentListQuery) ([]*user.UserAssignment, error) {
-	rows, err := store.Conn.Query(ctx, getUserAssignmentListQuery, pgx.NamedArgs{"orgId": query.OrgId})
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
-		return nil, err
-	}
-	defer rows.Close()
+// func (store *orgStore) GetUserAssignmentList(ctx context.Context, query *org.GetUserAssignmentListQuery) ([]*user.UserAssignment, error) {
+// 	rows, err := store.Conn.Query(ctx, getUserAssignmentListQuery, pgx.NamedArgs{"orgId": query.OrgId})
+// 	if err != nil {
+// 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
+// 		return nil, err
+// 	}
+// 	defer rows.Close()
 
-	var uaList []*user.UserAssignment = []*user.UserAssignment{}
+// 	var uaList []*user.UserAssignment = []*user.UserAssignment{}
 
-	for rows.Next() {
-		var ua user.UserAssignment
-		err := rows.Scan(
-			&ua.Id,
-			&ua.UserId,
-			&ua.Role,
-			&ua.CreatedAt,
-			&ua.CreatedBy,
-			&ua.UpdatedAt,
-			&ua.UpdatedBy,
-		)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
-			return nil, err
-		}
+// 	for rows.Next() {
+// 		var ua user.UserAssignment
+// 		err := rows.Scan(
+// 			&ua.Id,
+// 			&ua.UserId,
+// 			&ua.Role,
+// 			&ua.CreatedAt,
+// 			&ua.CreatedBy,
+// 			&ua.UpdatedAt,
+// 			&ua.UpdatedBy,
+// 		)
+// 		if err != nil {
+// 			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+// 			return nil, err
+// 		}
 
-		uaList = append(uaList, &ua)
-	}
+// 		uaList = append(uaList, &ua)
+// 	}
 
-	if err := rows.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
-		return nil, err
-	}
+// 	if err := rows.Err(); err != nil {
+// 		fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+// 		return nil, err
+// 	}
 
-	return uaList, nil
-}
+// 	return uaList, nil
+// }
