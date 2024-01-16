@@ -3,108 +3,156 @@ package org_impl
 import (
 	"context"
 
-	"github.com/gin-gonic/gin"
+	"google.golang.org/protobuf/types/known/emptypb"
+
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 	"github.com/quarkloop/quarkloop/pkg/service/org/store"
-	"github.com/quarkloop/quarkloop/pkg/service/project"
-	"github.com/quarkloop/quarkloop/pkg/service/user"
-	"github.com/quarkloop/quarkloop/pkg/service/workspace"
+	"github.com/quarkloop/quarkloop/service/system"
 )
 
 type orgService struct {
 	store store.OrgStore
+
+	system.UnimplementedOrgServiceServer
 }
 
 func NewOrgService(ds store.OrgStore) org.Service {
-	return &orgService{
-		store: ds,
-	}
+	return &orgService{store: ds}
 }
 
-func (s *orgService) GetOrgList(ctx *gin.Context, query *org.GetOrgListQuery) ([]*org.Org, error) {
-	orgList, err := s.store.GetOrgList(ctx, query)
+func (s *orgService) GetOrgList(ctx context.Context, query *system.GetOrgListQuery) (*system.GetOrgListReply, error) {
+	orgList, err := s.store.GetOrgList(ctx, &org.GetOrgListQuery{
+		UserId:     query.UserId,
+		Visibility: model.ScopeVisibility(query.Visibility),
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	for i := range orgList {
-		org := orgList[i]
+	res := &system.GetOrgListReply{OrgList: make([]*system.Org, len(orgList))}
+	for i, org := range orgList {
+		if org == nil {
+			continue
+		}
+
 		org.GeneratePath()
+		proto := org.Proto()
+		res.OrgList[i] = proto
 	}
 
-	return orgList, nil
+	return res, nil
 }
 
-func (s *orgService) GetOrgById(ctx *gin.Context, query *org.GetOrgByIdQuery) (*org.Org, error) {
-	o, err := s.store.GetOrgById(ctx, query)
+func (s *orgService) GetOrgById(ctx context.Context, query *system.GetOrgByIdQuery) (*system.GetOrgByIdReply, error) {
+	org, err := s.store.GetOrgById(ctx, &org.GetOrgByIdQuery{OrgId: query.OrgId})
 	if err != nil {
 		return nil, err
 	}
 
-	o.GeneratePath()
-	return o, nil
+	org.GeneratePath()
+	proto := org.Proto()
+
+	reply := &system.GetOrgByIdReply{Org: proto}
+	return reply, nil
 }
 
-func (s *orgService) GetOrgVisibilityById(ctx *gin.Context, query *org.GetOrgVisibilityByIdQuery) (model.ScopeVisibility, error) {
-	return s.store.GetOrgVisibilityById(ctx, query)
-}
-
-func (s *orgService) CreateOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) (*org.Org, error) {
-	o, err := s.store.CreateOrg(ctx, cmd)
-	if err != nil {
-		return nil, err
-	}
-	o.GeneratePath()
-
-	return o, nil
-}
-
-func (s *orgService) UpdateOrgById(ctx *gin.Context, cmd *org.UpdateOrgByIdCommand) error {
-	return s.store.UpdateOrgById(ctx, cmd)
-}
-
-func (s *orgService) DeleteOrgById(ctx *gin.Context, cmd *org.DeleteOrgByIdCommand) error {
-	return s.store.DeleteOrgById(ctx, cmd)
-}
-
-func (s *orgService) GetWorkspaceList(ctx *gin.Context, query *org.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
-	return s.getWorkspaceList(ctx, query)
-}
-
-func (s *orgService) getWorkspaceList(ctx context.Context, query *org.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
-	workspaceList, err := s.store.GetWorkspaceList(ctx, query)
+func (s *orgService) GetOrgVisibilityById(ctx context.Context, query *system.GetOrgVisibilityByIdQuery) (*system.GetOrgVisibilityByIdReply, error) {
+	visibility, err := s.store.GetOrgVisibilityById(ctx, &org.GetOrgVisibilityByIdQuery{OrgId: query.OrgId})
 	if err != nil {
 		return nil, err
 	}
 
-	for i := range workspaceList {
-		p := workspaceList[i]
-		p.GeneratePath()
-	}
-
-	return workspaceList, nil
+	reply := &system.GetOrgVisibilityByIdReply{Visibility: int32(visibility)}
+	return reply, nil
 }
 
-func (s *orgService) GetProjectList(ctx *gin.Context, query *org.GetProjectListQuery) ([]*project.Project, error) {
-	projectList, err := s.store.GetProjectList(ctx, query)
+func (s *orgService) CreateOrg(ctx context.Context, cmd *system.CreateOrgCommand) (*system.CreateOrgReply, error) {
+	org, err := s.store.CreateOrg(ctx, &org.CreateOrgCommand{
+		CreatedBy:   cmd.CreatedBy,
+		ScopeId:     cmd.ScopeId,
+		Name:        cmd.Name,
+		Description: cmd.Description,
+		Visibility:  model.ScopeVisibility(cmd.Visibility),
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	for i := range projectList {
-		p := projectList[i]
-		p.GeneratePath()
-	}
+	org.GeneratePath()
+	proto := org.Proto()
 
-	return projectList, nil
+	reply := &system.CreateOrgReply{Org: proto}
+	return reply, nil
 }
 
-func (s *orgService) GetUserAssignmentList(ctx *gin.Context, query *org.GetUserAssignmentListQuery) ([]*user.UserAssignment, error) {
-	uaList, err := s.store.GetUserAssignmentList(ctx, query)
+func (s *orgService) UpdateOrgById(ctx context.Context, cmd *system.UpdateOrgByIdCommand) (*emptypb.Empty, error) {
+	err := s.store.UpdateOrgById(ctx, &org.UpdateOrgByIdCommand{
+		UpdatedBy:   cmd.UpdatedBy,
+		ScopeId:     cmd.ScopeId,
+		Name:        cmd.Name,
+		Description: cmd.Description,
+		Visibility:  model.ScopeVisibility(cmd.Visibility),
+	})
+	return &emptypb.Empty{}, err
+}
+
+func (s *orgService) DeleteOrgById(ctx context.Context, cmd *system.DeleteOrgByIdCommand) (*emptypb.Empty, error) {
+	err := s.store.DeleteOrgById(ctx, &org.DeleteOrgByIdCommand{OrgId: cmd.OrgId})
+	return &emptypb.Empty{}, err
+}
+
+func (s *orgService) GetWorkspaceList(ctx context.Context, query *system.GetWorkspaceListQuery) (*system.GetWorkspaceListReply, error) {
+	workspaceList, err := s.store.GetWorkspaceList(ctx, &org.GetWorkspaceListQuery{
+		OrgId:      query.OrgId,
+		Visibility: model.ScopeVisibility(query.Visibility),
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	return uaList, nil
+	reply := &system.GetWorkspaceListReply{WorkspaceList: make([]*system.Workspace, len(workspaceList))}
+	for i, ws := range workspaceList {
+		if ws == nil {
+			continue
+		}
+
+		ws.GeneratePath()
+		proto := ws.Proto()
+		reply.WorkspaceList[i] = proto
+	}
+
+	return reply, nil
 }
+
+func (s *orgService) GetProjectList(ctx context.Context, query *system.GetProjectListQuery) (*system.GetProjectListReply, error) {
+	projectList, err := s.store.GetProjectList(ctx, &org.GetProjectListQuery{
+		OrgId:      query.OrgId,
+		Visibility: model.ScopeVisibility(query.Visibility),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	reply := &system.GetProjectListReply{ProjectList: make([]*system.Project, len(projectList))}
+	for i, project := range projectList {
+		if project == nil {
+			continue
+		}
+
+		project.GeneratePath()
+		proto := project.Proto()
+		reply.ProjectList[i] = proto
+	}
+
+	return reply, nil
+}
+
+// func (s *orgService) GetUserAssignmentList(ctx context.Context, query *system.GetUserAssignmentListQuery) (*system.GetUserAssignmentListReply, error) {
+// 	uaList, err := s.store.GetUserAssignmentList(ctx, query)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return uaList, nil
+// }
