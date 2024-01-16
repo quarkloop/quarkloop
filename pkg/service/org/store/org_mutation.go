@@ -9,6 +9,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	gonanoid "github.com/matoous/go-nanoid/v2"
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 )
 
@@ -39,7 +40,7 @@ RETURNING
     "createdBy";
 `
 
-func (store *orgStore) CreateOrg(ctx context.Context, cmd *org.CreateOrgCommand) (*org.Org, error) {
+func (store *orgStore) CreateOrg(ctx context.Context, cmd *org.CreateOrgCommand) (*model.Org, error) {
 	if cmd.ScopeId == "" {
 		sid, err := gonanoid.New()
 		if err != nil {
@@ -56,7 +57,7 @@ func (store *orgStore) CreateOrg(ctx context.Context, cmd *org.CreateOrgCommand)
 		"createdBy":   cmd.CreatedBy,
 	})
 
-	var o org.Org
+	var o model.Org
 	err := row.Scan(
 		&o.Id,
 		&o.ScopeId,
