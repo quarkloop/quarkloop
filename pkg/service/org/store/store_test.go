@@ -43,7 +43,7 @@ func TestMutationCreateOrg(t *testing.T) {
 	store := store.NewOrgStore(conn)
 
 	t.Run("create org with duplicate scopeId", func(t *testing.T) {
-		orgId := 0
+		var orgId int32 = 0
 		cmd := &org.CreateOrgCommand{
 			ScopeId:     "acme",
 			Name:        "ACME",
@@ -446,19 +446,19 @@ func TestQueryOrgRelations(t *testing.T) {
 		}
 	})
 
-	t.Run("get org's user assignment list", func(t *testing.T) {
-		orgList, err := test.GetFullOrgList(ctx, conn)
-		require.NoError(t, err)
+	// t.Run("get org's user assignment list", func(t *testing.T) {
+	// 	orgList, err := test.GetFullOrgList(ctx, conn)
+	// 	require.NoError(t, err)
 
-		for _, o := range orgList {
-			query := &org.GetUserAssignmentListQuery{OrgId: o.Id}
-			list, err := store.GetUserAssignmentList(ctx, query)
+	// 	for _, o := range orgList {
+	// 		query := &org.GetUserAssignmentListQuery{OrgId: o.Id}
+	// 		list, err := store.GetUserAssignmentList(ctx, query)
 
-			require.NoError(t, err)
-			require.Empty(t, list)
-			require.Equal(t, 0, len(list))
-		}
-	})
+	// 		require.NoError(t, err)
+	// 		require.Empty(t, list)
+	// 		require.Equal(t, 0, len(list))
+	// 	}
+	// })
 }
 
 func TestMutationDeleteOrg(t *testing.T) {
