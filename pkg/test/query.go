@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/quarkloop/quarkloop/pkg/service/org"
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/user"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
@@ -28,7 +28,7 @@ FROM
 ORDER BY id ASC;
 `
 
-func GetFullOrgList(ctx context.Context, conn *pgx.Conn) ([]*org.Org, error) {
+func GetFullOrgList(ctx context.Context, conn *pgx.Conn) ([]*model.Org, error) {
 	rows, err := conn.Query(ctx, getOrgListQuery)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
@@ -36,9 +36,9 @@ func GetFullOrgList(ctx context.Context, conn *pgx.Conn) ([]*org.Org, error) {
 	}
 	defer rows.Close()
 
-	var orgList []*org.Org = []*org.Org{}
+	var orgList []*model.Org = []*model.Org{}
 	for rows.Next() {
-		var org org.Org
+		var org model.Org
 		err := rows.Scan(
 			&org.Id,
 			&org.ScopeId,
