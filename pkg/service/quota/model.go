@@ -28,8 +28,8 @@ var (
 
 type Quota struct {
 	Feature QuotaFeature `json:"feature"`
-	Limit   int          `json:"limit"`
-	Metric  int          `json:"metric"`
+	Limit   int32        `json:"limit"`
+	Metric  int32        `json:"metric"`
 }
 
 func (q *Quota) CheckQuotaReached() bool {
@@ -38,30 +38,30 @@ func (q *Quota) CheckQuotaReached() bool {
 
 // GetQuotasByUserId
 type GetQuotasByUserIdQuery struct {
-	UserId int
+	UserId int32
 }
 
 // GetQuotasByOrgId
 type GetQuotasByOrgIdQuery struct {
-	OrgId int
+	OrgId int32
 }
 
 // CheckCreateOrgQuota
 type CheckCreateOrgQuotaQuery struct {
-	UserId int
+	UserId int32
 }
 
 // CheckCreateOrgUserQuota
 type CheckCreateOrgUserQuotaQuery struct {
-	OrgId int
+	OrgId int32
 }
 
 // CheckCreateWorkspaceQuota
 type CheckCreateWorkspaceQuotaQuery struct {
-	OrgId int
+	OrgId int32
 }
 
 // CheckCreateProjectQuota
 type CheckCreateProjectQuotaQuery struct {
-	OrgId int
+	OrgId int32
 }
