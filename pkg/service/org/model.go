@@ -63,5 +63,5 @@ type GetMemberListQuery struct {
 }
 
 type GetUserAssignmentListQuery struct {
-	OrgId int32
+	OrgId int32 `uri:"orgId" binding:"required"`
 }
