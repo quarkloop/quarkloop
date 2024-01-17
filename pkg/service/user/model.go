@@ -7,7 +7,7 @@ import (
 
 type User struct {
 	// id
-	Id       int    `json:"id,string"` // string: type bigint from javascript is encoded into string
+	Id       int32  `json:"id,string"` // string: type bigint from javascript is encoded into string
 	Username string `json:"username"`
 
 	// user
@@ -18,7 +18,7 @@ type User struct {
 	Birthdate     *time.Time `json:"birthdate"`
 	Country       *string    `json:"country"`
 	Image         string     `json:"image"`
-	Status        int        `json:"status"`
+	Status        int32      `json:"status"`
 	Path          string     `json:"path"`
 
 	// history
@@ -28,7 +28,7 @@ type User struct {
 	UpdatedBy *string    `json:"updatedBy"`
 }
 
-func (u *User) GetId() int {
+func (u *User) GetId() int32 {
 	return u.Id
 }
 
@@ -38,8 +38,8 @@ func (u *User) GeneratePath() {
 
 type Account struct {
 	// id
-	Id                int     `json:"id"`
-	UserId            int     `json:"userId"`
+	Id                int32   `json:"id"`
+	UserId            int32   `json:"userId"`
 	TokenId           *string `json:"tokenId"`
 	ProviderAccountId string  `json:"providerAccountId"`
 
@@ -56,8 +56,8 @@ type Account struct {
 
 type Session struct {
 	// id
-	Id     int
-	UserId int
+	Id     int32
+	UserId int32
 
 	// session
 	SessionToken string    `json:"sessionToken"`
@@ -66,8 +66,8 @@ type Session struct {
 
 type UserAssignment struct {
 	// id
-	Id     int `json:"id"`
-	UserId int `json:"userId"`
+	Id     int32 `json:"id"`
+	UserId int32 `json:"userId"`
 
 	// user assignment
 	Role string `json:"role"`
@@ -124,71 +124,71 @@ type GetAccountsQuery struct{}
 // GetUserById
 
 type GetUserByIdUriParams struct {
-	UserId int `uri:"userId_or_username" binding:"required"`
+	UserId int32 `uri:"userId_or_username" binding:"required"`
 }
 
 type GetUserByIdQuery struct {
-	UserId int
+	UserId int32
 }
 
 // GetUsernameByUserId
 
 type GetUsernameByUserIdUriParams struct {
-	UserId int `uri:"userId_or_username" binding:"required"`
+	UserId int32 `uri:"userId_or_username" binding:"required"`
 }
 
 type GetUsernameByUserIdQuery struct {
-	UserId int
+	UserId int32
 }
 
 // GetEmailByUserId
 
 type GetEmailByUserIdUriParams struct {
-	UserId int `uri:"userId_or_username" binding:"required"`
+	UserId int32 `uri:"userId_or_username" binding:"required"`
 }
 
 type GetEmailByUserIdQuery struct {
-	UserId int
+	UserId int32
 }
 
 // GetStatusByUserId
 
 type GetStatusByUserIdUriParams struct {
-	UserId int `uri:"userId_or_username" binding:"required"`
+	UserId int32 `uri:"userId_or_username" binding:"required"`
 }
 
 type GetStatusByUserIdQuery struct {
-	UserId int
+	UserId int32
 }
 
 // GetPreferencesByUserId
 
 type GetPreferencesByUserIdUriParams struct {
-	UserId int `uri:"userId_or_username" binding:"required"`
+	UserId int32 `uri:"userId_or_username" binding:"required"`
 }
 
 type GetPreferencesByUserIdQuery struct {
-	UserId int
+	UserId int32
 }
 
 // GetSessionsByUserId
 
 type GetSessionsByUserIdUriParams struct {
-	UserId int `uri:"userId_or_username" binding:"required"`
+	UserId int32 `uri:"userId_or_username" binding:"required"`
 }
 
 type GetSessionsByUserIdQuery struct {
-	UserId int
+	UserId int32
 }
 
 // GetAccountsByUserId
 
 type GetAccountsByUserIdUriParams struct {
-	UserId int `uri:"userId_or_username" binding:"required"`
+	UserId int32 `uri:"userId_or_username" binding:"required"`
 }
 
 type GetAccountsByUserIdQuery struct {
-	UserId int
+	UserId int32
 }
 
 // GetUsers
@@ -208,7 +208,7 @@ type CreateUserCommand struct {
 	Birthdate *time.Time `json:"birthdate"`
 	Country   string     `json:"country"`
 	Image     string     `json:"image"`
-	Status    int        `json:"status"`
+	Status    int32      `json:"status"`
 }
 
 // UpdateUser
@@ -230,11 +230,11 @@ type UpdatePreferencesCommand struct{}
 // UpdateUserById
 
 type UpdateUserByIdUriParams struct {
-	UserId int `uri:"userId" binding:"required"`
+	UserId int32 `uri:"userId" binding:"required"`
 }
 
 type UpdateUserByIdCommand struct {
-	UserId    int
+	UserId    int32
 	UpdatedBy string
 
 	Username      string     `json:"username"`
@@ -244,17 +244,17 @@ type UpdateUserByIdCommand struct {
 	Birthdate     *time.Time `json:"birthdate"`
 	Country       string     `json:"country"`
 	Image         string     `json:"image"`
-	Status        int        `json:"status"`
+	Status        int32      `json:"status"`
 }
 
 // UpdateUsernameByUserId
 
 type UpdateUsernameByUserIdUriParams struct {
-	UserId int `uri:"userId" binding:"required"`
+	UserId int32 `uri:"userId" binding:"required"`
 }
 
 type UpdateUsernameByUserIdCommand struct {
-	UserId    int
+	UserId    int32
 	UpdatedBy string
 	Username  string `json:"username" binding:"required"`
 }
@@ -262,11 +262,11 @@ type UpdateUsernameByUserIdCommand struct {
 // UpdatePasswordByUserId
 
 type UpdatePasswordByUserIdUriParams struct {
-	UserId int `uri:"userId" binding:"required"`
+	UserId int32 `uri:"userId" binding:"required"`
 }
 
 type UpdatePasswordByUserIdCommand struct {
-	UserId    int
+	UserId    int32
 	UpdatedBy string
 	Password  string `json:"password" binding:"required"`
 }
@@ -274,27 +274,27 @@ type UpdatePasswordByUserIdCommand struct {
 // UpdatePreferencesByUserId
 
 type UpdatePreferencesByUserIdUriParams struct {
-	UserId int `uri:"userId" binding:"required"`
+	UserId int32 `uri:"userId" binding:"required"`
 }
 
 type UpdatePreferencesByUserIdCommand struct {
-	UserId int
+	UserId int32
 }
 
 //  DeleteUserById
 
 type DeleteUserByIdUriParams struct {
-	UserId int `uri:"userId" binding:"required"`
+	UserId int32 `uri:"userId" binding:"required"`
 }
 
 type DeleteUserByIdCommand struct {
-	UserId int
+	UserId int32
 }
 
 // CreateSession
 
 type CreateSessionCommand struct {
-	UserId int
+	UserId int32
 
 	SessionToken string    `json:"sessionToken"`
 	ExpiresAt    time.Time `json:"expires"`
@@ -303,19 +303,19 @@ type CreateSessionCommand struct {
 // DeleteSessionById
 
 type DeleteSessionByIdUriParams struct {
-	UserId    int `uri:"userId" binding:"required"`
-	SessionId int `uri:"sessionId" binding:"required"`
+	UserId    int32 `uri:"userId" binding:"required"`
+	SessionId int32 `uri:"sessionId" binding:"required"`
 }
 
 type DeleteSessionByIdCommand struct {
-	UserId    int
-	SessionId int
+	UserId    int32
+	SessionId int32
 }
 
 // CreateAccountCommand
 
 type CreateAccountCommand struct {
-	UserId            int
+	UserId            int32
 	TokenId           string `json:"tokenId"`
 	ProviderAccountId string `json:"providerAccountId"`
 
@@ -330,11 +330,11 @@ type CreateAccountCommand struct {
 // DeleteAccountById
 
 type DeleteAccountByIdUriParams struct {
-	UserId    int `uri:"userId" binding:"required"`
-	AccountId int `uri:"accountId" binding:"required"`
+	UserId    int32 `uri:"userId" binding:"required"`
+	AccountId int32 `uri:"accountId" binding:"required"`
 }
 
 type DeleteAccountByIdCommand struct {
-	UserId    int
-	AccountId int
+	UserId    int32
+	AccountId int32
 }
