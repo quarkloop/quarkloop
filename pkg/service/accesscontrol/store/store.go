@@ -8,33 +8,38 @@ import (
 )
 
 type AccessControlStore interface {
-	// access control query
-	Evaluate(context.Context, *accesscontrol.EvaluateQuery) (bool, error)
-	GetUserAssignmentList(context.Context, *accesscontrol.GetUserAssignmentListQuery) ([]accesscontrol.UserAssignment, error)
-	GetUserAssignmentById(context.Context, *accesscontrol.GetUserAssignmentByIdQuery) (*accesscontrol.UserAssignment, error)
+	// user access query and mutation
+	EvaluateUserAccess(context.Context, *accesscontrol.EvaluateQuery) error
+	GrantUserAccess(context.Context, *accesscontrol.GrantUserAccessCommand) (bool, error)
+	RevokeUserAccess(context.Context, *accesscontrol.RevokeUserAccessCommand) error
 
-	// access control mutation
-	CreateUserAssignment(context.Context, *accesscontrol.CreateUserAssignmentCommand) (*accesscontrol.UserAssignment, error)
-	UpdateUserAssignmentById(context.Context, *accesscontrol.UpdateUserAssignmentByIdCommand) error
-	DeleteUserAssignmentById(context.Context, *accesscontrol.DeleteUserAssignmentByIdCommand) error
+	// member query
+	GetOrgMemberList(context.Context, *accesscontrol.GetOrgMemberListQuery) ([]*accesscontrol.OrgMember, error)
+	GetOrgMemberById(context.Context, *accesscontrol.GetOrgMemberByIdQuery) (*accesscontrol.OrgMember, error)
+	GetOrgMemberByUserId(ctx context.Context, query *accesscontrol.GetOrgMemberByUserIdQuery) (*accesscontrol.OrgMember, error)
+	GetWorkspaceMemberList(context.Context, *accesscontrol.GetWorkspaceMemberListQuery) ([]*accesscontrol.WorkspaceMember, error)
+	GetWorkspaceMemberById(context.Context, *accesscontrol.GetWorkspaceMemberByIdQuery) (*accesscontrol.WorkspaceMember, error)
+	GetWorkspaceMemberByUserId(ctx context.Context, query *accesscontrol.GetWorkspaceMemberByUserIdQuery) (*accesscontrol.WorkspaceMember, error)
+	GetProjectMemberList(context.Context, *accesscontrol.GetProjectMemberListQuery) ([]*accesscontrol.ProjectMember, error)
+	GetProjectMemberById(context.Context, *accesscontrol.GetProjectMemberByIdQuery) (*accesscontrol.ProjectMember, error)
+	GetProjectMemberByUserId(context.Context, *accesscontrol.GetProjectMemberByUserIdQuery) (*accesscontrol.ProjectMember, error)
 
-	// user group query
-	GetUserGroupList(context.Context, *accesscontrol.GetUserGroupListQuery) ([]*accesscontrol.UserGroup, error)
-	GetUserGroupById(context.Context, *accesscontrol.GetUserGroupByIdQuery) (*accesscontrol.UserGroup, error)
+	// member mutation
+	CreateOrgMember(context.Context, *accesscontrol.CreateOrgMemberCommand) (*accesscontrol.OrgMember, error)
+	UpdateOrgMemberById(context.Context, *accesscontrol.UpdateOrgMemberByIdCommand) error
+	DeleteOrgMemberById(context.Context, *accesscontrol.DeleteOrgMemberByIdCommand) error
+	CreateWorkspaceMember(context.Context, *accesscontrol.CreateWorkspaceMemberCommand) (*accesscontrol.WorkspaceMember, error)
+	UpdateWorkspaceMemberById(context.Context, *accesscontrol.UpdateWorkspaceMemberByIdCommand) error
+	DeleteWorkspaceMemberById(context.Context, *accesscontrol.DeleteWorkspaceMemberByIdCommand) error
+	CreateProjectMember(context.Context, *accesscontrol.CreateProjectMemberCommand) (*accesscontrol.ProjectMember, error)
+	UpdateProjectMemberById(context.Context, *accesscontrol.UpdateProjectMemberByIdCommand) error
+	DeleteProjectMemberById(context.Context, *accesscontrol.DeleteProjectMemberByIdCommand) error
 
-	// user group mutation
-	CreateUserGroup(context.Context, *accesscontrol.CreateUserGroupCommand) (*accesscontrol.UserGroup, error)
-	UpdateUserGroupById(context.Context, *accesscontrol.UpdateUserGroupByIdCommand) error
-	DeleteUserGroupById(context.Context, *accesscontrol.DeleteUserGroupByIdCommand) error
-
-	// role query
-	GetUserRoleList(context.Context, *accesscontrol.GetUserRoleListQuery) ([]*accesscontrol.UserRole, error)
-	GetUserRoleById(context.Context, *accesscontrol.GetUserRoleByIdQuery) (*accesscontrol.UserRole, error)
-
-	// role mutation
-	CreateUserRole(context.Context, *accesscontrol.CreateUserRoleCommand) (*accesscontrol.UserRole, error)
-	//UpdateUserRoleById(context.Context, *accesscontrol.UpdateUserRoleByIdCommand) error
-	DeleteUserRoleById(context.Context, *accesscontrol.DeleteUserRoleByIdCommand) error
+	// user role query and mutation
+	GetRoleList(context.Context) ([]*accesscontrol.Role, error)
+	GetRoleById(context.Context, *accesscontrol.GetRoleByIdQuery) (*accesscontrol.Role, error)
+	CreateRole(context.Context, *accesscontrol.CreateRoleCommand) (*accesscontrol.Role, error)
+	DeleteRoleById(context.Context, *accesscontrol.DeleteRoleByIdCommand) error
 }
 
 type accessControlStore struct {
@@ -46,6 +51,36 @@ func NewAccessControlStore(conn *pgx.Conn) *accessControlStore {
 		Conn: conn,
 	}
 }
+
+// type AccessControlStore interface {
+// 	// access control query
+// 	Evaluate(context.Context, *accesscontrol.EvaluateQuery) (bool, error)
+// 	GetUserAssignmentList(context.Context, *accesscontrol.GetUserAssignmentListQuery) ([]accesscontrol.UserAssignment, error)
+// 	GetUserAssignmentById(context.Context, *accesscontrol.GetUserAssignmentByIdQuery) (*accesscontrol.UserAssignment, error)
+
+// 	// access control mutation
+// 	CreateUserAssignment(context.Context, *accesscontrol.CreateUserAssignmentCommand) (*accesscontrol.UserAssignment, error)
+// 	UpdateUserAssignmentById(context.Context, *accesscontrol.UpdateUserAssignmentByIdCommand) error
+// 	DeleteUserAssignmentById(context.Context, *accesscontrol.DeleteUserAssignmentByIdCommand) error
+
+// 	// user group query
+// 	GetUserGroupList(context.Context, *accesscontrol.GetUserGroupListQuery) ([]*accesscontrol.UserGroup, error)
+// 	GetUserGroupById(context.Context, *accesscontrol.GetUserGroupByIdQuery) (*accesscontrol.UserGroup, error)
+
+// 	// user group mutation
+// 	CreateUserGroup(context.Context, *accesscontrol.CreateUserGroupCommand) (*accesscontrol.UserGroup, error)
+// 	UpdateUserGroupById(context.Context, *accesscontrol.UpdateUserGroupByIdCommand) error
+// 	DeleteUserGroupById(context.Context, *accesscontrol.DeleteUserGroupByIdCommand) error
+
+// 	// role query
+// 	GetRoleList(context.Context, *accesscontrol.GetRoleListQuery) ([]*accesscontrol.Role, error)
+// 	GetRoleById(context.Context, *accesscontrol.GetRoleByIdQuery) (*accesscontrol.Role, error)
+
+// 	// role mutation
+// 	CreateRole(context.Context, *accesscontrol.CreateRoleCommand) (*accesscontrol.Role, error)
+// 	//UpdateRoleById(context.Context, *accesscontrol.UpdateRoleByIdCommand) error
+// 	DeleteRoleById(context.Context, *accesscontrol.DeleteRoleByIdCommand) error
+// }
 
 const testQuery = `
 SELECT 
@@ -66,7 +101,7 @@ SELECT
 FROM
     "system"."UserAssignment" AS ua
 LEFT JOIN "system"."UserGroup" AS ug ON ug.id = ua."userGroupId"	
-LEFT JOIN "system"."UserRole" AS ur ON ur.id = ua."userRoleId"	
+LEFT JOIN "system"."Role" AS ur ON ur.id = ua."userRoleId"	
 LEFT JOIN "system"."Permission" AS rp ON rp."roleId" = ur.id
 WHERE 
 	ua."orgId" = 2 
@@ -90,7 +125,7 @@ SELECT
 FROM 
     "system"."UserAssignment" AS ua
 LEFT JOIN "system"."UserGroup" AS ug ON ug.id = ua."userGroupId" AND ug."userId" = ua."userId"
-LEFT JOIN "system"."UserRole" AS ur ON ur.id = ua."userRoleId"
+LEFT JOIN "system"."Role" AS ur ON ur.id = ua."userRoleId"
 LEFT JOIN "system"."Permission" AS rp ON rp."roleId" = ur.id
 WHERE 
     ua."orgId" = 2
@@ -122,7 +157,7 @@ SELECT
 FROM 
     "system"."UserAssignment" AS ua
 LEFT JOIN "system"."UserGroup" AS ug ON ug.id = ua."userGroupId" AND ug."users" @> '[]'
-LEFT JOIN "system"."UserRole" AS ur ON ur.id = ua."userRoleId"
+LEFT JOIN "system"."Role" AS ur ON ur.id = ua."userRoleId"
 LEFT JOIN "system"."Permission" AS rp ON rp."roleId" = ur.id
 WHERE 
     ua."orgId" = 2
@@ -149,7 +184,7 @@ SELECT
 FROM 
     "system"."UserAssignment" AS ua
 LEFT JOIN "system"."UserGroup" AS ug ON ug.id = ua."userGroupId"
-LEFT JOIN "system"."UserRole" AS ur ON ur.id = ua."userRoleId"
+LEFT JOIN "system"."Role" AS ur ON ur.id = ua."userRoleId"
 LEFT JOIN "system"."Permission" AS rp ON rp."roleId" = ur.id
 WHERE (
 	ua."orgId" = 2 
@@ -172,7 +207,7 @@ SELECT jsonb_array_length(permissions)::bool FROM (
 	FROM 
 		"system"."UserAssignment" AS ua
 	LEFT JOIN "system"."UserGroup" AS ug ON ug.id = ua."userGroupId"
-	LEFT JOIN "system"."UserRole" AS ur ON ur.id = ua."userRoleId"
+	LEFT JOIN "system"."Role" AS ur ON ur.id = ua."userRoleId"
 	LEFT JOIN "system"."Permission" AS rp ON rp."roleId" = ur.id
 	WHERE 
 	(
