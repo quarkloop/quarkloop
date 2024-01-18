@@ -10,6 +10,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
+	"github.com/quarkloop/quarkloop/service/system"
 )
 
 func (s *orgApi) createOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) api.Response {
@@ -25,7 +26,13 @@ func (s *orgApi) createOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) api.Resp
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
 	}
 
-	org, err := s.orgService.CreateOrg(ctx, cmd)
+	org, err := s.orgService.CreateOrg(ctx, &system.CreateOrgCommand{
+		CreatedBy:   cmd.CreatedBy,
+		ScopeId:     cmd.ScopeId,
+		Name:        cmd.Name,
+		Description: cmd.Description,
+		Visibility:  int32(cmd.Visibility),
+	})
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
@@ -39,7 +46,14 @@ func (s *orgApi) updateOrgById(ctx *gin.Context, cmd *org.UpdateOrgByIdCommand) 
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
 	}
 
-	err := s.orgService.UpdateOrgById(ctx, cmd)
+	_, err := s.orgService.UpdateOrgById(ctx, &system.UpdateOrgByIdCommand{
+		OrgId:       cmd.OrgId,
+		UpdatedBy:   cmd.UpdatedBy,
+		ScopeId:     cmd.ScopeId,
+		Name:        cmd.Name,
+		Description: cmd.Description,
+		Visibility:  int32(cmd.Visibility),
+	})
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
@@ -47,13 +61,13 @@ func (s *orgApi) updateOrgById(ctx *gin.Context, cmd *org.UpdateOrgByIdCommand) 
 	return api.Success(http.StatusOK, nil)
 }
 
-func (s *orgApi) deleteOrgById(ctx *gin.Context, orgId int) api.Response {
+func (s *orgApi) deleteOrgById(ctx *gin.Context, cmd *org.DeleteOrgByIdCommand) api.Response {
 	// check permissions
-	if err := s.evaluatePermission(ctx, accesscontrol.ActionProjectDelete, orgId); err != nil {
+	if err := s.evaluatePermission(ctx, accesscontrol.ActionProjectDelete, cmd.OrgId); err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
 	}
 
-	err := s.orgService.DeleteOrgById(ctx, &org.DeleteOrgByIdCommand{OrgId: orgId})
+	_, err := s.orgService.DeleteOrgById(ctx, &system.DeleteOrgByIdCommand{OrgId: cmd.OrgId})
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
@@ -63,17 +77,21 @@ func (s *orgApi) deleteOrgById(ctx *gin.Context, orgId int) api.Response {
 
 func (s *orgApi) evaluateCreatePermission(ctx *gin.Context, permission string) error {
 	user := contextdata.GetUser(ctx)
-	query := &accesscontrol.EvaluateFilterQuery{UserId: user.GetId()}
-
-	return s.aclService.Evaluate(ctx, permission, query)
-}
-
-func (s *orgApi) evaluatePermission(ctx *gin.Context, permission string, orgId int) error {
-	user := contextdata.GetUser(ctx)
-	query := &accesscontrol.EvaluateFilterQuery{
-		UserId: user.GetId(),
-		OrgId:  orgId,
+	query := &accesscontrol.EvaluateQuery{
+		Permission: permission,
+		UserId:     user.GetId(),
 	}
 
-	return s.aclService.Evaluate(ctx, permission, query)
+	return s.aclService.EvaluateUserAccess(ctx, query)
+}
+
+func (s *orgApi) evaluatePermission(ctx *gin.Context, permission string, orgId int32) error {
+	user := contextdata.GetUser(ctx)
+	query := &accesscontrol.EvaluateQuery{
+		Permission: permission,
+		UserId:     user.GetId(),
+		OrgId:      orgId,
+	}
+
+	return s.aclService.EvaluateUserAccess(ctx, query)
 }
