@@ -26,25 +26,25 @@ func TruncateAuthDBTables(ctx context.Context, conn *pgx.Conn) error {
 	return nil
 }
 
-const truncateAuthzDbTablesQuery = `
-TRUNCATE
-	"public"."alembic_version",
-	"public"."metadata",
-	"public"."relation_tuple_transaction",
-	"public"."relation_tuple",
-	"public"."namespace_config",
-	"public"."caveat";
-`
+// const truncateAuthzDbTablesQuery = `
+// TRUNCATE
+// 	"public"."alembic_version",
+// 	"public"."metadata",
+// 	"public"."relation_tuple_transaction",
+// 	"public"."relation_tuple",
+// 	"public"."namespace_config",
+// 	"public"."caveat";
+// `
 
-func TruncateAuthzDBTables(ctx context.Context, conn *pgx.Conn) error {
-	_, err := conn.Exec(ctx, truncateAuthzDbTablesQuery)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[TRUNCATE] failed: %v\n", err)
-		return err
-	}
+// func TruncateAuthzDBTables(ctx context.Context, conn *pgx.Conn) error {
+// 	_, err := conn.Exec(ctx, truncateAuthzDbTablesQuery)
+// 	if err != nil {
+// 		fmt.Fprintf(os.Stderr, "[TRUNCATE] failed: %v\n", err)
+// 		return err
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 const truncateSystemDbTablesQuery = `
 TRUNCATE
