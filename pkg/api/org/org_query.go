@@ -19,13 +19,13 @@ import (
 // 500: StatusInternalServerError
 
 func (s *orgApi) GetOrgById(ctx *gin.Context) {
-	uriParams := &org.GetOrgByIdUriParams{}
-	if err := ctx.ShouldBindUri(uriParams); err != nil {
+	query := &org.GetOrgByIdQuery{}
+	if err := ctx.ShouldBindUri(query); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	res := s.getOrgById(ctx, &org.GetOrgByIdQuery{OrgId: uriParams.OrgId})
+	res := s.getOrgById(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
 
@@ -53,13 +53,13 @@ func (s *orgApi) GetOrgList(ctx *gin.Context) {
 // 500: StatusInternalServerError
 
 func (s *orgApi) GetWorkspaceList(ctx *gin.Context) {
-	uriParams := &org.GetWorkspaceListUriParams{}
-	if err := ctx.ShouldBindUri(uriParams); err != nil {
+	query := &org.GetWorkspaceListQuery{}
+	if err := ctx.ShouldBindUri(query); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	res := s.getWorkspaceList(ctx, uriParams.OrgId)
+	res := s.getWorkspaceList(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
 
@@ -73,13 +73,13 @@ func (s *orgApi) GetWorkspaceList(ctx *gin.Context) {
 // 500: StatusInternalServerError
 
 func (s *orgApi) GetProjectList(ctx *gin.Context) {
-	uriParams := &org.GetProjectListUriParams{}
-	if err := ctx.ShouldBindUri(uriParams); err != nil {
+	query := &org.GetProjectListQuery{}
+	if err := ctx.ShouldBindUri(query); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	res := s.getProjectList(ctx, uriParams.OrgId)
+	res := s.getProjectList(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
 
@@ -94,12 +94,12 @@ func (s *orgApi) GetProjectList(ctx *gin.Context) {
 // 500: StatusInternalServerError
 
 func (s *orgApi) GetMemberList(ctx *gin.Context) {
-	uriParams := &org.GetMemberListUriParams{}
-	if err := ctx.ShouldBindUri(uriParams); err != nil {
+	query := &org.GetMemberListQuery{}
+	if err := ctx.ShouldBindUri(query); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	res := s.getMemberList(ctx, &org.GetMemberListQuery{OrgId: uriParams.OrgId})
+	res := s.getMemberList(ctx, query)
 	ctx.JSON(res.Status(), res.Body())
 }
