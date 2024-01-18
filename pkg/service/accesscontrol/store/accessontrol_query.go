@@ -18,11 +18,11 @@ SELECT jsonb_array_length(permissions)::bool FROM (
 	FROM 
 		"system"."UserAssignment" AS ua
 	LEFT JOIN "system"."UserGroup" AS ug ON ug.id = ua."userGroupId"
-	LEFT JOIN "system"."UserRole" AS ur ON ur.id = ua."userRoleId"
+	LEFT JOIN "system"."Role" AS ur ON ur.id = ua."userRoleId"
 	LEFT JOIN "system"."Permission" AS rp ON rp."roleId" = ur.id
 	WHERE 
 	(
-		((@orgId = 0 AND ua."orgId" IS NULL) OR ua."orgId" = @orgId) 
+		((@orgId = 0 AND ua."orgId" IS NULL) OR ua."orgId" = @orgId)
 		AND
 		((@workspaceId = 0 AND ua."workspaceId" IS NULL) OR ua."workspaceId" = @workspaceId)
 		AND
@@ -41,7 +41,7 @@ SELECT jsonb_array_length(permissions)::bool FROM (
 ) AS permission_exists
 `
 
-func (store *accessControlStore) Evaluate(ctx context.Context, query *accesscontrol.EvaluateQuery) (bool, error) {
+func (store *accessControlStore) EvaluateUserAccess(ctx context.Context, query *accesscontrol.EvaluateQuery) (bool, error) {
 	row := store.Conn.QueryRow(ctx, evaluateQuery, pgx.NamedArgs{
 		"permission":  query.Permission,
 		"userId":      query.UserId,
