@@ -10,7 +10,13 @@ import (
 
 type Database interface {
 	Connect()
-	Connection() *pgx.Conn
+	GetConnection() *pgx.Conn
+
+	GetDatabase() string
+	GetHost() string
+	GetPassword() string
+	GetPort() string
+	GetUser() string
 }
 
 type database struct {
@@ -29,6 +35,17 @@ func NewAuthDatabase() *database {
 		password:   os.Getenv("PG_PASSWORD"),
 		port:       os.Getenv("PG_PORT"),
 		database:   os.Getenv("PG_QUARKLOOP_AUTH_DB"),
+		connection: nil,
+	}
+}
+
+func NewAuthzDatabase() *database {
+	return &database{
+		host:       os.Getenv("PG_HOST"),
+		user:       os.Getenv("PG_USER"),
+		password:   os.Getenv("PG_PASSWORD"),
+		port:       os.Getenv("PG_PORT"),
+		database:   os.Getenv("PG_QUARKLOOP_AUTHZ_DB"),
 		connection: nil,
 	}
 }
