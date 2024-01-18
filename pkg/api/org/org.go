@@ -3,9 +3,9 @@ package org
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
-	"github.com/quarkloop/quarkloop/pkg/service/org"
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
 	"github.com/quarkloop/quarkloop/pkg/service/user"
+	"github.com/quarkloop/quarkloop/service/system"
 )
 
 type Api interface {
@@ -23,22 +23,22 @@ type Api interface {
 }
 
 type orgApi struct {
-	orgService org.Service
+	orgService system.OrgServiceClient
 
 	userService  user.Service
 	aclService   accesscontrol.Service
 	quotaService quota.Service
 }
 
-func NewOrgApi(service org.Service, userService user.Service, aclService accesscontrol.Service, quotaService quota.Service) *orgApi {
+func NewOrgApi(orgService system.OrgServiceClient, userService user.Service, aclService accesscontrol.Service, quotaService quota.Service) *orgApi {
 	return &orgApi{
-		orgService:   service,
+		orgService:   orgService,
 		userService:  userService,
 		aclService:   aclService,
 		quotaService: quotaService,
 	}
 }
 
-func (api *orgApi) GetService() org.Service {
-	return api.orgService
-}
+// func (api *orgApi) GetService() org.Service {
+// 	return api.orgService
+// }
