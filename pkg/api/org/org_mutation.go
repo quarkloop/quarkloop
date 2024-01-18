@@ -38,13 +38,12 @@ func (s *orgApi) CreateOrg(ctx *gin.Context) {
 // 500: StatusInternalServerError
 
 func (s *orgApi) UpdateOrgById(ctx *gin.Context) {
-	uriParams := &org.UpdateOrgByIdUriParams{}
-	if err := ctx.ShouldBindUri(uriParams); err != nil {
+	cmd := &org.UpdateOrgByIdCommand{}
+
+	if err := ctx.ShouldBindUri(cmd); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-
-	cmd := &org.UpdateOrgByIdCommand{OrgId: uriParams.OrgId}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
@@ -64,12 +63,12 @@ func (s *orgApi) UpdateOrgById(ctx *gin.Context) {
 // 500: StatusInternalServerError
 
 func (s *orgApi) DeleteOrgById(ctx *gin.Context) {
-	uriParams := &org.DeleteOrgByIdUriParams{}
-	if err := ctx.ShouldBindUri(uriParams); err != nil {
+	cmd := &org.DeleteOrgByIdCommand{}
+	if err := ctx.ShouldBindUri(cmd); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	res := s.deleteOrgById(ctx, uriParams.OrgId)
+	res := s.deleteOrgById(ctx, cmd)
 	ctx.JSON(res.Status(), res.Body())
 }
