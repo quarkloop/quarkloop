@@ -20,15 +20,15 @@ type Service interface {
 	GetProjectMemberByUserId(context.Context, *GetProjectMemberByUserIdQuery) (*ProjectMember, error)
 
 	// member mutation
-	CreateOrgMember(context.Context, *CreateOrgMemberCommand) (*OrgMember, error)
-	UpdateOrgMemberById(context.Context, *UpdateOrgMemberByIdCommand) error
-	DeleteOrgMemberById(context.Context, *DeleteOrgMemberByIdCommand) error
-	CreateWorkspaceMember(context.Context, *CreateWorkspaceMemberCommand) (*WorkspaceMember, error)
-	UpdateWorkspaceMemberById(context.Context, *UpdateWorkspaceMemberByIdCommand) error
-	DeleteWorkspaceMemberById(context.Context, *DeleteWorkspaceMemberByIdCommand) error
-	CreateProjectMember(context.Context, *CreateProjectMemberCommand) (*ProjectMember, error)
-	UpdateProjectMemberById(context.Context, *UpdateProjectMemberByIdCommand) error
-	DeleteProjectMemberById(context.Context, *DeleteProjectMemberByIdCommand) error
+	// CreateOrgMember(context.Context, *CreateOrgMemberCommand) (*OrgMember, error)
+	// UpdateOrgMemberById(context.Context, *UpdateOrgMemberByIdCommand) error
+	// DeleteOrgMemberById(context.Context, *DeleteOrgMemberByIdCommand) error
+	// CreateWorkspaceMember(context.Context, *CreateWorkspaceMemberCommand) (*WorkspaceMember, error)
+	// UpdateWorkspaceMemberById(context.Context, *UpdateWorkspaceMemberByIdCommand) error
+	// DeleteWorkspaceMemberById(context.Context, *DeleteWorkspaceMemberByIdCommand) error
+	// CreateProjectMember(context.Context, *CreateProjectMemberCommand) (*ProjectMember, error)
+	// UpdateProjectMemberById(context.Context, *UpdateProjectMemberByIdCommand) error
+	// DeleteProjectMemberById(context.Context, *DeleteProjectMemberByIdCommand) error
 
 	// user role query and mutation
 	GetRoleList(context.Context) ([]*Role, error)
