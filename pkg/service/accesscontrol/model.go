@@ -21,64 +21,64 @@ const (
 	GlobalOrgId = 0
 
 	// org actions
-	ActionOrgList   = "org:list"
-	ActionOrgRead   = "org:read"
-	ActionOrgCreate = "org:create"
-	ActionOrgUpdate = "org:update"
-	ActionOrgDelete = "org:delete"
+	ActionOrgList   = "list"
+	ActionOrgRead   = "read"
+	ActionOrgCreate = "create"
+	ActionOrgUpdate = "update"
+	ActionOrgDelete = "delete"
 
-	ActionOrgSettingsRead   = "org.settings:read"
-	ActionOrgSettingsUpdate = "org.settings:update"
+	ActionOrgSettingsRead   = "settings_read"
+	ActionOrgSettingsUpdate = "settings_update"
 
-	ActionOrgQuotaRead   = "org.quota:read"
-	ActionOrgQuotaCreate = "org.quota:create"
-	ActionOrgQuotaUpdate = "org.quota:update"
-	ActionOrgQuotaDelete = "org.quota:delete"
+	ActionOrgQuotaRead   = "quota_read"
+	ActionOrgQuotaCreate = "quota_create"
+	ActionOrgQuotaUpdate = "quota_update"
+	ActionOrgQuotaDelete = "quota_delete"
 
-	ActionOrgUserRead   = "org.user:read"
-	ActionOrgUserCreate = "org.user:create"
-	ActionOrgUserUpdate = "org.user:update"
-	ActionOrgUserDelete = "org.user:delete"
+	ActionOrgUserRead   = "user_read"
+	ActionOrgUserCreate = "user_create"
+	ActionOrgUserUpdate = "user_update"
+	ActionOrgUserDelete = "user_delete"
 
 	// workspace actions
-	ActionWorkspaceList   = "workspace:list"
-	ActionWorkspaceRead   = "workspace:read"
-	ActionWorkspaceCreate = "workspace:create"
-	ActionWorkspaceUpdate = "workspace:update"
-	ActionWorkspaceDelete = "workspace:delete"
+	ActionWorkspaceList   = "list"
+	ActionWorkspaceRead   = "read"
+	ActionWorkspaceCreate = "create"
+	ActionWorkspaceUpdate = "update"
+	ActionWorkspaceDelete = "delete"
 
-	ActionWorkspaceSettingsRead   = "workspace.settings:read"
-	ActionWorkspaceSettingsUpdate = "workspace.settings:update"
+	ActionWorkspaceSettingsRead   = "settings_read"
+	ActionWorkspaceSettingsUpdate = "settings_update"
 
-	ActionWorkspaceQuotaRead   = "workspace.quota:read"
-	ActionWorkspaceQuotaCreate = "workspace.quota:create"
-	ActionWorkspaceQuotaUpdate = "workspace.quota:update"
-	ActionWorkspaceQuotaDelete = "workspace.quota:delete"
+	ActionWorkspaceQuotaRead   = "quota_read"
+	ActionWorkspaceQuotaCreate = "quota_create"
+	ActionWorkspaceQuotaUpdate = "quota_update"
+	ActionWorkspaceQuotaDelete = "quota_delete"
 
-	ActionWorkspaceUserRead   = "workspace.user:read"
-	ActionWorkspaceUserCreate = "workspace.user:create"
-	ActionWorkspaceUserUpdate = "workspace.user:update"
-	ActionWorkspaceUserDelete = "workspace.user:delete"
+	ActionWorkspaceUserRead   = "user_read"
+	ActionWorkspaceUserCreate = "user_create"
+	ActionWorkspaceUserUpdate = "user_update"
+	ActionWorkspaceUserDelete = "user_delete"
 
 	// project actions
-	ActionProjectList   = "project:list"
-	ActionProjectRead   = "project:read"
-	ActionProjectCreate = "project:create"
-	ActionProjectUpdate = "project:update"
-	ActionProjectDelete = "project:delete"
+	ActionProjectList   = "list"
+	ActionProjectRead   = "read"
+	ActionProjectCreate = "create"
+	ActionProjectUpdate = "update"
+	ActionProjectDelete = "delete"
 
-	ActionProjectSettingsRead   = "project.settings:read"
-	ActionProjectSettingsUpdate = "project.settings:update"
+	ActionProjectSettingsRead   = "settings_read"
+	ActionProjectSettingsUpdate = "settings_update"
 
-	ActionProjectQuotaRead   = "project.quota:read"
-	ActionProjectQuotaCreate = "project.quota:create"
-	ActionProjectQuotaUpdate = "project.quota:update"
-	ActionProjectQuotaDelete = "project.quota:delete"
+	ActionProjectQuotaRead   = "quota_read"
+	ActionProjectQuotaCreate = "quota_create"
+	ActionProjectQuotaUpdate = "quota_update"
+	ActionProjectQuotaDelete = "quota_delete"
 
-	ActionProjectUserRead   = "project.user:read"
-	ActionProjectUserCreate = "project.user:create"
-	ActionProjectUserUpdate = "project.user:update"
-	ActionProjectUserDelete = "project.user:delete"
+	ActionProjectUserRead   = "user_read"
+	ActionProjectUserCreate = "user_create"
+	ActionProjectUserUpdate = "user_update"
+	ActionProjectUserDelete = "user_delete"
 )
 
 type OrgMember struct {
@@ -210,6 +210,11 @@ type GrantUserAccessCommand struct {
 
 type RevokeUserAccessCommand struct {
 	UserId int32
+	RoleId int32
+
+	OrgId       int32
+	WorkspaceId int32
+	ProjectId   int32
 }
 
 ////////////////////////////////////////////
