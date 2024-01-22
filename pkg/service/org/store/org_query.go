@@ -172,6 +172,8 @@ SELECT
     "updatedBy"
 FROM 
     "system"."Organization"
+WHERE 
+    "id" IN (@orgIds)
 %s	
 `
 
@@ -179,12 +181,15 @@ FROM
 func (store *orgStore) GetOrgList(ctx context.Context, query *org.GetOrgListQuery) ([]*model.Org, error) {
 	var finalQuery strings.Builder
 	if query.Visibility == model.PublicVisibility || query.Visibility == model.PrivateVisibility {
-		finalQuery.WriteString(fmt.Sprintf(listOrgsQuery, `WHERE "visibility" = @visibility;`))
+		finalQuery.WriteString(fmt.Sprintf(listOrgsQuery, `AND "visibility" = @visibility;`))
 	} else {
 		finalQuery.WriteString(fmt.Sprintf(listOrgsQuery, ";"))
 	}
 
-	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{"visibility": query.Visibility})
+	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{
+		"orgIds":     query.OrgIdList,
+		"visibility": query.Visibility,
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
 		return nil, err
