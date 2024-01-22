@@ -13,8 +13,13 @@ import (
 
 func (s *WorkspaceApi) createWorkspace(ctx *gin.Context, cmd *workspace.CreateWorkspaceCommand) api.Response {
 	// check permissions
-	if err := s.evaluateCreatePermission(ctx, accesscontrol.ActionWorkspaceCreate, cmd.OrgId); err != nil {
+	access, err := s.evaluateCreatePermission(ctx, accesscontrol.ActionWorkspaceCreate, cmd.OrgId)
+	if err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
+	}
+	if !access {
+		// unauthorized user (permission denied) => return org not found error
+		return api.Error(http.StatusNotFound, workspace.ErrWorkspaceNotFound) // TODO: change status code and error
 	}
 
 	// check quotas
@@ -33,11 +38,16 @@ func (s *WorkspaceApi) createWorkspace(ctx *gin.Context, cmd *workspace.CreateWo
 
 func (s *WorkspaceApi) updateWorkspaceById(ctx *gin.Context, cmd *workspace.UpdateWorkspaceByIdCommand) api.Response {
 	// check permissions
-	if err := s.evaluatePermission(ctx, accesscontrol.ActionProjectUpdate, cmd.OrgId, cmd.WorkspaceId); err != nil {
+	access, err := s.evaluatePermission(ctx, accesscontrol.ActionProjectUpdate, cmd.OrgId, cmd.WorkspaceId)
+	if err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
 	}
+	if !access {
+		// unauthorized user (permission denied) => return org not found error
+		return api.Error(http.StatusNotFound, workspace.ErrWorkspaceNotFound) // TODO: change status code
+	}
 
-	err := s.workspaceService.UpdateWorkspaceById(ctx, cmd)
+	err = s.workspaceService.UpdateWorkspaceById(ctx, cmd)
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
@@ -47,11 +57,16 @@ func (s *WorkspaceApi) updateWorkspaceById(ctx *gin.Context, cmd *workspace.Upda
 
 func (s *WorkspaceApi) deleteWorkspaceById(ctx *gin.Context, cmd *workspace.DeleteWorkspaceByIdCommand) api.Response {
 	// check permissions
-	if err := s.evaluatePermission(ctx, accesscontrol.ActionProjectDelete, cmd.OrgId, cmd.WorkspaceId); err != nil {
+	access, err := s.evaluatePermission(ctx, accesscontrol.ActionProjectDelete, cmd.OrgId, cmd.WorkspaceId)
+	if err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
 	}
+	if !access {
+		// unauthorized user (permission denied) => return org not found error
+		return api.Error(http.StatusNotFound, workspace.ErrWorkspaceNotFound) // TODO: change status code
+	}
 
-	err := s.workspaceService.DeleteWorkspaceById(ctx, cmd)
+	err = s.workspaceService.DeleteWorkspaceById(ctx, cmd)
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
@@ -59,23 +74,25 @@ func (s *WorkspaceApi) deleteWorkspaceById(ctx *gin.Context, cmd *workspace.Dele
 	return api.Success(http.StatusNoContent, nil)
 }
 
-func (s *WorkspaceApi) evaluateCreatePermission(ctx *gin.Context, permission string, orgId int) error {
+func (s *WorkspaceApi) evaluateCreatePermission(ctx *gin.Context, permission string, orgId int32) (bool, error) {
 	user := contextdata.GetUser(ctx)
-	query := &accesscontrol.EvaluateFilterQuery{
-		UserId: user.GetId(),
-		OrgId:  orgId,
+	query := &accesscontrol.EvaluateQuery{
+		Permission: permission,
+		UserId:     user.GetId(),
+		OrgId:      orgId,
 	}
 
-	return s.aclService.Evaluate(ctx, permission, query)
+	return s.aclService.EvaluateUserAccess(ctx, query)
 }
 
-func (s *WorkspaceApi) evaluatePermission(ctx *gin.Context, permission string, orgId, workspaceId int) error {
+func (s *WorkspaceApi) evaluatePermission(ctx *gin.Context, permission string, orgId, workspaceId int32) (bool, error) {
 	user := contextdata.GetUser(ctx)
-	query := &accesscontrol.EvaluateFilterQuery{
+	query := &accesscontrol.EvaluateQuery{
+		Permission:  permission,
 		UserId:      user.GetId(),
 		OrgId:       orgId,
 		WorkspaceId: workspaceId,
 	}
 
-	return s.aclService.Evaluate(ctx, permission, query)
+	return s.aclService.EvaluateUserAccess(ctx, query)
 }
