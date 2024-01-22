@@ -26,7 +26,7 @@ WHERE
     "projectId" = @projectId;
 `
 
-func (store *tableBranchStore) ListTableBranches(ctx context.Context, projectId int) ([]table_branch.TableBranch, error) {
+func (store *tableBranchStore) ListTableBranches(ctx context.Context, projectId int32) ([]table_branch.TableBranch, error) {
 	rows, err := store.Conn.Query(ctx, listTableBranchesQuery, pgx.NamedArgs{"projectId": projectId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
@@ -82,7 +82,7 @@ AND
     "projectId" = @projectId;
 `
 
-func (store *tableBranchStore) GetTableBranchById(ctx context.Context, projectId int, branchId int) (*table_branch.TableBranch, error) {
+func (store *tableBranchStore) GetTableBranchById(ctx context.Context, projectId int32, branchId int32) (*table_branch.TableBranch, error) {
 	row := store.Conn.QueryRow(ctx, getTableBranchByIdQuery, pgx.NamedArgs{
 		"projectId": projectId,
 		"id":        branchId,
