@@ -34,7 +34,7 @@ RETURNING
     "createdBy";
 `
 
-func (store *tableBranchStore) CreateTableBranch(ctx context.Context, projectId int, branch *table_branch.TableBranch) (*table_branch.TableBranch, error) {
+func (store *tableBranchStore) CreateTableBranch(ctx context.Context, projectId int32, branch *table_branch.TableBranch) (*table_branch.TableBranch, error) {
 	commandTag, err := store.Conn.Exec(
 		ctx,
 		createTableBranchMutation,
@@ -75,7 +75,7 @@ AND
     "projectId" = @projectId;
 `
 
-func (store *tableBranchStore) UpdateTableBranchById(ctx context.Context, projectId int, branchId int, branch *table_branch.TableBranch) error {
+func (store *tableBranchStore) UpdateTableBranchById(ctx context.Context, projectId int32, branchId int32, branch *table_branch.TableBranch) error {
 	commandTag, err := store.Conn.Exec(
 		ctx,
 		updateTableBranchByIdMutation,
@@ -113,7 +113,7 @@ AND
     "projectId" = @projectId;
 `
 
-func (store *tableBranchStore) DeleteTableBranchById(ctx context.Context, projectId int, branchId int) error {
+func (store *tableBranchStore) DeleteTableBranchById(ctx context.Context, projectId int32, branchId int32) error {
 	commandTag, err := store.Conn.Exec(ctx, deleteTableBranchByIdMutation, pgx.NamedArgs{
 		"projectId": projectId,
 		"id":        branchId,
