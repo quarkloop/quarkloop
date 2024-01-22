@@ -9,8 +9,8 @@ import (
 
 type QuotaStore interface {
 	// allocation quotas
-	GetQuotasByUserId(context.Context, int) (quota.Quota, error)
-	GetQuotasByOrgId(context.Context, int) ([]quota.Quota, error)
+	GetQuotasByUserId(context.Context, int32) (quota.Quota, error)
+	GetQuotasByOrgId(context.Context, int32) ([]quota.Quota, error)
 
 	// quota overrides
 	UpdateQuotaLimits(context.Context, int, QuoataLimit) error
