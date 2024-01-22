@@ -34,19 +34,20 @@ func (s *ProjectApi) getProjectById(ctx *gin.Context, query *project.GetProjectB
 	if isPrivate {
 		user := contextdata.GetUser(ctx)
 		// check permissions
-		query := &accesscontrol.EvaluateFilterQuery{
+		evalQuery := &accesscontrol.EvaluateQuery{
+			Permission:  accesscontrol.ActionProjectRead,
 			UserId:      user.GetId(),
 			OrgId:       query.OrgId,
 			WorkspaceId: query.WorkspaceId,
 			ProjectId:   query.ProjectId,
 		}
-		if err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectRead, query); err != nil {
-			if err == accesscontrol.ErrPermissionDenied {
-				// unauthorized user (permission denied) => return project not found error
-				return api.Error(http.StatusNotFound, project.ErrProjectNotFound) // TODO: change status code
-			}
-
+		access, err := s.aclService.EvaluateUserAccess(ctx, evalQuery)
+		if err != nil {
 			return api.Error(http.StatusInternalServerError, err)
+		}
+		if !access {
+			// unauthorized user (permission denied) => return project not found error
+			return api.Error(http.StatusNotFound, project.ErrProjectNotFound) // TODO: change status code
 		}
 	}
 
@@ -68,15 +69,21 @@ func (s *ProjectApi) getProjectList(ctx *gin.Context) api.Response {
 	if !contextdata.IsUserAnonymous(ctx) {
 		// check permissions
 		user := contextdata.GetUser(ctx)
-		evalQuery := &accesscontrol.EvaluateFilterQuery{UserId: user.GetId()}
-		if err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectList, evalQuery); err != nil {
-			if err != accesscontrol.ErrPermissionDenied {
-				return api.Error(http.StatusInternalServerError, err)
-			}
-		} else {
-			query.UserId = user.GetId()
-			query.Visibility = model.AllVisibility
+		evalQuery := &accesscontrol.EvaluateQuery{
+			Permission: accesscontrol.ActionProjectList,
+			UserId:     user.GetId(),
 		}
+		access, err := s.aclService.EvaluateUserAccess(ctx, evalQuery)
+		if err != nil {
+			return api.Error(http.StatusInternalServerError, err)
+		}
+		if !access {
+			// unauthorized user (permission denied) => return project not found error
+			return api.Error(http.StatusNotFound, project.ErrProjectNotFound) // TODO: change status code
+		}
+
+		query.UserId = user.GetId()
+		query.Visibility = model.AllVisibility
 	}
 
 	projectList, err := s.projectService.GetProjectList(ctx, query)
@@ -112,19 +119,20 @@ func (s *ProjectApi) getMemberList(ctx *gin.Context, query *project.GetMemberLis
 	if isPrivate {
 		user := contextdata.GetUser(ctx)
 		// check permissions
-		query := &accesscontrol.EvaluateFilterQuery{
+		evalQuery := &accesscontrol.EvaluateQuery{
+			Permission:  accesscontrol.ActionWorkspaceUserRead,
 			UserId:      user.GetId(),
 			OrgId:       query.OrgId,
 			WorkspaceId: query.WorkspaceId,
 			ProjectId:   query.ProjectId,
 		}
-		if err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceUserRead, query); err != nil {
-			if err == accesscontrol.ErrPermissionDenied {
-				// unauthorized user (permission denied) => return project not found error
-				return api.Error(http.StatusNotFound, project.ErrProjectNotFound) // TODO: change status code
-			}
-
+		access, err := s.aclService.EvaluateUserAccess(ctx, evalQuery)
+		if err != nil {
 			return api.Error(http.StatusInternalServerError, err)
+		}
+		if !access {
+			// unauthorized user (permission denied) => return project not found error
+			return api.Error(http.StatusNotFound, project.ErrProjectNotFound) // TODO: change status code
 		}
 	}
 
