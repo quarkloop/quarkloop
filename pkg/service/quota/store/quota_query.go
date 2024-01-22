@@ -132,7 +132,7 @@ CROSS JOIN
     jsonb_each_text(to_jsonb(metrics)) as cols(feature, metric);
 `
 
-func (store *quotaStore) GetQuotasByUserId(ctx context.Context, userId int) (quota.Quota, error) {
+func (store *quotaStore) GetQuotasByUserId(ctx context.Context, userId int32) (quota.Quota, error) {
 	row := store.Conn.QueryRow(ctx, getQuotasByUserIdQuery, pgx.NamedArgs{
 		"userId": userId,
 	})
@@ -172,7 +172,7 @@ CROSS JOIN
     jsonb_each_text(to_jsonb(metrics)) as cols(feature, metric);
 `
 
-func (store *quotaStore) GetQuotasByOrgId(ctx context.Context, orgId int) ([]quota.Quota, error) {
+func (store *quotaStore) GetQuotasByOrgId(ctx context.Context, orgId int32) ([]quota.Quota, error) {
 	rows, err := store.Conn.Query(ctx, getQuotasByOrgIdQuery, pgx.NamedArgs{
 		"orgId": orgId,
 	})
