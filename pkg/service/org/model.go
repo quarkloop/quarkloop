@@ -13,7 +13,7 @@ var (
 )
 
 type GetOrgListQuery struct {
-	UserId     int32
+	OrgIdList  []int32
 	Visibility model.ScopeVisibility
 }
 
