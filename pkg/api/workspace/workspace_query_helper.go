@@ -34,17 +34,19 @@ func (s *WorkspaceApi) getWorkspaceById(ctx *gin.Context, query *workspace.GetWo
 	if isPrivate {
 		user := contextdata.GetUser(ctx)
 		// check permissions
-		query := &accesscontrol.EvaluateFilterQuery{
+		query := &accesscontrol.EvaluateQuery{
+			Permission:  accesscontrol.ActionWorkspaceRead,
 			UserId:      user.GetId(),
 			OrgId:       query.OrgId,
 			WorkspaceId: query.WorkspaceId,
 		}
-		if err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceRead, query); err != nil {
-			if err == accesscontrol.ErrPermissionDenied {
-				// unauthorized user (permission denied) => return workspace not found error
-				return api.Error(http.StatusNotFound, workspace.ErrWorkspaceNotFound)
-			}
+		access, err := s.aclService.EvaluateUserAccess(ctx, query)
+		if err != nil {
 			return api.Error(http.StatusInternalServerError, err)
+		}
+		if !access {
+			// unauthorized user (permission denied) => return workspace not found error
+			return api.Error(http.StatusNotFound, workspace.ErrWorkspaceNotFound)
 		}
 	}
 
@@ -66,15 +68,21 @@ func (s *WorkspaceApi) getWorkspaceList(ctx *gin.Context) api.Response {
 	if !contextdata.IsUserAnonymous(ctx) {
 		// check permissions
 		user := contextdata.GetUser(ctx)
-		evalQuery := &accesscontrol.EvaluateFilterQuery{UserId: user.GetId()}
-		if err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceList, evalQuery); err != nil {
-			if err != accesscontrol.ErrPermissionDenied {
-				return api.Error(http.StatusInternalServerError, err)
-			}
-		} else {
-			query.UserId = user.GetId()
-			query.Visibility = model.AllVisibility
+		evalQuery := &accesscontrol.EvaluateQuery{
+			Permission: accesscontrol.ActionWorkspaceList,
+			UserId:     user.GetId(),
 		}
+		access, err := s.aclService.EvaluateUserAccess(ctx, evalQuery)
+		if err != nil {
+			return api.Error(http.StatusInternalServerError, err)
+		}
+		if !access {
+			// unauthorized user (permission denied) => return workspace not found error
+			return api.Error(http.StatusNotFound, workspace.ErrWorkspaceNotFound)
+		}
+
+		query.UserId = user.GetId()
+		query.Visibility = model.AllVisibility
 	}
 
 	wsList, err := s.workspaceService.GetWorkspaceList(ctx, query)
@@ -97,14 +105,20 @@ func (s *WorkspaceApi) getProjectList(ctx *gin.Context, query *workspace.GetProj
 	if !contextdata.IsUserAnonymous(ctx) {
 		// check permissions
 		user := contextdata.GetUser(ctx)
-		evalQuery := &accesscontrol.EvaluateFilterQuery{UserId: user.GetId()}
-		if err := s.aclService.Evaluate(ctx, accesscontrol.ActionProjectList, evalQuery); err != nil {
-			if err != accesscontrol.ErrPermissionDenied {
-				return api.Error(http.StatusInternalServerError, err)
-			}
-		} else {
-			getProjectListQuery.Visibility = model.AllVisibility
+		evalQuery := &accesscontrol.EvaluateQuery{
+			Permission: accesscontrol.ActionProjectList,
+			UserId:     user.GetId(),
 		}
+		access, err := s.aclService.EvaluateUserAccess(ctx, evalQuery)
+		if err != nil {
+			return api.Error(http.StatusInternalServerError, err)
+		}
+		if !access {
+			// unauthorized user (permission denied) => return workspace not found error
+			return api.Error(http.StatusNotFound, workspace.ErrWorkspaceNotFound)
+		}
+
+		getProjectListQuery.Visibility = model.AllVisibility
 	}
 
 	projectList, err := s.workspaceService.GetProjectList(ctx, getProjectListQuery)
@@ -139,18 +153,19 @@ func (s *WorkspaceApi) getMemberList(ctx *gin.Context, query *workspace.GetMembe
 	if isPrivate {
 		user := contextdata.GetUser(ctx)
 		// check permissions
-		query := &accesscontrol.EvaluateFilterQuery{
+		evalQuery := &accesscontrol.EvaluateQuery{
+			Permission:  accesscontrol.ActionWorkspaceUserRead,
 			UserId:      user.GetId(),
 			OrgId:       query.OrgId,
 			WorkspaceId: query.WorkspaceId,
 		}
-		if err := s.aclService.Evaluate(ctx, accesscontrol.ActionWorkspaceUserRead, query); err != nil {
-			if err == accesscontrol.ErrPermissionDenied {
-				// unauthorized user (permission denied) => return workspace not found error
-				return api.Error(http.StatusNotFound, workspace.ErrWorkspaceNotFound) // TODO: change status code
-			}
-
+		access, err := s.aclService.EvaluateUserAccess(ctx, evalQuery)
+		if err != nil {
 			return api.Error(http.StatusInternalServerError, err)
+		}
+		if !access {
+			// unauthorized user (permission denied) => return workspace not found error
+			return api.Error(http.StatusNotFound, workspace.ErrWorkspaceNotFound)
 		}
 	}
 
