@@ -5,7 +5,7 @@ import (
 )
 
 type TableBranch struct {
-	Id          int    `json:"id,omitempty"`
+	Id          int32  `json:"id,omitempty"`
 	Name        string `json:"name,omitempty"`
 	Default     bool   `json:"default,omitempty"`
 	Type        string `json:"type,omitempty"`
@@ -19,26 +19,26 @@ type TableBranch struct {
 }
 
 type GetTableBranchListParams struct {
-	ProjectId int
+	ProjectId int32
 }
 
 type GetTableBranchByIdParams struct {
-	ProjectId int
-	BranchId  int
+	ProjectId int32
+	BranchId  int32
 }
 
 type CreateTableBranchParams struct {
-	ProjectId int
+	ProjectId int32
 	Branch    *TableBranch
 }
 
 type UpdateTableBranchByIdParams struct {
-	ProjectId int
-	BranchId  int
+	ProjectId int32
+	BranchId  int32
 	Branch    *TableBranch
 }
 
 type DeleteTableBranchByIdParams struct {
-	ProjectId int
-	BranchId  int
+	ProjectId int32
+	BranchId  int32
 }
