@@ -3,6 +3,8 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"flag"
+	"log"
 	"net/http"
 	"time"
 
@@ -19,10 +21,6 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/api/workspace"
 	"github.com/quarkloop/quarkloop/pkg/contextdata"
 	acl_impl "github.com/quarkloop/quarkloop/pkg/service/accesscontrol/impl"
-	acl_store "github.com/quarkloop/quarkloop/pkg/service/accesscontrol/store"
-	orgService "github.com/quarkloop/quarkloop/pkg/service/org"
-	org_impl "github.com/quarkloop/quarkloop/pkg/service/org/impl"
-	org_store "github.com/quarkloop/quarkloop/pkg/service/org/store"
 	project_impl "github.com/quarkloop/quarkloop/pkg/service/project/impl"
 	project_store "github.com/quarkloop/quarkloop/pkg/service/project/store"
 	project_submission_impl "github.com/quarkloop/quarkloop/pkg/service/project_submission/impl"
@@ -40,13 +38,21 @@ import (
 	ws_impl "github.com/quarkloop/quarkloop/pkg/service/workspace/impl"
 	ws_store "github.com/quarkloop/quarkloop/pkg/service/workspace/store"
 	"github.com/quarkloop/quarkloop/pkg/store/repository"
+	"github.com/quarkloop/quarkloop/service/system"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+)
+
+var (
+	authzServiceAddr = flag.String("authzServiceAddr", "localhost:50051", "the address to connect to")
+	orgServiceAddr   = flag.String("orgServiceAddr", "localhost:50095", "the address to connect to")
 )
 
 type Server struct {
 	router    *gin.Engine
 	dataStore *repository.Repository
 
-	orgService orgService.Service
+	orgService system.OrgServiceClient
 
 	userApi              user.Api
 	orgApi               org.Api
@@ -59,10 +65,12 @@ type Server struct {
 }
 
 func NewDefaultServer(ds *repository.Repository) Server {
+	//gin.SetMode("release")
 	router := gin.Default()
 	router.RedirectFixedPath = false
 	router.RedirectTrailingSlash = true
 	router.RemoveExtraSlash = true
+	router.Use(gin.Recovery())
 
 	router.Use(cors.New(cors.Config{
 		AllowCredentials: true,
@@ -83,15 +91,25 @@ func NewDefaultServer(ds *repository.Repository) Server {
 		MaxAge:        12 * time.Hour,
 	}))
 
+	_, err := grpc.Dial(*authzServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("[grpc][authz] could not connect: %v", err)
+	}
+
+	orgServiceConn, err := grpc.Dial(*orgServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("[grpc][org] could not connect: %v", err)
+	}
+
 	userService := user_impl.NewUserService(user_store.NewUserStore(ds.AuthDbConn))
-	aclService := acl_impl.NewAccessControlService(acl_store.NewAccessControlStore(ds.SystemDbConn))
+	aclService := acl_impl.NewAccessControlService()
 	quotaService := quota_impl.NewQuotaService(quota_store.NewQuotaStore(ds.SystemDbConn))
 
 	tableBranchService := table_branch_impl.NewTableBranchService(table_branch_store.NewTableBranchStore(ds.ProjectDbConn))
 	tableSchemaService := table_schema_impl.NewTableSchemaService(table_schema_store.NewTableSchemaStore(ds.ProjectDbConn))
 	tableRecordService := table_record_impl.NewTableRecordService(table_record_store.NewTableRecordStore(ds.ProjectDbConn))
 
-	orgService := org_impl.NewOrgService(org_store.NewOrgStore(ds.SystemDbConn))
+	orgService := system.NewOrgServiceClient(orgServiceConn)
 	workspaceService := ws_impl.NewWorkspaceService(ws_store.NewWorkspaceStore(ds.SystemDbConn))
 	projectTableService := project_impl.NewProjectService(project_store.NewProjectStore(ds.SystemDbConn))
 
@@ -155,25 +173,25 @@ func (s *Server) AbortAnonymousUserRequest(ctx *gin.Context) {
 }
 
 // TODO: rewrite
-func (s *Server) ValidateOrgIdUriParam(ctx *gin.Context) {
-	type OrgIdUriParam struct {
-		OrgId int `uri:"orgId" binding:"required"`
-	}
+// func (s *Server) ValidateOrgIdUriParam(ctx *gin.Context) {
+// 	type OrgIdUriParam struct {
+// 		OrgId int `uri:"orgId" binding:"required"`
+// 	}
 
-	uriParam := &OrgIdUriParam{}
-	if err := ctx.ShouldBindUri(&uriParam); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
-		return
-	}
+// 	uriParam := &OrgIdUriParam{}
+// 	if err := ctx.ShouldBindUri(&uriParam); err != nil {
+// 		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+// 		return
+// 	}
 
-	_, err := s.orgService.GetOrgById(ctx, &orgService.GetOrgByIdQuery{OrgId: uriParam.OrgId})
-	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, "org not found")
-		return
-	}
+// 	_, err := s.orgService.GetOrgById(ctx, &orgService.GetOrgByIdQuery{OrgId: uriParam.OrgId})
+// 	if err != nil {
+// 		ctx.AbortWithStatusJSON(http.StatusNotFound, "org not found")
+// 		return
+// 	}
 
-	ctx.Next()
-}
+// 	ctx.Next()
+// }
 
 func (s *Server) TODOHandler(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "This is a TODO handler")
