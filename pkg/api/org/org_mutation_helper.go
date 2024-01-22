@@ -15,8 +15,13 @@ import (
 
 func (s *orgApi) createOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) api.Response {
 	// check permissions
-	if err := s.evaluateCreatePermission(ctx, accesscontrol.ActionOrgCreate); err != nil {
+	access, err := s.evaluateCreatePermission(ctx, accesscontrol.ActionOrgCreate)
+	if err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
+	}
+	if !access {
+		// unauthorized user (permission denied) => return org not found error
+		return api.Error(http.StatusNotFound, org.ErrOrgNotFound) // TODO: change status code and error
 	}
 
 	// check quotas
@@ -42,11 +47,16 @@ func (s *orgApi) createOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) api.Resp
 
 func (s *orgApi) updateOrgById(ctx *gin.Context, cmd *org.UpdateOrgByIdCommand) api.Response {
 	// check permissions
-	if err := s.evaluatePermission(ctx, accesscontrol.ActionProjectUpdate, cmd.OrgId); err != nil {
+	access, err := s.evaluatePermission(ctx, accesscontrol.ActionProjectUpdate, cmd.OrgId)
+	if err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
 	}
+	if !access {
+		// unauthorized user (permission denied) => return org not found error
+		return api.Error(http.StatusNotFound, org.ErrOrgNotFound) // TODO: change status code
+	}
 
-	_, err := s.orgService.UpdateOrgById(ctx, &system.UpdateOrgByIdCommand{
+	_, err = s.orgService.UpdateOrgById(ctx, &system.UpdateOrgByIdCommand{
 		OrgId:       cmd.OrgId,
 		UpdatedBy:   cmd.UpdatedBy,
 		ScopeId:     cmd.ScopeId,
@@ -63,11 +73,16 @@ func (s *orgApi) updateOrgById(ctx *gin.Context, cmd *org.UpdateOrgByIdCommand) 
 
 func (s *orgApi) deleteOrgById(ctx *gin.Context, cmd *org.DeleteOrgByIdCommand) api.Response {
 	// check permissions
-	if err := s.evaluatePermission(ctx, accesscontrol.ActionProjectDelete, cmd.OrgId); err != nil {
+	access, err := s.evaluatePermission(ctx, accesscontrol.ActionProjectDelete, cmd.OrgId)
+	if err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
 	}
+	if !access {
+		// unauthorized user (permission denied) => return org not found error
+		return api.Error(http.StatusNotFound, org.ErrOrgNotFound) // TODO: change status code
+	}
 
-	_, err := s.orgService.DeleteOrgById(ctx, &system.DeleteOrgByIdCommand{OrgId: cmd.OrgId})
+	_, err = s.orgService.DeleteOrgById(ctx, &system.DeleteOrgByIdCommand{OrgId: cmd.OrgId})
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
@@ -75,7 +90,7 @@ func (s *orgApi) deleteOrgById(ctx *gin.Context, cmd *org.DeleteOrgByIdCommand) 
 	return api.Success(http.StatusNoContent, nil)
 }
 
-func (s *orgApi) evaluateCreatePermission(ctx *gin.Context, permission string) error {
+func (s *orgApi) evaluateCreatePermission(ctx *gin.Context, permission string) (bool, error) {
 	user := contextdata.GetUser(ctx)
 	query := &accesscontrol.EvaluateQuery{
 		Permission: permission,
@@ -85,7 +100,7 @@ func (s *orgApi) evaluateCreatePermission(ctx *gin.Context, permission string) e
 	return s.aclService.EvaluateUserAccess(ctx, query)
 }
 
-func (s *orgApi) evaluatePermission(ctx *gin.Context, permission string, orgId int32) error {
+func (s *orgApi) evaluatePermission(ctx *gin.Context, permission string, orgId int32) (bool, error) {
 	user := contextdata.GetUser(ctx)
 	query := &accesscontrol.EvaluateQuery{
 		Permission: permission,
