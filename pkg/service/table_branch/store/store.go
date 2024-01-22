@@ -8,11 +8,11 @@ import (
 )
 
 type TableBranchStore interface {
-	ListTableBranches(ctx context.Context, projectId int) ([]table_branch.TableBranch, error)
-	GetTableBranchById(ctx context.Context, projectId int, branchId int) (*table_branch.TableBranch, error)
-	CreateTableBranch(ctx context.Context, projectId int, branch *table_branch.TableBranch) (*table_branch.TableBranch, error)
-	UpdateTableBranchById(ctx context.Context, projectId int, branchId int, branch *table_branch.TableBranch) error
-	DeleteTableBranchById(ctx context.Context, projectId int, branchId int) error
+	ListTableBranches(ctx context.Context, projectId int32) ([]table_branch.TableBranch, error)
+	GetTableBranchById(ctx context.Context, projectId int32, branchId int32) (*table_branch.TableBranch, error)
+	CreateTableBranch(ctx context.Context, projectId int32, branch *table_branch.TableBranch) (*table_branch.TableBranch, error)
+	UpdateTableBranchById(ctx context.Context, projectId int32, branchId int32, branch *table_branch.TableBranch) error
+	DeleteTableBranchById(ctx context.Context, projectId int32, branchId int32) error
 }
 
 type tableBranchStore struct {
