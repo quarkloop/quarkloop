@@ -25,21 +25,21 @@ type AccessControlStore interface {
 	GetProjectMemberByUserId(context.Context, *accesscontrol.GetProjectMemberByUserIdQuery) (*accesscontrol.ProjectMember, error)
 
 	// member mutation
-	CreateOrgMember(context.Context, *accesscontrol.CreateOrgMemberCommand) (*accesscontrol.OrgMember, error)
-	UpdateOrgMemberById(context.Context, *accesscontrol.UpdateOrgMemberByIdCommand) error
-	DeleteOrgMemberById(context.Context, *accesscontrol.DeleteOrgMemberByIdCommand) error
-	CreateWorkspaceMember(context.Context, *accesscontrol.CreateWorkspaceMemberCommand) (*accesscontrol.WorkspaceMember, error)
-	UpdateWorkspaceMemberById(context.Context, *accesscontrol.UpdateWorkspaceMemberByIdCommand) error
-	DeleteWorkspaceMemberById(context.Context, *accesscontrol.DeleteWorkspaceMemberByIdCommand) error
-	CreateProjectMember(context.Context, *accesscontrol.CreateProjectMemberCommand) (*accesscontrol.ProjectMember, error)
-	UpdateProjectMemberById(context.Context, *accesscontrol.UpdateProjectMemberByIdCommand) error
-	DeleteProjectMemberById(context.Context, *accesscontrol.DeleteProjectMemberByIdCommand) error
+	// CreateOrgMember(context.Context, *accesscontrol.CreateOrgMemberCommand) (*accesscontrol.OrgMember, error)
+	// UpdateOrgMemberById(context.Context, *accesscontrol.UpdateOrgMemberByIdCommand) error
+	// DeleteOrgMemberById(context.Context, *accesscontrol.DeleteOrgMemberByIdCommand) error
+	// CreateWorkspaceMember(context.Context, *accesscontrol.CreateWorkspaceMemberCommand) (*accesscontrol.WorkspaceMember, error)
+	// UpdateWorkspaceMemberById(context.Context, *accesscontrol.UpdateWorkspaceMemberByIdCommand) error
+	// DeleteWorkspaceMemberById(context.Context, *accesscontrol.DeleteWorkspaceMemberByIdCommand) error
+	// CreateProjectMember(context.Context, *accesscontrol.CreateProjectMemberCommand) (*accesscontrol.ProjectMember, error)
+	// UpdateProjectMemberById(context.Context, *accesscontrol.UpdateProjectMemberByIdCommand) error
+	// DeleteProjectMemberById(context.Context, *accesscontrol.DeleteProjectMemberByIdCommand) error
 
 	// user role query and mutation
-	GetRoleList(context.Context) ([]*accesscontrol.Role, error)
-	GetRoleById(context.Context, *accesscontrol.GetRoleByIdQuery) (*accesscontrol.Role, error)
-	CreateRole(context.Context, *accesscontrol.CreateRoleCommand) (*accesscontrol.Role, error)
-	DeleteRoleById(context.Context, *accesscontrol.DeleteRoleByIdCommand) error
+	// GetRoleList(context.Context) ([]*accesscontrol.Role, error)
+	// GetRoleById(context.Context, *accesscontrol.GetRoleByIdQuery) (*accesscontrol.Role, error)
+	// CreateRole(context.Context, *accesscontrol.CreateRoleCommand) (*accesscontrol.Role, error)
+	// DeleteRoleById(context.Context, *accesscontrol.DeleteRoleByIdCommand) error
 }
 
 type accessControlStore struct {
