@@ -17,8 +17,13 @@ func (s *ProjectApi) createProject(ctx *gin.Context, cmd *project.CreateProjectC
 	user := contextdata.GetUser(ctx)
 
 	// check permissions
-	if err := s.evaluateCreatePermission(ctx, accesscontrol.ActionProjectCreate, cmd.OrgId, cmd.WorkspaceId); err != nil {
+	access, err := s.evaluateCreatePermission(ctx, accesscontrol.ActionProjectCreate, cmd.OrgId, cmd.WorkspaceId)
+	if err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
+	}
+	if !access {
+		// unauthorized user (permission denied) => return project not found error
+		return api.Error(http.StatusNotFound, project.ErrProjectNotFound) // TODO: change status code and error
 	}
 
 	// check quotas
@@ -96,8 +101,13 @@ func (s *ProjectApi) createProject(ctx *gin.Context, cmd *project.CreateProjectC
 
 func (s *ProjectApi) updateProjectById(ctx *gin.Context, cmd *project.UpdateProjectByIdCommand) api.Response {
 	// check permissions
-	if err := s.evaluatePermission(ctx, accesscontrol.ActionProjectUpdate, cmd.OrgId, cmd.WorkspaceId, cmd.ProjectId); err != nil {
+	access, err := s.evaluatePermission(ctx, accesscontrol.ActionProjectUpdate, cmd.OrgId, cmd.WorkspaceId, cmd.ProjectId)
+	if err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
+	}
+	if !access {
+		// unauthorized user (permission denied) => return project not found error
+		return api.Error(http.StatusNotFound, project.ErrProjectNotFound) // TODO: change status code and error
 	}
 
 	if err := s.projectService.UpdateProjectById(ctx, cmd); err != nil {
@@ -109,8 +119,13 @@ func (s *ProjectApi) updateProjectById(ctx *gin.Context, cmd *project.UpdateProj
 
 func (s *ProjectApi) deleteProjectById(ctx *gin.Context, cmd *project.DeleteProjectByIdCommand) api.Response {
 	// check permissions
-	if err := s.evaluatePermission(ctx, accesscontrol.ActionProjectDelete, cmd.OrgId, cmd.WorkspaceId, cmd.ProjectId); err != nil {
+	access, err := s.evaluatePermission(ctx, accesscontrol.ActionProjectDelete, cmd.OrgId, cmd.WorkspaceId, cmd.ProjectId)
+	if err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
+	}
+	if !access {
+		// unauthorized user (permission denied) => return project not found error
+		return api.Error(http.StatusNotFound, project.ErrProjectNotFound) // TODO: change status code and error
 	}
 
 	if err := s.projectService.DeleteProjectById(ctx, cmd); err != nil {
@@ -120,25 +135,27 @@ func (s *ProjectApi) deleteProjectById(ctx *gin.Context, cmd *project.DeleteProj
 	return api.Success(http.StatusNoContent, nil)
 }
 
-func (s *ProjectApi) evaluateCreatePermission(ctx *gin.Context, permission string, orgId, workspaceId int) error {
+func (s *ProjectApi) evaluateCreatePermission(ctx *gin.Context, permission string, orgId, workspaceId int32) (bool, error) {
 	user := contextdata.GetUser(ctx)
-	query := &accesscontrol.EvaluateFilterQuery{
+	query := &accesscontrol.EvaluateQuery{
+		Permission:  permission,
 		UserId:      user.GetId(),
 		OrgId:       orgId,
 		WorkspaceId: workspaceId,
 	}
 
-	return s.aclService.Evaluate(ctx, permission, query)
+	return s.aclService.EvaluateUserAccess(ctx, query)
 }
 
-func (s *ProjectApi) evaluatePermission(ctx *gin.Context, permission string, orgId, workspaceId, projectId int) error {
+func (s *ProjectApi) evaluatePermission(ctx *gin.Context, permission string, orgId, workspaceId, projectId int32) (bool, error) {
 	user := contextdata.GetUser(ctx)
-	query := &accesscontrol.EvaluateFilterQuery{
+	query := &accesscontrol.EvaluateQuery{
+		Permission:  permission,
 		UserId:      user.GetId(),
 		OrgId:       orgId,
 		WorkspaceId: workspaceId,
 		ProjectId:   projectId,
 	}
 
-	return s.aclService.Evaluate(ctx, permission, query)
+	return s.aclService.EvaluateUserAccess(ctx, query)
 }
