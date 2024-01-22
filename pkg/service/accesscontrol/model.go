@@ -81,53 +81,16 @@ const (
 	ActionProjectUserDelete = "user_delete"
 )
 
-type OrgMember struct {
-	// id
-	Id     int32 `json:"id"`
-	UserId int32 `json:"userId"`
-	RoleId int32 `json:"userRoleId"`
-	OrgId  int32 `json:"orgId"`
-
-	// membership
-	ExpireDate *time.Time `json:"expireDate"`
-
-	// history
-	CreatedAt time.Time  `json:"createdAt"`
-	CreatedBy string     `json:"createdBy"`
-	UpdatedAt *time.Time `json:"updatedAt"`
-	UpdatedBy *string    `json:"updatedBy"`
-}
-
-type WorkspaceMember struct {
+type Member struct {
 	// id
 	Id          int32 `json:"id"`
 	UserId      int32 `json:"userId"`
-	RoleId      int32 `json:"userRoleId"`
+	OrgId       int32 `json:"orgId"`
 	WorkspaceId int32 `json:"workspaceId"`
+	ProjectId   int32 `json:"projectId"`
 
-	// membership
-	Type       int32      `json:"type"`
-	Source     *int32     `json:"source"`
-	ExpireDate *time.Time `json:"expireDate"`
-
-	// history
-	CreatedAt time.Time  `json:"createdAt"`
-	CreatedBy string     `json:"createdBy"`
-	UpdatedAt *time.Time `json:"updatedAt"`
-	UpdatedBy *string    `json:"updatedBy"`
-}
-
-type ProjectMember struct {
-	// id
-	Id        int32 `json:"id"`
-	UserId    int32 `json:"userId"`
-	RoleId    int32 `json:"userRoleId"`
-	ProjectId int32 `json:"projectId"`
-
-	// membership
-	Type       int32      `json:"type"`
-	Source     *int32     `json:"source"`
-	ExpireDate *time.Time `json:"expireDate"`
+	// data
+	Role string `json:"role"`
 
 	// history
 	CreatedAt time.Time  `json:"createdAt"`
@@ -135,6 +98,44 @@ type ProjectMember struct {
 	UpdatedAt *time.Time `json:"updatedAt"`
 	UpdatedBy *string    `json:"updatedBy"`
 }
+
+// type WorkspaceMember struct {
+// 	// id
+// 	Id          int32 `json:"id"`
+// 	UserId      int32 `json:"userId"`
+// 	RoleId      int32 `json:"userRoleId"`
+// 	WorkspaceId int32 `json:"workspaceId"`
+
+// 	// membership
+// 	Type       int32      `json:"type"`
+// 	Source     *int32     `json:"source"`
+// 	ExpireDate *time.Time `json:"expireDate"`
+
+// 	// history
+// 	CreatedAt time.Time  `json:"createdAt"`
+// 	CreatedBy string     `json:"createdBy"`
+// 	UpdatedAt *time.Time `json:"updatedAt"`
+// 	UpdatedBy *string    `json:"updatedBy"`
+// }
+
+// type ProjectMember struct {
+// 	// id
+// 	Id        int32 `json:"id"`
+// 	UserId    int32 `json:"userId"`
+// 	RoleId    int32 `json:"userRoleId"`
+// 	ProjectId int32 `json:"projectId"`
+
+// 	// membership
+// 	Type       int32      `json:"type"`
+// 	Source     *int32     `json:"source"`
+// 	ExpireDate *time.Time `json:"expireDate"`
+
+// 	// history
+// 	CreatedAt time.Time  `json:"createdAt"`
+// 	CreatedBy string     `json:"createdBy"`
+// 	UpdatedAt *time.Time `json:"updatedAt"`
+// 	UpdatedBy *string    `json:"updatedBy"`
+// }
 
 // type UserAssignment struct {
 // 	// id
@@ -215,6 +216,20 @@ type RevokeUserAccessCommand struct {
 	OrgId       int32
 	WorkspaceId int32
 	ProjectId   int32
+}
+
+////////////////////////////////////////////
+
+type GetOrgListQuery struct {
+	UserId int32
+}
+
+type GetWorkspaceListQuery struct {
+	UserId int32
+}
+
+type GetProjectListQuery struct {
+	UserId int32
 }
 
 ////////////////////////////////////////////
