@@ -9,7 +9,7 @@ import (
 )
 
 type ListTableBranchesUriParams struct {
-	ProjectId int `uri:"projectId" binding:"required"`
+	ProjectId int32 `uri:"projectId" binding:"required"`
 }
 
 func (s *TableBranchApi) ListTableBranches(ctx *gin.Context) {
@@ -33,8 +33,8 @@ func (s *TableBranchApi) ListTableBranches(ctx *gin.Context) {
 }
 
 type GetTableBranchByIdUriParams struct {
-	ProjectId int `uri:"projectId" binding:"required"`
-	BranchId  int `uri:"branchId" binding:"required"`
+	ProjectId int32 `uri:"projectId" binding:"required"`
+	BranchId  int32 `uri:"branchId" binding:"required"`
 }
 
 func (s *TableBranchApi) GetTableBranchById(ctx *gin.Context) {
