@@ -31,12 +31,12 @@ func (s *userService) GetPreferences(ctx context.Context, query *user.GetPrefere
 	return res, err
 }
 
-func (s *userService) GetSessions(ctx context.Context, query *user.GetSessionsQuery) ([]*user.UserSession, error) {
+func (s *userService) GetSessions(ctx context.Context, query *user.GetSessionsQuery) ([]*user.Session, error) {
 	res, err := s.store.GetSessions(ctx, query)
 	return res, err
 }
 
-func (s *userService) GetAccounts(ctx context.Context, query *user.GetAccountsQuery) ([]*user.UserAccount, error) {
+func (s *userService) GetAccounts(ctx context.Context, query *user.GetAccountsQuery) ([]*user.Account, error) {
 	res, err := s.store.GetAccounts(ctx, query)
 	return res, err
 }
@@ -66,12 +66,12 @@ func (s *userService) GetPreferencesByUserId(ctx context.Context, query *user.Ge
 	return res, err
 }
 
-func (s *userService) GetSessionsByUserId(ctx context.Context, query *user.GetSessionsByUserIdQuery) ([]*user.UserSession, error) {
+func (s *userService) GetSessionsByUserId(ctx context.Context, query *user.GetSessionsByUserIdQuery) ([]*user.Session, error) {
 	res, err := s.store.GetSessionsByUserId(ctx, query)
 	return res, err
 }
 
-func (s *userService) GetAccountsByUserId(ctx context.Context, query *user.GetAccountsByUserIdQuery) ([]*user.UserAccount, error) {
+func (s *userService) GetAccountsByUserId(ctx context.Context, query *user.GetAccountsByUserIdQuery) ([]*user.Account, error) {
 	res, err := s.store.GetAccountsByUserId(ctx, query)
 	return res, err
 }
