@@ -17,8 +17,8 @@ import (
 var (
 	ctx       context.Context
 	conn      *pgx.Conn
-	sessionId int
-	accountId int
+	sessionId int32
+	accountId int32
 )
 
 func init() {
