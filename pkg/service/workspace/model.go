@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/quarkloop/quarkloop/pkg/model"
-	"github.com/quarkloop/quarkloop/service/system"
+	"github.com/quarkloop/quarkloop/service/v1/system"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
