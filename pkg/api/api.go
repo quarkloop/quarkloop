@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/quarkloop/quarkloop/pkg/store/repository"
@@ -14,6 +15,14 @@ type ServerApi struct {
 
 func NewServerApi(ds *repository.Repository) ServerApi {
 	return ServerApi{dataStore: ds}
+}
+
+func AbortWithStatusJSON(ctx *gin.Context, code int, err error) {
+	if e, ok := err.(*strconv.NumError); ok && e.Func == "ParseInt" {
+		ctx.AbortWithStatusJSON(code, fmt.Errorf("field validation for '%s' failed", e.Num).Error())
+		return
+	}
+	ctx.AbortWithStatusJSON(code, err.Error())
 }
 
 type ErrorResponse struct {
