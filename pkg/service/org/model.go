@@ -49,7 +49,7 @@ type DeleteOrgByIdCommand struct {
 }
 
 type GetWorkspaceListQuery struct {
-	OrgId      int32 `uri:"orgId" binding:"required"`
+	OrgId      int32 `uri:"orgId" binding:"required,numeric"`
 	Visibility model.ScopeVisibility
 }
 
