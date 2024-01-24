@@ -10,7 +10,7 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
-	"github.com/quarkloop/quarkloop/service/system"
+	grpc "github.com/quarkloop/quarkloop/service/v1/system/org"
 )
 
 func (s *orgApi) createOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) api.Response {
@@ -31,7 +31,7 @@ func (s *orgApi) createOrg(ctx *gin.Context, cmd *org.CreateOrgCommand) api.Resp
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
 	}
 
-	org, err := s.orgService.CreateOrg(ctx, &system.CreateOrgCommand{
+	org, err := s.orgService.CreateOrg(ctx, &grpc.CreateOrgCommand{
 		CreatedBy:   cmd.CreatedBy,
 		ScopeId:     cmd.ScopeId,
 		Name:        cmd.Name,
@@ -56,7 +56,7 @@ func (s *orgApi) updateOrgById(ctx *gin.Context, cmd *org.UpdateOrgByIdCommand) 
 		return api.Error(http.StatusNotFound, org.ErrOrgNotFound) // TODO: change status code
 	}
 
-	_, err = s.orgService.UpdateOrgById(ctx, &system.UpdateOrgByIdCommand{
+	_, err = s.orgService.UpdateOrgById(ctx, &grpc.UpdateOrgByIdCommand{
 		OrgId:       cmd.OrgId,
 		UpdatedBy:   cmd.UpdatedBy,
 		ScopeId:     cmd.ScopeId,
@@ -82,7 +82,7 @@ func (s *orgApi) deleteOrgById(ctx *gin.Context, cmd *org.DeleteOrgByIdCommand) 
 		return api.Error(http.StatusNotFound, org.ErrOrgNotFound) // TODO: change status code
 	}
 
-	_, err = s.orgService.DeleteOrgById(ctx, &system.DeleteOrgByIdCommand{OrgId: cmd.OrgId})
+	_, err = s.orgService.DeleteOrgById(ctx, &grpc.DeleteOrgByIdCommand{OrgId: cmd.OrgId})
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
