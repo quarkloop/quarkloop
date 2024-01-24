@@ -17,7 +17,7 @@ import (
 	org_impl "github.com/quarkloop/quarkloop/pkg/service/org/impl"
 	"github.com/quarkloop/quarkloop/pkg/service/org/store"
 	"github.com/quarkloop/quarkloop/pkg/test"
-	"github.com/quarkloop/quarkloop/service/system"
+	system "github.com/quarkloop/quarkloop/service/v1/system/org"
 	"github.com/stretchr/testify/require"
 )
 
@@ -118,7 +118,7 @@ func TestMutationCreateOrg(t *testing.T) {
 func TestGetOrgList(t *testing.T) {
 	defer timer(t, "TestGetOrgList")()
 
-	resp, err := client.GetOrgList(ctx, &system.GetOrgListQuery{UserId: 0})
+	resp, err := client.GetOrgList(ctx, &system.GetOrgListQuery{OrgIdList: []int32{}})
 	if err != nil {
 		t.Fatalf("TestGetOrgList failed: %v", err)
 	}
