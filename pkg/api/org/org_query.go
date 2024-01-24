@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/quarkloop/quarkloop/pkg/api"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 )
 
@@ -21,7 +22,7 @@ import (
 func (s *orgApi) GetOrgById(ctx *gin.Context) {
 	query := &org.GetOrgByIdQuery{}
 	if err := ctx.ShouldBindUri(query); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
@@ -35,7 +36,6 @@ func (s *orgApi) GetOrgById(ctx *gin.Context) {
 //
 // Response status:
 // 200: StatusOK
-// 400: StatusBadRequest
 // 500: StatusInternalServerError
 
 func (s *orgApi) GetOrgList(ctx *gin.Context) {
@@ -55,7 +55,7 @@ func (s *orgApi) GetOrgList(ctx *gin.Context) {
 func (s *orgApi) GetWorkspaceList(ctx *gin.Context) {
 	query := &org.GetWorkspaceListQuery{}
 	if err := ctx.ShouldBindUri(query); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
@@ -75,7 +75,7 @@ func (s *orgApi) GetWorkspaceList(ctx *gin.Context) {
 func (s *orgApi) GetProjectList(ctx *gin.Context) {
 	query := &org.GetProjectListQuery{}
 	if err := ctx.ShouldBindUri(query); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
@@ -96,7 +96,7 @@ func (s *orgApi) GetProjectList(ctx *gin.Context) {
 func (s *orgApi) GetMemberList(ctx *gin.Context) {
 	query := &org.GetMemberListQuery{}
 	if err := ctx.ShouldBindUri(query); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
