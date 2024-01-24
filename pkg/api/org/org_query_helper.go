@@ -12,11 +12,12 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 	"github.com/quarkloop/quarkloop/pkg/service/user"
-	"github.com/quarkloop/quarkloop/service/system"
+	"github.com/quarkloop/quarkloop/service/v1/system"
+	grpc "github.com/quarkloop/quarkloop/service/v1/system/org"
 )
 
 func (s *orgApi) getOrgById(ctx *gin.Context, query *org.GetOrgByIdQuery) api.Response {
-	visibility, err := s.orgService.GetOrgVisibilityById(ctx, &system.GetOrgVisibilityByIdQuery{OrgId: query.OrgId})
+	visibility, err := s.orgService.GetOrgVisibilityById(ctx, &grpc.GetOrgVisibilityByIdQuery{OrgId: query.OrgId})
 	if err != nil {
 		if err == org.ErrOrgNotFound {
 			return api.Error(http.StatusNotFound, err)
@@ -48,7 +49,7 @@ func (s *orgApi) getOrgById(ctx *gin.Context, query *org.GetOrgByIdQuery) api.Re
 		}
 	}
 
-	o, err := s.orgService.GetOrgById(ctx, &system.GetOrgByIdQuery{OrgId: query.OrgId})
+	o, err := s.orgService.GetOrgById(ctx, &grpc.GetOrgByIdQuery{OrgId: query.OrgId})
 	if err != nil {
 		if err == org.ErrOrgNotFound {
 			return api.Error(http.StatusNotFound, err)
@@ -58,21 +59,23 @@ func (s *orgApi) getOrgById(ctx *gin.Context, query *org.GetOrgByIdQuery) api.Re
 
 	// anonymous and unauthorized user => return public org
 	// authorized user => return public or private org
-	return api.Success(http.StatusOK, o)
+	return api.Success(http.StatusOK, o.GetOrg())
 }
 
 func (s *orgApi) getOrgList(ctx *gin.Context) api.Response {
-	query := &system.GetOrgListQuery{Visibility: int32(model.PublicVisibility)}
+	query := &grpc.GetOrgListQuery{Visibility: int32(model.PublicVisibility)}
 	if !contextdata.IsUserAnonymous(ctx) {
 		// check permissions
 		user := contextdata.GetUser(ctx)
-		orgList, err := s.aclService.GetOrgList(ctx, &accesscontrol.GetOrgListQuery{UserId: user.GetId()})
+		list, err := s.aclService.GetOrgList(ctx, &accesscontrol.GetOrgListQuery{UserId: user.GetId()})
 		if err != nil {
 			return api.Error(http.StatusInternalServerError, err)
 		}
 
-		query.OrgIdList = orgList
-		query.Visibility = int32(model.AllVisibility)
+		if len(list) > 0 {
+			query.OrgIdList = list
+			query.Visibility = int32(model.AllVisibility)
+		}
 	}
 
 	orgList, err := s.orgService.GetOrgList(ctx, query)
@@ -83,12 +86,12 @@ func (s *orgApi) getOrgList(ctx *gin.Context) api.Response {
 	// anonymous user => return public orgs
 	// unauthorized user (permission denied) => return public orgs
 	// authorized user => return public + private orgs
-	return api.Success(http.StatusOK, &orgList)
+	return api.Success(http.StatusOK, transformGrpcSlice(orgList.OrgList))
 }
 
 func (s *orgApi) getWorkspaceList(ctx *gin.Context, query *org.GetWorkspaceListQuery) api.Response {
-	var authorizedWsList []int32 = []int32{}
-	queryPayload := &system.GetWorkspaceListQuery{
+	var authorizedList []int32 = []int32{}
+	queryPayload := &grpc.GetWorkspaceListQuery{
 		OrgId:      query.OrgId,
 		Visibility: int32(model.PublicVisibility),
 	}
@@ -101,8 +104,10 @@ func (s *orgApi) getWorkspaceList(ctx *gin.Context, query *org.GetWorkspaceListQ
 			return api.Error(http.StatusInternalServerError, err)
 		}
 
-		authorizedWsList = list
-		queryPayload.Visibility = int32(model.AllVisibility)
+		if len(list) > 0 {
+			authorizedList = list
+			queryPayload.Visibility = int32(model.AllVisibility)
+		}
 	}
 
 	var newList []*system.Workspace = []*system.Workspace{}
@@ -115,7 +120,7 @@ func (s *orgApi) getWorkspaceList(ctx *gin.Context, query *org.GetWorkspaceListQ
 		for _, ws := range wsList.GetWorkspaceList() {
 			if ws.Visibility == int32(model.PublicVisibility) {
 				newList = append(newList, ws)
-			} else if ws.Visibility == int32(model.PrivateVisibility) && slices.Contains(authorizedWsList, ws.Id) {
+			} else if ws.Visibility == int32(model.PrivateVisibility) && slices.Contains(authorizedList, ws.Id) {
 				newList = append(newList, ws)
 			}
 		}
@@ -128,48 +133,49 @@ func (s *orgApi) getWorkspaceList(ctx *gin.Context, query *org.GetWorkspaceListQ
 }
 
 func (s *orgApi) getProjectList(ctx *gin.Context, query *org.GetProjectListQuery) api.Response {
-	var authorizedWsList []int32 = []int32{}
-	queryPayload := &system.GetProjectListQuery{
-		OrgId:       query.OrgId,
-		WorkspaceId: query.OrgId,
-		Visibility:  int32(model.PublicVisibility),
+	var authorizedList []int32 = []int32{}
+	queryPayload := &grpc.GetProjectListQuery{
+		OrgId:      query.OrgId,
+		Visibility: int32(model.PublicVisibility),
 	}
 	if !contextdata.IsUserAnonymous(ctx) {
 		// check permissions
 		user := contextdata.GetUser(ctx)
-		evalQuery := &accesscontrol.EvaluateQuery{
-			Permission: accesscontrol.ActionProjectList,
-			UserId:     user.GetId(),
-			OrgId:      query.OrgId,
-		}
-		access, err := s.aclService.EvaluateUserAccess(ctx, evalQuery)
+		list, err := s.aclService.GetProjectList(ctx, &accesscontrol.GetProjectListQuery{UserId: user.GetId()})
 		if err != nil {
 			return api.Error(http.StatusInternalServerError, err)
 		}
-		if !access {
-			// unauthorized user (permission denied) => return org not found error
-			return api.Error(http.StatusNotFound, org.ErrOrgNotFound) // TODO: change status code
-		}
 
-		visibility = model.AllVisibility
+		if len(list) > 0 {
+			authorizedList = list
+			queryPayload.Visibility = int32(model.AllVisibility)
+		}
 	}
 
-	projectList, err := s.orgService.GetProjectList(ctx, &system.GetProjectListQuery{
-		OrgId:      query.OrgId,
-		Visibility: int32(visibility),
-	})
-	if err != nil {
-		return api.Error(http.StatusInternalServerError, err)
+	var newList []*system.Project = []*system.Project{}
+	{
+		projectList, err := s.orgService.GetProjectList(ctx, queryPayload)
+		if err != nil {
+			return api.Error(http.StatusInternalServerError, err)
+		}
+
+		for _, project := range projectList.GetProjectList() {
+			if project.Visibility == int32(model.PublicVisibility) {
+				newList = append(newList, project)
+			} else if project.Visibility == int32(model.PrivateVisibility) && slices.Contains(authorizedList, project.Id) {
+				newList = append(newList, project)
+			}
+		}
 	}
 
 	// anonymous user => return public projects
 	// unauthorized user (permission denied) => return public projects
 	// authorized user => return public + private projects
-	return api.Success(http.StatusOK, &projectList)
+	return api.Success(http.StatusOK, newList)
 }
 
 func (s *orgApi) getMemberList(ctx *gin.Context, query *org.GetMemberListQuery) api.Response {
-	visibility, err := s.orgService.GetOrgVisibilityById(ctx, &system.GetOrgVisibilityByIdQuery{OrgId: query.OrgId})
+	visibility, err := s.orgService.GetOrgVisibilityById(ctx, &grpc.GetOrgVisibilityByIdQuery{OrgId: query.OrgId})
 	if err != nil {
 		if err == org.ErrOrgNotFound {
 			return api.Error(http.StatusNotFound, err)
