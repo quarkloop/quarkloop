@@ -19,7 +19,7 @@ import (
 var (
 	ctx   context.Context
 	conn  *pgx.Conn
-	orgId int
+	orgId int32
 )
 
 const workspaceCount = 10
@@ -66,7 +66,7 @@ func TestMutationCreateWorkspace(t *testing.T) {
 	store := store.NewWorkspaceStore(conn)
 
 	t.Run("create workspace with duplicate scopeId", func(t *testing.T) {
-		workspaceId := 0
+		var workspaceId int32 = 0
 		cmd := &workspace.CreateWorkspaceCommand{
 			OrgId:       orgId,
 			ScopeId:     "it",
