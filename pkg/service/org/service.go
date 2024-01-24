@@ -6,10 +6,10 @@ import (
 	// "github.com/quarkloop/quarkloop/pkg/service/project"
 	// "github.com/quarkloop/quarkloop/pkg/service/user"
 	// "github.com/quarkloop/quarkloop/pkg/service/workspace"
-	"github.com/quarkloop/quarkloop/service/system"
+	"github.com/quarkloop/quarkloop/service/v1/system/org"
 )
 
-type Service system.OrgServiceServer
+type Service org.OrgServiceServer
 
 // type Service interface {
 // 	// query
