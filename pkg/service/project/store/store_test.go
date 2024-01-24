@@ -21,8 +21,8 @@ import (
 var (
 	ctx         context.Context
 	conn        *pgx.Conn
-	orgId       int
-	workspaceId int
+	orgId       int32
+	workspaceId int32
 )
 
 const projectCount = 10
@@ -87,7 +87,7 @@ func TestMutationCreateProject(t *testing.T) {
 	store := store.NewProjectStore(conn)
 
 	t.Run("create project with duplicate scopeId", func(t *testing.T) {
-		projectId := 0
+		var projectId int32 = 0
 		cmd := &project.CreateProjectCommand{
 			OrgId:       orgId,
 			WorkspaceId: workspaceId,
