@@ -5,7 +5,8 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
 	"github.com/quarkloop/quarkloop/pkg/service/user"
-	"github.com/quarkloop/quarkloop/service/system"
+	"github.com/quarkloop/quarkloop/service/v1/system"
+	grpc "github.com/quarkloop/quarkloop/service/v1/system/org"
 )
 
 type Api interface {
@@ -23,14 +24,14 @@ type Api interface {
 }
 
 type orgApi struct {
-	orgService system.OrgServiceClient
+	orgService grpc.OrgServiceClient
 
 	userService  user.Service
 	aclService   accesscontrol.Service
 	quotaService quota.Service
 }
 
-func NewOrgApi(orgService system.OrgServiceClient, userService user.Service, aclService accesscontrol.Service, quotaService quota.Service) *orgApi {
+func NewOrgApi(orgService grpc.OrgServiceClient, userService user.Service, aclService accesscontrol.Service, quotaService quota.Service) *orgApi {
 	return &orgApi{
 		orgService:   orgService,
 		userService:  userService,
@@ -42,3 +43,10 @@ func NewOrgApi(orgService system.OrgServiceClient, userService user.Service, acl
 // func (api *orgApi) GetService() org.Service {
 // 	return api.orgService
 // }
+
+func transformGrpcSlice(slice []*system.Org) []*system.Org {
+	if slice == nil {
+		return []*system.Org{}
+	}
+	return slice
+}
