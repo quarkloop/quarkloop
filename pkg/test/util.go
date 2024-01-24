@@ -3,6 +3,7 @@ package test
 import (
 	"context"
 	"log"
+	"os"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
@@ -44,4 +45,13 @@ func InitTestSystemDB() (context.Context, *pgx.Conn) {
 	db.Connect()
 
 	return context.Background(), db.GetConnection()
+}
+
+func GetCookie() string {
+	err := godotenv.Load(util.GetTestEnvFilePath())
+	if err != nil {
+		log.Fatal("Error loading .env file", err.Error())
+	}
+
+	return os.Getenv("QUARKLOOP_AUTH_COOKIE")
 }
