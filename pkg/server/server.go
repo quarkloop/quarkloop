@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"errors"
 	"flag"
 	"log"
 	"net/http"
@@ -38,21 +37,20 @@ import (
 	ws_impl "github.com/quarkloop/quarkloop/pkg/service/workspace/impl"
 	ws_store "github.com/quarkloop/quarkloop/pkg/service/workspace/store"
 	"github.com/quarkloop/quarkloop/pkg/store/repository"
-	"github.com/quarkloop/quarkloop/service/system"
+	grpcService "github.com/quarkloop/quarkloop/service/v1/system/org"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
-	authzServiceAddr = flag.String("authzServiceAddr", "localhost:50051", "the address to connect to")
-	orgServiceAddr   = flag.String("orgServiceAddr", "localhost:50095", "the address to connect to")
+	orgServiceAddr = flag.String("orgServiceAddr", "localhost:50095", "the address to connect to")
 )
 
 type Server struct {
 	router    *gin.Engine
 	dataStore *repository.Repository
 
-	orgService system.OrgServiceClient
+	orgService grpcService.OrgServiceClient
 
 	userApi              user.Api
 	orgApi               org.Api
@@ -91,11 +89,6 @@ func NewDefaultServer(ds *repository.Repository) Server {
 		MaxAge:        12 * time.Hour,
 	}))
 
-	_, err := grpc.Dial(*authzServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("[grpc][authz] could not connect: %v", err)
-	}
-
 	orgServiceConn, err := grpc.Dial(*orgServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("[grpc][org] could not connect: %v", err)
@@ -109,7 +102,7 @@ func NewDefaultServer(ds *repository.Repository) Server {
 	tableSchemaService := table_schema_impl.NewTableSchemaService(table_schema_store.NewTableSchemaStore(ds.ProjectDbConn))
 	tableRecordService := table_record_impl.NewTableRecordService(table_record_store.NewTableRecordStore(ds.ProjectDbConn))
 
-	orgService := system.NewOrgServiceClient(orgServiceConn)
+	orgService := grpcService.NewOrgServiceClient(orgServiceConn)
 	workspaceService := ws_impl.NewWorkspaceService(ws_store.NewWorkspaceStore(ds.SystemDbConn))
 	projectTableService := project_impl.NewProjectService(project_store.NewProjectStore(ds.SystemDbConn))
 
@@ -134,7 +127,34 @@ func NewDefaultServer(ds *repository.Repository) Server {
 	return serve
 }
 
-func (s *Server) UserAuth(ctx *gin.Context) {
+func (s *Server) UserAuthForQueries(ctx *gin.Context) {
+	req, _ := http.NewRequest("GET", "http://localhost:3001/api/auth/check", nil)
+	req.Header = ctx.Request.Header.Clone()
+
+	client := http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		u := &user_service.User{}
+		err = json.NewDecoder(resp.Body).Decode(u)
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		// set user context data
+		contextdata.SetUser(ctx, u)
+	}
+
+	ctx.Next()
+}
+
+func (s *Server) UserAuthForMutations(ctx *gin.Context) {
 	req, _ := http.NewRequest("GET", "http://localhost:3001/api/auth/check", nil)
 	req.Header = ctx.Request.Header.Clone()
 
@@ -147,7 +167,8 @@ func (s *Server) UserAuth(ctx *gin.Context) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		ctx.AbortWithStatusJSON(resp.StatusCode, errors.New(resp.Status))
+		// 401 Unauthorized
+		ctx.AbortWithStatusJSON(resp.StatusCode, resp.Status)
 		return
 	}
 
@@ -165,7 +186,7 @@ func (s *Server) UserAuth(ctx *gin.Context) {
 
 func (s *Server) AbortAnonymousUserRequest(ctx *gin.Context) {
 	if contextdata.IsUserAnonymous(ctx) {
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, errors.New("Unauthorized"))
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, "Unauthorized")
 		return
 	}
 
@@ -200,7 +221,7 @@ func (s *Server) TODOHandler(ctx *gin.Context) {
 func (s *Server) BindHandlers(api *api.ServerApi) {
 	// query apis
 	query := s.router.Group("/api/v1")
-	query.Use(s.UserAuth)
+	query.Use(s.UserAuthForQueries)
 	{
 		query.GET("/user", s.userApi.GetUser)
 		query.GET("/user/username", s.userApi.GetUsername)
@@ -237,7 +258,7 @@ func (s *Server) BindHandlers(api *api.ServerApi) {
 
 	// mutation apis
 	mutation := s.router.Group("/api/v1")
-	mutation.Use(s.UserAuth)
+	mutation.Use(s.UserAuthForMutations)
 	mutation.Use(s.AbortAnonymousUserRequest)
 	{
 		mutation.PUT("/user", s.userApi.UpdateUser)
@@ -274,98 +295,98 @@ func (s *Server) BindHandlers(api *api.ServerApi) {
 }
 
 func (s *Server) BindHandlers_old(api *api.ServerApi) {
-	router := s.router.Group("/api/v1")
+	// router := s.router.Group("/api/v1")
 
-	testGroup := router.Group("/test")
-	testGroup.Use(s.UserAuth)
+	// testGroup := router.Group("/test")
+	// testGroup.Use(s.UserAuth)
 
-	router.GET("/orgs", s.orgApi.GetOrgList)
-	router.GET("/workspaces", s.workspaceApi.GetWorkspaceList)
-	router.GET("/projects", s.projectApi.GetProjectList)
+	// router.GET("/orgs", s.orgApi.GetOrgList)
+	// router.GET("/workspaces", s.workspaceApi.GetWorkspaceList)
+	// router.GET("/projects", s.projectApi.GetProjectList)
 
-	// org query apis
-	orgGroup := router.Group("/orgs")
-	orgGroup.Use(s.UserAuth)
-	//orgGroup.Use(s.ValidateOrgIdUriParam)
-	{
-		orgGroup.GET("/:orgId", s.orgApi.GetOrgById)
-		orgGroup.GET("/:orgId/workspaces", s.orgApi.GetWorkspaceList)
-		orgGroup.GET("/:orgId/projects", s.orgApi.GetProjectList)
-		orgGroup.GET("/:orgId/members", s.orgApi.GetMemberList)
-	}
-	// org mutation apis
-	orgMutationGroup := orgGroup.Group("")
-	orgMutationGroup.Use(s.AbortAnonymousUserRequest)
-	{
-		orgMutationGroup.POST("", s.orgApi.CreateOrg)
-		orgMutationGroup.PUT("/:orgId", s.orgApi.UpdateOrgById)
-		orgMutationGroup.DELETE("/:orgId", s.orgApi.DeleteOrgById)
-	}
+	// // org query apis
+	// orgGroup := router.Group("/orgs")
+	// orgGroup.Use(s.UserAuth)
+	// //orgGroup.Use(s.ValidateOrgIdUriParam)
+	// {
+	// 	orgGroup.GET("/:orgId", s.orgApi.GetOrgById)
+	// 	orgGroup.GET("/:orgId/workspaces", s.orgApi.GetWorkspaceList)
+	// 	orgGroup.GET("/:orgId/projects", s.orgApi.GetProjectList)
+	// 	orgGroup.GET("/:orgId/members", s.orgApi.GetMemberList)
+	// }
+	// // org mutation apis
+	// orgMutationGroup := orgGroup.Group("")
+	// orgMutationGroup.Use(s.AbortAnonymousUserRequest)
+	// {
+	// 	orgMutationGroup.POST("", s.orgApi.CreateOrg)
+	// 	orgMutationGroup.PUT("/:orgId", s.orgApi.UpdateOrgById)
+	// 	orgMutationGroup.DELETE("/:orgId", s.orgApi.DeleteOrgById)
+	// }
 
-	// workspace query apis
-	wsGroup := router.Group("/orgs/:orgId/workspaces")
-	wsGroup.Use(s.UserAuth)
-	{
-		wsGroup.GET("/:workspaceId", s.workspaceApi.GetWorkspaceById)
-		wsGroup.GET("/:workspaceId/projects", s.workspaceApi.GetProjectList)
-		wsGroup.GET("/:workspaceId/members", s.workspaceApi.GetMemberList)
-	}
-	// workspace mutation apis
-	workspaceMutationGroup := wsGroup.Group("")
-	workspaceMutationGroup.Use(s.AbortAnonymousUserRequest)
-	{
-		workspaceMutationGroup.POST("", s.workspaceApi.CreateWorkspace)
-		workspaceMutationGroup.PUT("/:workspaceId", s.workspaceApi.UpdateWorkspaceById)
-		workspaceMutationGroup.DELETE("/:workspaceId", s.workspaceApi.DeleteWorkspaceById)
-	}
+	// // workspace query apis
+	// wsGroup := router.Group("/orgs/:orgId/workspaces")
+	// wsGroup.Use(s.UserAuth)
+	// {
+	// 	wsGroup.GET("/:workspaceId", s.workspaceApi.GetWorkspaceById)
+	// 	wsGroup.GET("/:workspaceId/projects", s.workspaceApi.GetProjectList)
+	// 	wsGroup.GET("/:workspaceId/members", s.workspaceApi.GetMemberList)
+	// }
+	// // workspace mutation apis
+	// workspaceMutationGroup := wsGroup.Group("")
+	// workspaceMutationGroup.Use(s.AbortAnonymousUserRequest)
+	// {
+	// 	workspaceMutationGroup.POST("", s.workspaceApi.CreateWorkspace)
+	// 	workspaceMutationGroup.PUT("/:workspaceId", s.workspaceApi.UpdateWorkspaceById)
+	// 	workspaceMutationGroup.DELETE("/:workspaceId", s.workspaceApi.DeleteWorkspaceById)
+	// }
 
-	// project query apis
-	projectGroup := router.Group("/orgs/:orgId/workspaces/:workspaceId/projects")
-	projectGroup.Use(s.UserAuth)
-	{
-		projectGroup.GET("/:projectId", s.projectApi.GetProjectById)
-		projectGroup.GET("/:projectId/projects", s.projectApi.GetProjectList)
-		projectGroup.GET("/:projectId/members", s.projectApi.GetMemberList)
-	}
-	// project mutation apis
-	projectMutationGroup := projectGroup.Group("")
-	projectMutationGroup.Use(s.AbortAnonymousUserRequest)
-	{
-		projectMutationGroup.POST("", s.projectApi.CreateProject)
-		projectMutationGroup.PUT("/:projectId", s.projectApi.UpdateProjectById)
-		projectMutationGroup.DELETE("/:projectId", s.projectApi.DeleteProjectById)
-	}
+	// // project query apis
+	// projectGroup := router.Group("/orgs/:orgId/workspaces/:workspaceId/projects")
+	// projectGroup.Use(s.UserAuth)
+	// {
+	// 	projectGroup.GET("/:projectId", s.projectApi.GetProjectById)
+	// 	projectGroup.GET("/:projectId/projects", s.projectApi.GetProjectList)
+	// 	projectGroup.GET("/:projectId/members", s.projectApi.GetMemberList)
+	// }
+	// // project mutation apis
+	// projectMutationGroup := projectGroup.Group("")
+	// projectMutationGroup.Use(s.AbortAnonymousUserRequest)
+	// {
+	// 	projectMutationGroup.POST("", s.projectApi.CreateProject)
+	// 	projectMutationGroup.PUT("/:projectId", s.projectApi.UpdateProjectById)
+	// 	projectMutationGroup.DELETE("/:projectId", s.projectApi.DeleteProjectById)
+	// }
 
-	// // Tables apis
-	// projectGroup.GET("/:projectId/tables", s.projectTableApi.ListTableRecords)
-	// projectGroup.POST("/:projectId/tables", s.projectTableApi.CreateProjectTable)
-	// projectGroup.DELETE("/:projectId/tables/:tableType", s.projectTableApi.DeleteProjectTableById)
+	// // // Tables apis
+	// // projectGroup.GET("/:projectId/tables", s.projectTableApi.ListTableRecords)
+	// // projectGroup.POST("/:projectId/tables", s.projectTableApi.CreateProjectTable)
+	// // projectGroup.DELETE("/:projectId/tables/:tableType", s.projectTableApi.DeleteProjectTableById)
 
-	// Branches apis
-	projectGroup.GET("/:projectId/tables/main/branches", s.tableBranchApi.ListTableBranches)
-	projectGroup.GET("/:projectId/tables/main/branches/:branchId", s.tableBranchApi.GetTableBranchById)
+	// // Branches apis
+	// projectGroup.GET("/:projectId/tables/main/branches", s.tableBranchApi.ListTableBranches)
+	// projectGroup.GET("/:projectId/tables/main/branches/:branchId", s.tableBranchApi.GetTableBranchById)
 
-	// Schemas apis
-	projectGroup.GET("/:projectId/tables/form/schemas", s.tableSchemaApi.ListTableSchemas)
-	projectGroup.POST("/:projectId/tables/form/schemas", s.tableSchemaApi.CreateTableSchema)
-	projectGroup.GET("/:projectId/tables/form/schemas/:schemaId", s.tableSchemaApi.GetTableSchemaById)
-	projectGroup.PUT("/:projectId/tables/form/schemas/:schemaId", s.tableSchemaApi.UpdateTableSchemaById)
-	projectGroup.DELETE("/:projectId/tables/form/schemas/:schemaId", s.tableSchemaApi.DeleteTableSchemaById)
+	// // Schemas apis
+	// projectGroup.GET("/:projectId/tables/form/schemas", s.tableSchemaApi.ListTableSchemas)
+	// projectGroup.POST("/:projectId/tables/form/schemas", s.tableSchemaApi.CreateTableSchema)
+	// projectGroup.GET("/:projectId/tables/form/schemas/:schemaId", s.tableSchemaApi.GetTableSchemaById)
+	// projectGroup.PUT("/:projectId/tables/form/schemas/:schemaId", s.tableSchemaApi.UpdateTableSchemaById)
+	// projectGroup.DELETE("/:projectId/tables/form/schemas/:schemaId", s.tableSchemaApi.DeleteTableSchemaById)
 
-	// Records apis
-	projectGroup.GET("/:projectId/tables/:tableType/branches/:branchId/records", s.tableRecordApi.ListTableRecords)
-	//projectGroup.GET("/:projectId/tables/:tableType/branches/:branchId/records/count", s.tableRecordApi.ListTableRecords)
-	projectGroup.POST("/:projectId/tables/:tableType/branches/:branchId/records", s.tableRecordApi.CreateTableRecord)
-	projectGroup.GET("/:projectId/tables/:tableType/branches/:branchId/records/:recordId", s.tableRecordApi.GetTableRecordById)
-	projectGroup.PUT("/:projectId/tables/:tableType/branches/:branchId/records/:recordId", s.tableRecordApi.UpdateTableRecordById)
-	projectGroup.DELETE("/:projectId/tables/:tableType/branches/:branchId/records/:recordId", s.tableRecordApi.DeleteTableRecordById)
+	// // Records apis
+	// projectGroup.GET("/:projectId/tables/:tableType/branches/:branchId/records", s.tableRecordApi.ListTableRecords)
+	// //projectGroup.GET("/:projectId/tables/:tableType/branches/:branchId/records/count", s.tableRecordApi.ListTableRecords)
+	// projectGroup.POST("/:projectId/tables/:tableType/branches/:branchId/records", s.tableRecordApi.CreateTableRecord)
+	// projectGroup.GET("/:projectId/tables/:tableType/branches/:branchId/records/:recordId", s.tableRecordApi.GetTableRecordById)
+	// projectGroup.PUT("/:projectId/tables/:tableType/branches/:branchId/records/:recordId", s.tableRecordApi.UpdateTableRecordById)
+	// projectGroup.DELETE("/:projectId/tables/:tableType/branches/:branchId/records/:recordId", s.tableRecordApi.DeleteTableRecordById)
 
-	// // submissions apis
-	// projectGroup.GET("/:projectId/submissions", s.projectSubmissionApi.GetAppSubmissionList)
-	// projectGroup.POST("/:projectId/submissions", s.projectSubmissionApi.CreateAppSubmission)
-	// projectGroup.GET("/:projectId/submissions/:submissionId", s.projectSubmissionApi.GetAppSubmissionById)
-	// projectGroup.PUT("/:projectId/submissions/:submissionId", s.projectSubmissionApi.UpdateAppSubmissionById)
-	// projectGroup.DELETE("/:projectId/submissions/:submissionId", s.projectSubmissionApi.DeleteAppSubmissionById)
+	// // // submissions apis
+	// // projectGroup.GET("/:projectId/submissions", s.projectSubmissionApi.GetAppSubmissionList)
+	// // projectGroup.POST("/:projectId/submissions", s.projectSubmissionApi.CreateAppSubmission)
+	// // projectGroup.GET("/:projectId/submissions/:submissionId", s.projectSubmissionApi.GetAppSubmissionById)
+	// // projectGroup.PUT("/:projectId/submissions/:submissionId", s.projectSubmissionApi.UpdateAppSubmissionById)
+	// // projectGroup.DELETE("/:projectId/submissions/:submissionId", s.projectSubmissionApi.DeleteAppSubmissionById)
 }
 
 func (server *Server) Router() *gin.Engine {
