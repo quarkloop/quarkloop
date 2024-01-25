@@ -67,7 +67,11 @@ func (s *orgApi) getOrgList(ctx *gin.Context) api.Response {
 	if !contextdata.IsUserAnonymous(ctx) {
 		// check permissions
 		user := contextdata.GetUser(ctx)
-		list, err := s.aclService.GetOrgList(ctx, &accesscontrol.GetOrgListQuery{UserId: user.GetId()})
+		aclQuery := &accesscontrol.GetOrgListQuery{
+			Permission: "all",
+			UserId:     user.GetId(),
+		}
+		list, err := s.aclService.GetOrgList(ctx, aclQuery)
 		if err != nil {
 			return api.Error(http.StatusInternalServerError, err)
 		}
@@ -99,7 +103,11 @@ func (s *orgApi) getWorkspaceList(ctx *gin.Context, query *org.GetWorkspaceListQ
 	if !contextdata.IsUserAnonymous(ctx) {
 		// check permissions
 		user := contextdata.GetUser(ctx)
-		list, err := s.aclService.GetWorkspaceList(ctx, &accesscontrol.GetWorkspaceListQuery{UserId: user.GetId()})
+		aclQuery := &accesscontrol.GetWorkspaceListQuery{
+			Permission: "all",
+			UserId:     user.GetId(),
+		}
+		list, err := s.aclService.GetWorkspaceList(ctx, aclQuery)
 		if err != nil {
 			return api.Error(http.StatusInternalServerError, err)
 		}
@@ -141,7 +149,11 @@ func (s *orgApi) getProjectList(ctx *gin.Context, query *org.GetProjectListQuery
 	if !contextdata.IsUserAnonymous(ctx) {
 		// check permissions
 		user := contextdata.GetUser(ctx)
-		list, err := s.aclService.GetProjectList(ctx, &accesscontrol.GetProjectListQuery{UserId: user.GetId()})
+		aclQuery := &accesscontrol.GetProjectListQuery{
+			Permission: "all",
+			UserId:     user.GetId(),
+		}
+		list, err := s.aclService.GetProjectList(ctx, aclQuery)
 		if err != nil {
 			return api.Error(http.StatusInternalServerError, err)
 		}
