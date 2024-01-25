@@ -12,10 +12,10 @@ var (
 )
 
 var (
-	OrgQuotaLimit       = 1
-	OrgUserQuotaLimit   = 3
-	WorkspaceQuotaLimit = 2
-	ProjectQuotaLimit   = 2
+	OrgQuotaLimit       int32 = 2
+	OrgUserQuotaLimit   int32 = 3
+	WorkspaceQuotaLimit int32 = 2
+	ProjectQuotaLimit   int32 = 2
 )
 
 var (
