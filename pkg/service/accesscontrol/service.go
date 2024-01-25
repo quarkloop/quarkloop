@@ -5,7 +5,7 @@ import "context"
 type Service interface {
 	// user access query and mutation
 	EvaluateUserAccess(context.Context, *EvaluateQuery) (bool, error)
-	GrantUserAccess(context.Context, *GrantUserAccessCommand) (bool, error)
+	GrantUserAccess(context.Context, *GrantUserAccessCommand) error
 	RevokeUserAccess(context.Context, *RevokeUserAccessCommand) error
 
 	// member query
