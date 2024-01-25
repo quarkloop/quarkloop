@@ -367,6 +367,26 @@ func TestMutationUpdateOrg(t *testing.T) {
 	})
 }
 
+func TestQueryOrgList(t *testing.T) {
+	store := store.NewOrgStore(conn)
+
+	t.Run("get org list", func(t *testing.T) {
+		orgList, err := test.GetFullOrgList(ctx, conn)
+		require.NoError(t, err)
+
+		orgs := []int32{}
+		for _, o := range orgList {
+			orgs = append(orgs, o.Id)
+		}
+
+		orgList, err = store.GetOrgList(ctx, &org.GetOrgListQuery{OrgIdList: orgs})
+		require.NoError(t, err)
+		require.NotNil(t, orgList)
+		require.NotEmpty(t, orgList)
+		require.Len(t, orgList, orgCount)
+	})
+}
+
 func TestQueryOrgRelations(t *testing.T) {
 	store := store.NewOrgStore(conn)
 
@@ -445,20 +465,6 @@ func TestQueryOrgRelations(t *testing.T) {
 			}
 		}
 	})
-
-	// t.Run("get org's user assignment list", func(t *testing.T) {
-	// 	orgList, err := test.GetFullOrgList(ctx, conn)
-	// 	require.NoError(t, err)
-
-	// 	for _, o := range orgList {
-	// 		query := &org.GetUserAssignmentListQuery{OrgId: o.Id}
-	// 		list, err := store.GetUserAssignmentList(ctx, query)
-
-	// 		require.NoError(t, err)
-	// 		require.Empty(t, list)
-	// 		require.Equal(t, 0, len(list))
-	// 	}
-	// })
 }
 
 func TestMutationDeleteOrg(t *testing.T) {
