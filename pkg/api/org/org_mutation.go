@@ -15,6 +15,7 @@ import (
 // Response status:
 // 201: StatusCreated
 // 400: StatusBadRequest
+// 403: StatusForbidden
 // 500: StatusInternalServerError
 
 func (s *orgApi) CreateOrg(ctx *gin.Context) {
