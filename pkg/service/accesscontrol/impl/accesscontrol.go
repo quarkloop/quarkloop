@@ -46,6 +46,8 @@ func (s *aclService) EvaluateUserAccess(ctx context.Context, query *accesscontro
 		objectId = fmt.Sprintf("%d", query.OrgId)
 	}
 
+	fmt.Printf("\nresource: => %+v => %+v => %+v\n\n", objectType, objectId, query)
+
 	rResp, err := s.authz.CheckPermission(context.Background(), &v1.CheckPermissionRequest{
 		Resource: &v1.ObjectReference{
 			ObjectType: objectType,
@@ -74,10 +76,10 @@ func (s *aclService) EvaluateUserAccess(ctx context.Context, query *accesscontro
 	return false, nil
 }
 
-func (s *aclService) GrantUserAccess(ctx context.Context, cmd *accesscontrol.GrantUserAccessCommand) (bool, error) {
+func (s *aclService) GrantUserAccess(ctx context.Context, cmd *accesscontrol.GrantUserAccessCommand) error {
 	objectType := ""
 	objectId := ""
-	relation := fmt.Sprintf("%d", cmd.RoleId) // TODO
+	relation := cmd.Role
 	userId := fmt.Sprintf("%d", cmd.UserId)
 
 	if cmd.OrgId != 0 && cmd.WorkspaceId != 0 && cmd.ProjectId != 0 {
@@ -111,10 +113,10 @@ func (s *aclService) GrantUserAccess(ctx context.Context, cmd *accesscontrol.Gra
 	}
 	_, err := s.authz.WriteRelationships(ctx, &v1.WriteRelationshipsRequest{Updates: relationships})
 	if err != nil {
-		return false, err
+		return err
 	}
 
-	return true, nil
+	return nil
 
 	// if cmd.OrgId != 0 {
 	// 	query := &accesscontrol.GetOrgMemberByUserIdQuery{UserId: cmd.UserId, OrgId: 0}
@@ -209,7 +211,7 @@ func (s *aclService) GrantUserAccess(ctx context.Context, cmd *accesscontrol.Gra
 func (s *aclService) RevokeUserAccess(ctx context.Context, cmd *accesscontrol.RevokeUserAccessCommand) error {
 	objectType := ""
 	objectId := ""
-	relation := fmt.Sprintf("%d", cmd.RoleId) // TODO
+	relation := cmd.Role
 	userId := fmt.Sprintf("%d", cmd.UserId)
 
 	if cmd.OrgId != 0 && cmd.WorkspaceId != 0 && cmd.ProjectId != 0 {
