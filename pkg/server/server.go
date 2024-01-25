@@ -96,7 +96,7 @@ func NewDefaultServer(ds *repository.Repository) Server {
 
 	userService := user_impl.NewUserService(user_store.NewUserStore(ds.AuthDbConn))
 	aclService := acl_impl.NewAccessControlService()
-	quotaService := quota_impl.NewQuotaService(quota_store.NewQuotaStore(ds.SystemDbConn))
+	quotaService := quota_impl.NewQuotaService(quota_store.NewQuotaStore(ds.SystemDbConn), aclService)
 
 	tableBranchService := table_branch_impl.NewTableBranchService(table_branch_store.NewTableBranchStore(ds.ProjectDbConn))
 	tableSchemaService := table_schema_impl.NewTableSchemaService(table_schema_store.NewTableSchemaStore(ds.ProjectDbConn))
