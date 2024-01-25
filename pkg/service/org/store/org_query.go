@@ -173,11 +173,10 @@ SELECT
 FROM 
     "system"."Organization"
 WHERE 
-    "id" IN (@orgIds)
+    "id" = ANY (@orgIdList)
 %s	
 `
 
-// TODO: rewrite query, userId?
 func (store *orgStore) GetOrgList(ctx context.Context, query *org.GetOrgListQuery) ([]*model.Org, error) {
 	var finalQuery strings.Builder
 	if query.Visibility == model.PublicVisibility || query.Visibility == model.PrivateVisibility {
@@ -187,7 +186,7 @@ func (store *orgStore) GetOrgList(ctx context.Context, query *org.GetOrgListQuer
 	}
 
 	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{
-		"orgIds":     query.OrgIdList,
+		"orgIdList":  query.OrgIdList,
 		"visibility": query.Visibility,
 	})
 	if err != nil {
