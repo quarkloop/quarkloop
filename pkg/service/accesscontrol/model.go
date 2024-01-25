@@ -18,6 +18,13 @@ const (
 )
 
 const (
+	RoleOwner       = "owner"
+	RoleAdmin       = "admin"
+	RoleContributor = "contributor"
+	RoleViewer      = "viewer"
+)
+
+const (
 	GlobalOrgId = 0
 
 	// org actions
@@ -200,7 +207,8 @@ type EvaluateQuery struct {
 
 type GrantUserAccessCommand struct {
 	UserId int32
-	RoleId int32
+
+	Role string
 
 	OrgId       int32
 	WorkspaceId int32
@@ -211,7 +219,8 @@ type GrantUserAccessCommand struct {
 
 type RevokeUserAccessCommand struct {
 	UserId int32
-	RoleId int32
+
+	Role string
 
 	OrgId       int32
 	WorkspaceId int32
@@ -221,15 +230,18 @@ type RevokeUserAccessCommand struct {
 ////////////////////////////////////////////
 
 type GetOrgListQuery struct {
-	UserId int32
+	UserId     int32
+	Permission string
 }
 
 type GetWorkspaceListQuery struct {
-	UserId int32
+	UserId     int32
+	Permission string
 }
 
 type GetProjectListQuery struct {
-	UserId int32
+	UserId     int32
+	Permission string
 }
 
 ////////////////////////////////////////////
