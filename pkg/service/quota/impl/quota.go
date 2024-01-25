@@ -2,18 +2,22 @@ package quota_impl
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
 	"github.com/quarkloop/quarkloop/pkg/service/quota/store"
 )
 
 type quotaService struct {
-	store store.QuotaStore
+	store      store.QuotaStore
+	aclService accesscontrol.Service
 }
 
-func NewQuotaService(ds store.QuotaStore) quota.Service {
+func NewQuotaService(ds store.QuotaStore, aclService accesscontrol.Service) quota.Service {
 	return &quotaService{
-		store: ds,
+		store:      ds,
+		aclService: aclService,
 	}
 }
 
@@ -36,10 +40,22 @@ func (s *quotaService) GetQuotasByOrgId(ctx context.Context, query *quota.GetQuo
 }
 
 func (s *quotaService) CheckCreateOrgQuota(ctx context.Context, query *quota.CheckCreateOrgQuotaQuery) error {
-	q, err := s.store.GetQuotasByUserId(ctx, query.UserId)
+	orgQuery := &accesscontrol.GetOrgListQuery{
+		UserId:     query.UserId,
+		Permission: "owner",
+	}
+	orgList, err := s.aclService.GetOrgList(ctx, orgQuery)
 	if err != nil {
 		return err
 	}
+
+	q := quota.Quota{
+		Feature: quota.OrgCount,
+		Limit:   quota.OrgQuotaLimit,
+		Metric:  int32(len(orgList)),
+	}
+
+	fmt.Printf("\nOrgQuota Service => %+v => %+v => %+v\n\n", orgList, q, q.CheckQuotaReached())
 
 	if q.CheckQuotaReached() {
 		return quota.ErrOrgQuotaReached
