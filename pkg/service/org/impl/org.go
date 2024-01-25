@@ -3,6 +3,8 @@ package org_impl
 import (
 	"context"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/quarkloop/quarkloop/pkg/model"
@@ -69,7 +71,15 @@ func (s *orgService) GetOrgVisibilityById(ctx context.Context, query *grpc.GetOr
 }
 
 func (s *orgService) CreateOrg(ctx context.Context, cmd *grpc.CreateOrgCommand) (*grpc.CreateOrgReply, error) {
-	org, err := s.store.CreateOrg(ctx, &org.CreateOrgCommand{
+	if cmd.Name == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "request missing required field: Name")
+	} else if cmd.Description == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "request missing required field: Description")
+	} else if cmd.CreatedBy == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "request missing required field: CreatedBy")
+	}
+
+	o, err := s.store.CreateOrg(ctx, &org.CreateOrgCommand{
 		CreatedBy:   cmd.CreatedBy,
 		ScopeId:     cmd.ScopeId,
 		Name:        cmd.Name,
@@ -77,11 +87,14 @@ func (s *orgService) CreateOrg(ctx context.Context, cmd *grpc.CreateOrgCommand) 
 		Visibility:  model.ScopeVisibility(cmd.Visibility),
 	})
 	if err != nil {
-		return nil, err
+		if err == org.ErrOrgAlreadyExists {
+			return nil, status.Errorf(codes.AlreadyExists, err.Error())
+		}
+		return nil, status.Errorf(codes.Internal, "something wrong happened in server")
 	}
 
-	org.GeneratePath()
-	proto := org.Proto()
+	o.GeneratePath()
+	proto := o.Proto()
 
 	reply := &grpc.CreateOrgReply{Org: proto}
 	return reply, nil
