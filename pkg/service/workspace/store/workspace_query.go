@@ -34,12 +34,11 @@ FROM
 LEFT JOIN 
     system."Organization" AS org ON org."id" = ws."orgId"
 WHERE 
-    ws."orgId" = ANY (@orgId)
+    ws."orgId" = ANY (@workspaceIdList)
 %s	
 `
 
-// TODO: rewrite query
-func (store *workspaceStore) GetWorkspaceList(ctx context.Context, query *workspace.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
+func (store *workspaceStore) GetWorkspaceList(ctx context.Context, query *workspace.GetWorkspaceListQuery) ([]*model.Workspace, error) {
 	var finalQuery strings.Builder
 	if query.Visibility == model.PublicVisibility || query.Visibility == model.PrivateVisibility {
 		finalQuery.WriteString(fmt.Sprintf(listWorkspacesQuery, `AND ws."visibility" = @visibility;`))
@@ -48,8 +47,8 @@ func (store *workspaceStore) GetWorkspaceList(ctx context.Context, query *worksp
 	}
 
 	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{
-		"userId":     query.UserId,
-		"visibility": query.Visibility,
+		"workspaceIdList": query.WorkspaceIdList,
+		"visibility":      query.Visibility,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
@@ -57,10 +56,10 @@ func (store *workspaceStore) GetWorkspaceList(ctx context.Context, query *worksp
 	}
 	defer rows.Close()
 
-	var wsList []*workspace.Workspace = []*workspace.Workspace{}
+	var wsList []*model.Workspace = []*model.Workspace{}
 
 	for rows.Next() {
-		var workspace workspace.Workspace
+		var workspace model.Workspace
 		err := rows.Scan(
 			&workspace.Id,
 			&workspace.ScopeId,
@@ -116,13 +115,13 @@ WHERE (
 );
 `
 
-func (store *workspaceStore) GetWorkspaceById(ctx context.Context, query *workspace.GetWorkspaceByIdQuery) (*workspace.Workspace, error) {
+func (store *workspaceStore) GetWorkspaceById(ctx context.Context, query *workspace.GetWorkspaceByIdQuery) (*model.Workspace, error) {
 	row := store.Conn.QueryRow(ctx, getWorkspaceByIdQuery, pgx.NamedArgs{
 		"orgId": query.OrgId,
 		"id":    query.WorkspaceId,
 	})
 
-	var ws workspace.Workspace
+	var ws model.Workspace
 	err := row.Scan(
 		&ws.Id,
 		&ws.ScopeId,
@@ -205,7 +204,7 @@ ORDER BY
 LIMIT 1;
 `
 
-func (store *workspaceStore) GetWorkspace(ctx context.Context, orgId int, ws *workspace.Workspace) (*workspace.Workspace, error) {
+func (store *workspaceStore) GetWorkspace(ctx context.Context, orgId int, ws *model.Workspace) (*model.Workspace, error) {
 	availableFields := []string{}
 	workspaceFields := map[string]interface{}{
 		"name":       ws.Name,
@@ -237,7 +236,7 @@ func (store *workspaceStore) GetWorkspace(ctx context.Context, orgId int, ws *wo
 
 	row := store.Conn.QueryRow(ctx, finalQuery)
 
-	var workspace workspace.Workspace
+	var workspace model.Workspace
 	err := row.Scan(
 		&workspace.Id,
 		&workspace.ScopeId,
