@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/quarkloop/quarkloop/pkg/api"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
@@ -19,7 +20,7 @@ import (
 func (s *WorkspaceApi) CreateWorkspace(ctx *gin.Context) {
 	uriParams := &workspace.CreateWorkspaceUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
@@ -45,7 +46,7 @@ func (s *WorkspaceApi) CreateWorkspace(ctx *gin.Context) {
 func (s *WorkspaceApi) UpdateWorkspaceById(ctx *gin.Context) {
 	uriParams := &workspace.UpdateWorkspaceByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
@@ -74,7 +75,7 @@ func (s *WorkspaceApi) UpdateWorkspaceById(ctx *gin.Context) {
 func (s *WorkspaceApi) DeleteWorkspaceById(ctx *gin.Context) {
 	uriParams := &workspace.DeleteWorkspaceByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
