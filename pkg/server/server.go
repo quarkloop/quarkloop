@@ -9,6 +9,9 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
 	"github.com/quarkloop/quarkloop/pkg/api"
 	"github.com/quarkloop/quarkloop/pkg/api/org"
 	"github.com/quarkloop/quarkloop/pkg/api/project"
@@ -34,24 +37,24 @@ import (
 	user_service "github.com/quarkloop/quarkloop/pkg/service/user"
 	user_impl "github.com/quarkloop/quarkloop/pkg/service/user/impl"
 	user_store "github.com/quarkloop/quarkloop/pkg/service/user/store"
-	ws_impl "github.com/quarkloop/quarkloop/pkg/service/workspace/impl"
-	ws_store "github.com/quarkloop/quarkloop/pkg/service/workspace/store"
 	"github.com/quarkloop/quarkloop/pkg/store/repository"
-	grpcService "github.com/quarkloop/quarkloop/service/v1/system/org"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	orgGrpcService "github.com/quarkloop/quarkloop/service/v1/system/org"
+	workspaceGrpcService "github.com/quarkloop/quarkloop/service/v1/system/workspace"
 )
 
 var (
-	orgServiceAddr = flag.String("orgServiceAddr", "localhost:50095", "the address to connect to")
+	systemGrpcServiceAddr = flag.String("systemGrpcServiceAddr", "localhost:50095", "the address to connect to")
 )
 
 type Server struct {
 	router    *gin.Engine
 	dataStore *repository.Repository
 
-	orgService grpcService.OrgServiceClient
+	// grpc services
+	orgService       orgGrpcService.OrgServiceClient
+	workspaceService workspaceGrpcService.WorkspaceServiceClient
 
+	// apis
 	userApi              user.Api
 	orgApi               org.Api
 	workspaceApi         workspace.Api
@@ -89,7 +92,7 @@ func NewDefaultServer(ds *repository.Repository) Server {
 		MaxAge:        12 * time.Hour,
 	}))
 
-	orgServiceConn, err := grpc.Dial(*orgServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	systemGrpcServiceConn, err := grpc.Dial(*systemGrpcServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("[grpc][org] could not connect: %v", err)
 	}
@@ -102,8 +105,8 @@ func NewDefaultServer(ds *repository.Repository) Server {
 	tableSchemaService := table_schema_impl.NewTableSchemaService(table_schema_store.NewTableSchemaStore(ds.ProjectDbConn))
 	tableRecordService := table_record_impl.NewTableRecordService(table_record_store.NewTableRecordStore(ds.ProjectDbConn))
 
-	orgService := grpcService.NewOrgServiceClient(orgServiceConn)
-	workspaceService := ws_impl.NewWorkspaceService(ws_store.NewWorkspaceStore(ds.SystemDbConn))
+	orgService := orgGrpcService.NewOrgServiceClient(systemGrpcServiceConn)
+	workspaceService := workspaceGrpcService.NewWorkspaceServiceClient(systemGrpcServiceConn)
 	projectTableService := project_impl.NewProjectService(project_store.NewProjectStore(ds.SystemDbConn))
 
 	projectSubmissionService := project_submission_impl.NewAppSubmissionService(ds)
