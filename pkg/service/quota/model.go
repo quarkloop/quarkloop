@@ -32,6 +32,21 @@ type Quota struct {
 	Metric  int32        `json:"metric"`
 }
 
+func (q *Quota) ApplyLimit() {
+	switch q.Feature {
+	case OrgCount:
+		q.Limit = OrgQuotaLimit
+	case OrgUserCount:
+		q.Limit = OrgUserQuotaLimit
+	case WorkspaceCount:
+		q.Limit = WorkspaceQuotaLimit
+	case ProjectCount:
+		q.Limit = ProjectQuotaLimit
+	default:
+		panic("unknown quota feature found")
+	}
+}
+
 func (q *Quota) CheckQuotaReached() bool {
 	return q.Metric >= q.Limit
 }
