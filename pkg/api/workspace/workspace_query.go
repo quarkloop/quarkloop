@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/quarkloop/quarkloop/pkg/api"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
@@ -21,7 +22,7 @@ import (
 func (s *WorkspaceApi) GetWorkspaceById(ctx *gin.Context) {
 	uriParams := &workspace.GetWorkspaceByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
@@ -59,7 +60,7 @@ func (s *WorkspaceApi) GetWorkspaceList(ctx *gin.Context) {
 func (s *WorkspaceApi) GetProjectList(ctx *gin.Context) {
 	uriParams := &workspace.GetProjectListUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
@@ -84,7 +85,7 @@ func (s *WorkspaceApi) GetProjectList(ctx *gin.Context) {
 func (s *WorkspaceApi) GetMemberList(ctx *gin.Context) {
 	uriParams := &workspace.GetMemberListUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
