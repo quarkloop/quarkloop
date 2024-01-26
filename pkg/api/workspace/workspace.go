@@ -5,7 +5,8 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
 	"github.com/quarkloop/quarkloop/pkg/service/user"
-	"github.com/quarkloop/quarkloop/pkg/service/workspace"
+	"github.com/quarkloop/quarkloop/service/v1/system"
+	grpc "github.com/quarkloop/quarkloop/service/v1/system/workspace"
 )
 
 type Api interface {
@@ -22,7 +23,7 @@ type Api interface {
 }
 
 type WorkspaceApi struct {
-	workspaceService workspace.Service
+	workspaceService grpc.WorkspaceServiceClient
 
 	userService  user.Service
 	aclService   accesscontrol.Service
@@ -30,15 +31,22 @@ type WorkspaceApi struct {
 }
 
 func NewWorkspaceApi(
-	service workspace.Service,
+	workspaceService grpc.WorkspaceServiceClient,
 	userService user.Service,
 	aclService accesscontrol.Service,
 	quotaService quota.Service,
 ) *WorkspaceApi {
 	return &WorkspaceApi{
-		workspaceService: service,
+		workspaceService: workspaceService,
 		userService:      userService,
 		aclService:       aclService,
 		quotaService:     quotaService,
 	}
+}
+
+func transformGrpcSlice(slice []*system.Workspace) []*system.Workspace {
+	if slice == nil {
+		return []*system.Workspace{}
+	}
+	return slice
 }
