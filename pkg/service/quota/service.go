@@ -5,7 +5,7 @@ import "context"
 type Service interface {
 	// allocation quotas
 	GetQuotasByUserId(context.Context, *GetQuotasByUserIdQuery) (Quota, error)
-	GetQuotasByOrgId(context.Context, *GetQuotasByOrgIdQuery) ([]Quota, error)
+	GetQuotasByOrgId(context.Context, *GetQuotasByOrgIdQuery) ([]*Quota, error)
 
 	CheckCreateOrgQuota(context.Context, *CheckCreateOrgQuotaQuery) error
 	CheckCreateOrgUserQuota(context.Context, *CheckCreateOrgUserQuotaQuery) error
