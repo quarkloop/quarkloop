@@ -30,10 +30,10 @@ func (s *quotaService) GetQuotasByUserId(ctx context.Context, query *quota.GetQu
 	return q, nil
 }
 
-func (s *quotaService) GetQuotasByOrgId(ctx context.Context, query *quota.GetQuotasByOrgIdQuery) ([]quota.Quota, error) {
+func (s *quotaService) GetQuotasByOrgId(ctx context.Context, query *quota.GetQuotasByOrgIdQuery) ([]*quota.Quota, error) {
 	q, err := s.store.GetQuotasByOrgId(ctx, query.OrgId)
 	if err != nil {
-		return []quota.Quota{}, err
+		return []*quota.Quota{}, err
 	}
 
 	return q, nil
@@ -55,8 +55,6 @@ func (s *quotaService) CheckCreateOrgQuota(ctx context.Context, query *quota.Che
 		Metric:  int32(len(orgList)),
 	}
 
-	fmt.Printf("\nOrgQuota Service => %+v => %+v => %+v\n\n", orgList, q, q.CheckQuotaReached())
-
 	if q.CheckQuotaReached() {
 		return quota.ErrOrgQuotaReached
 	}
@@ -64,15 +62,16 @@ func (s *quotaService) CheckCreateOrgQuota(ctx context.Context, query *quota.Che
 }
 
 func (s *quotaService) CheckCreateOrgUserQuota(ctx context.Context, query *quota.CheckCreateOrgUserQuotaQuery) error {
-	q, err := s.store.GetQuotasByOrgId(ctx, query.OrgId)
+	quotaList, err := s.store.GetQuotasByOrgId(ctx, query.OrgId)
 	if err != nil {
 		return err
 	}
 
-	for _, v := range q {
-		if v.Feature == quota.OrgUserCount {
-			if v.CheckQuotaReached() {
-				return quota.ErrOrgUserQuotaReached
+	for _, q := range quotaList {
+		if q.Feature == quota.OrgUserCount {
+			q.ApplyLimit()
+			if q.CheckQuotaReached() {
+				return quota.ErrWorkspaceQuotaReached
 			}
 			return nil
 		}
@@ -82,14 +81,16 @@ func (s *quotaService) CheckCreateOrgUserQuota(ctx context.Context, query *quota
 }
 
 func (s *quotaService) CheckCreateWorkspaceQuota(ctx context.Context, query *quota.CheckCreateWorkspaceQuotaQuery) error {
-	q, err := s.store.GetQuotasByOrgId(ctx, query.OrgId)
+	quotaList, err := s.store.GetQuotasByOrgId(ctx, query.OrgId)
+	fmt.Printf("\nWorkspaceQuota Service => %+v => %+v\n\n", quotaList, err)
 	if err != nil {
 		return err
 	}
 
-	for _, v := range q {
-		if v.Feature == quota.WorkspaceCount {
-			if v.CheckQuotaReached() {
+	for _, q := range quotaList {
+		if q.Feature == quota.WorkspaceCount {
+			q.ApplyLimit()
+			if q.CheckQuotaReached() {
 				return quota.ErrWorkspaceQuotaReached
 			}
 			return nil
@@ -100,15 +101,16 @@ func (s *quotaService) CheckCreateWorkspaceQuota(ctx context.Context, query *quo
 }
 
 func (s *quotaService) CheckCreateProjectQuota(ctx context.Context, query *quota.CheckCreateProjectQuotaQuery) error {
-	q, err := s.store.GetQuotasByOrgId(ctx, query.OrgId)
+	quotaList, err := s.store.GetQuotasByOrgId(ctx, query.OrgId)
 	if err != nil {
 		return err
 	}
 
-	for _, v := range q {
-		if v.Feature == quota.ProjectCount {
-			if v.CheckQuotaReached() {
-				return quota.ErrProjectQuotaReached
+	for _, q := range quotaList {
+		if q.Feature == quota.ProjectCount {
+			q.ApplyLimit()
+			if q.CheckQuotaReached() {
+				return quota.ErrWorkspaceQuotaReached
 			}
 			return nil
 		}
