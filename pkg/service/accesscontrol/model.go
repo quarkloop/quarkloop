@@ -50,7 +50,7 @@ const (
 	// workspace actions
 	ActionWorkspaceList   = "list"
 	ActionWorkspaceRead   = "read"
-	ActionWorkspaceCreate = "create"
+	ActionWorkspaceCreate = "create_workspace"
 	ActionWorkspaceUpdate = "update"
 	ActionWorkspaceDelete = "delete"
 
