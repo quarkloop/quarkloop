@@ -12,14 +12,14 @@ import (
 
 type WorkspaceStore interface {
 	// query
-	GetWorkspaceById(context.Context, *workspace.GetWorkspaceByIdQuery) (*workspace.Workspace, error)
+	GetWorkspaceById(context.Context, *workspace.GetWorkspaceByIdQuery) (*model.Workspace, error)
 	GetWorkspaceVisibilityById(context.Context, *workspace.GetWorkspaceVisibilityByIdQuery) (model.ScopeVisibility, error)
-	GetWorkspaceList(context.Context, *workspace.GetWorkspaceListQuery) ([]*workspace.Workspace, error)
+	GetWorkspaceList(context.Context, *workspace.GetWorkspaceListQuery) ([]*model.Workspace, error)
 	GetProjectList(context.Context, *workspace.GetProjectListQuery) ([]*project.Project, error)
 	GetUserAssignmentList(context.Context, *workspace.GetUserAssignmentListQuery) ([]*user.UserAssignment, error)
 
 	// mutation
-	CreateWorkspace(context.Context, *workspace.CreateWorkspaceCommand) (*workspace.Workspace, error)
+	CreateWorkspace(context.Context, *workspace.CreateWorkspaceCommand) (*model.Workspace, error)
 	UpdateWorkspaceById(context.Context, *workspace.UpdateWorkspaceByIdCommand) error
 	DeleteWorkspaceById(context.Context, *workspace.DeleteWorkspaceByIdCommand) error
 }
