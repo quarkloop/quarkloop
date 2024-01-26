@@ -90,7 +90,7 @@ func (s *orgService) CreateOrg(ctx context.Context, cmd *grpc.CreateOrgCommand) 
 		if err == org.ErrOrgAlreadyExists {
 			return nil, status.Errorf(codes.AlreadyExists, err.Error())
 		}
-		return nil, status.Errorf(codes.Internal, "something wrong happened in server")
+		return nil, status.Errorf(codes.Internal, "something went wrong in server")
 	}
 
 	o.GeneratePath()
@@ -102,6 +102,7 @@ func (s *orgService) CreateOrg(ctx context.Context, cmd *grpc.CreateOrgCommand) 
 
 func (s *orgService) UpdateOrgById(ctx context.Context, cmd *grpc.UpdateOrgByIdCommand) (*emptypb.Empty, error) {
 	err := s.store.UpdateOrgById(ctx, &org.UpdateOrgByIdCommand{
+		OrgId:       cmd.OrgId,
 		UpdatedBy:   cmd.UpdatedBy,
 		ScopeId:     cmd.ScopeId,
 		Name:        cmd.Name,
