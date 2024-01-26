@@ -7,7 +7,6 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
-	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
 type OrgStore interface {
@@ -15,7 +14,7 @@ type OrgStore interface {
 	GetOrgById(context.Context, *org.GetOrgByIdQuery) (*model.Org, error)
 	GetOrgVisibilityById(context.Context, *org.GetOrgVisibilityByIdQuery) (model.ScopeVisibility, error)
 	GetOrgList(context.Context, *org.GetOrgListQuery) ([]*model.Org, error)
-	GetWorkspaceList(context.Context, *org.GetWorkspaceListQuery) ([]*workspace.Workspace, error)
+	GetWorkspaceList(context.Context, *org.GetWorkspaceListQuery) ([]*model.Workspace, error)
 	GetProjectList(context.Context, *org.GetProjectListQuery) ([]*project.Project, error)
 	//GetUserAssignmentList(context.Context, *org.GetUserAssignmentListQuery) ([]*user.UserAssignment, error)
 
