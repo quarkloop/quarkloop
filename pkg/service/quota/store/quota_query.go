@@ -151,20 +151,17 @@ func (store *quotaStore) GetQuotasByUserId(ctx context.Context, userId int32) (q
 const getQuotasByOrgIdQuery = `
 SELECT 
     feature, 
-    metric 
+    metric::int
 FROM (
     SELECT 
        COUNT(DISTINCT w.id) AS workspace_count,
-       COUNT(DISTINCT p.id) AS project_count,
-       COUNT(DISTINCT u.id) AS org_user_count
+       COUNT(DISTINCT p.id) AS project_count
     FROM 
       "system"."Organization" As o
     LEFT JOIN 
         "system"."Workspace" AS w ON w."orgId" = o."id"
     LEFT JOIN 
         "system"."Project" AS p ON p."orgId" = o."id"
-    LEFT JOIN 
-        "system"."User" AS u ON u."orgId" = o."id"
     WHERE
       o."id" = @orgId
 ) AS metrics
@@ -172,7 +169,7 @@ CROSS JOIN
     jsonb_each_text(to_jsonb(metrics)) as cols(feature, metric);
 `
 
-func (store *quotaStore) GetQuotasByOrgId(ctx context.Context, orgId int32) ([]quota.Quota, error) {
+func (store *quotaStore) GetQuotasByOrgId(ctx context.Context, orgId int32) ([]*quota.Quota, error) {
 	rows, err := store.Conn.Query(ctx, getQuotasByOrgIdQuery, pgx.NamedArgs{
 		"orgId": orgId,
 	})
@@ -182,7 +179,7 @@ func (store *quotaStore) GetQuotasByOrgId(ctx context.Context, orgId int32) ([]q
 	}
 	defer rows.Close()
 
-	var quotaList []quota.Quota = []quota.Quota{}
+	var quotaList []*quota.Quota = []*quota.Quota{}
 
 	for rows.Next() {
 		var quota quota.Quota
@@ -191,7 +188,7 @@ func (store *quotaStore) GetQuotasByOrgId(ctx context.Context, orgId int32) ([]q
 			return nil, err
 		}
 
-		quotaList = append(quotaList, quota)
+		quotaList = append(quotaList, &quota)
 	}
 
 	if err := rows.Err(); err != nil {
