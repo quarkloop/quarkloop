@@ -12,7 +12,6 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
-	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
 /// GetOrgById
@@ -250,7 +249,7 @@ WHERE
 %s	
 `
 
-func (store *orgStore) GetWorkspaceList(ctx context.Context, query *org.GetWorkspaceListQuery) ([]*workspace.Workspace, error) {
+func (store *orgStore) GetWorkspaceList(ctx context.Context, query *org.GetWorkspaceListQuery) ([]*model.Workspace, error) {
 	var finalQuery strings.Builder
 	if query.Visibility == model.PublicVisibility || query.Visibility == model.PrivateVisibility {
 		finalQuery.WriteString(fmt.Sprintf(listWorkspacesQuery, `AND ws."visibility" = @visibility;`))
@@ -268,9 +267,9 @@ func (store *orgStore) GetWorkspaceList(ctx context.Context, query *org.GetWorks
 	}
 	defer rows.Close()
 
-	var wsList []*workspace.Workspace = []*workspace.Workspace{}
+	var wsList []*model.Workspace = []*model.Workspace{}
 	for rows.Next() {
-		var workspace workspace.Workspace
+		var workspace model.Workspace
 		err := rows.Scan(
 			&workspace.Id,
 			&workspace.ScopeId,
