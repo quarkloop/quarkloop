@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"net/http"
+	"slices"
 
 	"github.com/gin-gonic/gin"
 
@@ -11,10 +12,12 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/user"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
+	"github.com/quarkloop/quarkloop/service/v1/system"
+	grpc "github.com/quarkloop/quarkloop/service/v1/system/workspace"
 )
 
 func (s *WorkspaceApi) getWorkspaceById(ctx *gin.Context, query *workspace.GetWorkspaceByIdQuery) api.Response {
-	visibility, err := s.workspaceService.GetWorkspaceVisibilityById(ctx, &workspace.GetWorkspaceVisibilityByIdQuery{
+	visibility, err := s.workspaceService.GetWorkspaceVisibilityById(ctx, &grpc.GetWorkspaceVisibilityByIdQuery{
 		OrgId:       query.OrgId,
 		WorkspaceId: query.WorkspaceId,
 	})
@@ -25,7 +28,7 @@ func (s *WorkspaceApi) getWorkspaceById(ctx *gin.Context, query *workspace.GetWo
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	isPrivate := visibility == model.PrivateVisibility
+	isPrivate := model.ScopeVisibility(visibility.GetVisibility()) == model.PrivateVisibility
 
 	// anonymous user => return workspace not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
@@ -50,7 +53,10 @@ func (s *WorkspaceApi) getWorkspaceById(ctx *gin.Context, query *workspace.GetWo
 		}
 	}
 
-	ws, err := s.workspaceService.GetWorkspaceById(ctx, query)
+	ws, err := s.workspaceService.GetWorkspaceById(ctx, &grpc.GetWorkspaceByIdQuery{
+		OrgId:       query.OrgId,
+		WorkspaceId: query.WorkspaceId,
+	})
 	if err != nil {
 		if err == workspace.ErrWorkspaceNotFound {
 			return api.Error(http.StatusNotFound, err)
@@ -64,25 +70,23 @@ func (s *WorkspaceApi) getWorkspaceById(ctx *gin.Context, query *workspace.GetWo
 }
 
 func (s *WorkspaceApi) getWorkspaceList(ctx *gin.Context) api.Response {
-	query := &workspace.GetWorkspaceListQuery{Visibility: model.PublicVisibility}
+	query := &grpc.GetWorkspaceListQuery{Visibility: int32(model.PublicVisibility)}
 	if !contextdata.IsUserAnonymous(ctx) {
 		// check permissions
 		user := contextdata.GetUser(ctx)
-		evalQuery := &accesscontrol.EvaluateQuery{
-			Permission: accesscontrol.ActionWorkspaceList,
+		aclQuery := &accesscontrol.GetWorkspaceListQuery{
+			Permission: "all",
 			UserId:     user.GetId(),
 		}
-		access, err := s.aclService.EvaluateUserAccess(ctx, evalQuery)
+		list, err := s.aclService.GetWorkspaceList(ctx, aclQuery)
 		if err != nil {
 			return api.Error(http.StatusInternalServerError, err)
 		}
-		if !access {
-			// unauthorized user (permission denied) => return workspace not found error
-			return api.Error(http.StatusNotFound, workspace.ErrWorkspaceNotFound)
-		}
 
-		query.UserId = user.GetId()
-		query.Visibility = model.AllVisibility
+		if len(list) > 0 {
+			query.WorkspaceIdList = list
+			query.Visibility = int32(model.AllVisibility)
+		}
 	}
 
 	wsList, err := s.workspaceService.GetWorkspaceList(ctx, query)
@@ -93,47 +97,58 @@ func (s *WorkspaceApi) getWorkspaceList(ctx *gin.Context) api.Response {
 	// anonymous user => return public workspaces
 	// unauthorized user (permission denied) => return public workspaces
 	// authorized user => return public + private workspaces
-	return api.Success(http.StatusOK, &wsList)
+	return api.Success(http.StatusOK, transformGrpcSlice(wsList.WorkspaceList))
 }
 
 func (s *WorkspaceApi) getProjectList(ctx *gin.Context, query *workspace.GetProjectListQuery) api.Response {
-	getProjectListQuery := &workspace.GetProjectListQuery{
+	var authorizedList []int32 = []int32{}
+	queryPayload := &grpc.GetProjectListQuery{
 		OrgId:       query.OrgId,
 		WorkspaceId: query.WorkspaceId,
-		Visibility:  model.PublicVisibility,
+		Visibility:  int32(model.PublicVisibility),
 	}
 	if !contextdata.IsUserAnonymous(ctx) {
 		// check permissions
 		user := contextdata.GetUser(ctx)
-		evalQuery := &accesscontrol.EvaluateQuery{
-			Permission: accesscontrol.ActionProjectList,
+		aclQuery := &accesscontrol.GetProjectListQuery{
+			Permission: "all",
 			UserId:     user.GetId(),
 		}
-		access, err := s.aclService.EvaluateUserAccess(ctx, evalQuery)
+		list, err := s.aclService.GetProjectList(ctx, aclQuery)
 		if err != nil {
 			return api.Error(http.StatusInternalServerError, err)
 		}
-		if !access {
-			// unauthorized user (permission denied) => return workspace not found error
-			return api.Error(http.StatusNotFound, workspace.ErrWorkspaceNotFound)
-		}
 
-		getProjectListQuery.Visibility = model.AllVisibility
+		if len(list) > 0 {
+			authorizedList = list
+			queryPayload.Visibility = int32(model.AllVisibility)
+		}
 	}
 
-	projectList, err := s.workspaceService.GetProjectList(ctx, getProjectListQuery)
-	if err != nil {
-		return api.Error(http.StatusInternalServerError, err)
+	var newList []*system.Project = []*system.Project{}
+	{
+		projectList, err := s.workspaceService.GetProjectList(ctx, queryPayload)
+		if err != nil {
+			return api.Error(http.StatusInternalServerError, err)
+		}
+
+		for _, project := range projectList.GetProjectList() {
+			if project.Visibility == int32(model.PublicVisibility) {
+				newList = append(newList, project)
+			} else if project.Visibility == int32(model.PrivateVisibility) && slices.Contains(authorizedList, project.Id) {
+				newList = append(newList, project)
+			}
+		}
 	}
 
 	// anonymous user => return public projects
 	// unauthorized user (permission denied) => return public projects
 	// authorized user => return public + private projects
-	return api.Success(http.StatusOK, &projectList)
+	return api.Success(http.StatusOK, newList)
 }
 
 func (s *WorkspaceApi) getMemberList(ctx *gin.Context, query *workspace.GetMemberListQuery) api.Response {
-	visibility, err := s.workspaceService.GetWorkspaceVisibilityById(ctx, &workspace.GetWorkspaceVisibilityByIdQuery{
+	visibility, err := s.workspaceService.GetWorkspaceVisibilityById(ctx, &grpc.GetWorkspaceVisibilityByIdQuery{
 		OrgId:       query.OrgId,
 		WorkspaceId: query.WorkspaceId,
 	})
@@ -144,7 +159,7 @@ func (s *WorkspaceApi) getMemberList(ctx *gin.Context, query *workspace.GetMembe
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	isPrivate := visibility == model.PrivateVisibility
+	isPrivate := model.ScopeVisibility(visibility.GetVisibility()) == model.PrivateVisibility
 
 	// anonymous user => return workspace not found error
 	if isPrivate && contextdata.IsUserAnonymous(ctx) {
@@ -169,10 +184,10 @@ func (s *WorkspaceApi) getMemberList(ctx *gin.Context, query *workspace.GetMembe
 		}
 	}
 
-	uaList, err := s.workspaceService.GetUserAssignmentList(ctx, &workspace.GetUserAssignmentListQuery{
-		OrgId:       query.OrgId,
-		WorkspaceId: query.WorkspaceId,
-	})
+	uaList, err := s.aclService.GetWorkspaceMemberList(ctx, &accesscontrol.GetWorkspaceMemberListQuery{WorkspaceId: query.WorkspaceId})
+	if err != nil {
+		return api.Error(http.StatusInternalServerError, err)
+	}
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
