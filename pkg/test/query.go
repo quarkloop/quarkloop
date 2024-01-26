@@ -9,7 +9,6 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/user"
-	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
 const getOrgListQuery = `
@@ -80,7 +79,7 @@ FROM
 ORDER BY id ASC;
 `
 
-func GetFullWorkspaceList(ctx context.Context, conn *pgx.Conn) ([]*workspace.Workspace, error) {
+func GetFullWorkspaceList(ctx context.Context, conn *pgx.Conn) ([]*model.Workspace, error) {
 	rows, err := conn.Query(ctx, getWorkspaceListQuery)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
@@ -88,9 +87,9 @@ func GetFullWorkspaceList(ctx context.Context, conn *pgx.Conn) ([]*workspace.Wor
 	}
 	defer rows.Close()
 
-	var wsList []*workspace.Workspace = []*workspace.Workspace{}
+	var wsList []*model.Workspace = []*model.Workspace{}
 	for rows.Next() {
-		var ws workspace.Workspace
+		var ws model.Workspace
 		err := rows.Scan(
 			&ws.Id,
 			&ws.ScopeId,
