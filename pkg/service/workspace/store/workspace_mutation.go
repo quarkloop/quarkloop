@@ -9,6 +9,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	gonanoid "github.com/matoous/go-nanoid/v2"
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
 
@@ -42,7 +43,7 @@ RETURNING
     "createdBy";
 `
 
-func (store *workspaceStore) CreateWorkspace(ctx context.Context, cmd *workspace.CreateWorkspaceCommand) (*workspace.Workspace, error) {
+func (store *workspaceStore) CreateWorkspace(ctx context.Context, cmd *workspace.CreateWorkspaceCommand) (*model.Workspace, error) {
 	if cmd.ScopeId == "" {
 		sid, err := gonanoid.New()
 		if err != nil {
@@ -60,7 +61,7 @@ func (store *workspaceStore) CreateWorkspace(ctx context.Context, cmd *workspace
 		"createdBy":   cmd.CreatedBy,
 	})
 
-	var ws workspace.Workspace
+	var ws model.Workspace
 	err := row.Scan(
 		&ws.Id,
 		&ws.ScopeId,
