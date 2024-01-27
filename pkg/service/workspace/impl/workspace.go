@@ -25,7 +25,7 @@ func NewWorkspaceService(ds store.WorkspaceStore) workspace.Service {
 }
 
 func (s *workspaceService) GetWorkspaceList(ctx context.Context, query *grpc.GetWorkspaceListQuery) (*grpc.GetWorkspaceListReply, error) {
-	workspaceList, err := s.store.GetWorkspaceList(ctx, &workspace.GetWorkspaceListQuery{
+	wsList, err := s.store.GetWorkspaceList(ctx, &workspace.GetWorkspaceListQuery{
 		WorkspaceIdList: query.WorkspaceIdList,
 		Visibility:      model.ScopeVisibility(query.Visibility),
 	})
@@ -33,8 +33,8 @@ func (s *workspaceService) GetWorkspaceList(ctx context.Context, query *grpc.Get
 		return nil, err
 	}
 
-	res := &grpc.GetWorkspaceListReply{WorkspaceList: make([]*system.Workspace, len(workspaceList))}
-	for i, ws := range workspaceList {
+	res := &grpc.GetWorkspaceListReply{WorkspaceList: make([]*system.Workspace, len(wsList))}
+	for i, ws := range wsList {
 		if ws == nil {
 			continue
 		}
