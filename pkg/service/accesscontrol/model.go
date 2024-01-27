@@ -227,6 +227,15 @@ type RevokeUserAccessCommand struct {
 	ProjectId   int32
 }
 
+// MakeParentResource
+
+type MakeParentResourceCommand struct {
+	ParentResource   string
+	ParentResourceId int32
+	ChildResource    string
+	ChildResourceId  int32
+}
+
 ////////////////////////////////////////////
 
 type GetOrgListQuery struct {
