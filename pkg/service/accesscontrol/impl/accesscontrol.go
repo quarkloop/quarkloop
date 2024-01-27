@@ -2,8 +2,11 @@ package accesscontrol_impl
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"log"
+	"strconv"
 
 	v1 "github.com/authzed/authzed-go/proto/authzed/api/v1"
 	"github.com/authzed/authzed-go/v1"
@@ -45,8 +48,6 @@ func (s *aclService) EvaluateUserAccess(ctx context.Context, query *accesscontro
 		objectType = "org"
 		objectId = fmt.Sprintf("%d", query.OrgId)
 	}
-
-	fmt.Printf("\nresource: => %+v => %+v => %+v\n\n", objectType, objectId, query)
 
 	rResp, err := s.authz.CheckPermission(context.Background(), &v1.CheckPermissionRequest{
 		Resource: &v1.ObjectReference{
@@ -117,102 +118,12 @@ func (s *aclService) GrantUserAccess(ctx context.Context, cmd *accesscontrol.Gra
 	}
 
 	return nil
-
-	// if cmd.OrgId != 0 {
-	// 	query := &accesscontrol.GetOrgMemberByUserIdQuery{UserId: cmd.UserId, OrgId: 0}
-	// 	_, err := s.store.GetOrgMemberByUserId(ctx, query)
-	// 	if err != nil {
-	// 		return false, err
-	// 	}
-
-	// 	cmd := &accesscontrol.CreateOrgMemberCommand{
-	// 		OrgId:     cmd.OrgId,
-	// 		UserId:    cmd.UserId,
-	// 		RoleId:    cmd.RoleId,
-	// 		CreatedBy: "admin",
-	// 	}
-	// 	_, err = s.store.CreateOrgMember(ctx, cmd)
-	// 	if err != nil {
-	// 		return false, err
-	// 	}
-	// } else if cmd.WorkspaceId != 0 {
-	// 	query := &accesscontrol.GetOrgMemberByUserIdQuery{UserId: cmd.UserId, OrgId: 0}
-	// 	orgMember, err := s.store.GetOrgMemberByUserId(ctx, query)
-	// 	if err != nil && err != org.ErrOrgMemberNotFound {
-	// 		return false, err
-	// 	}
-
-	// 	roleId := cmd.RoleId
-	// 	membership := accesscontrol.DirectMembership
-	// 	sourceId := 0
-
-	// 	if orgMember != nil {
-	// 		roleId = orgMember.RoleId
-	// 		membership = accesscontrol.InheritedMembership
-	// 		sourceId = orgMember.OrgId
-	// 	}
-
-	// 	cmd := &accesscontrol.CreateWorkspaceMemberCommand{
-	// 		WorkspaceId: cmd.WorkspaceId,
-	// 		UserId:      cmd.UserId,
-	// 		RoleId:      roleId,
-	// 		Type:        membership, // direct, inherited
-	// 		Source:      sourceId,   // orgId if membership is inherited
-	// 		CreatedBy:   "admin",
-	// 	}
-	// 	_, err = s.store.CreateWorkspaceMember(ctx, cmd)
-	// 	if err != nil {
-	// 		return false, err
-	// 	}
-	// } else if cmd.ProjectId != 0 {
-	// 	orgQuery := &accesscontrol.GetOrgMemberByUserIdQuery{UserId: cmd.UserId, OrgId: 0}
-	// 	orgMember, err := s.store.GetOrgMemberByUserId(ctx, orgQuery)
-	// 	if err != nil && err != org.ErrOrgMemberNotFound {
-	// 		return false, err
-	// 	}
-
-	// 	wsQuery := &accesscontrol.GetWorkspaceMemberByUserIdQuery{UserId: cmd.UserId, WorkspaceId: 0}
-	// 	wsMember, err := s.store.GetWorkspaceMemberByUserId(ctx, wsQuery)
-	// 	if err != nil && err != org.ErrOrgMemberNotFound {
-	// 		return false, err
-	// 	}
-
-	// 	roleId := cmd.RoleId
-	// 	membership := accesscontrol.DirectMembership
-	// 	sourceId := 0
-
-	// 	if orgMember != nil {
-	// 		roleId = orgMember.RoleId
-	// 		membership = accesscontrol.InheritedMembership
-	// 		sourceId = orgMember.OrgId
-	// 	} else if wsMember != nil && wsMember.Type == accesscontrol.DirectMembership {
-	// 		roleId = wsMember.RoleId
-	// 		membership = accesscontrol.InheritedMembership
-	// 		sourceId = wsMember.WorkspaceId
-	// 	}
-
-	// 	cmd := &accesscontrol.CreateProjectMemberCommand{
-	// 		ProjectId: cmd.ProjectId,
-	// 		UserId:    cmd.UserId,
-	// 		RoleId:    roleId,
-	// 		Type:      membership, // direct, inherited
-	// 		Source:    sourceId,   // orgId if membership is inherited
-	// 		CreatedBy: "admin",
-	// 	}
-	// 	_, err = s.store.CreateProjectMember(ctx, cmd)
-	// 	if err != nil {
-	// 		return false, err
-	// 	}
-	// }
-
-	// return true, nil
 }
 
 func (s *aclService) RevokeUserAccess(ctx context.Context, cmd *accesscontrol.RevokeUserAccessCommand) error {
 	objectType := ""
 	objectId := ""
 	relation := cmd.Role
-	userId := fmt.Sprintf("%d", cmd.UserId)
 
 	if cmd.OrgId != 0 && cmd.WorkspaceId != 0 && cmd.ProjectId != 0 {
 		objectType = "project"
@@ -225,18 +136,137 @@ func (s *aclService) RevokeUserAccess(ctx context.Context, cmd *accesscontrol.Re
 		objectId = fmt.Sprintf("%d", cmd.OrgId)
 	}
 
+	filter := &v1.RelationshipFilter{
+		ResourceType:       objectType,
+		OptionalResourceId: objectId,
+	}
+
+	if relation != "" {
+		filter.OptionalRelation = relation
+	}
+	if cmd.UserId != 0 {
+		filter.OptionalSubjectFilter = &v1.SubjectFilter{
+			SubjectType:       "user",
+			OptionalSubjectId: fmt.Sprintf("%d", cmd.UserId),
+		}
+	}
+
 	req := &v1.DeleteRelationshipsRequest{
-		RelationshipFilter: &v1.RelationshipFilter{
-			ResourceType:       objectType,
-			OptionalResourceId: objectId,
-			OptionalRelation:   relation,
-			OptionalSubjectFilter: &v1.SubjectFilter{
-				SubjectType:       "user",
-				OptionalSubjectId: userId,
+		RelationshipFilter:            filter,
+		OptionalAllowPartialDeletions: true,
+	}
+	_, err := s.authz.DeleteRelationships(ctx, req)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *aclService) RevokeUserAccessByResourceType(ctx context.Context, cmd *accesscontrol.RevokeUserAccessCommand) error {
+	objectType := ""
+	objectId := ""
+	//relation := cmd.Role
+	//userId := fmt.Sprintf("%d", cmd.UserId)
+
+	if cmd.OrgId != 0 && cmd.WorkspaceId != 0 && cmd.ProjectId != 0 {
+		objectType = "project"
+		objectId = fmt.Sprintf("%d", cmd.ProjectId)
+	} else if cmd.OrgId != 0 && cmd.WorkspaceId != 0 {
+		objectType = "workspace"
+		objectId = fmt.Sprintf("%d", cmd.WorkspaceId)
+	} else if cmd.OrgId != 0 {
+		objectType = "org"
+		objectId = fmt.Sprintf("%d", cmd.OrgId)
+	}
+
+	userList, err := s.getResourceUsers(ctx, objectType, objectId)
+	if err != nil {
+		return err
+	}
+
+	for _, userId := range userList {
+		req := &v1.DeleteRelationshipsRequest{
+			RelationshipFilter: &v1.RelationshipFilter{
+				ResourceType:       objectType,
+				OptionalResourceId: objectId,
+				//OptionalRelation:   relation,
+				OptionalSubjectFilter: &v1.SubjectFilter{
+					SubjectType:       "user",
+					OptionalSubjectId: strconv.FormatInt(int64(userId), 10),
+				},
+			},
+		}
+		_, err := s.authz.DeleteRelationships(ctx, req)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *aclService) getResourceUsers(ctx context.Context, resource, resourceId string) ([]int32, error) {
+	var userList []int32 = []int32{}
+	resp, err := s.authz.LookupSubjects(ctx, &v1.LookupSubjectsRequest{
+		Permission:        "all",
+		SubjectObjectType: "user",
+		Resource: &v1.ObjectReference{
+			ObjectType: resource,
+			ObjectId:   resourceId,
+		},
+		Consistency: &v1.Consistency{
+			Requirement: &v1.Consistency_FullyConsistent{FullyConsistent: true},
+		},
+	})
+	if err != nil {
+		return userList, err
+	}
+
+	for {
+		res, err := resp.Recv()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			fmt.Printf("\n[LookupSubjects] (%+v, %+v) => %+v\n", resource, resourceId, err)
+		}
+
+		userId, err := strconv.ParseInt(res.Subject.SubjectObjectId, 10, 32)
+		if err != nil {
+			panic(err)
+		}
+
+		userList = append(userList, int32(userId))
+	}
+	return userList, nil
+}
+
+func (s *aclService) MakeParentResource(ctx context.Context, cmd *accesscontrol.MakeParentResourceCommand) error {
+	parent := cmd.ParentResource
+	parentId := strconv.FormatInt(int64(cmd.ParentResourceId), 10)
+	child := cmd.ChildResource
+	childId := strconv.FormatInt(int64(cmd.ChildResourceId), 10)
+
+	relationships := []*v1.RelationshipUpdate{
+		{
+			Operation: v1.RelationshipUpdate_OPERATION_CREATE,
+			Relationship: &v1.Relationship{
+				Resource: &v1.ObjectReference{
+					ObjectType: child,
+					ObjectId:   childId,
+				},
+				Relation: "parent",
+				Subject: &v1.SubjectReference{
+					Object: &v1.ObjectReference{
+						ObjectType: parent,
+						ObjectId:   parentId,
+					},
+				},
 			},
 		},
 	}
-	_, err := s.authz.DeleteRelationships(ctx, req)
+	_, err := s.authz.WriteRelationships(ctx, &v1.WriteRelationshipsRequest{Updates: relationships})
 	if err != nil {
 		return err
 	}
