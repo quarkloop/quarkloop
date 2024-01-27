@@ -1,6 +1,7 @@
 package workspace
 
 import (
+	"fmt"
 	"net/http"
 	"slices"
 
@@ -79,6 +80,7 @@ func (s *WorkspaceApi) getWorkspaceList(ctx *gin.Context) api.Response {
 			UserId:     user.GetId(),
 		}
 		list, err := s.aclService.GetWorkspaceList(ctx, aclQuery)
+		fmt.Printf("\n[aclService] GetWorkspaceList => %+v => %+v\n", list, err)
 		if err != nil {
 			return api.Error(http.StatusInternalServerError, err)
 		}
@@ -90,6 +92,7 @@ func (s *WorkspaceApi) getWorkspaceList(ctx *gin.Context) api.Response {
 	}
 
 	wsList, err := s.workspaceService.GetWorkspaceList(ctx, query)
+	fmt.Printf("\n[workspaceService] GetWorkspaceList => %+v => %+v\n", wsList, err)
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
