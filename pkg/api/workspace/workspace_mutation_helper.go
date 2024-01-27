@@ -1,7 +1,6 @@
 package workspace
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,8 +15,6 @@ import (
 )
 
 func (s *WorkspaceApi) createWorkspace(ctx *gin.Context, cmd *workspace.CreateWorkspaceCommand) api.Response {
-	user := contextdata.GetUser(ctx)
-
 	// check permissions
 	access, err := s.evaluateCreatePermission(ctx, accesscontrol.ActionWorkspaceCreate, cmd.OrgId)
 	if err != nil {
@@ -42,7 +39,6 @@ func (s *WorkspaceApi) createWorkspace(ctx *gin.Context, cmd *workspace.CreateWo
 		Description: cmd.Description,
 		Visibility:  int32(cmd.Visibility),
 	})
-	fmt.Printf("\ncreateWorkspace => %+v\n", err)
 	if err != nil {
 		if e, ok := status.FromError(err); ok {
 			switch e.Code() {
@@ -57,13 +53,13 @@ func (s *WorkspaceApi) createWorkspace(ctx *gin.Context, cmd *workspace.CreateWo
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	aclCommand := &accesscontrol.GrantUserAccessCommand{
-		UserId:      user.Id,
-		OrgId:       ws.Workspace.OrgId,
-		WorkspaceId: ws.Workspace.Id,
-		Role:        accesscontrol.RoleOwner,
+	relationCmd := &accesscontrol.MakeParentResourceCommand{
+		ParentResource:   "org",
+		ParentResourceId: cmd.OrgId,
+		ChildResource:    "workspace",
+		ChildResourceId:  ws.Workspace.Id,
 	}
-	err = s.aclService.GrantUserAccess(ctx, aclCommand)
+	err = s.aclService.MakeParentResource(ctx, relationCmd)
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
@@ -99,8 +95,6 @@ func (s *WorkspaceApi) updateWorkspaceById(ctx *gin.Context, cmd *workspace.Upda
 }
 
 func (s *WorkspaceApi) deleteWorkspaceById(ctx *gin.Context, cmd *workspace.DeleteWorkspaceByIdCommand) api.Response {
-	user := contextdata.GetUser(ctx)
-
 	// check permissions
 	access, err := s.evaluatePermission(ctx, accesscontrol.ActionProjectDelete, cmd.OrgId, cmd.WorkspaceId)
 	if err != nil {
@@ -120,10 +114,8 @@ func (s *WorkspaceApi) deleteWorkspaceById(ctx *gin.Context, cmd *workspace.Dele
 	}
 
 	aclCommand := &accesscontrol.RevokeUserAccessCommand{
-		UserId:      user.Id,
 		OrgId:       cmd.OrgId,
 		WorkspaceId: cmd.WorkspaceId,
-		Role:        accesscontrol.RoleOwner,
 	}
 	err = s.aclService.RevokeUserAccess(ctx, aclCommand)
 	if err != nil {
