@@ -85,8 +85,6 @@ func (s *orgApi) updateOrgById(ctx *gin.Context, cmd *org.UpdateOrgByIdCommand) 
 }
 
 func (s *orgApi) deleteOrgById(ctx *gin.Context, cmd *org.DeleteOrgByIdCommand) api.Response {
-	user := contextdata.GetUser(ctx)
-
 	// check permissions
 	access, err := s.evaluatePermission(ctx, accesscontrol.ActionOrgDelete, cmd.OrgId)
 	if err != nil {
@@ -102,11 +100,7 @@ func (s *orgApi) deleteOrgById(ctx *gin.Context, cmd *org.DeleteOrgByIdCommand) 
 		return api.Error(http.StatusInternalServerError, err)
 	}
 
-	aclCommand := &accesscontrol.RevokeUserAccessCommand{
-		UserId: user.Id,
-		OrgId:  cmd.OrgId,
-		Role:   accesscontrol.RoleOwner,
-	}
+	aclCommand := &accesscontrol.RevokeUserAccessCommand{OrgId: cmd.OrgId}
 	err = s.aclService.RevokeUserAccess(ctx, aclCommand)
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
