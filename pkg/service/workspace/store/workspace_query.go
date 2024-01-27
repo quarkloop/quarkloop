@@ -34,7 +34,7 @@ FROM
 LEFT JOIN 
     system."Organization" AS org ON org."id" = ws."orgId"
 WHERE 
-    ws."orgId" = ANY (@workspaceIdList)
+    ws."id" = ANY (@workspaceIdList)
 %s	
 `
 
