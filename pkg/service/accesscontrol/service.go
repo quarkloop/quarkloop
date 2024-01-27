@@ -7,6 +7,8 @@ type Service interface {
 	EvaluateUserAccess(context.Context, *EvaluateQuery) (bool, error)
 	GrantUserAccess(context.Context, *GrantUserAccessCommand) error
 	RevokeUserAccess(context.Context, *RevokeUserAccessCommand) error
+	RevokeUserAccessByResourceType(context.Context, *RevokeUserAccessCommand) error
+	MakeParentResource(context.Context, *MakeParentResourceCommand) error
 
 	// member query
 	GetOrgMemberList(context.Context, *GetOrgMemberListQuery) ([]*Member, error)
