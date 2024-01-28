@@ -26,7 +26,7 @@ func (s *WorkspaceApi) CreateWorkspace(ctx *gin.Context) {
 
 	cmd := &workspace.CreateWorkspaceCommand{OrgId: uriParams.OrgId}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
@@ -55,7 +55,7 @@ func (s *WorkspaceApi) UpdateWorkspaceById(ctx *gin.Context) {
 		WorkspaceId: uriParams.WorkspaceId,
 	}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
