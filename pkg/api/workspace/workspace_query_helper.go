@@ -1,7 +1,6 @@
 package workspace
 
 import (
-	"fmt"
 	"net/http"
 	"slices"
 
@@ -67,7 +66,7 @@ func (s *WorkspaceApi) getWorkspaceById(ctx *gin.Context, query *workspace.GetWo
 
 	// anonymous and unauthorized user => return public workspace
 	// authorized user => return public or private workspace
-	return api.Success(http.StatusOK, ws)
+	return api.Success(http.StatusOK, ws.GetWorkspace())
 }
 
 func (s *WorkspaceApi) getWorkspaceList(ctx *gin.Context) api.Response {
@@ -80,7 +79,6 @@ func (s *WorkspaceApi) getWorkspaceList(ctx *gin.Context) api.Response {
 			UserId:     user.GetId(),
 		}
 		list, err := s.aclService.GetWorkspaceList(ctx, aclQuery)
-		fmt.Printf("\n[aclService] GetWorkspaceList => %+v => %+v\n", list, err)
 		if err != nil {
 			return api.Error(http.StatusInternalServerError, err)
 		}
@@ -92,7 +90,6 @@ func (s *WorkspaceApi) getWorkspaceList(ctx *gin.Context) api.Response {
 	}
 
 	wsList, err := s.workspaceService.GetWorkspaceList(ctx, query)
-	fmt.Printf("\n[workspaceService] GetWorkspaceList => %+v => %+v\n", wsList, err)
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err)
 	}
