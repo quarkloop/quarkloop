@@ -23,8 +23,6 @@ import (
 	"github.com/quarkloop/quarkloop/pkg/api/workspace"
 	"github.com/quarkloop/quarkloop/pkg/contextdata"
 	acl_impl "github.com/quarkloop/quarkloop/pkg/service/accesscontrol/impl"
-	project_impl "github.com/quarkloop/quarkloop/pkg/service/project/impl"
-	project_store "github.com/quarkloop/quarkloop/pkg/service/project/store"
 	project_submission_impl "github.com/quarkloop/quarkloop/pkg/service/project_submission/impl"
 	quota_impl "github.com/quarkloop/quarkloop/pkg/service/quota/impl"
 	quota_store "github.com/quarkloop/quarkloop/pkg/service/quota/store"
@@ -39,6 +37,7 @@ import (
 	user_store "github.com/quarkloop/quarkloop/pkg/service/user/store"
 	"github.com/quarkloop/quarkloop/pkg/store/repository"
 	orgGrpcService "github.com/quarkloop/quarkloop/service/v1/system/org"
+	projectGrpcService "github.com/quarkloop/quarkloop/service/v1/system/project"
 	workspaceGrpcService "github.com/quarkloop/quarkloop/service/v1/system/workspace"
 )
 
@@ -53,6 +52,7 @@ type Server struct {
 	// grpc services
 	orgService       orgGrpcService.OrgServiceClient
 	workspaceService workspaceGrpcService.WorkspaceServiceClient
+	projectService   projectGrpcService.ProjectServiceClient
 
 	// apis
 	userApi              user.Api
@@ -107,7 +107,9 @@ func NewDefaultServer(ds *repository.Repository) Server {
 
 	orgService := orgGrpcService.NewOrgServiceClient(systemGrpcServiceConn)
 	workspaceService := workspaceGrpcService.NewWorkspaceServiceClient(systemGrpcServiceConn)
-	projectTableService := project_impl.NewProjectService(project_store.NewProjectStore(ds.SystemDbConn))
+	projectService := projectGrpcService.NewProjectServiceClient(systemGrpcServiceConn)
+
+	//projectTableService := project_impl.NewProjectService(project_store.NewProjectStore(ds.SystemDbConn))
 
 	projectSubmissionService := project_submission_impl.NewAppSubmissionService(ds)
 
@@ -117,10 +119,12 @@ func NewDefaultServer(ds *repository.Repository) Server {
 
 		orgService: orgService,
 
-		userApi:              user.NewUserApi(userService, aclService),
-		orgApi:               org.NewOrgApi(orgService, userService, aclService, quotaService),
-		workspaceApi:         workspace.NewWorkspaceApi(workspaceService, userService, aclService, quotaService),
-		projectApi:           project.NewProjectApi(projectTableService, userService, aclService, quotaService, tableBranchService),
+		userApi: user.NewUserApi(userService, aclService),
+
+		orgApi:       org.NewOrgApi(orgService, userService, aclService, quotaService),
+		workspaceApi: workspace.NewWorkspaceApi(workspaceService, userService, aclService, quotaService),
+		projectApi:   project.NewProjectApi(projectService, userService, aclService, quotaService, tableBranchService),
+
 		tableBranchApi:       table_branch.NewTableBranchApi(tableBranchService),
 		tableSchemaApi:       table_schema.NewTableSchemaApi(tableSchemaService),
 		tableRecordApi:       table_record.NewTableRecordApi(tableRecordService),
