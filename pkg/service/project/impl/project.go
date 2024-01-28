@@ -1,73 +1,134 @@
 package project_impl
 
 import (
-	"github.com/gin-gonic/gin"
+	"context"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
+
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/project/store"
-	"github.com/quarkloop/quarkloop/pkg/service/user"
+	"github.com/quarkloop/quarkloop/service/v1/system"
+	grpc "github.com/quarkloop/quarkloop/service/v1/system/project"
 )
 
 type projectService struct {
 	store store.ProjectStore
+
+	grpc.UnimplementedProjectServiceServer
 }
 
 func NewProjectService(ds store.ProjectStore) project.Service {
-	return &projectService{
-		store: ds,
-	}
+	return &projectService{store: ds}
 }
 
-func (s *projectService) GetProjectList(ctx *gin.Context, query *project.GetProjectListQuery) ([]*project.Project, error) {
-	projectList, err := s.store.GetProjectList(ctx, query)
+func (s *projectService) GetProjectList(ctx context.Context, query *grpc.GetProjectListQuery) (*grpc.GetProjectListReply, error) {
+	projectList, err := s.store.GetProjectList(ctx, &project.GetProjectListQuery{
+		ProjectIdList: query.ProjectIdList,
+		Visibility:    model.ScopeVisibility(query.Visibility),
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	for i := range projectList {
-		project := projectList[i]
-		project.GeneratePath()
+	res := &grpc.GetProjectListReply{ProjectList: make([]*system.Project, len(projectList))}
+	for i, prj := range projectList {
+		if prj == nil {
+			continue
+		}
+
+		prj.GeneratePath()
+		proto := prj.Proto()
+		res.ProjectList[i] = proto
 	}
-	return projectList, nil
+
+	return res, nil
 }
 
-func (s *projectService) GetProjectById(ctx *gin.Context, query *project.GetProjectByIdQuery) (*project.Project, error) {
-	p, err := s.store.GetProjectById(ctx, query)
+func (s *projectService) GetProjectById(ctx context.Context, query *grpc.GetProjectByIdQuery) (*grpc.GetProjectByIdReply, error) {
+	prj, err := s.store.GetProjectById(ctx, &project.GetProjectByIdQuery{
+		OrgId:       query.OrgId,
+		WorkspaceId: query.WorkspaceId,
+		ProjectId:   query.ProjectId,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	p.GeneratePath()
-	return p, nil
+	prj.GeneratePath()
+	proto := prj.Proto()
+
+	reply := &grpc.GetProjectByIdReply{Project: proto}
+	return reply, nil
 }
 
-func (s *projectService) GetProjectVisibilityById(ctx *gin.Context, query *project.GetProjectVisibilityByIdQuery) (model.ScopeVisibility, error) {
-	return s.store.GetProjectVisibilityById(ctx, query)
-}
-
-func (s *projectService) CreateProject(ctx *gin.Context, cmd *project.CreateProjectCommand) (*project.Project, error) {
-	p, err := s.store.CreateProject(ctx, cmd)
+func (s *projectService) GetProjectVisibilityById(ctx context.Context, query *grpc.GetProjectVisibilityByIdQuery) (*grpc.GetProjectVisibilityByIdReply, error) {
+	visibility, err := s.store.GetProjectVisibilityById(ctx, &project.GetProjectVisibilityByIdQuery{
+		OrgId:       query.OrgId,
+		WorkspaceId: query.WorkspaceId,
+		ProjectId:   query.ProjectId,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	p.GeneratePath()
-	return p, nil
+	reply := &grpc.GetProjectVisibilityByIdReply{Visibility: int32(visibility)}
+	return reply, nil
 }
 
-func (s *projectService) UpdateProjectById(ctx *gin.Context, cmd *project.UpdateProjectByIdCommand) error {
-	return s.store.UpdateProjectById(ctx, cmd)
-}
-
-func (s *projectService) DeleteProjectById(ctx *gin.Context, cmd *project.DeleteProjectByIdCommand) error {
-	return s.store.DeleteProjectById(ctx, cmd)
-}
-
-func (s *projectService) GetUserAssignmentList(ctx *gin.Context, query *project.GetUserAssignmentListQuery) ([]*user.UserAssignment, error) {
-	uaList, err := s.store.GetUserAssignmentList(ctx, query)
-	if err != nil {
-		return nil, err
+func (s *projectService) CreateProject(ctx context.Context, cmd *grpc.CreateProjectCommand) (*grpc.CreateProjectReply, error) {
+	if cmd.Name == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "request missing required field: Name")
+	} else if cmd.Description == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "request missing required field: Description")
+	} else if cmd.CreatedBy == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "request missing required field: CreatedBy")
 	}
 
-	return uaList, nil
+	prj, err := s.store.CreateProject(ctx, &project.CreateProjectCommand{
+		OrgId:       cmd.OrgId,
+		WorkspaceId: cmd.WorkspaceId,
+		CreatedBy:   cmd.CreatedBy,
+		ScopeId:     cmd.ScopeId,
+		Name:        cmd.Name,
+		Description: cmd.Description,
+		Visibility:  model.ScopeVisibility(cmd.Visibility),
+	})
+	if err != nil {
+		if err == project.ErrProjectAlreadyExists {
+			return nil, status.Errorf(codes.AlreadyExists, err.Error())
+		}
+		return nil, status.Errorf(codes.Internal, "something went wrong in server, error: %s", err.Error())
+	}
+
+	prj.GeneratePath()
+	proto := prj.Proto()
+
+	reply := &grpc.CreateProjectReply{Project: proto}
+	return reply, nil
+}
+
+func (s *projectService) UpdateProjectById(ctx context.Context, cmd *grpc.UpdateProjectByIdCommand) (*emptypb.Empty, error) {
+	err := s.store.UpdateProjectById(ctx, &project.UpdateProjectByIdCommand{
+		OrgId:       cmd.OrgId,
+		WorkspaceId: cmd.WorkspaceId,
+		ProjectId:   cmd.ProjectId,
+		UpdatedBy:   cmd.UpdatedBy,
+		ScopeId:     cmd.ScopeId,
+		Name:        cmd.Name,
+		Description: cmd.Description,
+		Visibility:  model.ScopeVisibility(cmd.Visibility),
+	})
+	return &emptypb.Empty{}, err
+}
+
+func (s *projectService) DeleteProjectById(ctx context.Context, cmd *grpc.DeleteProjectByIdCommand) (*emptypb.Empty, error) {
+	err := s.store.DeleteProjectById(ctx, &project.DeleteProjectByIdCommand{
+		OrgId:       cmd.OrgId,
+		WorkspaceId: cmd.WorkspaceId,
+		ProjectId:   cmd.ProjectId,
+	})
+	return &emptypb.Empty{}, err
 }
