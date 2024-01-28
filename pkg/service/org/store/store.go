@@ -6,7 +6,6 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
-	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
 type OrgStore interface {
@@ -15,7 +14,7 @@ type OrgStore interface {
 	GetOrgVisibilityById(context.Context, *org.GetOrgVisibilityByIdQuery) (model.ScopeVisibility, error)
 	GetOrgList(context.Context, *org.GetOrgListQuery) ([]*model.Org, error)
 	GetWorkspaceList(context.Context, *org.GetWorkspaceListQuery) ([]*model.Workspace, error)
-	GetProjectList(context.Context, *org.GetProjectListQuery) ([]*project.Project, error)
+	GetProjectList(context.Context, *org.GetProjectListQuery) ([]*model.Project, error)
 	//GetUserAssignmentList(context.Context, *org.GetUserAssignmentListQuery) ([]*user.UserAssignment, error)
 
 	// mutation
