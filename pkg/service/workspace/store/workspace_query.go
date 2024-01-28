@@ -9,7 +9,6 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/quarkloop/quarkloop/pkg/model"
-	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/user"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 )
@@ -57,7 +56,6 @@ func (store *workspaceStore) GetWorkspaceList(ctx context.Context, query *worksp
 	defer rows.Close()
 
 	var wsList []*model.Workspace = []*model.Workspace{}
-
 	for rows.Next() {
 		var workspace model.Workspace
 		err := rows.Scan(
@@ -288,7 +286,7 @@ AND
 %s
 `
 
-func (store *workspaceStore) GetProjectList(ctx context.Context, query *workspace.GetProjectListQuery) ([]*project.Project, error) {
+func (store *workspaceStore) GetProjectList(ctx context.Context, query *workspace.GetProjectListQuery) ([]*model.Project, error) {
 	whereClause := ";"
 	if query.Visibility == model.PublicVisibility || query.Visibility == model.PrivateVisibility {
 		whereClause = `AND p."visibility" = @visibility;`
@@ -307,10 +305,10 @@ func (store *workspaceStore) GetProjectList(ctx context.Context, query *workspac
 	}
 	defer rows.Close()
 
-	var projectList []*project.Project = []*project.Project{}
+	var projectList []*model.Project = []*model.Project{}
 
 	for rows.Next() {
-		var project project.Project
+		var project model.Project
 		err := rows.Scan(
 			&project.Id,
 			&project.ScopeId,
