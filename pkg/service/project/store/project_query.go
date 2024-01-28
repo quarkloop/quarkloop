@@ -33,31 +33,25 @@ SELECT
 FROM 
     "system"."Project" AS p
 LEFT JOIN 
-    system."Organization" AS org ON org."id" = p."orgId"
-LEFT JOIN 
     system."Workspace" AS ws ON ws."id" = p."workspaceId"
+LEFT JOIN 
+    system."Organization" AS org ON org."id" = p."orgId"	
 WHERE
-    %s;
+    p."id" = ANY (@projectIdList)
+%s
 `
 
-// TODO: rewrite query
-func (store *projectStore) GetProjectList(ctx context.Context, query *project.GetProjectListQuery) ([]*project.Project, error) {
-	whereClause := []string{}
-	// if len(orgId) != 0 {
-	// 	whereClause = append(whereClause, `p."orgId" = ANY (@orgId)`)
-	// }
-	// if len(workspaceId) != 0 {
-	// 	whereClause = append(whereClause, `p."workspaceId" = ANY (@workspaceId)`)
-	// }
+func (store *projectStore) GetProjectList(ctx context.Context, query *project.GetProjectListQuery) ([]*model.Project, error) {
+	var finalQuery strings.Builder
 	if query.Visibility == model.PublicVisibility || query.Visibility == model.PrivateVisibility {
-		whereClause = append(whereClause, `p."visibility" = @visibility`)
+		finalQuery.WriteString(fmt.Sprintf(listProjectsQuery, `AND p."visibility" = @visibility;`))
+	} else {
+		finalQuery.WriteString(fmt.Sprintf(listProjectsQuery, ";"))
 	}
 
-	finalQuery := fmt.Sprintf(listProjectsQuery, strings.Join(whereClause[:], " AND "))
-
-	rows, err := store.Conn.Query(ctx, finalQuery, pgx.NamedArgs{
-		"userId":     query.UserId,
-		"visibility": query.Visibility,
+	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{
+		"projectIdList": query.ProjectIdList,
+		"visibility":    query.Visibility,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
@@ -65,10 +59,9 @@ func (store *projectStore) GetProjectList(ctx context.Context, query *project.Ge
 	}
 	defer rows.Close()
 
-	var projectList []*project.Project = []*project.Project{}
-
+	var projectList []*model.Project = []*model.Project{}
 	for rows.Next() {
-		var project project.Project
+		var project model.Project
 		err := rows.Scan(
 			&project.Id,
 			&project.ScopeId,
@@ -132,14 +125,14 @@ WHERE (
 );
 `
 
-func (store *projectStore) GetProjectById(ctx context.Context, query *project.GetProjectByIdQuery) (*project.Project, error) {
+func (store *projectStore) GetProjectById(ctx context.Context, query *project.GetProjectByIdQuery) (*model.Project, error) {
 	row := store.Conn.QueryRow(ctx, getProjectByIdQuery, pgx.NamedArgs{
 		"orgId":       query.OrgId,
 		"workspaceId": query.WorkspaceId,
 		"id":          query.ProjectId,
 	})
 
-	var p project.Project
+	var p model.Project
 	err := row.Scan(
 		&p.Id,
 		&p.ScopeId,
@@ -230,7 +223,7 @@ ORDER BY "updatedAt" ASC
 LIMIT 1;
 `
 
-func (store *projectStore) GetProject(ctx context.Context, p *project.Project) (*project.Project, error) {
+func (store *projectStore) GetProject(ctx context.Context, p *model.Project) (*model.Project, error) {
 	availableFields := []string{}
 	projectFields := map[string]interface{}{
 		"sid":        p.ScopeId,
@@ -263,7 +256,7 @@ func (store *projectStore) GetProject(ctx context.Context, p *project.Project) (
 
 	row := store.Conn.QueryRow(ctx, finalQuery)
 
-	var project project.Project
+	var project model.Project
 	err := row.Scan(
 		&project.Id,
 		&project.ScopeId,
