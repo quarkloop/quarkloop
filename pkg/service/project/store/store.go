@@ -11,13 +11,13 @@ import (
 
 type ProjectStore interface {
 	// query
-	GetProjectById(context.Context, *project.GetProjectByIdQuery) (*project.Project, error)
+	GetProjectById(context.Context, *project.GetProjectByIdQuery) (*model.Project, error)
 	GetProjectVisibilityById(context.Context, *project.GetProjectVisibilityByIdQuery) (model.ScopeVisibility, error)
-	GetProjectList(context.Context, *project.GetProjectListQuery) ([]*project.Project, error)
+	GetProjectList(context.Context, *project.GetProjectListQuery) ([]*model.Project, error)
 	GetUserAssignmentList(context.Context, *project.GetUserAssignmentListQuery) ([]*user.UserAssignment, error)
 
 	// mutation
-	CreateProject(context.Context, *project.CreateProjectCommand) (*project.Project, error)
+	CreateProject(context.Context, *project.CreateProjectCommand) (*model.Project, error)
 	UpdateProjectById(context.Context, *project.UpdateProjectByIdCommand) error
 	DeleteProjectById(context.Context, *project.DeleteProjectByIdCommand) error
 }
