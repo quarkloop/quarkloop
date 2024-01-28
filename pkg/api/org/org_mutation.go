@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/quarkloop/quarkloop/pkg/api"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
 )
 
@@ -21,7 +22,7 @@ import (
 func (s *orgApi) CreateOrg(ctx *gin.Context) {
 	cmd := &org.CreateOrgCommand{}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
@@ -42,11 +43,11 @@ func (s *orgApi) UpdateOrgById(ctx *gin.Context) {
 	cmd := &org.UpdateOrgByIdCommand{}
 
 	if err := ctx.ShouldBindUri(cmd); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
@@ -66,7 +67,7 @@ func (s *orgApi) UpdateOrgById(ctx *gin.Context) {
 func (s *orgApi) DeleteOrgById(ctx *gin.Context) {
 	cmd := &org.DeleteOrgByIdCommand{}
 	if err := ctx.ShouldBindUri(cmd); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
