@@ -9,6 +9,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	gonanoid "github.com/matoous/go-nanoid/v2"
+	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
@@ -45,7 +46,7 @@ RETURNING
     "createdBy";
 `
 
-func (store *projectStore) CreateProject(ctx context.Context, cmd *project.CreateProjectCommand) (*project.Project, error) {
+func (store *projectStore) CreateProject(ctx context.Context, cmd *project.CreateProjectCommand) (*model.Project, error) {
 	if cmd.ScopeId == "" {
 		sid, err := gonanoid.New()
 		if err != nil {
@@ -64,7 +65,7 @@ func (store *projectStore) CreateProject(ctx context.Context, cmd *project.Creat
 		"createdBy":   cmd.CreatedBy,
 	})
 
-	var pr project.Project
+	var pr model.Project
 	err := row.Scan(
 		&pr.Id,
 		&pr.ScopeId,
