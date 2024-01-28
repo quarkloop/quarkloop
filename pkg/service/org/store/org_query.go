@@ -11,7 +11,6 @@ import (
 
 	"github.com/quarkloop/quarkloop/pkg/model"
 	"github.com/quarkloop/quarkloop/pkg/service/org"
-	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
 /// GetOrgById
@@ -327,7 +326,7 @@ WHERE
 %s
 `
 
-func (store *orgStore) GetProjectList(ctx context.Context, query *org.GetProjectListQuery) ([]*project.Project, error) {
+func (store *orgStore) GetProjectList(ctx context.Context, query *org.GetProjectListQuery) ([]*model.Project, error) {
 	var finalQuery strings.Builder
 	if query.Visibility == model.PublicVisibility || query.Visibility == model.PrivateVisibility {
 		finalQuery.WriteString(fmt.Sprintf(listProjectsQuery, `AND p."visibility" = @visibility;`))
@@ -345,10 +344,10 @@ func (store *orgStore) GetProjectList(ctx context.Context, query *org.GetProject
 	}
 	defer rows.Close()
 
-	var projectList []*project.Project = []*project.Project{}
+	var projectList []*model.Project = []*model.Project{}
 
 	for rows.Next() {
-		var project project.Project
+		var project model.Project
 		err := rows.Scan(
 			&project.Id,
 			&project.ScopeId,
