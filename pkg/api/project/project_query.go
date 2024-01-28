@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/quarkloop/quarkloop/pkg/api"
 	"github.com/quarkloop/quarkloop/pkg/service/project"
 )
 
@@ -20,7 +21,7 @@ import (
 func (s *ProjectApi) GetProjectById(ctx *gin.Context) {
 	uriParams := &project.GetProjectByIdUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
@@ -59,7 +60,7 @@ func (s *ProjectApi) GetProjectList(ctx *gin.Context) {
 func (s *ProjectApi) GetMemberList(ctx *gin.Context) {
 	uriParams := &project.GetMemberListUriParams{}
 	if err := ctx.ShouldBindUri(uriParams); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
 	}
 
