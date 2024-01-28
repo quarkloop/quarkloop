@@ -2,63 +2,14 @@ package project
 
 import (
 	"errors"
-	"fmt"
-	"time"
 
 	"github.com/quarkloop/quarkloop/pkg/model"
-	"github.com/quarkloop/quarkloop/pkg/service/table_branch"
-	"github.com/quarkloop/quarkloop/service/v1/system"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
 	ErrProjectNotFound      = errors.New("project not found")
 	ErrProjectAlreadyExists = errors.New("project with same scopeId already exists")
 )
-
-type Project struct {
-	// id
-	Id               int32  `json:"id"`
-	ScopeId          string `json:"sid"`
-	WorkspaceId      int32  `json:"workspaceId"`
-	WorkspaceScopeId string `json:"workspaceScopeId"`
-	OrgId            int32  `json:"orgId"`
-	OrgScopeId       string `json:"orgScopeId"`
-
-	// project
-	Name        string                      `json:"name"`
-	Description string                      `json:"description"`
-	Visibility  model.ScopeVisibility       `json:"visibility"`
-	Path        string                      `json:"path"`
-	Branches    []*table_branch.TableBranch `json:"branches"`
-
-	// history
-	CreatedAt time.Time  `json:"createdAt"`
-	CreatedBy string     `json:"createdBy"`
-	UpdatedAt *time.Time `json:"updatedAt"`
-	UpdatedBy *string    `json:"updatedBy"`
-}
-
-func (p *Project) GeneratePath() {
-	p.Path = fmt.Sprintf("/org/%s/%s/%s", p.OrgScopeId, p.WorkspaceScopeId, p.ScopeId)
-}
-
-func (p *Project) Proto() *system.Project {
-	project := &system.Project{
-		Id:          p.Id,
-		ScopeId:     p.ScopeId,
-		Name:        p.Name,
-		Description: p.Description,
-		Visibility:  int32(p.Visibility),
-		Path:        p.Path,
-		CreatedAt:   timestamppb.New(p.CreatedAt),
-		UpdatedAt:   timestamppb.New(*p.UpdatedAt),
-		CreatedBy:   p.CreatedBy,
-		UpdatedBy:   *p.UpdatedBy,
-	}
-
-	return project
-}
 
 // GetProjectById
 
@@ -85,8 +36,8 @@ type GetProjectVisibilityByIdQuery struct {
 // GetProjectList
 
 type GetProjectListQuery struct {
-	UserId     int32
-	Visibility model.ScopeVisibility
+	ProjectIdList []int32
+	Visibility    model.ScopeVisibility
 }
 
 //  CreateProject
