@@ -7,7 +7,6 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/quarkloop/quarkloop/pkg/model"
-	"github.com/quarkloop/quarkloop/pkg/service/project"
 	"github.com/quarkloop/quarkloop/pkg/service/user"
 )
 
@@ -131,7 +130,7 @@ FROM
 ORDER BY id ASC;
 `
 
-func GetFullProjectList(ctx context.Context, conn *pgx.Conn) ([]*project.Project, error) {
+func GetFullProjectList(ctx context.Context, conn *pgx.Conn) ([]*model.Project, error) {
 	rows, err := conn.Query(ctx, getProjectListQuery)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
@@ -139,9 +138,9 @@ func GetFullProjectList(ctx context.Context, conn *pgx.Conn) ([]*project.Project
 	}
 	defer rows.Close()
 
-	var projectList []*project.Project = []*project.Project{}
+	var projectList []*model.Project = []*model.Project{}
 	for rows.Next() {
-		var ws project.Project
+		var ws model.Project
 		err := rows.Scan(
 			&ws.Id,
 			&ws.ScopeId,
