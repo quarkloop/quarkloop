@@ -4,14 +4,15 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/quarkloop/quarkloop/pkg/api"
 	"github.com/quarkloop/quarkloop/pkg/contextdata"
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
 	"github.com/quarkloop/quarkloop/pkg/service/workspace"
 	grpc "github.com/quarkloop/quarkloop/service/v1/system/workspace"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 func (s *WorkspaceApi) createWorkspace(ctx *gin.Context, cmd *workspace.CreateWorkspaceCommand) api.Response {
@@ -69,7 +70,7 @@ func (s *WorkspaceApi) createWorkspace(ctx *gin.Context, cmd *workspace.CreateWo
 
 func (s *WorkspaceApi) updateWorkspaceById(ctx *gin.Context, cmd *workspace.UpdateWorkspaceByIdCommand) api.Response {
 	// check permissions
-	access, err := s.evaluatePermission(ctx, accesscontrol.ActionProjectUpdate, cmd.OrgId, cmd.WorkspaceId)
+	access, err := s.evaluatePermission(ctx, accesscontrol.ActionWorkspaceUpdate, cmd.OrgId, cmd.WorkspaceId)
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
 	}
@@ -96,7 +97,7 @@ func (s *WorkspaceApi) updateWorkspaceById(ctx *gin.Context, cmd *workspace.Upda
 
 func (s *WorkspaceApi) deleteWorkspaceById(ctx *gin.Context, cmd *workspace.DeleteWorkspaceByIdCommand) api.Response {
 	// check permissions
-	access, err := s.evaluatePermission(ctx, accesscontrol.ActionProjectDelete, cmd.OrgId, cmd.WorkspaceId)
+	access, err := s.evaluatePermission(ctx, accesscontrol.ActionWorkspaceDelete, cmd.OrgId, cmd.WorkspaceId)
 	if err != nil {
 		return api.Error(http.StatusInternalServerError, err) // TODO: change status
 	}
