@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package system.org;
+
+import "google/protobuf/empty.proto";
+//import "google/protobuf/timestamp.proto";
+import "system.proto";
+
+option go_package = "github.com/quarkloop/quarkloop/service/v1/system/org";
+
+service OrgService {
+	// query
+	rpc GetOrgById(GetOrgByIdQuery) returns (GetOrgByIdReply) {}
+	rpc GetOrgVisibilityById(GetOrgVisibilityByIdQuery)returns  (GetOrgVisibilityByIdReply) {}
+	rpc GetOrgList(GetOrgListQuery) returns (GetOrgListReply) {}
+	rpc GetWorkspaceList(GetWorkspaceListQuery) returns (GetWorkspaceListReply) {}
+	rpc GetProjectList(GetProjectListQuery) returns (GetProjectListReply) {}
+
+	// mutation
+	rpc CreateOrg(CreateOrgCommand) returns (CreateOrgReply) {}
+	rpc UpdateOrgById(UpdateOrgByIdCommand) returns (google.protobuf.Empty) {}
+	rpc DeleteOrgById(DeleteOrgByIdCommand) returns (google.protobuf.Empty) {}
+}
+
+message GetOrgByIdQuery { 
+  int32 orgId = 1; 
+}
+message GetOrgByIdReply {
+  Org org = 1;
+}
+
+message GetOrgVisibilityByIdQuery {
+  int32 orgId = 1; 
+}
+message GetOrgVisibilityByIdReply {
+  int32 visibility = 1;
+}
+
+message GetOrgListQuery {
+  repeated int32 orgIdList = 1;
+  int32 visibility = 2;
+}
+message GetOrgListReply {
+  repeated Org orgList = 1;
+}
+
+message GetWorkspaceListQuery {
+  int32 orgId = 1;
+  int32 visibility = 2;  
+}
+message GetWorkspaceListReply {
+  repeated Workspace workspaceList = 1;
+}
+
+message GetProjectListQuery {
+  int32 orgId = 1;
+  int32 visibility = 2;    
+}
+message GetProjectListReply {
+  repeated Project projectList = 1;
+}
+
+message CreateOrgCommand {
+  string createdBy = 1;
+  string scopeId = 2;
+  string name = 3;
+  string description = 4;
+  int32 visibility = 5;
+}
+message CreateOrgReply {
+  Org org = 1;
+}
+
+message UpdateOrgByIdCommand {
+  string updatedBy = 1;
+  int32 orgId = 2;
+  string scopeId = 3;
+  string name = 4;
+  string description = 5;
+  int32 visibility = 6;  
+}
+
+message DeleteOrgByIdCommand {
+  int32 orgId = 1;
+}
