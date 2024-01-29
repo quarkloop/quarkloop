@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package system.workspace;
+
+import "google/protobuf/empty.proto";
+//import "google/protobuf/timestamp.proto";
+
+import "system.proto";
+
+option go_package = "github.com/quarkloop/quarkloop/service/v1/system/workspace";
+
+service WorkspaceService {
+	// query
+	rpc GetWorkspaceById(GetWorkspaceByIdQuery) returns (GetWorkspaceByIdReply) {}
+	rpc GetWorkspaceVisibilityById(GetWorkspaceVisibilityByIdQuery)returns  (GetWorkspaceVisibilityByIdReply) {}
+	rpc GetWorkspaceList(GetWorkspaceListQuery) returns (GetWorkspaceListReply) {}
+	rpc GetProjectList(GetProjectListQuery) returns (GetProjectListReply) {}
+
+	// mutation
+	rpc CreateWorkspace(CreateWorkspaceCommand) returns (CreateWorkspaceReply) {}
+	rpc UpdateWorkspaceById(UpdateWorkspaceByIdCommand) returns (google.protobuf.Empty) {}
+	rpc DeleteWorkspaceById(DeleteWorkspaceByIdCommand) returns (google.protobuf.Empty) {}
+}
+
+message GetWorkspaceByIdQuery { 
+  int32 orgId = 1;
+  int32 workspaceId = 2;
+}
+message GetWorkspaceByIdReply {
+  Workspace workspace = 1;
+}
+
+message GetWorkspaceVisibilityByIdQuery {
+  int32 orgId = 1;
+  int32 workspaceId = 2;
+}
+message GetWorkspaceVisibilityByIdReply {
+  int32 visibility = 1;
+}
+
+message GetWorkspaceListQuery {
+  repeated int32 workspaceIdList = 2;
+  int32 visibility = 3;
+}
+message GetWorkspaceListReply {
+  repeated Workspace workspaceList = 1;
+}
+
+message GetProjectListQuery {
+  int32 orgId = 1;
+  int32 workspaceId = 2;
+  int32 visibility = 3;    
+}
+message GetProjectListReply {
+  repeated Project projectList = 1;
+}
+
+message CreateWorkspaceCommand {
+  int32 orgId = 1;
+  string createdBy = 2;
+  string scopeId = 3;
+  string name = 4;
+  string description = 5;
+  int32 visibility = 6;
+}
+message CreateWorkspaceReply {
+  Workspace workspace = 1;
+}
+
+message UpdateWorkspaceByIdCommand {
+
+  int32 orgId = 1;
+  string updatedBy = 2;
+  int32 workspaceId = 3;
+  string scopeId = 4;
+  string name = 5;
+  string description = 6;
+  int32 visibility = 7;
+}
+
+message DeleteWorkspaceByIdCommand {
+  int32 orgId = 1;
+  int32 workspaceId = 2;
+}
