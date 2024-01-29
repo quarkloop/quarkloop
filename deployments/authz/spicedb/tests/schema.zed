@@ -1,0 +1,91 @@
+definition user {}
+
+definition org {
+    relation owner: user
+
+    relation admin: user
+    relation contributor: user
+    relation viewer: user
+
+    permission all = admins + contributors + viewer
+    permission admins = owner + admin
+    permission contributors = contributor
+    permission viewers = viewer
+
+    // org
+    permission read = all
+    permission update = admins + contributors
+    permission delete = admins
+    permission settings_read = admins
+    permission settings_update = admins
+    permission quota_read = all
+    permission quota_create = admins
+    permission quota_update = admins
+    permission quota_delete = admins
+    permission user_read = all
+    permission user_create = admins
+    permission user_update = admins
+    permission user_delete = admins
+
+    // workspace
+    permission create_workspace = admins
+}
+
+definition workspace {
+    relation parent: org
+
+    relation admin: user
+    relation contributor: user
+    relation viewer: user
+
+    permission all = admins + contributors + viewers
+    permission admins = admin + parent->admins
+    permission contributors = contributor + parent->contributors
+    permission viewers = viewer + parent->viewers
+
+    // workspace
+    permission read = all
+    permission update = admins + contributors
+    permission delete = admins
+    permission settings_read = admins
+    permission settings_update = admins
+    permission quota_read = all
+    permission quota_create = admins
+    permission quota_update = admins
+    permission quota_delete = admins
+    permission user_read = all
+    permission user_create = admins
+    permission user_update = admins
+    permission user_delete = admins
+
+    // project
+    permission create_project = admins
+}
+
+definition project {
+    relation parent: workspace
+
+    relation admin: user
+    relation contributor: user
+    relation viewer: user
+
+    permission all = admins + contributors + viewer
+    permission admins = admin + parent->admins
+    permission contributors = contributor + parent->contributors
+    permission viewers = viewer + parent->viewers
+
+    // project
+    permission read = all
+    permission update = admins + contributors
+    permission delete = admins
+    permission settings_read = admins
+    permission settings_update = admins
+    permission quota_read = all
+    permission quota_create = admins
+    permission quota_update = admins
+    permission quota_delete = admins
+    permission user_read = all
+    permission user_create = admins
+    permission user_update = admins
+    permission user_delete = admins
+}
