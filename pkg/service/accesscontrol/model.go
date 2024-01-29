@@ -70,7 +70,7 @@ const (
 	// project actions
 	ActionProjectList   = "list"
 	ActionProjectRead   = "read"
-	ActionProjectCreate = "create"
+	ActionProjectCreate = "create_project"
 	ActionProjectUpdate = "update"
 	ActionProjectDelete = "delete"
 
