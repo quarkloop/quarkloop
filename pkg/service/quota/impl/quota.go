@@ -2,7 +2,6 @@ package quota_impl
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/quarkloop/quarkloop/pkg/service/accesscontrol"
 	"github.com/quarkloop/quarkloop/pkg/service/quota"
@@ -71,7 +70,7 @@ func (s *quotaService) CheckCreateOrgUserQuota(ctx context.Context, query *quota
 		if q.Feature == quota.OrgUserCount {
 			q.ApplyLimit()
 			if q.CheckQuotaReached() {
-				return quota.ErrWorkspaceQuotaReached
+				return quota.ErrOrgUserQuotaReached
 			}
 			return nil
 		}
@@ -82,7 +81,6 @@ func (s *quotaService) CheckCreateOrgUserQuota(ctx context.Context, query *quota
 
 func (s *quotaService) CheckCreateWorkspaceQuota(ctx context.Context, query *quota.CheckCreateWorkspaceQuotaQuery) error {
 	quotaList, err := s.store.GetQuotasByOrgId(ctx, query.OrgId)
-	fmt.Printf("\nWorkspaceQuota Service => %+v => %+v\n\n", quotaList, err)
 	if err != nil {
 		return err
 	}
@@ -110,7 +108,7 @@ func (s *quotaService) CheckCreateProjectQuota(ctx context.Context, query *quota
 		if q.Feature == quota.ProjectCount {
 			q.ApplyLimit()
 			if q.CheckQuotaReached() {
-				return quota.ErrWorkspaceQuotaReached
+				return quota.ErrProjectQuotaReached
 			}
 			return nil
 		}
