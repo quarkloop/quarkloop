@@ -30,10 +30,10 @@ type database struct {
 
 func NewAuthDatabase() *database {
 	return &database{
-		host:       os.Getenv("PG_HOST"),
-		user:       os.Getenv("PG_USER"),
-		password:   os.Getenv("PG_PASSWORD"),
-		port:       os.Getenv("PG_PORT"),
+		host:       os.Getenv("PGHOST"),
+		user:       os.Getenv("PGUSER"),
+		password:   os.Getenv("PGPASSWORD"),
+		port:       os.Getenv("PGPORT"),
 		database:   os.Getenv("PG_QUARKLOOP_AUTH_DB"),
 		connection: nil,
 	}
@@ -41,10 +41,10 @@ func NewAuthDatabase() *database {
 
 func NewAuthzDatabase() *database {
 	return &database{
-		host:       os.Getenv("PG_HOST"),
-		user:       os.Getenv("PG_USER"),
-		password:   os.Getenv("PG_PASSWORD"),
-		port:       os.Getenv("PG_PORT"),
+		host:       os.Getenv("PGHOST"),
+		user:       os.Getenv("PGUSER"),
+		password:   os.Getenv("PGPASSWORD"),
+		port:       os.Getenv("PGPORT"),
 		database:   os.Getenv("PG_QUARKLOOP_AUTHZ_DB"),
 		connection: nil,
 	}
@@ -52,10 +52,10 @@ func NewAuthzDatabase() *database {
 
 func NewProjectDatabase() *database {
 	return &database{
-		host:       os.Getenv("PG_HOST"),
-		user:       os.Getenv("PG_USER"),
-		password:   os.Getenv("PG_PASSWORD"),
-		port:       os.Getenv("PG_PORT"),
+		host:       os.Getenv("PGHOST"),
+		user:       os.Getenv("PGUSER"),
+		password:   os.Getenv("PGPASSWORD"),
+		port:       os.Getenv("PGPORT"),
 		database:   os.Getenv("PG_QUARKLOOP_PROJECT_DB"),
 		connection: nil,
 	}
@@ -63,11 +63,22 @@ func NewProjectDatabase() *database {
 
 func NewSystemDatabase() *database {
 	return &database{
-		host:       os.Getenv("PG_HOST"),
-		user:       os.Getenv("PG_USER"),
-		password:   os.Getenv("PG_PASSWORD"),
-		port:       os.Getenv("PG_PORT"),
+		host:       os.Getenv("PGHOST"),
+		user:       os.Getenv("PGUSER"),
+		password:   os.Getenv("PGPASSWORD"),
+		port:       os.Getenv("PGPORT"),
 		database:   os.Getenv("PG_QUARKLOOP_SYSTEM_DB"),
+		connection: nil,
+	}
+}
+
+func NewEngineDatabase() *database {
+	return &database{
+		host:       os.Getenv("PGHOST"),
+		user:       os.Getenv("PGUSER"),
+		password:   os.Getenv("PGPASSWORD"),
+		port:       os.Getenv("PGPORT"),
+		database:   os.Getenv("PG_QUARKLOOP_ENGINE_DB"),
 		connection: nil,
 	}
 }
