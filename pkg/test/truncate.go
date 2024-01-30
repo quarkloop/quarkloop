@@ -66,3 +66,20 @@ func TruncateSystemDBTables(ctx context.Context, conn *pgx.Conn) error {
 
 	return nil
 }
+
+const truncateEngineDbTablesQuery = `
+TRUNCATE
+    "engine"."TableColumn",
+	"engine"."TableRecord",
+    "engine"."Table";
+`
+
+func TruncateEngineDbTables(ctx context.Context, conn *pgx.Conn) error {
+	_, err := conn.Exec(ctx, truncateEngineDbTablesQuery)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[TRUNCATE] failed: %v\n", err)
+		return err
+	}
+
+	return nil
+}
