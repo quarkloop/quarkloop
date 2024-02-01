@@ -1,0 +1,238 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("PG_QUARKLOOP_SYSTEM_URL") // uses connection pooling
+    directUrl = env("PG_QUARKLOOP_SYSTEM_URL_NON_POOLING") // used for migrations
+    schemas   = ["system"]
+}
+
+model Organization {
+    // id
+    id  BigInt @id @default(autoincrement())
+    sid String @unique // scope id
+
+    // organization
+    name        String
+    description String
+    visibility  Int    @default(1)
+    metadata    Json?
+
+    // history
+    createdAt DateTime  @default(now())
+    createdBy String
+    updatedAt DateTime?
+    updatedBy String?
+
+    // relation
+    workspaces Workspace[]
+    projects   Project[]
+    members    OrganizationMember[]
+
+    @@schema("system")
+}
+
+model Workspace {
+    // id
+    id    BigInt @id @default(autoincrement())
+    orgId BigInt
+    sid   String // scope id
+
+    // workspace
+    name        String
+    description String
+    visibility  Int    @default(1)
+    metadata    Json?
+
+    // history
+    createdAt DateTime  @default(now())
+    createdBy String
+    updatedAt DateTime?
+    updatedBy String?
+
+    // relation
+    organization Organization      @relation(fields: [orgId], references: [id])
+    projects     Project[]
+    members      WorkspaceMember[]
+
+    @@unique([orgId, sid])
+    @@schema("system")
+}
+
+model Project {
+    // id
+    id          BigInt @id @default(autoincrement())
+    orgId       BigInt
+    workspaceId BigInt
+    sid         String // scope id
+
+    // project
+    name        String
+    description String
+    visibility  Int    @default(1)
+    metadata    Json?
+
+    // history
+    createdAt DateTime  @default(now())
+    createdBy String
+    updatedAt DateTime?
+    updatedBy String?
+
+    // relation
+    organization Organization    @relation(fields: [orgId], references: [id])
+    workspace    Workspace       @relation(fields: [workspaceId], references: [id])
+    members      ProjectMember[]
+
+    @@unique([orgId, workspaceId, sid])
+    @@index([orgId, workspaceId])
+    @@schema("system")
+}
+
+model OrganizationMember {
+    // id
+    id     BigInt @id @default(autoincrement())
+    userId BigInt
+    roleId BigInt
+    orgId  BigInt
+
+    // membership
+    expireDate DateTime?
+
+    // history
+    createdAt DateTime  @default(now())
+    createdBy String
+    updatedAt DateTime?
+    updatedBy String?
+
+    // relation
+    org  Organization @relation(fields: [orgId], references: [id])
+    role Role         @relation(fields: [roleId], references: [id])
+
+    @@schema("system")
+}
+
+model WorkspaceMember {
+    // id
+    id          BigInt @id @default(autoincrement())
+    userId      BigInt
+    roleId      BigInt
+    workspaceId BigInt
+
+    // membership
+    type       Int // direct, inherited
+    source     Int? // orgId if membership type is inherited
+    expireDate DateTime?
+
+    // history
+    createdAt DateTime  @default(now())
+    createdBy String
+    updatedAt DateTime?
+    updatedBy String?
+
+    // relation
+    workspace Workspace @relation(fields: [workspaceId], references: [id])
+    role      Role      @relation(fields: [roleId], references: [id])
+
+    @@schema("system")
+}
+
+model ProjectMember {
+    // id
+    id        BigInt @id @default(autoincrement())
+    userId    BigInt
+    roleId    BigInt
+    projectId BigInt
+
+    // membership
+    type       Int // direct, inherited
+    source     Int? // orgId or workspaceId if membership type is inherited
+    expireDate DateTime?
+
+    // history
+    createdAt DateTime  @default(now())
+    createdBy String
+    updatedAt DateTime?
+    updatedBy String?
+
+    // relation
+    project Project @relation(fields: [projectId], references: [id])
+    role    Role    @relation(fields: [roleId], references: [id])
+
+    @@schema("system")
+}
+
+model Role {
+    // id
+    id BigInt @id @default(autoincrement())
+
+    // role
+    name String
+
+    // history
+    createdAt DateTime  @default(now())
+    createdBy String
+    updatedAt DateTime?
+    updatedBy String?
+
+    // relation
+    org       OrganizationMember[]
+    workspace WorkspaceMember[]
+    project   ProjectMember[]
+
+    @@schema("system")
+}
+
+// model UserAssignment {
+//     // id
+//     id BigInt @id @default(autoincrement())
+
+//     orgId       BigInt?
+//     workspaceId BigInt?
+//     projectId   BigInt?
+
+//     userId      BigInt? // CHECK constraint
+//     userGroupId BigInt? // CHECK constraint
+//     userRoleId  BigInt
+
+//     // history
+//     createdAt DateTime  @default(now())
+//     createdBy String
+//     updatedAt DateTime?
+//     updatedBy String?
+
+//     // relation
+//     org       Organization? @relation(fields: [orgId], references: [id])
+//     workspace Workspace?    @relation(fields: [workspaceId], references: [id])
+//     project   Project?      @relation(fields: [projectId], references: [id])
+//     userGroup UserGroup?    @relation(fields: [userGroupId], references: [id])
+//     role      Role      @relation(fields: [userRoleId], references: [id])
+
+//     @@index([orgId, workspaceId])
+//     @@index([orgId, workspaceId, projectId])
+//     @@schema("system")
+// }
+
+// model UserGroup {
+//     // id
+//     id    BigInt @id @default(autoincrement())
+//     orgId BigInt
+
+//     // user group
+//     name  String
+//     users Json   @default(dbgenerated("'[]'")) @db.JsonB
+
+//     // history
+//     createdAt DateTime  @default(now())
+//     createdBy String
+//     updatedAt DateTime?
+//     updatedBy String?
+
+//     // relation
+//     assignments UserAssignment[]
+//     org         Organization     @relation(fields: [orgId], references: [id])
+
+//     @@schema("system")
+// }
