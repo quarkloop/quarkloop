@@ -1,9 +1,0 @@
-{
-  "name": "@quarkloop/types",
-  "version": "0.0.0",
-  "private": true,
-  "main": "index.ts",
-  "dependencies": {
-    "zod": "^3.22.4"
-  }
-}
