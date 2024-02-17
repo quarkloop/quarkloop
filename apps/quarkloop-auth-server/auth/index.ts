@@ -1,1 +1,0 @@
-export { authOptions } from "./authOptions";
