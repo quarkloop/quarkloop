@@ -4,8 +4,4 @@ Headless service operating system for all your operations. It is heavily under d
 
 ## Getting Started
 
-First, run the development server:
 
-```bash
-pnpm dev
-```
