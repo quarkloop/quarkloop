@@ -12,6 +12,7 @@ func NewImageCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(
+		NewImageBuildCommand(),
 		NewImageCreateCommand(),
 		NewImageRemoveCommand(),
 		NewImageListCommand(),
