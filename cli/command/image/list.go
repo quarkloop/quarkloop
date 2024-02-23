@@ -7,7 +7,7 @@ import (
 
 	"github.com/quarkloop/quarkloop/cli/client"
 	"github.com/quarkloop/quarkloop/cli/console"
-	"github.com/quarkloop/quarkloop/pkg/grpc/v1/cluster"
+	v1 "github.com/quarkloop/quarkloop/pkg/grpc/daemon/v1/image"
 )
 
 func NewImageListCommand() *cobra.Command {
@@ -16,67 +16,36 @@ func NewImageListCommand() *cobra.Command {
 		Short: "List namespace images",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			namespace, _ := cmd.Flags().GetString("namespace")
-			return runImageList(cmd.Context(), cmd, namespace)
+			return runImageList(cmd.Context(), cmd)
 		},
 	}
-
-	flags := cmd.Flags()
-	flags.String("namespace", "", "image namespace")
 
 	return cmd
 }
 
-type IterableImageList struct {
-	imageList        []*cluster.NamespaceImage
-	includeNamespace bool
-}
+type IterableImageList []*v1.Image
 
 func (it IterableImageList) Iter() chan []any {
 	c := make(chan []any)
 	go func() {
-		for _, p := range it.imageList {
-			if it.includeNamespace {
-				c <- []any{p.Name, p.Namespace, p.Database, p.CreatedAt.AsTime().Local()}
-			} else {
-				c <- []any{p.Name, p.Database, p.CreatedAt.AsTime().Local()}
-			}
+		for _, p := range it {
+			c <- []any{p.Name, p.CreatedAt.AsTime().Local()}
 		}
 		close(c)
 	}()
 	return c
 }
 
-func runImageList(ctx context.Context, cmd *cobra.Command, namespace string) error {
-	query := &cluster.GetNamespaceImageListQuery{Namespace: namespace}
-	resp, err := client.NewClient().GetCluster().GetNamespaceImageList(context.Background(), query)
+func runImageList(ctx context.Context, cmd *cobra.Command) error {
+	resp, err := client.NewClient().GetImage().GetImageList(context.Background(), nil)
 	if err != nil {
 		cmd.Printf("[error] unable to get list %s\n", err.Error())
 		return err
 	}
 
-	if len(namespace) == 0 {
-		var cols = []any{"NAME", "NAMESPACE", "DATABASE", "CREATED"}
-		printConsole(resp, cols, true)
-	} else {
-		var cols = []any{"NAME", "DATABASE", "CREATED"}
-		printConsole(resp, cols, false)
-	}
+	var cols = []any{"NAME", "CREATED"}
+	var rows IterableImageList = resp.Images
+	console.Print("%s\t%s\t%s\n", cols, rows)
 
 	return nil
-}
-
-func printConsole(resp *cluster.GetNamespaceImageListResponse, cols []any, includeNamespace bool) {
-	var rows IterableImageList = IterableImageList{
-		imageList:        resp.ImageList,
-		includeNamespace: includeNamespace,
-	}
-
-	var format string
-	if includeNamespace {
-		format = "%s\t%s\t%s\t%s\n"
-	} else {
-		format = "%s\t%s\t%s\n"
-	}
-	console.Print(format, cols, rows)
 }
