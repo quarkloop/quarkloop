@@ -17,7 +17,7 @@ func NewDatabaseCreateCommand() *cobra.Command {
 			namespace, _ := cmd.Flags().GetString("namespace")
 			agent, _ := cmd.Flags().GetString("name")
 
-			return runDatabaseCreate(cmd.Context(), cmd, filename)
+			return runDatabaseCreate(cmd.Context(), cmd, namespace, agent)
 		},
 	}
 
@@ -31,9 +31,9 @@ func NewDatabaseCreateCommand() *cobra.Command {
 	return cmd
 }
 
-func runDatabaseCreate(ctx context.Context, cmd *cobra.Command, filename string) error {
+func runDatabaseCreate(ctx context.Context, cmd *cobra.Command, namespace, agent string) error {
 	dispatcher := builder.NewDispatcher()
-	err := dispatcher.ReadFile(filename)
+	err := dispatcher.ReadFile(namespace + agent)
 	if err != nil {
 		cmd.Printf("error on reading Quarkfile: %s", err.Error())
 		return err
