@@ -7,8 +7,8 @@ import (
 
 	"github.com/quarkloop/quarkloop/cli/client"
 	"github.com/quarkloop/quarkloop/cli/console"
-	v1 "github.com/quarkloop/quarkloop/pkg/grpc/v1"
-	"github.com/quarkloop/quarkloop/pkg/grpc/v1/table"
+	v1 "github.com/quarkloop/quarkloop/pkg/grpc/daemon/v1"
+	table "github.com/quarkloop/quarkloop/pkg/grpc/daemon/v1/table"
 )
 
 func NewDatabaseListCommand() *cobra.Command {
