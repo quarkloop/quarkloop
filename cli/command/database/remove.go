@@ -7,8 +7,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/quarkloop/quarkloop/cli/client"
-	v1 "github.com/quarkloop/quarkloop/pkg/grpc/v1"
-	grpc "github.com/quarkloop/quarkloop/pkg/grpc/v1/table"
+	v1 "github.com/quarkloop/quarkloop/pkg/grpc/daemon/v1"
+	grpc "github.com/quarkloop/quarkloop/pkg/grpc/daemon/v1/table"
 )
 
 func NewDatabaseRemoveCommand() *cobra.Command {
