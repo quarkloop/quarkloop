@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/quarkloop/quarkloop/cli/client"
-	"github.com/quarkloop/quarkloop/pkg/grpc/v1/cluster"
+	cluster "github.com/quarkloop/quarkloop/pkg/grpc/daemon/v1/cluster"
 )
 
 func NewNamespaceCreateCommand() *cobra.Command {
