@@ -7,7 +7,7 @@ import (
 
 	"github.com/quarkloop/quarkloop/cli/client"
 	"github.com/quarkloop/quarkloop/cli/console"
-	"github.com/quarkloop/quarkloop/pkg/grpc/v1/cluster"
+	cluster "github.com/quarkloop/quarkloop/pkg/grpc/daemon/v1/cluster"
 )
 
 func NewAgentListCommand() *cobra.Command {
