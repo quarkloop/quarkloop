@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/quarkloop/quarkloop/cli/client"
-	v1 "github.com/quarkloop/quarkloop/pkg/grpc/v1"
-	grpc "github.com/quarkloop/quarkloop/pkg/grpc/v1/agent"
+	v1 "github.com/quarkloop/quarkloop/pkg/grpc/daemon/v1"
+	grpc "github.com/quarkloop/quarkloop/pkg/grpc/daemon/v1/agent"
 )
 
 func NewAgentRemoveCommand() *cobra.Command {
