@@ -4,5 +4,5 @@ use (
 	.
 	./cli
 	./daemon
-	./runtime
+	./runtime_go
 )
