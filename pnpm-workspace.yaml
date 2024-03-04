@@ -1,5 +1,0 @@
-packages:
-  - packages/*
-  - apps/quarkloop-auth-server
-  - apps/quarkloop-docs
-  - apps/quarkloop-client
