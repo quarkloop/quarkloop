@@ -1,8 +1,12 @@
 go 1.22.0
 
+// use (
+// 	.
+// 	./cli
+// 	./daemon
+// 	./runtime_go
+// )
+
 use (
 	.
-	./cli
-	./daemon
-	./runtime_go
 )
