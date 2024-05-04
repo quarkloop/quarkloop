@@ -3,7 +3,7 @@ package store
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/quarkloop/quarkloop/pkg/model"
 )
 
@@ -14,8 +14,8 @@ type OrgStore interface {
 	GetOrgVisibilityById(context.Context, *GetOrgVisibilityByIdQuery) (model.ScopeVisibility, error)
 	GetOrgList(context.Context, *GetOrgListQuery) ([]*model.Org, error)
 	GetWorkspaceList(context.Context, *GetWorkspaceListQuery) ([]*model.Workspace, error)
-	GetProjectList(context.Context, *GetProjectListQuery) ([]*model.Project, error)
-	//GetUserAssignmentList(context.Context, *GetUserAssignmentListQuery) ([]*user.UserAssignment, error)
+	// GetProjectList(context.Context, *GetProjectListQuery) ([]*model.Project, error)
+	// GetUserAssignmentList(context.Context, *GetUserAssignmentListQuery) ([]*user.UserAssignment, error)
 
 	// mutation
 	CreateOrg(context.Context, *CreateOrgCommand) (*model.Org, error)
@@ -24,10 +24,10 @@ type OrgStore interface {
 }
 
 type orgStore struct {
-	Conn *pgx.Conn
+	Conn *pgxpool.Pool
 }
 
-func NewOrgStore(conn *pgx.Conn) *orgStore {
+func NewOrgStore(conn *pgxpool.Pool) *orgStore {
 	return &orgStore{
 		Conn: conn,
 	}
