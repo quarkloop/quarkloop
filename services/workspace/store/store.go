@@ -3,8 +3,7 @@ package store
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5"
-
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/quarkloop/quarkloop/pkg/model"
 )
 
@@ -14,8 +13,8 @@ type WorkspaceStore interface {
 	GetWorkspaceById(context.Context, *GetWorkspaceByIdQuery) (*model.Workspace, error)
 	GetWorkspaceVisibilityById(context.Context, *GetWorkspaceVisibilityByIdQuery) (model.ScopeVisibility, error)
 	GetWorkspaceList(context.Context, *GetWorkspaceListQuery) ([]*model.Workspace, error)
-	GetProjectList(context.Context, *GetProjectListQuery) ([]*model.Project, error)
-	//GetUserAssignmentList(context.Context, *GetUserAssignmentListQuery) ([]*user.UserAssignment, error)
+	// GetProjectList(context.Context, *GetProjectListQuery) ([]*model.Project, error)
+	// GetUserAssignmentList(context.Context, *GetUserAssignmentListQuery) ([]*user.UserAssignment, error)
 
 	// mutation
 	CreateWorkspace(context.Context, *CreateWorkspaceCommand) (*model.Workspace, error)
@@ -24,10 +23,10 @@ type WorkspaceStore interface {
 }
 
 type workspaceStore struct {
-	Conn *pgx.Conn
+	Conn *pgxpool.Pool
 }
 
-func NewWorkspaceStore(conn *pgx.Conn) *workspaceStore {
+func NewWorkspaceStore(conn *pgxpool.Pool) *workspaceStore {
 	return &workspaceStore{
 		Conn: conn,
 	}
