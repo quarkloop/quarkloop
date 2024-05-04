@@ -17,7 +17,7 @@ import (
 /// CreateOrg
 
 const createOrgMutation = `
-INSERT INTO "system"."Organization" (
+INSERT INTO "system"."Org" (
     "sid",
     "name",
     "description",
@@ -88,12 +88,12 @@ func (store *orgStore) CreateOrg(ctx context.Context, cmd *CreateOrgCommand) (*m
 
 const updateOrgByIdMutation = `
 UPDATE
-    "system"."Organization"
+    "system"."Org"
 SET
     "sid"         = COALESCE (NULLIF(@sid, ''), "sid"),
     "name"        = COALESCE (NULLIF(@name, ''), "name"),
     "description" = COALESCE (NULLIF(@description, ''), "description"),
-    "visibility"  = COALESCE (NULLIF(@visibility, 0), "visibility"),
+    "visibility"  = COALESCE (NULLIF(@visibility, ''), "visibility"),
     "updatedAt"   = @updatedAt,
     "updatedBy"   = @updatedBy
 WHERE
@@ -137,7 +137,7 @@ func (store *orgStore) UpdateOrgById(ctx context.Context, cmd *UpdateOrgByIdComm
 
 const deleteOrgByIdMutation = `
 DELETE FROM
-    "system"."Organization"
+    "system"."Org"
 WHERE
     "id" = @id;
 `
