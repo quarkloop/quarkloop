@@ -21,7 +21,7 @@ SELECT
 FROM 
     "system"."Project" AS p
 LEFT JOIN 
-    system."Organization" AS org ON org."id" = p."orgId"
+    "system"."Org" AS org ON org."id" = p."orgId"
 LEFT JOIN 
     system."Workspace" AS ws ON ws."id" = p."workspaceId"
 WHERE (
@@ -79,7 +79,7 @@ SELECT
 FROM 
     "system"."Project" AS p
 LEFT JOIN 
-    system."Organization" AS org ON org."id" = p."orgId"
+    "system"."Org" AS org ON org."id" = p."orgId"
 LEFT JOIN 
     system."Workspace" AS ws ON ws."id" = p."workspaceId"
 WHERE (
@@ -194,7 +194,7 @@ FROM
 LEFT JOIN 
     system."Workspace" AS ws ON ws."id" = p."workspaceId"
 LEFT JOIN 
-    system."Organization" AS org ON org."id" = p."orgId"	
+    "system"."Org" AS org ON org."id" = p."orgId"	
 WHERE
     p."id" = ANY (@projectIdList)
 %s
@@ -352,7 +352,7 @@ func (store *projectStore) GetProjectList(ctx context.Context, query *GetProject
 // FROM
 //     "system"."Project" AS p
 // LEFT JOIN
-//     system."Organization" AS org ON org."id" = p."orgId"
+//     "system"."Org" AS org ON org."id" = p."orgId"
 // LEFT JOIN
 //     system."Workspace" AS ws ON ws."id" = p."workspaceId"
 // WHERE
