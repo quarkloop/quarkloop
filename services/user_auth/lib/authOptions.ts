@@ -55,10 +55,10 @@ export const authOptions: NextAuthOptions = {
         //   return true;
         // },
 
-        // async redirect({ url, baseUrl }) {
-        //   console.log("redirectEventt", { url, baseUrl });
-        //   return "http://localhost:3000";
-        // },
+        async redirect({ url, baseUrl }) {
+            //console.log("redirectEventt", { url, baseUrl });
+            return Promise.resolve(process.env.QUARKLOOP_WEB_SERVER_URL);
+        },
 
         async session({ session, user, token }) {
             // TODO: this check remains here until the problem with
@@ -70,8 +70,13 @@ export const authOptions: NextAuthOptions = {
             if (session.user) {
                 const userId: bigint = BigInt(user.id);
 
-                const { id, password, passwordSalt, ...u } = user;
-                session.user = { id: userId, ...u };
+                const { id, password, passwordSalt, emailVerified, ...u } =
+                    user;
+                session.user = {
+                    id: userId,
+                    emailVerified: emailVerified ?? undefined,
+                    ...u,
+                };
             }
 
             //console.log("session", { session, user, token });
