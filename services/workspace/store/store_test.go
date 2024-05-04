@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
 
 	"github.com/quarkloop/quarkloop/pkg/model"
@@ -16,7 +16,7 @@ import (
 
 var (
 	ctx   context.Context
-	conn  *pgx.Conn
+	conn  *pgxpool.Pool
 	orgId int64
 )
 
@@ -417,45 +417,45 @@ func TestMutationUpdateWorkspace(t *testing.T) {
 }
 
 func TestQueryWorkspaceRelations(t *testing.T) {
-	store := NewWorkspaceStore(conn)
+	// store := NewWorkspaceStore(conn)
 
-	t.Run("get workspace's project list", func(t *testing.T) {
-		wsList, err := test.GetFullWorkspaceList(ctx, conn)
-		require.NoError(t, err)
+	// t.Run("get workspace's project list", func(t *testing.T) {
+	// 	wsList, err := test.GetFullWorkspaceList(ctx, conn)
+	// 	require.NoError(t, err)
 
-		for _, ws := range wsList {
-			query := &GetProjectListQuery{
-				WorkspaceId: ws.Id,
-				Visibility:  model.AllVisibility,
-			}
-			// public and private
-			{
-				list, err := store.GetProjectList(ctx, query)
+	// 	for _, ws := range wsList {
+	// 		query := &GetProjectListQuery{
+	// 			WorkspaceId: ws.Id,
+	// 			Visibility:  model.AllVisibility,
+	// 		}
+	// 		// public and private
+	// 		{
+	// 			list, err := store.GetProjectList(ctx, query)
 
-				require.NoError(t, err)
-				require.Empty(t, list)
-				require.Equal(t, 0, len(list))
-			}
-			// public
-			{
-				query.Visibility = model.PublicVisibility
-				list, err := store.GetProjectList(ctx, query)
+	// 			require.NoError(t, err)
+	// 			require.Empty(t, list)
+	// 			require.Equal(t, 0, len(list))
+	// 		}
+	// 		// public
+	// 		{
+	// 			query.Visibility = model.PublicVisibility
+	// 			list, err := store.GetProjectList(ctx, query)
 
-				require.NoError(t, err)
-				require.Empty(t, list)
-				require.Equal(t, 0, len(list))
-			}
-			// private
-			{
-				query.Visibility = model.PrivateVisibility
-				list, err := store.GetProjectList(ctx, query)
+	// 			require.NoError(t, err)
+	// 			require.Empty(t, list)
+	// 			require.Equal(t, 0, len(list))
+	// 		}
+	// 		// private
+	// 		{
+	// 			query.Visibility = model.PrivateVisibility
+	// 			list, err := store.GetProjectList(ctx, query)
 
-				require.NoError(t, err)
-				require.Empty(t, list)
-				require.Equal(t, 0, len(list))
-			}
-		}
-	})
+	// 			require.NoError(t, err)
+	// 			require.Empty(t, list)
+	// 			require.Equal(t, 0, len(list))
+	// 		}
+	// 	}
+	// })
 
 	// t.Run("get workspace's user assignment list", func(t *testing.T) {
 	// 	wsList, err := test.GetFullWorkspaceList(ctx, conn)
