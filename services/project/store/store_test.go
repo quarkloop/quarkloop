@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
 
 	"github.com/quarkloop/quarkloop/pkg/model"
@@ -17,7 +17,7 @@ import (
 
 var (
 	ctx         context.Context
-	conn        *pgx.Conn
+	conn        *pgxpool.Pool
 	orgId       int64
 	workspaceId int64
 )
