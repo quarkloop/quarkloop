@@ -3,7 +3,7 @@ package store
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/quarkloop/quarkloop/pkg/model"
 )
 
@@ -22,10 +22,10 @@ type ProjectStore interface {
 }
 
 type projectStore struct {
-	Conn *pgx.Conn
+	Conn *pgxpool.Pool
 }
 
-func NewProjectStore(conn *pgx.Conn) *projectStore {
+func NewProjectStore(conn *pgxpool.Pool) *projectStore {
 	return &projectStore{
 		Conn: conn,
 	}
