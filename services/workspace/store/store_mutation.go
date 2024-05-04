@@ -100,7 +100,7 @@ SET
     "sid"         = COALESCE (NULLIF(@sid, ''), "sid"),
     "name"        = COALESCE (NULLIF(@name, ''), "name"),
     "description" = COALESCE (NULLIF(@description, ''), "description"),
-    "visibility"  = COALESCE (NULLIF(@visibility, 0), "visibility"),
+    "visibility"  = COALESCE (NULLIF(@visibility, ''), "visibility"),
     "updatedAt"   = @updatedAt,
     "updatedBy"   = @updatedBy
 WHERE
