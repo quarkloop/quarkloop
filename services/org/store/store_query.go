@@ -18,7 +18,7 @@ const getOrgIdQuery = `
 SELECT 
     "id"
 FROM 
-    "system"."Organization"
+    "system"."Org"
 WHERE 
     "sid" = @sid;
 `
@@ -53,7 +53,7 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-    "system"."Organization"
+    "system"."Org"
 WHERE 
     "id" = @id;
 `
@@ -94,7 +94,7 @@ const getOrgVisibilityByIdQuery = `
 SELECT 
     "visibility"
 FROM 
-    "system"."Organization"
+    "system"."Org"
 WHERE 
     "id" = @id;
 `
@@ -109,10 +109,10 @@ func (store *orgStore) GetOrgVisibilityById(ctx context.Context, query *GetOrgVi
 	var visibility model.ScopeVisibility
 	if err := row.Scan(&visibility); err != nil {
 		if err == pgx.ErrNoRows {
-			return 0, orgErrors.ErrOrgNotFound
+			return "", orgErrors.ErrOrgNotFound
 		}
 		fmt.Fprintf(os.Stderr, "[READ] failed: %v\n", err)
-		return 0, err
+		return "", err
 	}
 
 	return visibility, nil
@@ -132,7 +132,7 @@ func (store *orgStore) GetOrgVisibilityById(ctx context.Context, query *GetOrgVi
 //     "updatedAt",
 //     "updatedBy"
 // FROM
-//     "system"."Organization"
+//     "system"."Org"
 // WHERE
 // `
 
@@ -203,7 +203,7 @@ SELECT
     "updatedAt",
     "updatedBy"
 FROM 
-    "system"."Organization"
+    "system"."Org"
 WHERE 
     "id" = ANY (@orgIdList)
 %s	
@@ -281,7 +281,7 @@ SELECT
 FROM 
     "system"."Workspace" AS ws
 LEFT JOIN 
-    "system"."Organization" AS org ON org."id" = ws."orgId"
+    "system"."Org" AS org ON org."id" = ws."orgId"
 WHERE 
     ws."orgId" = @orgId
 %s	
@@ -342,91 +342,91 @@ func (store *orgStore) GetWorkspaceList(ctx context.Context, query *GetWorkspace
 	return wsList, nil
 }
 
-/// GetProjectList
+// /// GetProjectList
 
-const listProjectsQuery = `
-SELECT 
-    p."id",
-    p."sid",
-    p."orgId",
-    p."workspaceId",
-    org."sid",
-    ws."sid",
-    p."name",
-    p."description",
-    p."visibility",
-    p."createdAt",
-    p."createdBy",
-    p."updatedAt",
-    p."updatedBy"
-FROM
-    "system"."Project" AS p
-LEFT JOIN
-    "system"."Workspace" AS ws ON ws.id = p."workspaceId"
-LEFT JOIN 
-    "system"."Organization" AS org ON org.id = p."orgId"
-WHERE
-    p."orgId" = @orgId
-%s
-`
+// const listProjectsQuery = `
+// SELECT
+//     p."id",
+//     p."sid",
+//     p."orgId",
+//     p."workspaceId",
+//     org."sid",
+//     ws."sid",
+//     p."name",
+//     p."description",
+//     p."visibility",
+//     p."createdAt",
+//     p."createdBy",
+//     p."updatedAt",
+//     p."updatedBy"
+// FROM
+//     "system"."Project" AS p
+// LEFT JOIN
+//     "system"."Workspace" AS ws ON ws.id = p."workspaceId"
+// LEFT JOIN
+//     "system"."Org" AS org ON org.id = p."orgId"
+// WHERE
+//     p."orgId" = @orgId
+// %s
+// `
 
-type GetProjectListQuery struct {
-	OrgId      int64
-	Visibility model.ScopeVisibility
-}
+// type GetProjectListQuery struct {
+// 	OrgId      int64
+// 	Visibility model.ScopeVisibility
+// }
 
-func (store *orgStore) GetProjectList(ctx context.Context, query *GetProjectListQuery) ([]*model.Project, error) {
-	var finalQuery strings.Builder
-	if query.Visibility == model.PublicVisibility || query.Visibility == model.PrivateVisibility {
-		finalQuery.WriteString(fmt.Sprintf(listProjectsQuery, `AND p."visibility" = @visibility;`))
-	} else {
-		finalQuery.WriteString(fmt.Sprintf(listProjectsQuery, ";"))
-	}
+// func (store *orgStore) GetProjectList(ctx context.Context, query *GetProjectListQuery) ([]*model.Project, error) {
+// 	var finalQuery strings.Builder
+// 	if query.Visibility == model.PublicVisibility || query.Visibility == model.PrivateVisibility {
+// 		finalQuery.WriteString(fmt.Sprintf(listProjectsQuery, `AND p."visibility" = @visibility;`))
+// 	} else {
+// 		finalQuery.WriteString(fmt.Sprintf(listProjectsQuery, ";"))
+// 	}
 
-	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{
-		"orgId":      query.OrgId,
-		"visibility": query.Visibility,
-	})
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
-		return nil, err
-	}
-	defer rows.Close()
+// 	rows, err := store.Conn.Query(ctx, finalQuery.String(), pgx.NamedArgs{
+// 		"orgId":      query.OrgId,
+// 		"visibility": query.Visibility,
+// 	})
+// 	if err != nil {
+// 		fmt.Fprintf(os.Stderr, "[LIST] failed: %v\n", err)
+// 		return nil, err
+// 	}
+// 	defer rows.Close()
 
-	var projectList []*model.Project = []*model.Project{}
+// 	var projectList []*model.Project = []*model.Project{}
 
-	for rows.Next() {
-		var project model.Project
-		err := rows.Scan(
-			&project.Id,
-			&project.ScopeId,
-			&project.OrgId,
-			&project.WorkspaceId,
-			&project.OrgScopeId,
-			&project.WorkspaceScopeId,
-			&project.Name,
-			&project.Description,
-			&project.Visibility,
-			&project.CreatedAt,
-			&project.CreatedBy,
-			&project.UpdatedAt,
-			&project.UpdatedBy,
-		)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
-			return nil, err
-		}
+// 	for rows.Next() {
+// 		var project model.Project
+// 		err := rows.Scan(
+// 			&project.Id,
+// 			&project.ScopeId,
+// 			&project.OrgId,
+// 			&project.WorkspaceId,
+// 			&project.OrgScopeId,
+// 			&project.WorkspaceScopeId,
+// 			&project.Name,
+// 			&project.Description,
+// 			&project.Visibility,
+// 			&project.CreatedAt,
+// 			&project.CreatedBy,
+// 			&project.UpdatedAt,
+// 			&project.UpdatedBy,
+// 		)
+// 		if err != nil {
+// 			fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+// 			return nil, err
+// 		}
 
-		projectList = append(projectList, &project)
-	}
+// 		projectList = append(projectList, &project)
+// 	}
 
-	if err := rows.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
-		return nil, err
-	}
+// 	if err := rows.Err(); err != nil {
+// 		fmt.Fprintf(os.Stderr, "[LIST]: Rows failed: %v\n", err)
+// 		return nil, err
+// 	}
 
-	return projectList, nil
-}
+// 	return projectList, nil
+// }
 
 // /// GetUserAssignmentList
 
