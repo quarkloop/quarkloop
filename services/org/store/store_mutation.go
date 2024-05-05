@@ -97,7 +97,7 @@ SET
     "updatedAt"   = @updatedAt,
     "updatedBy"   = @updatedBy
 WHERE
-    "id" = @id;
+    "id" = @orgId;
 `
 
 type UpdateOrgByIdCommand struct {
@@ -111,7 +111,7 @@ type UpdateOrgByIdCommand struct {
 
 func (store *orgStore) UpdateOrgById(ctx context.Context, cmd *UpdateOrgByIdCommand) error {
 	commandTag, err := store.Conn.Exec(ctx, updateOrgByIdMutation, pgx.NamedArgs{
-		"id":          cmd.OrgId,
+		"orgId":       cmd.OrgId,
 		"sid":         cmd.ScopeId,
 		"name":        cmd.Name,
 		"description": cmd.Description,
@@ -139,7 +139,7 @@ const deleteOrgByIdMutation = `
 DELETE FROM
     "system"."Org"
 WHERE
-    "id" = @id;
+    "id" = @orgId;
 `
 
 type DeleteOrgByIdCommand struct {
@@ -147,7 +147,7 @@ type DeleteOrgByIdCommand struct {
 }
 
 func (store *orgStore) DeleteOrgById(ctx context.Context, cmd *DeleteOrgByIdCommand) error {
-	commandTag, err := store.Conn.Exec(ctx, deleteOrgByIdMutation, pgx.NamedArgs{"id": cmd.OrgId})
+	commandTag, err := store.Conn.Exec(ctx, deleteOrgByIdMutation, pgx.NamedArgs{"orgId": cmd.OrgId})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
 		return err
@@ -156,6 +156,46 @@ func (store *orgStore) DeleteOrgById(ctx context.Context, cmd *DeleteOrgByIdComm
 	if commandTag.RowsAffected() != 1 {
 		notFoundErr := errors.New("cannot find to delete")
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", notFoundErr)
+		return notFoundErr
+	}
+
+	return nil
+}
+
+/// ChangeOrgVisibility
+
+const changeOrgVisibilityMutation = `
+UPDATE
+    "system"."Org"
+SET
+    "visibility"  = COALESCE (NULLIF(@visibility, ''), "visibility"),
+    "updatedAt"   = @updatedAt,
+    "updatedBy"   = @updatedBy
+WHERE
+    "id" = @orgId;
+`
+
+type ChangeOrgVisibilityCommand struct {
+	UpdatedBy  string
+	OrgId      int64
+	Visibility model.ScopeVisibility
+}
+
+func (store *orgStore) ChangeOrgVisibility(ctx context.Context, cmd *ChangeOrgVisibilityCommand) error {
+	commandTag, err := store.Conn.Exec(ctx, changeOrgVisibilityMutation, pgx.NamedArgs{
+		"orgId":      cmd.OrgId,
+		"visibility": cmd.Visibility,
+		"updatedBy":  cmd.UpdatedBy,
+		"updatedAt":  time.Now(),
+	})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", err)
+		return orgErrors.HandleError(err)
+	}
+
+	if commandTag.RowsAffected() != 1 {
+		notFoundErr := errors.New("cannot find to update")
+		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", notFoundErr)
 		return notFoundErr
 	}
 
