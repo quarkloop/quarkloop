@@ -21,6 +21,7 @@ type OrgStore interface {
 	CreateOrg(context.Context, *CreateOrgCommand) (*model.Org, error)
 	UpdateOrgById(context.Context, *UpdateOrgByIdCommand) error
 	DeleteOrgById(context.Context, *DeleteOrgByIdCommand) error
+	ChangeOrgVisibility(context.Context, *ChangeOrgVisibilityCommand) error
 }
 
 type orgStore struct {
