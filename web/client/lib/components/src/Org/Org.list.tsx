@@ -7,7 +7,7 @@ import { Button } from "@/ui/primitives";
 import { DataTableV3 } from "@/components/DataTable";
 
 import { columns } from "./Org.list.columns";
-import { useGetOrgsQuery, useCreateOrgMutation } from "./Org.endpoint";
+import { useGetOrgsQuery, useCreateOrgMutation } from "./Org.net.client";
 import { OrgCreateFormData } from "./Org.create.form";
 import { OrgCreateModal } from "./Org.create.modal";
 
