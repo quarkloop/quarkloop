@@ -9,7 +9,7 @@ import {
     IconUserCircle,
     IconUsers,
 } from "@tabler/icons-react";
-import { Role } from "@/components/Auth";
+import { Role } from "@/components/Utils";
 
 type SideBarLinkType = "user" | "org" | "workspace";
 
@@ -82,7 +82,6 @@ const workspaces: SideBarLink = {
 const manage: SideBarLink = {
     label: "Manage",
     priority: 9,
-    href: "members",
     icon: (
         <IconUsers
             size="1.3rem"
@@ -353,24 +352,9 @@ export class OrgSideBarLink implements LinkBase {
 
     public links(): SideBarLink[] {
         let links = [
-            // {
-            //     label: "Dashboard",
-            //     priority: 1,
-            //     href: "dashboard",
-            //     icon: (
-            //         <IconPlaceholder
-            //             size="1.3rem"
-            //             stroke={1.5}
-            //         />
-            //     ),
-            //     sublinks: [],
-            // },
             {
                 ...workspaces,
-                sublinks: workspaces.sublinks.map((link) => ({
-                    ...link,
-                    href: `${this.href}/${link.href}`,
-                })),
+                href: `${this.href}/workspaces`,
             },
             {
                 ...manage,
@@ -381,7 +365,7 @@ export class OrgSideBarLink implements LinkBase {
             },
         ];
 
-        if (this.role && this.role === Role.RoleOwner) {
+        if (this.role && this.role === "owner") {
             links = [
                 ...links,
                 {
@@ -416,17 +400,9 @@ export class WorkspaceSideBarLink implements LinkBase {
     }
 
     public links(): SideBarLink[] {
-        let links = [
-            {
-                ...manage,
-                sublinks: manage.sublinks.map((link) => ({
-                    ...link,
-                    href: `${this.href}/${link.href}`,
-                })),
-            },
-        ];
+        let links = [manage];
 
-        if (this.role && this.role === Role.RoleOwner) {
+        if (this.role && this.role === "owner") {
             links = [
                 ...links,
                 {
