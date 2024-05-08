@@ -2,7 +2,7 @@
 
 import { HTMLAttributes, useCallback, useMemo } from "react";
 
-import { useGetOrgByIdQuery, useUpdateOrgByIdMutation } from "./Org.endpoint";
+import { useGetOrgByIdQuery, useUpdateOrgByIdMutation } from "./Org.net.client";
 import {
     OrgGeneralSettingsForm,
     OrgGeneralSettingsFormData,
