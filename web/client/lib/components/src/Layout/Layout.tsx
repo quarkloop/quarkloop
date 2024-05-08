@@ -1,7 +1,7 @@
-import { Role } from "@/components/Auth";
-import { getUserAccess } from "@/components/Auth/Role/server";
+import { Role } from "@/components/Utils";
+import { getUserAccess } from "@/components/Auth/server";
 
-import { Header } from "./Layout.Header";
+import { Header } from "./Layout.header";
 import { Sidebar } from "./Layout.sidebar";
 import { getLinks } from "./Layout.links";
 
