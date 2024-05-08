@@ -7,6 +7,7 @@ import (
 
 	"github.com/quarkloop/quarkloop/pkg/api"
 	"github.com/quarkloop/quarkloop/pkg/model"
+	"github.com/quarkloop/quarkloop/services/user"
 )
 
 // GET /orgs/:orgSid
@@ -113,6 +114,10 @@ func (s *orgApi) GetWorkspaceList(ctx *gin.Context) {
 type GetMemberListQuery struct {
 	OrgSid string `uri:"orgSid" binding:"required,sid"`
 	OrgId  int64  `uri:"-"`
+}
+
+type GetMemberListDTO struct {
+	Data []*user.MemberDTO `json:"data" binding:"required"`
 }
 
 func (s *orgApi) GetMemberList(ctx *gin.Context) {
