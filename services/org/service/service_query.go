@@ -17,10 +17,13 @@ import (
 func (s *orgService) GetOrgId(ctx context.Context, query *grpc.GetOrgIdQuery) (*grpc.GetOrgIdReply, error) {
 	orgId, err := s.store.GetOrgId(ctx, query.OrgSid)
 	if err != nil {
-		if err == errors.ErrOrgNotFound {
+		switch err {
+		case errors.ErrOrgNotFound:
 			return nil, status.Errorf(codes.NotFound, err.Error())
+		case errors.ErrOrgAlreadyExists:
+			return nil, status.Errorf(codes.AlreadyExists, err.Error())
 		}
-		return nil, status.Errorf(codes.Internal, "something went wrong in server")
+		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
 	return &grpc.GetOrgIdReply{OrgId: orgId}, nil
