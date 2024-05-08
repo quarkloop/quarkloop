@@ -13,7 +13,7 @@ func (s *userService) GetUserById(ctx context.Context, query *userGrpc.GetUserBy
 		return nil, err
 	}
 
-	res := &userGrpc.GetUserByIdReply{User: u.Proto()}
+	res := &userGrpc.GetUserByIdReply{User: u.ToProto()}
 	return res, err
 }
 
