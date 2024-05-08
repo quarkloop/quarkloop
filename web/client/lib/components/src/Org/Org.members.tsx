@@ -1,14 +1,36 @@
 "use client";
 
+import { useMemo } from "react";
 import { useDisclosure } from "@mantine/hooks";
 
+import { useGetUserQuery } from "@quarkloop/lib";
 import { Button } from "@/ui/primitives";
 import { DataTableV3 } from "@/components/DataTable";
 
 import { columns } from "./Org.members.columns";
+import { useGetOrgMembersQuery } from "./Org.net.client";
+import { OrgMemberRow } from "./Org.members.schema";
 
-const OrgMemberList = () => {
-    const [opened, { open, close }] = useDisclosure(false);
+interface OrgMemberListProps {
+    orgSid: string;
+}
+
+const OrgMemberList = ({ orgSid }: OrgMemberListProps) => {
+    const { data: currentLoggedInUser } = useGetUserQuery();
+    const { data: memberList } = useGetOrgMembersQuery({ orgSid });
+
+    const data: OrgMemberRow[] = useMemo(() => {
+        if (currentLoggedInUser) {
+            const members = memberList?.data.map((member, idx) => ({
+                ...member,
+                currentLoggedInUser,
+            }));
+            return members || [];
+        }
+        return [];
+    }, [memberList, currentLoggedInUser]);
+
+    //const [opened, { open, close }] = useDisclosure(false);
 
     return (
         <div className="px-20 py-10 flex-1 flex-col gap-3 md:flex">
@@ -19,27 +41,27 @@ const OrgMemberList = () => {
                     </h2>
                     <p className="text-muted-foreground">All members</p>
                 </div>
-                <Button onClick={open}>New member</Button>
+                {/* <Button onClick={open}>New member</Button> */}
             </div>
             <DataTableV3
                 enableHeader
                 enablePagination
                 toolbar={{
-                    filterColumnName: "name",
+                    filterColumnName: "account",
                     filterColumns: [
                         {
-                            columnName: "name",
-                            columnTitle: "Name",
+                            columnName: "account",
+                            columnTitle: "Account",
                             options: [
                                 {
-                                    label: "Name",
-                                    value: "name",
+                                    label: "Account",
+                                    value: "account",
                                 },
                             ],
                         },
                     ],
                 }}
-                data={orgList || []}
+                data={data}
                 columns={columns}
             />
         </div>
