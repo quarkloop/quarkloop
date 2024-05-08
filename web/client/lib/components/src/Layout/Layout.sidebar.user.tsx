@@ -15,7 +15,7 @@ const SidebarUser = () => {
     }
 
     return (
-        <div className="px-3 py-2 flex items-center gap-3 bg-neutral-100">
+        <div className="px-3 py-2 flex items-center gap-3 bg-neutral-100 border-t border-t-neutral-200">
             <Link
                 href={`/users/${user.id}`}
                 className="basis-10 w-10 h-10 relative rounded-full bg-[#d5d5d5]">
