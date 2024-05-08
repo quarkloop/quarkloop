@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useGetOrgByIdQuery, useGetOrgUsersQuery } from "./Org.endpoint";
-import { StatusCode } from "@quarkloop/lib";
+import { useGetOrgByIdQuery, useGetOrgMembersQuery } from "./Org.net.client";
 import { Org } from "./Org.schema";
 
 //import { GetOrgUsersApiResponse } from "@quarkloop/types";
@@ -94,7 +93,7 @@ export const useGetOrgUsers = (
         isLoading,
         isError,
         isSuccess,
-    } = useGetOrgUsersQuery({ orgSid });
+    } = useGetOrgMembersQuery({ orgSid });
 
     //   useEffect(() => {
     //     if (isLoading) {
@@ -110,13 +109,13 @@ export const useGetOrgUsers = (
             return;
         }
 
-        const status = osUsersQuery.status;
-        if (status !== StatusCode.OK) {
-            // TODO: make showErrorAlert to accept error messages
-            //showErrorNotification({ message: status.details?.message });
-            //showErrorAlert(true);
-            return;
-        }
+        // const status = osUsersQuery.status;
+        // if (status !== StatusCode.OK) {
+        //     // TODO: make showErrorAlert to accept error messages
+        //     //showErrorNotification({ message: status.details?.message });
+        //     //showErrorAlert(true);
+        //     return;
+        // }
     }, [osUsersQuery]);
 
     return {
