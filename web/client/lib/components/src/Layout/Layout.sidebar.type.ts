@@ -1,4 +1,4 @@
-import { Role } from "@/components/Auth";
+import { Role } from "@/components/Utils";
 import { SideBarLink } from "./Layout.links";
 
 export interface SidebarProps {
