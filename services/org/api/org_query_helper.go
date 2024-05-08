@@ -196,23 +196,13 @@ func (s *orgApi) getMemberList(ctx *gin.Context, query *GetMemberListQuery) api.
 		}
 
 		user := user.MemberDTO{
-			User: &model.User{
-				Id:       u.User.Id,
-				Username: &u.User.Username,
-				Name:     u.User.Name,
-				Email:    u.User.Email,
-				Status:   u.User.Status,
-			},
-			Role:      ua.Role,
-			CreatedAt: ua.CreatedAt,
-			CreatedBy: ua.CreatedBy,
-			UpdatedAt: ua.UpdatedAt,
-			UpdatedBy: ua.UpdatedBy,
+			User: model.FromUserProto(u.User),
+			Role: ua.Role,
 		}
 		memberList = append(memberList, &user)
 	}
 
 	// anonymous and unauthorized user => return members of public org
 	// authorized user => return members of public or private org
-	return api.Success(http.StatusOK, &memberList)
+	return api.Success(http.StatusOK, GetMemberListDTO{Data: memberList})
 }
