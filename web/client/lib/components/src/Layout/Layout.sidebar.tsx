@@ -27,25 +27,28 @@ const Sidebar = (props: SidebarProps) => {
         return null;
     }, [orgSid, workspaceSid]);
 
-    const linkProps = useCallback((link: SideBarLink) => {
-        if (link.sublinks.length === 0) {
-            return {
-                defaultOpened: false,
-                component: Link,
-                label: link.label,
-                href: link.href || "",
-                className: pathname === link.href ? "bg-neutral-100" : "",
-            };
-        }
+    const linkProps = useCallback(
+        (link: SideBarLink) => {
+            if (link.sublinks.length === 0) {
+                return {
+                    defaultOpened: false,
+                    component: Link,
+                    label: link.label,
+                    href: link.href || "",
+                    className: pathname === link.href ? "bg-neutral-100" : "",
+                };
+            }
 
-        return {
-            defaultOpened: true,
-            component: undefined,
-            label: <p className="font-medium">{link.label}</p>,
-            href: "",
-            childrenOffset: 35,
-        };
-    }, []);
+            return {
+                defaultOpened: true,
+                component: undefined,
+                label: <p className="font-medium">{link.label}</p>,
+                href: "",
+                childrenOffset: 35,
+            };
+        },
+        [pathname]
+    );
 
     return (
         <nav className="min-h-screen h-screen sticky top-0 w-80 flex flex-col border-r border-r-neutral-200 text-sm">
@@ -54,7 +57,7 @@ const Sidebar = (props: SidebarProps) => {
             </div>
 
             {NameComponent && (
-                <div className="px-3 py-2 basis-12 max-h-12 flex flex-col border-b">
+                <div className="px-3 py-2 basis-12 max-h-12 flex flex-col border-b border-b-neutral-200">
                     {NameComponent}
                 </div>
             )}
