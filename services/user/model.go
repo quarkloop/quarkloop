@@ -22,17 +22,8 @@ type UserAssignment struct {
 }
 
 type MemberDTO struct {
-	// user
 	User *model.User `json:"user"`
-
-	// user assignment
-	Role string `json:"role"`
-
-	// history
-	CreatedAt time.Time  `json:"createdAt,omitempty"`
-	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
-	CreatedBy string     `json:"createdBy,omitempty"`
-	UpdatedBy *string    `json:"updatedBy,omitempty"`
+	Role string      `json:"role"`
 }
 
 type GetUserByIdUriParams struct {
