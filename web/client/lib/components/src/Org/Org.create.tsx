@@ -7,7 +7,7 @@ import { useForm, zodResolver } from "@mantine/form";
 
 import { Button } from "@/ui/primitives";
 import { OrgCreateForm, orgCreateFormSchema } from "./Org.create.schema";
-import { useCreateOrgMutation } from "./Org.endpoint";
+import { useCreateOrgMutation } from "./Org.net.client";
 import { orgVisibilityData } from "./Org.util";
 
 export const useOrgCreate = () => {
