@@ -1,20 +1,21 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 
 import { Button } from "@/ui/primitives";
 import { Form, FormButton, FormSegmentedControl } from "@/ui/form";
+import { visibilitySchema } from "@/components/Utils";
 
 import {
     useGetOrgByIdQuery,
     useDeleteOrgByIdMutation,
     useGetOrgWorkspaceListQuery,
     useChangeOrgVisibilityMutation,
-} from "./Org.endpoint";
+} from "./Org.net.client";
 import { orgVisibilityData } from "./Org.util";
-import { OrgVisibility, orgVisibilitySchema } from "./Org.schema";
+import { OrgVisibility } from "./Org.schema";
 import { OrgSettingsForm } from "./Org.settings.schema";
 
 const useOrgDangerZoneSettings = (orgSid: string) => {
@@ -130,7 +131,7 @@ const ChangeOrgVisibilitySettings = (props: SettingsProps) => {
             <hr />
             <Form
                 initialValues={{ visibility: org.visibility }}
-                schema={z.object({ visibility: orgVisibilitySchema })}
+                schema={z.object({ visibility: visibilitySchema })}
                 onFormSubmit={onChangeOrgVisibility}
                 className="p-3 flex justify-end gap-5">
                 <FormSegmentedControl
