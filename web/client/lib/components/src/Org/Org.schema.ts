@@ -1,21 +1,14 @@
 import { z } from "zod";
+
 import { PermissionRole, PermissionType } from "@quarkloop/types";
+import { historySchema, visibilitySchema } from "@/components/Utils";
 
-export const history = z.object({
-    createdAt: z.any(),
-    createdBy: z.string(),
-    updatedAt: z.any().optional(),
-    updatedBy: z.string().optional(),
-});
-
-export const orgVisibilitySchema = z.enum(["public", "private"]);
-
-export const orgSchema = history.merge(
+export const orgSchema = historySchema.merge(
     z.object({
         id: z.number(),
         sid: z.string(),
         name: z.string(),
-        visibility: orgVisibilitySchema,
+        visibility: visibilitySchema,
         description: z.string(),
         path: z.string(),
         createdAt: z.coerce.date().optional(),
@@ -24,7 +17,7 @@ export const orgSchema = history.merge(
 );
 
 export type Org = z.infer<typeof orgSchema>;
-export type OrgVisibility = z.infer<typeof orgVisibilitySchema>;
+export type OrgVisibility = z.infer<typeof visibilitySchema>;
 
 export interface OrgUser {
     orgSid: string | null;
