@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 
-import { useGetOrgByIdQuery } from "./Org.endpoint";
+import { useGetOrgByIdQuery } from "./Org.net.client";
 import { useOrgData } from "./Org.util";
 
 const OrgDashboard = () => {
