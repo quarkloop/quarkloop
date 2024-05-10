@@ -24,8 +24,8 @@ interface ServerLink {
 
 const serverLinks: ServerLink = {
     getWorkspaceById: {
-        query: ({ workspaceSid }: GetWorkspaceByIdApiArgs) =>
-            `http://localhost:8000/api/v1/manage/${workspaceSid}`,
+        query: ({ orgSid, workspaceSid }: GetWorkspaceByIdApiArgs) =>
+            `http://localhost:8000/api/v1/manage/${orgSid}/workspaces/${workspaceSid}`,
         queryFn: getFn,
         schema: {
             response: getWorkspaceByIdSchema,
@@ -41,16 +41,21 @@ const getWorkspaceById = async (
 };
 
 export async function getFn(link: Link, params: any): Promise<unknown | null> {
-    const res = await fetch(link.query(params), {
-        credentials: "include",
-        headers: { Cookie: cookies().toString() },
-    });
-    if (res.status !== 200) {
+    try {
+        const res = await fetch(link.query(params), {
+            credentials: "include",
+            headers: { Cookie: cookies().toString() },
+        });
+        if (res.status !== 200) {
+            return null;
+        }
+
+        const jsonBody = await res.json();
+        return await link.schema.response.parseAsync(jsonBody);
+    } catch (error) {
+        console.error(error);
         return null;
     }
-
-    const jsonBody = await res.json();
-    return await link.schema.response.parseAsync(jsonBody);
 }
 
 export { getWorkspaceById };
