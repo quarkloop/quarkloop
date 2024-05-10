@@ -33,6 +33,7 @@ const useOrgGeneralSettings = ({ orgSid }: { orgSid: string }) => {
                 sid: org?.data.sid ?? "",
                 name: org?.data.name ?? "",
                 description: org?.data.description ?? "",
+                visibility: org?.data.visibility ?? "private",
                 path: org?.data.path ?? "",
                 createdBy: org?.data.createdBy ?? "",
                 updatedBy: org?.data.updatedBy ?? "",
