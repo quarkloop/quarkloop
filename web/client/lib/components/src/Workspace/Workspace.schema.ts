@@ -11,8 +11,6 @@ export const workspaceSchema = historySchema.merge(
         visibility: visibilitySchema,
         description: z.string(),
         path: z.string(),
-        createdAt: z.coerce.date().optional(),
-        updatedAt: z.coerce.date().optional(),
     })
 );
 
