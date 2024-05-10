@@ -1,5 +1,6 @@
 import {
     IconAntenna,
+    IconApps,
     IconBox,
     IconCirclesRelation,
     IconPlaceholder,
@@ -400,9 +401,47 @@ export class WorkspaceSideBarLink implements LinkBase {
     }
 
     public links(): SideBarLink[] {
-        let links = [manage];
+        let links = [
+            {
+                label: "Contact",
+                priority: 1,
+                href: `${this.href}/about/contact`,
+                icon: (
+                    <IconApps
+                        size="1.3rem"
+                        stroke={1.5}
+                    />
+                ),
+                sublinks: [],
+            },
+            {
+                label: "Working hours",
+                priority: 1,
+                href: `${this.href}/about/working-hours`,
+                icon: (
+                    <IconApps
+                        size="1.3rem"
+                        stroke={1.5}
+                    />
+                ),
+                sublinks: [],
+            },
+            {
+                label: "Pricing",
+                priority: 1,
+                href: `${this.href}/pricing`,
+                icon: (
+                    <IconApps
+                        size="1.3rem"
+                        stroke={1.5}
+                    />
+                ),
+                sublinks: [],
+            },
+            manage,
+        ];
 
-        if (this.role && this.role === "owner") {
+        if (this.role && this.role === "admin") {
             links = [
                 ...links,
                 {
