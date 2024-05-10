@@ -40,6 +40,7 @@ const useWorkspaceGeneralSettings = (orgSid: string, workspaceSid: string) => {
                 sid: workspace?.data.sid ?? "",
                 name: workspace?.data.name ?? "",
                 description: workspace?.data.description ?? "",
+                visibility: workspace?.data.visibility ?? "private",
                 path: workspace?.data.path ?? "",
                 createdBy: workspace?.data.createdBy ?? "",
                 updatedBy: workspace?.data.updatedBy ?? "",
