@@ -14,9 +14,13 @@ import {
     DeleteWorkspaceByIdApiArgs,
     createWorkspaceApiArgsSchema,
     createWorkspaceApiResponseSchema,
-    GetWorkspacesApiResponse,
-    GetWorkspacesApiArgs,
-    getWorkspacesSchema,
+    GetUserWorkspacesApiResponse,
+    GetUserWorkspacesApiArgs,
+    getUserWorkspacesSchema,
+    GetOrgWorkspacesApiResponse,
+    GetOrgWorkspacesApiArgs,
+    getOrgWorkspacesApiResponseSchema,
+    getOrgWorkspacesApiArgsSchema,
     getWorkspaceByIdSchema,
     updateWorkspaceByIdApiArgsSchema,
     deleteWorkspaceByIdApiArgsSchema,
@@ -37,7 +41,7 @@ const endpoint = enpointApi
                 GetWorkspaceByIdApiArgs
             >({
                 query: (queryArg) => ({
-                    url: `/manage/${queryArg.orgSid}/${queryArg.workspaceSid}`,
+                    url: `/manage/${queryArg.orgSid}/workspaces/${queryArg.workspaceSid}`,
                     method: "GET",
                 }),
                 providesTags: ["workspace"],
@@ -46,10 +50,10 @@ const endpoint = enpointApi
                 },
             }),
 
-            // getWorkspaces endpoint
-            getWorkspaces: builder.query<
-                GetWorkspacesApiResponse,
-                GetWorkspacesApiArgs
+            // getUserWorkspaces endpoint
+            getUserWorkspaces: builder.query<
+                GetUserWorkspacesApiResponse,
+                GetUserWorkspacesApiArgs
             >({
                 query: (queryArg) => ({
                     url: "/manage/workspaces",
@@ -57,7 +61,23 @@ const endpoint = enpointApi
                 }),
                 providesTags: ["workspace"],
                 extraOptions: {
-                    responseSchema: getWorkspacesSchema,
+                    responseSchema: getUserWorkspacesSchema,
+                },
+            }),
+
+            // getOrgWorkspaces endpoint
+            getOrgWorkspaces: builder.query<
+                GetOrgWorkspacesApiResponse,
+                GetOrgWorkspacesApiArgs
+            >({
+                query: (queryArg) => ({
+                    url: "/manage/workspaces",
+                    method: "GET",
+                }),
+                providesTags: ["workspace"],
+                extraOptions: {
+                    argSchema: getOrgWorkspacesApiArgsSchema,
+                    responseSchema: getOrgWorkspacesApiResponseSchema,
                 },
             }),
 
@@ -146,8 +166,10 @@ const endpoint = enpointApi
 export const {
     useGetWorkspaceByIdQuery,
     useLazyGetWorkspaceByIdQuery,
-    useGetWorkspacesQuery,
-    useLazyGetWorkspacesQuery,
+    useGetUserWorkspacesQuery,
+    useLazyGetUserWorkspacesQuery,
+    useGetOrgWorkspacesQuery,
+    useLazyGetOrgWorkspacesQuery,
     useCreateWorkspaceMutation,
     useUpdateWorkspaceByIdMutation,
     useDeleteWorkspaceByIdMutation,
