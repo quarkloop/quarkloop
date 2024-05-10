@@ -3,19 +3,21 @@
 import { useMemo } from "react";
 import { z } from "zod";
 
-import {
-    Form,
-    FormButton,
-    FormInput,
-    FormSegmentedControl,
-    FormTextArea,
-} from "@/ui/form";
+import { Form, FormButton, FormInput, FormTextArea } from "@/ui/form";
 
 import { orgSchema } from "./Org.schema";
-import { orgRowSchema } from "./Org.list.schema";
 import { orgVisibilityData } from "./Org.util";
 
-export type OrgGeneralSettingsFormData = z.infer<typeof orgRowSchema>;
+const formSchema = orgSchema.omit({
+    id: true,
+    path: true,
+    createdAt: true,
+    createdBy: true,
+    updatedAt: true,
+    updatedBy: true,
+});
+
+export type OrgGeneralSettingsFormData = z.infer<typeof formSchema>;
 
 interface FormProps {
     readOnly: boolean;
@@ -26,7 +28,6 @@ interface FormProps {
 const OrgGeneralSettingsForm = (props: FormProps) => {
     const { readOnly, initialValues, onFormSubmit } = props;
 
-    const visibilityData = useMemo(orgVisibilityData, []);
     const FormStatus = useMemo(() => {
         const vis = (
             <span className="font-semibold">{initialValues.visibility}</span>
@@ -90,7 +91,7 @@ const OrgGeneralSettingsForm = (props: FormProps) => {
                         label="Org name"
                     />
                 </div>
-                <div className="flex flex-col gap-1">
+                {/* <div className="flex flex-col gap-1">
                     <div className="font-medium text-sm">Visibility</div>
                     <div className="flex gap-4">
                         <FormSegmentedControl
@@ -112,7 +113,7 @@ const OrgGeneralSettingsForm = (props: FormProps) => {
                             </p>
                         </div>
                     </div>
-                </div>
+                </div> */}
                 <FormTextArea
                     autosize
                     required
