@@ -91,12 +91,28 @@ export type GetWorkspaceMembersApiResponse = z.infer<
     typeof getWorkspaceMembersApiResponseSchema
 >;
 
-/// GetWorkspaces
-export const getWorkspacesSchema = z.object({
+/// GetUserWorkspaces
+export const getUserWorkspacesSchema = z.object({
     data: z.array(workspaceSchema),
 });
-export type GetWorkspacesApiArgs = void;
-export type GetWorkspacesApiResponse = z.infer<typeof getWorkspacesSchema>;
+export type GetUserWorkspacesApiArgs = void;
+export type GetUserWorkspacesApiResponse = z.infer<
+    typeof getUserWorkspacesSchema
+>;
+
+/// GetOrgWorkspaces
+export const getOrgWorkspacesApiArgsSchema = z.object({
+    orgSid: z.string(),
+});
+export type GetOrgWorkspacesApiArgs = z.infer<
+    typeof getOrgWorkspacesApiArgsSchema
+>;
+export const getOrgWorkspacesApiResponseSchema = z.object({
+    data: z.array(workspaceSchema),
+});
+export type GetOrgWorkspacesApiResponse = z.infer<
+    typeof getOrgWorkspacesApiResponseSchema
+>;
 
 /// GetWorkspacesByUserId
 export const getWorkspacesByUserIdSchema = apiResponseV2Schema.merge(
