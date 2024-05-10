@@ -4,10 +4,10 @@ import React from "react";
 import Link from "next/link";
 import { Skeleton } from "@mantine/core";
 
-import { useGetWorkspaceByIdQuery } from "@quarkloop/lib";
 import { useGetOrgByIdQuery } from "@/components/Org";
+import { useGetWorkspaceByIdQuery } from "@/components/Workspace";
 
-const Name = ({ href }: any) => {
+const Name = ({ href }: { href: string }) => {
     return (
         <Link
             href={href}
@@ -17,7 +17,7 @@ const Name = ({ href }: any) => {
     );
 };
 
-const Org = ({ orgSid }: any) => {
+const Org = ({ orgSid }: { orgSid: string }) => {
     const { data: orgData } = useGetOrgByIdQuery({ orgSid: orgSid });
 
     if (orgData?.data == null) {
@@ -26,8 +26,17 @@ const Org = ({ orgSid }: any) => {
     return <Name href={orgData.data.path} />;
 };
 
-const Workspace = ({ workspaceSid }: any) => {
-    const { data: wsData } = useGetWorkspaceByIdQuery({ id: workspaceSid });
+const Workspace = ({
+    orgSid,
+    workspaceSid,
+}: {
+    orgSid: string;
+    workspaceSid: string;
+}) => {
+    const { data: wsData } = useGetWorkspaceByIdQuery({
+        orgSid,
+        workspaceSid,
+    });
 
     if (wsData?.data == null) {
         return <NameSkeleton />;
