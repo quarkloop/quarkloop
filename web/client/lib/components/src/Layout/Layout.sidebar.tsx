@@ -15,12 +15,18 @@ import { Org, Workspace } from "./Layout.sidebar.component";
 const Sidebar = (props: SidebarProps) => {
     const { links } = props;
 
-    const { orgSid, workspaceSid } = useParams();
+    const { orgSid, workspaceSid }: { orgSid: string; workspaceSid: string } =
+        useParams();
     const pathname = usePathname();
 
     const NameComponent = useMemo(() => {
         if (workspaceSid) {
-            return <Workspace workspaceSid={workspaceSid} />;
+            return (
+                <Workspace
+                    orgSid={orgSid}
+                    workspaceSid={workspaceSid}
+                />
+            );
         } else if (orgSid) {
             return <Org orgSid={orgSid} />;
         }
@@ -62,7 +68,7 @@ const Sidebar = (props: SidebarProps) => {
                 </div>
             )}
 
-            <div className="flex-1 flex flex-col gap-1 overflow-y-auto">
+            <div className="flex-1 flex flex-col overflow-y-auto">
                 {links.map((link, idx) => (
                     <NavLink
                         key={idx}
