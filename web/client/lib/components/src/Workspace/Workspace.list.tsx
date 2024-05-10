@@ -8,7 +8,7 @@ import { DataTableV3 } from "@/components/DataTable";
 
 import { columns } from "./Workspace.list.columns";
 import {
-    useGetWorkspacesQuery,
+    useGetOrgWorkspacesQuery,
     useCreateWorkspaceMutation,
 } from "./Workspace.net.client";
 import { WorkspaceCreateFormData } from "./Workspace.create.form";
@@ -21,7 +21,7 @@ interface WorkspaceListProps {
 const WorkspaceList = ({ orgSid }: WorkspaceListProps) => {
     const [opened, { open, close }] = useDisclosure(false);
 
-    const { data: workspaceData } = useGetWorkspacesQuery();
+    const { data: workspaceData } = useGetOrgWorkspacesQuery({ orgSid });
     const [createWorkspace] = useCreateWorkspaceMutation();
 
     const onCreateClick = useCallback(async (data: WorkspaceCreateFormData) => {
