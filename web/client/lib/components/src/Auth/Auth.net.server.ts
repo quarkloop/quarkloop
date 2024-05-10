@@ -20,15 +20,21 @@ const url = {
 export async function getUserAccess(
     params: GetUserAccessApiArgs
 ): Promise<Role | null> {
-    const res = await fetch(url.userAccess(params), {
-        credentials: "include",
-        headers: { Cookie: cookies().toString() },
-    });
-    if (res.status !== 200 && res.status !== 404) {
-        throw new Error("Failed to fetch user access data");
-    }
+    try {
+        const res = await fetch(url.userAccess(params), {
+            credentials: "include",
+            headers: { Cookie: cookies().toString() },
+            cache: "no-store",
+        });
+        if (res.status !== 200 && res.status !== 404) {
+            return null;
+        }
 
-    const jsonBody = await res.json();
-    const role = await getUserAccessApiResponseSchema.parseAsync(jsonBody);
-    return role as Role | null;
+        const jsonBody = await res.json();
+        const role = await getUserAccessApiResponseSchema.parseAsync(jsonBody);
+        return role as Role | null;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
 }
