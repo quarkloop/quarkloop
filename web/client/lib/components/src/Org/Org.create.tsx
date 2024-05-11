@@ -6,24 +6,22 @@ import { SegmentedControl, Textarea, TextInput } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 
 import { Button } from "@/ui/primitives";
-import { OrgCreateForm, orgCreateFormSchema } from "./Org.create.schema";
 import { useCreateOrgMutation } from "./Org.net.client";
 import { orgVisibilityData } from "./Org.util";
+import { OrgCreateFormData } from "./Org.create.form";
+import { mutationOrgFormSchema } from "./Org.schema";
 
 export const useOrgCreate = () => {
-    const router = useRouter();
-
     const [createOrg] = useCreateOrgMutation();
     const onCreateOrg = useCallback(
-        async (data: OrgCreateForm) => {
+        async (data: OrgCreateFormData) => {
             try {
                 const org = await createOrg({ payload: data }).unwrap();
-                router.push(`/manage/${org.data.sid}`);
             } catch (error) {
                 console.error("[onCreateOrg] error:", error);
             }
         },
-        [createOrg, router]
+        [createOrg]
     );
 
     return {
@@ -34,9 +32,9 @@ export const useOrgCreate = () => {
 const OrgCreate = forwardRef<HTMLFormElement>((_, ref) => {
     const { onCreateOrg } = useOrgCreate();
 
-    const form = useForm<OrgCreateForm>({
-        validate: zodResolver(orgCreateFormSchema),
-        transformValues: (value) => orgCreateFormSchema.parse(value),
+    const form = useForm<OrgCreateFormData>({
+        validate: zodResolver(mutationOrgFormSchema),
+        transformValues: (value) => mutationOrgFormSchema.parse(value),
         initialValues: {
             sid: "",
             name: "",
