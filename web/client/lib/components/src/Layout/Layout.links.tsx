@@ -60,8 +60,8 @@ const org: SideBarLink = {
     href: "/manage/orgs",
     icon: (
         <IconBox
-            size="1.3rem"
-            stroke={1.5}
+            size="1.1rem"
+            stroke={1.3}
         />
     ),
     sublinks: [],
@@ -73,8 +73,8 @@ const workspaces: SideBarLink = {
     href: "/manage/workspaces",
     icon: (
         <IconPlaceholder
-            size="1.3rem"
-            stroke={1.5}
+            size="1.1rem"
+            stroke={1.3}
         />
     ),
     sublinks: [],
@@ -85,8 +85,8 @@ const manage: SideBarLink = {
     priority: 9,
     icon: (
         <IconUsers
-            size="1.3rem"
-            stroke={1.5}
+            size="1.1rem"
+            stroke={1.3}
         />
     ),
     sublinks: [
@@ -110,8 +110,8 @@ const settings: SideBarLink = {
     priority: 10,
     icon: (
         <IconSettings
-            size="1.3rem"
-            stroke={1.5}
+            size="1.1rem"
+            stroke={1.3}
         />
     ),
     sublinks: [
@@ -153,8 +153,8 @@ const settings: SideBarLink = {
 //     priority: 1,
 //     icon: (
 //         <IconDatabase
-//             size="1.3rem"
-//             stroke={1.5}
+//             size="1.1rem"
+//             stroke={1.3}
 //         />
 //     ),
 //     sublinks: [
@@ -196,8 +196,8 @@ const settings: SideBarLink = {
 //     priority: 1,
 //     icon: (
 //         <IconCode
-//             size="1.3rem"
-//             stroke={1.5}
+//             size="1.1rem"
+//             stroke={1.3}
 //         />
 //     ),
 //     sublinks: [
@@ -221,8 +221,8 @@ const settings: SideBarLink = {
 //     priority: 1,
 //     icon: (
 //         <IconCode
-//             size="1.3rem"
-//             stroke={1.5}
+//             size="1.1rem"
+//             stroke={1.3}
 //         />
 //     ),
 //     sublinks: [
@@ -282,8 +282,8 @@ export class UserSettingsSideBarLink implements LinkBase {
                 href: `${this.href}/profile`,
                 icon: (
                     <IconUser
-                        size="1.3rem"
-                        stroke={1.5}
+                        size="1.1rem"
+                        stroke={1.3}
                     />
                 ),
                 sublinks: [],
@@ -294,8 +294,8 @@ export class UserSettingsSideBarLink implements LinkBase {
                 href: `${this.href}/account`,
                 icon: (
                     <IconUserCircle
-                        size="1.3rem"
-                        stroke={1.5}
+                        size="1.1rem"
+                        stroke={1.3}
                     />
                 ),
                 sublinks: [],
@@ -306,8 +306,8 @@ export class UserSettingsSideBarLink implements LinkBase {
                 href: `${this.href}/linked-accounts`,
                 icon: (
                     <IconCirclesRelation
-                        size="1.3rem"
-                        stroke={1.5}
+                        size="1.1rem"
+                        stroke={1.3}
                     />
                 ),
                 sublinks: [],
@@ -318,8 +318,8 @@ export class UserSettingsSideBarLink implements LinkBase {
                 href: `${this.href}/sessions`,
                 icon: (
                     <IconAntenna
-                        size="1.3rem"
-                        stroke={1.5}
+                        size="1.1rem"
+                        stroke={1.3}
                     />
                 ),
                 sublinks: [],
@@ -330,8 +330,8 @@ export class UserSettingsSideBarLink implements LinkBase {
                 href: `${this.href}/plan`,
                 icon: (
                     <IconSquare
-                        size="1.3rem"
-                        stroke={1.5}
+                        size="1.1rem"
+                        stroke={1.3}
                     />
                 ),
                 sublinks: [],
@@ -408,8 +408,8 @@ export class WorkspaceSideBarLink implements LinkBase {
                 href: `${this.href}/about/contact`,
                 icon: (
                     <IconApps
-                        size="1.3rem"
-                        stroke={1.5}
+                        size="1.1rem"
+                        stroke={1.3}
                     />
                 ),
                 sublinks: [],
@@ -420,8 +420,8 @@ export class WorkspaceSideBarLink implements LinkBase {
                 href: `${this.href}/about/working-hours`,
                 icon: (
                     <IconApps
-                        size="1.3rem"
-                        stroke={1.5}
+                        size="1.1rem"
+                        stroke={1.3}
                     />
                 ),
                 sublinks: [],
@@ -432,13 +432,19 @@ export class WorkspaceSideBarLink implements LinkBase {
                 href: `${this.href}/pricing`,
                 icon: (
                     <IconApps
-                        size="1.3rem"
-                        stroke={1.5}
+                        size="1.1rem"
+                        stroke={1.3}
                     />
                 ),
                 sublinks: [],
             },
-            manage,
+            {
+                ...manage,
+                sublinks: manage.sublinks.map((link) => ({
+                    ...link,
+                    href: `${this.href}/${link.href}`,
+                })),
+            },
         ];
 
         if (this.role && this.role === "admin") {
