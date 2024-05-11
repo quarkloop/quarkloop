@@ -5,19 +5,9 @@ import { z } from "zod";
 
 import { Form, FormButton, FormInput, FormTextArea } from "@/ui/form";
 
-import { orgSchema } from "./Org.schema";
-import { orgVisibilityData } from "./Org.util";
+import { mutationOrgFormSchema, orgSchema } from "./Org.schema";
 
-const formSchema = orgSchema.omit({
-    id: true,
-    path: true,
-    createdAt: true,
-    createdBy: true,
-    updatedAt: true,
-    updatedBy: true,
-});
-
-export type OrgGeneralSettingsFormData = z.infer<typeof formSchema>;
+export type OrgGeneralSettingsFormData = z.infer<typeof mutationOrgFormSchema>;
 
 interface FormProps {
     readOnly: boolean;
