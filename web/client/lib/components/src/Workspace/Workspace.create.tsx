@@ -6,19 +6,18 @@ import { SegmentedControl, Textarea, TextInput } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 
 import { Button } from "@/ui/primitives";
-import {
-    WorkspaceCreateForm,
-    workspaceCreateFormSchema,
-} from "./Workspace.create.schema";
-import { useCreateWorkspaceMutation } from "./Workspace.net.client";
 import { visibilityData } from "@/components/Utils";
+
+import { mutationFormSchema } from "./Workspace.schema";
+import { WorkspaceCreateFormData } from "./Workspace.create.form";
+import { useCreateWorkspaceMutation } from "./Workspace.net.client";
 
 export const useWorkspaceCreate = (orgSid: string) => {
     const router = useRouter();
 
     const [createWorkspace] = useCreateWorkspaceMutation();
     const onCreateWorkspace = useCallback(
-        async (data: WorkspaceCreateForm) => {
+        async (data: WorkspaceCreateFormData) => {
             try {
                 const workspace = await createWorkspace({
                     orgSid,
@@ -46,9 +45,9 @@ const WorkspaceCreate = forwardRef<HTMLFormElement, WorkspaceCreateProps>(
         const { orgSid } = props;
         const { onCreateWorkspace } = useWorkspaceCreate(orgSid);
 
-        const form = useForm<WorkspaceCreateForm>({
-            validate: zodResolver(workspaceCreateFormSchema),
-            transformValues: (value) => workspaceCreateFormSchema.parse(value),
+        const form = useForm<WorkspaceCreateFormData>({
+            validate: zodResolver(mutationFormSchema),
+            transformValues: (value) => mutationFormSchema.parse(value),
             initialValues: {
                 sid: "",
                 name: "",

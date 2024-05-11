@@ -13,6 +13,7 @@ import {
 } from "./Workspace.net.client";
 import { WorkspaceCreateFormData } from "./Workspace.create.form";
 import { WorkspaceCreateModal } from "./Workspace.create.modal";
+import { WorkspaceRow } from "./Workspace.list.schema";
 
 interface WorkspaceListProps {
     orgSid: string;
@@ -37,7 +38,12 @@ const WorkspaceList = ({ orgSid }: WorkspaceListProps) => {
             console.error("[onCreateClick] error:", error);
         }
     }, []);
-    const workspaceList = useMemo(() => workspaceData?.data, [workspaceData]);
+    const workspaceList: WorkspaceRow[] | undefined = useMemo(() => {
+        return workspaceData?.data.map((ws, idx) => ({
+            ...ws,
+            orgSid,
+        }));
+    }, [workspaceData]);
 
     return (
         <div className="px-20 py-10 flex-1 flex-col gap-3 md:flex">
@@ -59,21 +65,21 @@ const WorkspaceList = ({ orgSid }: WorkspaceListProps) => {
             <DataTableV3
                 enableHeader
                 enablePagination
-                toolbar={{
-                    filterColumnName: "name",
-                    filterColumns: [
-                        {
-                            columnName: "name",
-                            columnTitle: "Name",
-                            options: [
-                                {
-                                    label: "Name",
-                                    value: "name",
-                                },
-                            ],
-                        },
-                    ],
-                }}
+                // toolbar={{
+                //     filterColumnName: "name",
+                //     filterColumns: [
+                //         {
+                //             columnName: "name",
+                //             columnTitle: "Name",
+                //             options: [
+                //                 {
+                //                     label: "Name",
+                //                     value: "name",
+                //                 },
+                //             ],
+                //         },
+                //     ],
+                // }}
                 data={workspaceList || []}
                 columns={columns}
             />

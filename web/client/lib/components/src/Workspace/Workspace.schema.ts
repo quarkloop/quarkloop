@@ -17,6 +17,15 @@ export const workspaceSchema = historySchema.merge(
 export type Workspace = z.infer<typeof workspaceSchema>;
 export type WorkspaceVisibility = z.infer<typeof visibilitySchema>;
 
+export const mutationFormSchema = workspaceSchema.omit({
+    id: true,
+    path: true,
+    createdAt: true,
+    createdBy: true,
+    updatedAt: true,
+    updatedBy: true,
+});
+
 // export interface WorkspaceUser {
 //     workspaceSid: string | null;
 //     type: PermissionType;

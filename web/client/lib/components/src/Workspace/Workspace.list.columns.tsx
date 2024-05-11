@@ -17,7 +17,7 @@ import {
     DropdownMenuTrigger,
 } from "@/ui/primitives";
 import { DataTableV3ColumnHeader } from "@/components/DataTable";
-import { WorkspaceRow, workspaceRowSchema } from "./Workspace.list.schema";
+import { WorkspaceRow } from "./Workspace.list.schema";
 import { useWorkspaceData } from "./Workspace.util";
 
 interface CellProps extends HTMLAttributes<HTMLDivElement> {
@@ -92,7 +92,7 @@ export const Cell = (props: CellProps) => {
             {...rest}>
             <div className="flex items-center gap-4">
                 <Link
-                    href={`/manage/${rowData.sid}`}
+                    href={`/manage/${row.original.orgSid}/${rowData.sid}`}
                     className="flex items-center text-base font-semibold hover:text-neutral-700">
                     {rowData.name}
                 </Link>
@@ -110,7 +110,7 @@ export const Cell = (props: CellProps) => {
 
 export const columns: ColumnDef<WorkspaceRow>[] = [
     {
-        accessorKey: "workspaceRow",
+        accessorKey: "workspace",
         header: ({ column }) => (
             <DataTableV3ColumnHeader
                 column={column}
@@ -118,9 +118,6 @@ export const columns: ColumnDef<WorkspaceRow>[] = [
             />
         ),
         cell: ({ row }) => <Cell row={row} />,
-        filterFn: (row, id, value) => {
-            return value.includes(row.getValue(id));
-        },
         enableSorting: false,
         enableHiding: false,
     },

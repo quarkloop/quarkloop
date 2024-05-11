@@ -22,14 +22,10 @@ const WorkspaceCreateModal = (props: WorkspaceCreateModalProps) => {
     const initialValues = useMemo(
         () =>
             ({
-                id: initialValue?.id ?? 0,
                 sid: initialValue?.sid ?? "",
                 name: initialValue?.name ?? "",
                 description: initialValue?.description ?? "",
                 visibility: initialValue?.visibility ?? "private",
-                path: initialValue?.path ?? "",
-                createdBy: initialValue?.createdBy ?? "",
-                updatedBy: initialValue?.updatedBy ?? "",
             } as WorkspaceCreateFormData),
         [initialValue]
     );

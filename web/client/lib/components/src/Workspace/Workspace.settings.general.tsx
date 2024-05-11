@@ -36,7 +36,6 @@ const useWorkspaceGeneralSettings = (orgSid: string, workspaceSid: string) => {
     const initialValues = useMemo(
         () =>
             ({
-                id: workspace?.data.id ?? 0,
                 sid: workspace?.data.sid ?? "",
                 name: workspace?.data.name ?? "",
                 description: workspace?.data.description ?? "",

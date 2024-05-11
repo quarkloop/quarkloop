@@ -5,18 +5,11 @@ import { z } from "zod";
 
 import { Form, FormButton, FormInput, FormTextArea } from "@/ui/form";
 
-import { workspaceSchema } from "./Workspace.schema";
+import { mutationFormSchema } from "./Workspace.schema";
 
-const formSchema = workspaceSchema.omit({
-    id: true,
-    path: true,
-    createdAt: true,
-    createdBy: true,
-    updatedAt: true,
-    updatedBy: true,
-});
-
-export type WorkspaceGeneralSettingsFormData = z.infer<typeof formSchema>;
+export type WorkspaceGeneralSettingsFormData = z.infer<
+    typeof mutationFormSchema
+>;
 
 interface FormProps {
     readOnly: boolean;
@@ -39,7 +32,7 @@ const WorkspaceGeneralSettingsForm = (props: FormProps) => {
     return (
         <Form
             initialValues={initialValues}
-            schema={formSchema}
+            schema={mutationFormSchema}
             onFormSubmit={onFormSubmit}
             className="py-3 flex-1 flex flex-col gap-4">
             <div className="border-t border-t-neutral-200" />

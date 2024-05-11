@@ -12,10 +12,9 @@ import {
 } from "@/ui/form";
 import { visibilityData } from "@/components/Utils";
 
-import { workspaceSchema } from "./Workspace.schema";
-import { workspaceRowSchema } from "./Workspace.list.schema";
+import { mutationFormSchema } from "./Workspace.schema";
 
-export type WorkspaceCreateFormData = z.infer<typeof workspaceRowSchema>;
+export type WorkspaceCreateFormData = z.infer<typeof mutationFormSchema>;
 
 interface FormProps {
     readOnly: boolean;
@@ -40,7 +39,7 @@ const WorkspaceCreateForm = (props: FormProps) => {
     return (
         <Form
             initialValues={initialValues}
-            schema={workspaceSchema}
+            schema={mutationFormSchema}
             onFormSubmit={onFormSubmit}
             className="py-3 flex-1 flex flex-col gap-4">
             <div className="border-t border-t-neutral-200" />
