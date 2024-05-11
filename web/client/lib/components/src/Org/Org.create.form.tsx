@@ -11,11 +11,10 @@ import {
     FormTextArea,
 } from "@/ui/form";
 
-import { orgSchema } from "./Org.schema";
-import { orgRowSchema } from "./Org.list.schema";
+import { mutationOrgFormSchema, orgSchema } from "./Org.schema";
 import { orgVisibilityData } from "./Org.util";
 
-export type OrgCreateFormData = z.infer<typeof orgRowSchema>;
+export type OrgCreateFormData = z.infer<typeof mutationOrgFormSchema>;
 
 interface FormProps {
     readOnly: boolean;
