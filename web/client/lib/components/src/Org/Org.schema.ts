@@ -19,15 +19,24 @@ export const orgSchema = historySchema.merge(
 export type Org = z.infer<typeof orgSchema>;
 export type OrgVisibility = z.infer<typeof visibilitySchema>;
 
-export interface OrgUser {
-    orgSid: string | null;
-    type: PermissionType;
-    role: PermissionRole;
-    createdAt: Date;
-    user: {
-        id: string;
-        name: string | null;
-        email: string;
-        image: string | null;
-    };
-}
+export const mutationOrgFormSchema = orgSchema.omit({
+    id: true,
+    path: true,
+    createdAt: true,
+    createdBy: true,
+    updatedAt: true,
+    updatedBy: true,
+});
+
+// export interface OrgUser {
+//     orgSid: string | null;
+//     type: PermissionType;
+//     role: PermissionRole;
+//     createdAt: Date;
+//     user: {
+//         id: string;
+//         name: string | null;
+//         email: string;
+//         image: string | null;
+//     };
+// }
