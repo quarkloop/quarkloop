@@ -7,12 +7,21 @@ import { Skeleton } from "@mantine/core";
 import { useGetOrgByIdQuery } from "@/components/Org";
 import { useGetWorkspaceByIdQuery } from "@/components/Workspace";
 
-const Name = ({ href }: { href: string }) => {
+interface NameProps {
+    type: "Organization" | "Workspace";
+    label: string;
+    href: string;
+}
+
+const Name = (props: NameProps) => {
+    const { type, label, href } = props;
     return (
         <Link
             href={href}
-            className="flex-1 px-2 flex items-center rounded-lg hover:bg-neutral-100">
-            Overview
+            className="px-3 flex-1 flex items-center gap-2 hover:bg-neutral-100">
+            <div className="font-medium">{label}</div>
+            <div className="text-neutral-500">|</div>
+            <div className="text-xs text-neutral-500">{type}</div>
         </Link>
     );
 };
@@ -23,7 +32,13 @@ const Org = ({ orgSid }: { orgSid: string }) => {
     if (orgData?.data == null) {
         return <NameSkeleton />;
     }
-    return <Name href={orgData.data.path} />;
+    return (
+        <Name
+            type="Organization"
+            label={orgData.data.name}
+            href={orgData.data.path}
+        />
+    );
 };
 
 const Workspace = ({
@@ -41,16 +56,21 @@ const Workspace = ({
     if (wsData?.data == null) {
         return <NameSkeleton />;
     }
-    return <Name href={wsData.data.path} />;
+    return (
+        <Name
+            type="Workspace"
+            label={wsData.data.name}
+            href={wsData.data.path}
+        />
+    );
 };
 
 const NameSkeleton = () => (
-    <div className="flex-1 p-2">
-        <Skeleton
-            height={"100%"}
-            radius="lg"
-        />
-    </div>
+    <Skeleton
+        height="100%"
+        radius={0}
+        style={{ flex: 1 }}
+    />
 );
 
 export { Org, Workspace };
