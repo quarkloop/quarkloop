@@ -63,7 +63,7 @@ const Sidebar = (props: SidebarProps) => {
             </div>
 
             {NameComponent && (
-                <div className="px-3 py-2 basis-12 max-h-12 flex flex-col border-b border-b-neutral-200">
+                <div className="basis-12 max-h-12 flex flex-col border-b border-b-neutral-200">
                     {NameComponent}
                 </div>
             )}
