@@ -41,7 +41,10 @@ const Sidebar = (props: SidebarProps) => {
                     component: Link,
                     label: link.label,
                     href: link.href || "",
-                    className: pathname === link.href ? "bg-neutral-100" : "",
+                    className:
+                        pathname === link.href
+                            ? "bg-violet-100 text-violet-700 font-medium"
+                            : "",
                 };
             }
 
