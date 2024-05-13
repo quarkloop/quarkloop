@@ -19,7 +19,10 @@ const Name = (props: NameProps) => {
         <Link
             href={href}
             className="px-3 flex-1 flex items-center gap-2 hover:bg-neutral-100">
-            <div className="font-medium">{label}</div>
+            <div className="w-8 h-8 flex items-center justify-center font-medium rounded-full bg-sky-200 text-sky-700">
+                {label.charAt(0).toUpperCase()}
+            </div>
+            <div className="font-semibold">{label}</div>
             <div className="text-neutral-500">|</div>
             <div className="text-xs text-neutral-500">{type}</div>
         </Link>
