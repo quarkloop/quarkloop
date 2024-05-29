@@ -1,6 +1,6 @@
 "use client";
 
-import { enpointApi } from "@quarkloop/lib";
+import { enpointApi } from "@/api/net";
 import {
     GetUserAccessApiResponse,
     GetUserAccessApiArgs,
