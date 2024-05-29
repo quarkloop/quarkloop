@@ -72,8 +72,8 @@ func (s *orgService) ChangeOrgVisibility(ctx context.Context, cmd *grpc.ChangeOr
 	}
 
 	err := s.store.ChangeOrgVisibility(ctx, &store.ChangeOrgVisibilityCommand{
-		OrgId:      cmd.OrgId,
 		UpdatedBy:  cmd.UpdatedBy,
+		OrgId:      cmd.OrgId,
 		Visibility: model.ScopeVisibility(cmd.Visibility),
 	})
 	return &emptypb.Empty{}, err
