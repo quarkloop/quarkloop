@@ -20,6 +20,7 @@ type WorkspaceStore interface {
 	CreateWorkspace(context.Context, *CreateWorkspaceCommand) (*model.Workspace, error)
 	UpdateWorkspaceById(context.Context, *UpdateWorkspaceByIdCommand) error
 	DeleteWorkspaceById(context.Context, *DeleteWorkspaceByIdCommand) error
+	ChangeWorkspaceVisibility(context.Context, *ChangeWorkspaceVisibilityCommand) error
 }
 
 type workspaceStore struct {
