@@ -2,11 +2,11 @@
 
 import { useMemo } from "react";
 
-import { useGetUserQuery } from "@quarkloop/lib";
+import { useGetUserQuery } from "@/components/User";
 import { DataTableV3 } from "@/components/DataTable";
 
-import { columns } from "./Workspace.members.columns";
 import { useGetWorkspaceMembersQuery } from "./Workspace.net.client";
+import { columns } from "./Workspace.members.columns";
 import { WorkspaceMemberRow } from "./Workspace.members.schema";
 
 interface WorkspaceMemberListProps {
