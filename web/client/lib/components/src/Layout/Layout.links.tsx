@@ -403,6 +403,18 @@ export class WorkspaceSideBarLink implements LinkBase {
     public links(): SideBarLink[] {
         let links = [
             {
+                label: "Quarks",
+                priority: 1,
+                href: `${this.href}/quarks`,
+                icon: (
+                    <IconApps
+                        size="1.1rem"
+                        stroke={1.3}
+                    />
+                ),
+                sublinks: [],
+            },
+            {
                 label: "Contact",
                 priority: 1,
                 href: `${this.href}/about/contact`,
