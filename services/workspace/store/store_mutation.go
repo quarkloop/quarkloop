@@ -104,7 +104,7 @@ SET
     "updatedAt"   = @updatedAt,
     "updatedBy"   = @updatedBy
 WHERE
-    "id" = @id
+    "id" = @workspaceId
 AND
     "orgId" = @orgId;
 `
@@ -123,7 +123,7 @@ type UpdateWorkspaceByIdCommand struct {
 func (store *workspaceStore) UpdateWorkspaceById(ctx context.Context, cmd *UpdateWorkspaceByIdCommand) error {
 	commandTag, err := store.Conn.Exec(ctx, updateWorkspaceByIdMutation, pgx.NamedArgs{
 		"orgId":       cmd.OrgId,
-		"id":          cmd.WorkspaceId,
+		"workspaceId": cmd.WorkspaceId,
 		"sid":         cmd.ScopeId,
 		"name":        cmd.Name,
 		"description": cmd.Description,
@@ -151,7 +151,7 @@ const deleteWorkspaceByIdMutation = `
 DELETE FROM
     "system"."Workspace"
 WHERE
-    "id" = @id
+    "id" = @workspaceId
 AND
     "orgId" = @orgId;	
 `
@@ -163,8 +163,8 @@ type DeleteWorkspaceByIdCommand struct {
 
 func (store *workspaceStore) DeleteWorkspaceById(ctx context.Context, cmd *DeleteWorkspaceByIdCommand) error {
 	commandTag, err := store.Conn.Exec(ctx, deleteWorkspaceByIdMutation, pgx.NamedArgs{
-		"id":    cmd.WorkspaceId,
-		"orgId": cmd.OrgId,
+		"workspaceId": cmd.WorkspaceId,
+		"orgId":       cmd.OrgId,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", err)
@@ -174,6 +174,51 @@ func (store *workspaceStore) DeleteWorkspaceById(ctx context.Context, cmd *Delet
 	if commandTag.RowsAffected() != 1 {
 		notFoundErr := errors.New("cannot find to delete")
 		fmt.Fprintf(os.Stderr, "[DELETE] failed: %v\n", notFoundErr)
+		return notFoundErr
+	}
+
+	return nil
+}
+
+/// ChangeWorkspaceVisibility
+
+const changeWorkspaceVisibilityMutation = `
+UPDATE
+    "system"."Workspace"
+SET
+    "visibility"  = COALESCE (NULLIF(@visibility, ''), "visibility"),
+    "updatedAt"   = @updatedAt,
+    "updatedBy"   = @updatedBy
+WHERE (
+	"id" = @workspaceId
+AND
+    "orgId" = @orgId
+);
+`
+
+type ChangeWorkspaceVisibilityCommand struct {
+	UpdatedBy   string
+	OrgId       int64
+	WorkspaceId int64
+	Visibility  model.ScopeVisibility
+}
+
+func (store *workspaceStore) ChangeWorkspaceVisibility(ctx context.Context, cmd *ChangeWorkspaceVisibilityCommand) error {
+	commandTag, err := store.Conn.Exec(ctx, changeWorkspaceVisibilityMutation, pgx.NamedArgs{
+		"orgId":       cmd.OrgId,
+		"workspaceId": cmd.WorkspaceId,
+		"visibility":  cmd.Visibility,
+		"updatedBy":   cmd.UpdatedBy,
+		"updatedAt":   time.Now(),
+	})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", err)
+		return wsErrors.HandleError(err)
+	}
+
+	if commandTag.RowsAffected() != 1 {
+		notFoundErr := errors.New("cannot find to update")
+		fmt.Fprintf(os.Stderr, "[UPDATE] failed: %v\n", notFoundErr)
 		return notFoundErr
 	}
 
