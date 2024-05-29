@@ -1,14 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import { useDisclosure } from "@mantine/hooks";
 
-import { useGetUserQuery } from "@quarkloop/lib";
-import { Button } from "@/ui/primitives";
+import { useGetUserQuery } from "@/components/User";
 import { DataTableV3 } from "@/components/DataTable";
 
-import { columns } from "./Org.members.columns";
 import { useGetOrgMembersQuery } from "./Org.net.client";
+import { columns } from "./Org.members.columns";
 import { OrgMemberRow } from "./Org.members.schema";
 
 interface OrgMemberListProps {
