@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/quarkloop/quarkloop/pkg/api"
-	"github.com/quarkloop/quarkloop/pkg/grpc/v1/system/org"
 	"github.com/quarkloop/quarkloop/pkg/model"
 )
 
@@ -64,13 +63,13 @@ func (s *orgApi) UpdateOrgById(ctx *gin.Context) {
 		return
 	}
 
-	reply, err := s.orgService.GetOrgId(ctx, &org.GetOrgIdQuery{OrgSid: uriParams.OrgSid})
+	orgId, err, errStatus := GetOrgId(ctx, s.orgService, uriParams.OrgSid)
 	if err != nil {
-		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
+		api.AbortWithStatusJSON(ctx, errStatus, err)
 		return
 	}
 
-	cmd := &UpdateOrgByIdCommand{OrgId: reply.OrgId}
+	cmd := &UpdateOrgByIdCommand{OrgId: orgId}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
 		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
@@ -104,13 +103,13 @@ func (s *orgApi) DeleteOrgById(ctx *gin.Context) {
 		return
 	}
 
-	reply, err := s.orgService.GetOrgId(ctx, &org.GetOrgIdQuery{OrgSid: uriParams.OrgSid})
+	orgId, err, errStatus := GetOrgId(ctx, s.orgService, uriParams.OrgSid)
 	if err != nil {
-		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
+		api.AbortWithStatusJSON(ctx, errStatus, err)
 		return
 	}
 
-	res := s.deleteOrgById(ctx, &DeleteOrgByIdCommand{OrgId: reply.OrgId})
+	res := s.deleteOrgById(ctx, &DeleteOrgByIdCommand{OrgId: orgId})
 	ctx.JSON(res.Status(), res.Body())
 }
 
@@ -139,13 +138,13 @@ func (s *orgApi) ChangeOrgVisibility(ctx *gin.Context) {
 		return
 	}
 
-	reply, err := s.orgService.GetOrgId(ctx, &org.GetOrgIdQuery{OrgSid: uriParams.OrgSid})
+	orgId, err, errStatus := GetOrgId(ctx, s.orgService, uriParams.OrgSid)
 	if err != nil {
-		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
+		api.AbortWithStatusJSON(ctx, errStatus, err)
 		return
 	}
 
-	cmd := &ChangeOrgVisibilityCommand{OrgId: reply.OrgId}
+	cmd := &ChangeOrgVisibilityCommand{OrgId: orgId}
 	if err := ctx.ShouldBindJSON(cmd); err != nil {
 		api.AbortWithStatusJSON(ctx, http.StatusBadRequest, err)
 		return
