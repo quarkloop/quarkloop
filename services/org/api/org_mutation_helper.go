@@ -106,17 +106,6 @@ func (s *orgApi) deleteOrgById(ctx *gin.Context, cmd *DeleteOrgByIdCommand) api.
 	return api.Success(http.StatusNoContent, nil)
 }
 
-func (s *orgApi) evaluatePermission(ctx *gin.Context, permission string, orgId int64) (bool, error) {
-	user := contextdata.GetUser(ctx)
-	query := &accesscontrol.CheckPermissionQuery{
-		Permission: permission,
-		UserId:     user.GetId(),
-		OrgId:      orgId,
-	}
-
-	return s.aclService.CheckPermission(ctx, query)
-}
-
 func (s *orgApi) changeOrgVisibility(ctx *gin.Context, cmd *ChangeOrgVisibilityCommand) api.Response {
 	// check permissions
 	access, err := s.evaluatePermission(ctx, permission.ActionOrgUpdate, cmd.OrgId)
@@ -138,4 +127,15 @@ func (s *orgApi) changeOrgVisibility(ctx *gin.Context, cmd *ChangeOrgVisibilityC
 	}
 
 	return api.Success(http.StatusOK, nil)
+}
+
+func (s *orgApi) evaluatePermission(ctx *gin.Context, permission string, orgId int64) (bool, error) {
+	user := contextdata.GetUser(ctx)
+	query := &accesscontrol.CheckPermissionQuery{
+		Permission: permission,
+		UserId:     user.GetId(),
+		OrgId:      orgId,
+	}
+
+	return s.aclService.CheckPermission(ctx, query)
 }
