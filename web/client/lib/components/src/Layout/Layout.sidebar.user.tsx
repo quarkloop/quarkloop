@@ -4,8 +4,7 @@ import Link from "next/link";
 import { Skeleton } from "@mantine/core";
 import { IconSettings } from "@tabler/icons-react";
 
-import { useGetUserQuery } from "@quarkloop/lib";
-import { UserImage } from "@/components/User";
+import { UserImage, useGetUserQuery } from "@/components/User";
 
 const SidebarUser = () => {
     const { data: user } = useGetUserQuery();
